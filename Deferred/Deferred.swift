@@ -13,7 +13,7 @@ private var DeferredDefaultQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIO
 
 public class Deferred<T> {
     typealias UponBlock = (dispatch_queue_t, T -> ())
-    typealias Protected = (value: T?, uponBlocks: [UponBlock])
+    private typealias Protected = (protectedValue: T?, uponBlocks: [UponBlock])
 
     private var protected: LockProtected<Protected>
 
@@ -29,20 +29,20 @@ public class Deferred<T> {
 
     // Check whether or not the receiver is filled
     public var isFilled: Bool {
-        return protected.withReadLock { $0.value != nil }
+        return protected.withReadLock { $0.protectedValue != nil }
     }
 
     private func _fill(value: T, assertIfFilled: Bool) {
         let (filledValue, blocks) = protected.withWriteLock { data -> (T, [UponBlock]) in
             if assertIfFilled {
-                assert(data.value == nil, "Cannot fill an already-filled Deferred")
-                data.value = value
-            } else if data.value == nil {
-                data.value = value
+                assert(data.protectedValue == nil, "Cannot fill an already-filled Deferred")
+                data.protectedValue = value
+            } else if data.protectedValue == nil {
+                data.protectedValue = value
             }
             let blocks = data.uponBlocks
             data.uponBlocks.removeAll(keepCapacity: false)
-            return (data.value!, blocks)
+            return (data.protectedValue!, blocks)
         }
         for (queue, block) in blocks {
             dispatch_async(queue) { block(filledValue) }
@@ -58,15 +58,15 @@ public class Deferred<T> {
     }
 
     public func peek() -> T? {
-        return protected.withReadLock { $0.value }
+        return protected.withReadLock { $0.protectedValue }
     }
 
     public func uponQueue(queue: dispatch_queue_t, block: T -> ()) {
         let maybeValue: T? = protected.withWriteLock{ data in
-            if data.value == nil {
+            if data.protectedValue == nil {
                 data.uponBlocks.append( (queue, block) )
             }
-            return data.value
+            return data.protectedValue
         }
         if let value = maybeValue {
             dispatch_async(queue) { block(value) }

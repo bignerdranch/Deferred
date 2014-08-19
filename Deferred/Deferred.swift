@@ -29,7 +29,7 @@ public class Deferred<T> {
 
     // Check whether or not the receiver is filled
     public var isFilled: Bool {
-        return protected.withReadLock { $0.value.hasValue }
+        return protected.withReadLock { $0.value != nil }
     }
 
     private func _fill(value: T, assertIfFilled: Bool) {

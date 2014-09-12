@@ -14,7 +14,23 @@
 		523E00C81999166700E07C3C /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C71999166700E07C3C /* DeferredTests.swift */; };
 		523E00CC199916A200E07C3C /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00CA199916A200E07C3C /* LockProtectedTests.swift */; };
 		523E00CD199916A200E07C3C /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00CB199916A200E07C3C /* ReadWriteLockTests.swift */; };
+		52B9AF1E19C35F110039E5D7 /* DeferredMac.h in Headers */ = {isa = PBXBuildFile; fileRef = 52B9AF1D19C35F110039E5D7 /* DeferredMac.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		52B9AF2419C35F110039E5D7 /* DeferredMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B9AF1919C35F110039E5D7 /* DeferredMac.framework */; };
+		52B9AF3219C35F260039E5D7 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C51999162F00E07C3C /* Deferred.swift */; };
+		52B9AF3319C35F2A0039E5D7 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C71999166700E07C3C /* DeferredTests.swift */; };
+		52B9AF3419C35F380039E5D7 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C0199915E800E07C3C /* LockProtected.swift */; };
+		52B9AF3519C35F380039E5D7 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C1199915E800E07C3C /* ReadWriteLock.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		52B9AF2519C35F110039E5D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 523E0098199915C500E07C3C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 52B9AF1819C35F110039E5D7;
+			remoteInfo = DeferredMac;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		523E00A1199915C600E07C3C /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -28,6 +44,11 @@
 		523E00C71999166700E07C3C /* DeferredTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
 		523E00CA199916A200E07C3C /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
 		523E00CB199916A200E07C3C /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
+		52B9AF1919C35F110039E5D7 /* DeferredMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DeferredMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		52B9AF1C19C35F110039E5D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		52B9AF1D19C35F110039E5D7 /* DeferredMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeferredMac.h; sourceTree = "<group>"; };
+		52B9AF2319C35F110039E5D7 /* DeferredMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		52B9AF2919C35F110039E5D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +66,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B9AF1519C35F110039E5D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B9AF2019C35F110039E5D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52B9AF2419C35F110039E5D7 /* DeferredMac.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -53,6 +89,8 @@
 			children = (
 				523E00A3199915C600E07C3C /* Deferred */,
 				523E00AD199915C600E07C3C /* DeferredTests */,
+				52B9AF1A19C35F110039E5D7 /* DeferredMac */,
+				52B9AF2719C35F110039E5D7 /* DeferredMacTests */,
 				523E00A2199915C600E07C3C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +100,8 @@
 			children = (
 				523E00A1199915C600E07C3C /* Deferred.framework */,
 				523E00AC199915C600E07C3C /* DeferredTests.xctest */,
+				52B9AF1919C35F110039E5D7 /* DeferredMac.framework */,
+				52B9AF2319C35F110039E5D7 /* DeferredMacTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -121,6 +161,39 @@
 			name = Locking;
 			sourceTree = "<group>";
 		};
+		52B9AF1A19C35F110039E5D7 /* DeferredMac */ = {
+			isa = PBXGroup;
+			children = (
+				52B9AF1D19C35F110039E5D7 /* DeferredMac.h */,
+				52B9AF1B19C35F110039E5D7 /* Supporting Files */,
+			);
+			path = DeferredMac;
+			sourceTree = "<group>";
+		};
+		52B9AF1B19C35F110039E5D7 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				52B9AF1C19C35F110039E5D7 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		52B9AF2719C35F110039E5D7 /* DeferredMacTests */ = {
+			isa = PBXGroup;
+			children = (
+				52B9AF2819C35F110039E5D7 /* Supporting Files */,
+			);
+			path = DeferredMacTests;
+			sourceTree = "<group>";
+		};
+		52B9AF2819C35F110039E5D7 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				52B9AF2919C35F110039E5D7 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -129,6 +202,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				523E00A7199915C600E07C3C /* Deferred.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B9AF1619C35F110039E5D7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52B9AF1E19C35F110039E5D7 /* DeferredMac.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +251,42 @@
 			productReference = 523E00AC199915C600E07C3C /* DeferredTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		52B9AF1819C35F110039E5D7 /* DeferredMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52B9AF3019C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMac" */;
+			buildPhases = (
+				52B9AF1419C35F110039E5D7 /* Sources */,
+				52B9AF1519C35F110039E5D7 /* Frameworks */,
+				52B9AF1619C35F110039E5D7 /* Headers */,
+				52B9AF1719C35F110039E5D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DeferredMac;
+			productName = DeferredMac;
+			productReference = 52B9AF1919C35F110039E5D7 /* DeferredMac.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		52B9AF2219C35F110039E5D7 /* DeferredMacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52B9AF3119C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMacTests" */;
+			buildPhases = (
+				52B9AF1F19C35F110039E5D7 /* Sources */,
+				52B9AF2019C35F110039E5D7 /* Frameworks */,
+				52B9AF2119C35F110039E5D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				52B9AF2619C35F110039E5D7 /* PBXTargetDependency */,
+			);
+			name = DeferredMacTests;
+			productName = DeferredMacTests;
+			productReference = 52B9AF2319C35F110039E5D7 /* DeferredMacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +301,12 @@
 					};
 					523E00AB199915C600E07C3C = {
 						CreatedOnToolsVersion = 6.0;
+					};
+					52B9AF1819C35F110039E5D7 = {
+						CreatedOnToolsVersion = 6.1;
+					};
+					52B9AF2219C35F110039E5D7 = {
+						CreatedOnToolsVersion = 6.1;
 					};
 				};
 			};
@@ -201,6 +324,8 @@
 			targets = (
 				523E00A0199915C600E07C3C /* Deferred */,
 				523E00AB199915C600E07C3C /* DeferredTests */,
+				52B9AF1819C35F110039E5D7 /* DeferredMac */,
+				52B9AF2219C35F110039E5D7 /* DeferredMacTests */,
 			);
 		};
 /* End PBXProject section */
@@ -214,6 +339,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		523E00AA199915C600E07C3C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B9AF1719C35F110039E5D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B9AF2119C35F110039E5D7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -243,7 +382,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B9AF1419C35F110039E5D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52B9AF3519C35F380039E5D7 /* ReadWriteLock.swift in Sources */,
+				52B9AF3219C35F260039E5D7 /* Deferred.swift in Sources */,
+				52B9AF3419C35F380039E5D7 /* LockProtected.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B9AF1F19C35F110039E5D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52B9AF3319C35F2A0039E5D7 /* DeferredTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		52B9AF2619C35F110039E5D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 52B9AF1819C35F110039E5D7 /* DeferredMac */;
+			targetProxy = 52B9AF2519C35F110039E5D7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		523E00B2199915C600E07C3C /* Debug */ = {
@@ -397,6 +562,86 @@
 			};
 			name = Release;
 		};
+		52B9AF2C19C35F110039E5D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = DeferredMac/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		52B9AF2D19C35F110039E5D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = DeferredMac/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		52B9AF2E19C35F110039E5D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = DeferredMacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		52B9AF2F19C35F110039E5D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = DeferredMacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -416,12 +661,30 @@
 				523E00B6199915C600E07C3C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		523E00B7199915C600E07C3C /* Build configuration list for PBXNativeTarget "DeferredTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				523E00B8199915C600E07C3C /* Debug */,
 				523E00B9199915C600E07C3C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52B9AF3019C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52B9AF2C19C35F110039E5D7 /* Debug */,
+				52B9AF2D19C35F110039E5D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		52B9AF3119C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52B9AF2E19C35F110039E5D7 /* Debug */,
+				52B9AF2F19C35F110039E5D7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

@@ -136,6 +136,10 @@ var anyDeferred: Deferred<Deferred<Int>> = any(deferreds)
 // Deferred instance, which is guaranteed to be filled.
 ```
 
+## Integration
+
+Add this repository as a submodule, or use [Carthage](https://github.com/Carthage/Carthage/).
+
 ## Author
 
 John Gallagher, jgallagher@bignerdranch.com

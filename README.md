@@ -1,14 +1,14 @@
 # Deferred
 
-This is an implmentation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift.
+This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift.
 
 ## Overview
 
-`Deferred` made for supporting asynchronous programming. An instance of `Deferred`
-represents a value that will be available at some point in the future. Deferred
-objects can trivially replace completion blocks (see [#upon](Running Closures
-Upon Fulfillment)), but also enable some higher level, powerful composition
-techniques.
+`Deferred` is designed for supporting asynchronous programming. An instance of
+`Deferred` represents a value that will be available at some point in the
+future. Deferred objects can trivially replace completion blocks (see
+[#upon](Running Closures Upon Fulfillment)), but also enable some higher level,
+powerful composition techniques.
 
 All properties and methods on an instance of `Deferred` can safely be called from
 multiple threads simultaneously; a lock is used internally for synchronization.

@@ -16,15 +16,21 @@ public final class Deferred<T> {
     private typealias Protected = (protectedValue: T?, uponBlocks: [UponBlock])
 
     private var protected: LockProtected<Protected>
+    private let defaultQueue: dispatch_queue_t
+
+    private init(value: T?, queue: dispatch_queue_t) {
+        protected = LockProtected(item: (value, []))
+        self.defaultQueue = queue
+    }
 
     // Initialize an unfilled Deferred
-    public init() {
-        protected = LockProtected(item: (nil, []))
+    public convenience init(defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
+        self.init(value: nil, queue: defaultQueue)
     }
 
     // Initialize a filled Deferred with the given value
-    public init(value: T) {
-        protected = LockProtected(item: (value, []))
+    public convenience init(value: T, defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
+        self.init(value: value, queue: defaultQueue)
     }
 
     // Check whether or not the receiver is filled
@@ -109,15 +115,15 @@ extension Deferred {
 
 extension Deferred {
     public func upon(block: T ->()) {
-        uponQueue(DeferredDefaultQueue, block: block)
+        uponQueue(defaultQueue, block: block)
     }
 
     public func bind<U>(f: T -> Deferred<U>) -> Deferred<U> {
-        return bindQueue(DeferredDefaultQueue, f: f)
+        return bindQueue(defaultQueue, f: f)
     }
 
     public func map<U>(f: T -> U) -> Deferred<U> {
-        return mapQueue(DeferredDefaultQueue, f: f)
+        return mapQueue(defaultQueue, f: f)
     }
 }
 

@@ -102,6 +102,10 @@ func readString() -> Deferred<String> {
 let deferredInt: Deferred<Int?> = readString().map { $0.toInt() }
 ```
 
+`bind` and `map`, like `upon`, execute on a concurrent background thread by
+default (once the instance has been filled).  `bindQueue` and `mapQueue` are
+available if you want to specify the GCD queue for the closure to run on.
+
 ### Combining Deferreds
 
 There are three functions available for combining multiple `Deferred` instances:

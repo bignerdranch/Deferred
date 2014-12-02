@@ -13,7 +13,7 @@ public protocol ReadWriteLock: class {
     func withWriteLock<T>(block: () -> T) -> T
 }
 
-public class GCDReadWriteLock: ReadWriteLock {
+public final class GCDReadWriteLock: ReadWriteLock {
     private let queue = dispatch_queue_create("GCDReadWriteLock", DISPATCH_QUEUE_CONCURRENT)
 
     public init() {}
@@ -35,7 +35,7 @@ public class GCDReadWriteLock: ReadWriteLock {
     }
 }
 
-public class SpinLock: ReadWriteLock {
+public final class SpinLock: ReadWriteLock {
     private var lock: UnsafeMutablePointer<Int32>
 
     public init() {
@@ -63,7 +63,7 @@ public class SpinLock: ReadWriteLock {
 }
 
 /// Test comment 2
-public class CASSpinLock: ReadWriteLock {
+public final class CASSpinLock: ReadWriteLock {
     private struct Masks {
         static let WRITER_BIT: Int32         = 0x40000000
         static let WRITER_WAITING_BIT: Int32 = 0x20000000

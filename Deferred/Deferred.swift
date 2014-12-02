@@ -11,7 +11,7 @@ import Foundation
 // TODO: Replace this with a class var
 private var DeferredDefaultQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 
-public class Deferred<T> {
+public final class Deferred<T> {
     typealias UponBlock = (dispatch_queue_t, T -> ())
     private typealias Protected = (protectedValue: T?, uponBlocks: [UponBlock])
 

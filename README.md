@@ -49,8 +49,9 @@ filled. `upon` can be called multiple times, and the closures will be called
 in the order they were supplied to `upon` (with the normal race condition caveat
 if you are calling `upon` from multiple threads simultaneously).
 
-`upon` will run the closures on a background concurrent GCD queue. `uponQueue`
-is available if you want to specify a queue for a closure.
+By default, `upon` will run the closures on a background concurrent GCD queue.
+You can change this by passing a different default queue when the `Deferred` is
+created, or by using the `uponQueue` method to specify a queue for the closure.
 
 ```swift
 let deferredResult = performOperation()
@@ -103,8 +104,9 @@ let deferredInt: Deferred<Int?> = readString().map { $0.toInt() }
 ```
 
 `bind` and `map`, like `upon`, execute on a concurrent background thread by
-default (once the instance has been filled).  `bindQueue` and `mapQueue` are
-available if you want to specify the GCD queue for the closure to run on.
+default (once the instance has been filled), unless a different queue is
+passed when the `Deferred` instance is created. `bindQueue` and `mapQueue` are
+available if you want to specify the GCD queue as the consumer.
 
 ### Combining Deferreds
 

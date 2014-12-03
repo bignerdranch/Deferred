@@ -7,7 +7,7 @@ This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/oca
 `Deferred` is designed for supporting asynchronous programming. An instance of
 `Deferred` represents a value that will be available at some point in the
 future. Deferred objects can trivially replace completion blocks (see
-[#upon](Running Closures Upon Fulfillment)), but also enable some higher level,
+[Running Closures Upon Fulfillment](#upon)), but also enable some higher level,
 powerful composition techniques.
 
 All properties and methods on an instance of `Deferred` can safely be called from
@@ -42,7 +42,7 @@ func performOperation() -> Deferred<Int> {
 
 ## Usage - Consumer
 
-### <a name="#upon"></a>Running Closures Upon Fulfillment
+### <a name="upon"></a>Running Closures Upon Fulfillment
 
 You can use the `upon` method to run a closure once the `Deferred` has been
 filled. `upon` can be called multiple times, and the closures will be called

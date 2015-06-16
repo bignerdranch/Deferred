@@ -72,9 +72,9 @@ class ReadWriteLockTests: XCTestCase {
     func testMultipleConcurrentReaders() {
         // do not test spinLock, as it does not allow concurrent reading
         let locks: [ReadWriteLock] = [gcdLock, casSpinLock]
-        for (var lock) in locks {
+        for lock in locks {
             // start up 32 readers that block for 0.1 seconds each...
-            for i in 0 ..< 32 {
+            for _ in 0 ..< 32 {
                 let expectation = expectationWithDescription("read \(lock)")
                 dispatch_async(queue) {
                     lock.withReadLock {
@@ -93,7 +93,7 @@ class ReadWriteLockTests: XCTestCase {
     func testMultipleConcurrentWriters() {
         // all three lock types ensure writes happen exclusively
         let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock]
-        for (var lock) in locks {
+        for lock in locks {
             var x: Int32 = 0
 
             // spin up 5 writers concurrently...
@@ -118,7 +118,7 @@ class ReadWriteLockTests: XCTestCase {
         // all three lock types ensure reads cannot run while writes do
         let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock]
 
-        for (var lock) in locks {
+        for lock in locks {
             var x: Int32 = 0
 
             let startReader: (Int) -> () = { i in
@@ -141,7 +141,7 @@ class ReadWriteLockTests: XCTestCase {
             let expectation = expectationWithDescription("writer")
             dispatch_async(queue) {
                 lock.withWriteLock {
-                    for i in 0 ..< 5 {
+                    for _ in 0 ..< 5 {
                         OSAtomicIncrement32Barrier(&x)
                         timeIntervalSleep(0.1)
                     }
@@ -157,28 +157,28 @@ class ReadWriteLockTests: XCTestCase {
         }
     }
 
-    func measureReadLockSingleThread(var lock: ReadWriteLock, iters: Int) {
+    func measureReadLockSingleThread(lock: ReadWriteLock, iters: Int) {
         let doNothing: () -> () = {}
         self.measureBlock {
-            for i in 0 ..< iters {
+            for _ in 0 ..< iters {
                 lock.withReadLock(doNothing)
             }
         }
     }
 
-    func measureWriteLockSingleThread(var lock: ReadWriteLock, iters: Int) {
+    func measureWriteLockSingleThread(lock: ReadWriteLock, iters: Int) {
         let doNothing: () -> () = {}
         self.measureBlock {
-            for i in 0 ..< iters {
+            for _ in 0 ..< iters {
                 lock.withWriteLock(doNothing)
             }
         }
     }
 
-    func measureLock90PercentReadsNThreads(var lock: ReadWriteLock, iters: Int, nthreads: Int) {
+    func measureLock90PercentReadsNThreads(lock: ReadWriteLock, iters: Int, nthreads: Int) {
         self.measureBlock {
             var threads: [PerfTestThread] = []
-            for i in 0 ..< nthreads {
+            for _ in 0 ..< nthreads {
                 let t = PerfTestThread(lock: lock, iters: iters)
                 t.start()
                 threads.append(t)

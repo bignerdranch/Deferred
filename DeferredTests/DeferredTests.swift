@@ -7,11 +7,7 @@
 //
 
 import XCTest
-#if os(iOS)
 import Deferred
-#else
-import DeferredMac
-#endif
 
 func dispatch_main_after(interval: NSTimeInterval, block: () -> ()) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSTimeInterval(NSEC_PER_SEC)*interval)),

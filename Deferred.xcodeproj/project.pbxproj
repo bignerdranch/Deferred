@@ -7,223 +7,196 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		523E00A7199915C600E07C3C /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = 523E00A6199915C600E07C3C /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		523E00C2199915E800E07C3C /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C0199915E800E07C3C /* LockProtected.swift */; };
-		523E00C3199915E800E07C3C /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C1199915E800E07C3C /* ReadWriteLock.swift */; };
-		523E00C61999162F00E07C3C /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C51999162F00E07C3C /* Deferred.swift */; };
-		523E00C81999166700E07C3C /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C71999166700E07C3C /* DeferredTests.swift */; };
-		523E00CC199916A200E07C3C /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00CA199916A200E07C3C /* LockProtectedTests.swift */; };
-		523E00CD199916A200E07C3C /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00CB199916A200E07C3C /* ReadWriteLockTests.swift */; };
-		52B9AF1E19C35F110039E5D7 /* DeferredMac.h in Headers */ = {isa = PBXBuildFile; fileRef = 52B9AF1D19C35F110039E5D7 /* DeferredMac.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		52B9AF2419C35F110039E5D7 /* DeferredMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B9AF1919C35F110039E5D7 /* DeferredMac.framework */; };
-		52B9AF3219C35F260039E5D7 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C51999162F00E07C3C /* Deferred.swift */; };
-		52B9AF3319C35F2A0039E5D7 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C71999166700E07C3C /* DeferredTests.swift */; };
-		52B9AF3419C35F380039E5D7 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C0199915E800E07C3C /* LockProtected.swift */; };
-		52B9AF3519C35F380039E5D7 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E00C1199915E800E07C3C /* ReadWriteLock.swift */; };
+		DB12D80B1B30D23100020970 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB12D80A1B30D23100020970 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB12D8111B30D23200020970 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB12D8051B30D23100020970 /* Deferred.framework */; };
+		DB12D8181B30D23200020970 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8171B30D23200020970 /* DeferredTests.swift */; };
+		DB12D8311B30D23A00020970 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB12D8261B30D23A00020970 /* Deferred.framework */; };
+		DB12D83F1B30D25A00020970 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB12D80A1B30D23100020970 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB12D8401B30D26100020970 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8171B30D23200020970 /* DeferredTests.swift */; };
+		DB12D8441B30D29C00020970 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8411B30D29C00020970 /* Deferred.swift */; };
+		DB12D8451B30D29C00020970 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8411B30D29C00020970 /* Deferred.swift */; };
+		DB12D8461B30D29C00020970 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8421B30D29C00020970 /* LockProtected.swift */; };
+		DB12D8471B30D29C00020970 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8421B30D29C00020970 /* LockProtected.swift */; };
+		DB12D8481B30D29C00020970 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8431B30D29C00020970 /* ReadWriteLock.swift */; };
+		DB12D8491B30D29C00020970 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D8431B30D29C00020970 /* ReadWriteLock.swift */; };
+		DB12D84D1B30D2CC00020970 /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D84B1B30D2CC00020970 /* LockProtectedTests.swift */; };
+		DB12D84E1B30D2CC00020970 /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D84B1B30D2CC00020970 /* LockProtectedTests.swift */; };
+		DB12D84F1B30D2CC00020970 /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D84C1B30D2CC00020970 /* ReadWriteLockTests.swift */; };
+		DB12D8501B30D2CC00020970 /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB12D84C1B30D2CC00020970 /* ReadWriteLockTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		52B9AF2519C35F110039E5D7 /* PBXContainerItemProxy */ = {
+		DB12D8121B30D23200020970 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 523E0098199915C500E07C3C /* Project object */;
+			containerPortal = DB12D7FC1B30D23100020970 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 52B9AF1819C35F110039E5D7;
+			remoteGlobalIDString = DB12D8041B30D23100020970;
+			remoteInfo = Deferred;
+		};
+		DB12D8321B30D23A00020970 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DB12D7FC1B30D23100020970 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DB12D8251B30D23A00020970;
 			remoteInfo = DeferredMac;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		523E00A1199915C600E07C3C /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		523E00A5199915C600E07C3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		523E00A6199915C600E07C3C /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
-		523E00AC199915C600E07C3C /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		523E00AF199915C600E07C3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		523E00C0199915E800E07C3C /* LockProtected.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
-		523E00C1199915E800E07C3C /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
-		523E00C51999162F00E07C3C /* Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Deferred.swift; sourceTree = "<group>"; };
-		523E00C71999166700E07C3C /* DeferredTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
-		523E00CA199916A200E07C3C /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
-		523E00CB199916A200E07C3C /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
-		52B9AF1919C35F110039E5D7 /* DeferredMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DeferredMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		52B9AF1C19C35F110039E5D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		52B9AF1D19C35F110039E5D7 /* DeferredMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeferredMac.h; sourceTree = "<group>"; };
-		52B9AF2319C35F110039E5D7 /* DeferredMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		52B9AF2919C35F110039E5D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB12D8051B30D23100020970 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB12D8091B30D23100020970 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB12D80A1B30D23100020970 /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
+		DB12D8101B30D23200020970 /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB12D8161B30D23200020970 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB12D8171B30D23200020970 /* DeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
+		DB12D8261B30D23A00020970 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB12D8301B30D23A00020970 /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB12D8411B30D29C00020970 /* Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Deferred.swift; sourceTree = "<group>"; };
+		DB12D8421B30D29C00020970 /* LockProtected.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
+		DB12D8431B30D29C00020970 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
+		DB12D84B1B30D2CC00020970 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
+		DB12D84C1B30D2CC00020970 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		523E009D199915C600E07C3C /* Frameworks */ = {
+		DB12D8011B30D23100020970 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		523E00A9199915C600E07C3C /* Frameworks */ = {
+		DB12D80D1B30D23200020970 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB12D8111B30D23200020970 /* Deferred.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB12D8221B30D23A00020970 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52B9AF1519C35F110039E5D7 /* Frameworks */ = {
+		DB12D82D1B30D23A00020970 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52B9AF2019C35F110039E5D7 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				52B9AF2419C35F110039E5D7 /* DeferredMac.framework in Frameworks */,
+				DB12D8311B30D23A00020970 /* Deferred.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		523E0097199915C500E07C3C = {
+		DB12D7FB1B30D23100020970 = {
 			isa = PBXGroup;
 			children = (
-				523E00A3199915C600E07C3C /* Deferred */,
-				523E00AD199915C600E07C3C /* DeferredTests */,
-				52B9AF1A19C35F110039E5D7 /* DeferredMac */,
-				52B9AF2719C35F110039E5D7 /* DeferredMacTests */,
-				523E00A2199915C600E07C3C /* Products */,
+				DB12D8071B30D23100020970 /* Deferred */,
+				DB12D8141B30D23200020970 /* DeferredTests */,
+				DB12D8061B30D23100020970 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		523E00A2199915C600E07C3C /* Products */ = {
+		DB12D8061B30D23100020970 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				523E00A1199915C600E07C3C /* Deferred.framework */,
-				523E00AC199915C600E07C3C /* DeferredTests.xctest */,
-				52B9AF1919C35F110039E5D7 /* DeferredMac.framework */,
-				52B9AF2319C35F110039E5D7 /* DeferredMacTests.xctest */,
+				DB12D8051B30D23100020970 /* Deferred.framework */,
+				DB12D8101B30D23200020970 /* DeferredTests.xctest */,
+				DB12D8261B30D23A00020970 /* Deferred.framework */,
+				DB12D8301B30D23A00020970 /* DeferredTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		523E00A3199915C600E07C3C /* Deferred */ = {
+		DB12D8071B30D23100020970 /* Deferred */ = {
 			isa = PBXGroup;
 			children = (
-				523E00C51999162F00E07C3C /* Deferred.swift */,
-				523E00C41999161E00E07C3C /* Locking */,
-				523E00A6199915C600E07C3C /* Deferred.h */,
-				523E00A4199915C600E07C3C /* Supporting Files */,
+				DB12D80A1B30D23100020970 /* Deferred.h */,
+				DB12D8411B30D29C00020970 /* Deferred.swift */,
+				DB12D84A1B30D2A500020970 /* Locking */,
+				DB12D8081B30D23100020970 /* Supporting Files */,
 			);
 			path = Deferred;
 			sourceTree = "<group>";
 		};
-		523E00A4199915C600E07C3C /* Supporting Files */ = {
+		DB12D8081B30D23100020970 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				523E00A5199915C600E07C3C /* Info.plist */,
+				DB12D8091B30D23100020970 /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		523E00AD199915C600E07C3C /* DeferredTests */ = {
+		DB12D8141B30D23200020970 /* DeferredTests */ = {
 			isa = PBXGroup;
 			children = (
-				523E00C91999169900E07C3C /* Locking */,
-				523E00C71999166700E07C3C /* DeferredTests.swift */,
-				523E00AE199915C600E07C3C /* Supporting Files */,
+				DB12D8171B30D23200020970 /* DeferredTests.swift */,
+				DB12D8511B30D2CF00020970 /* Locking */,
+				DB12D8151B30D23200020970 /* Supporting Files */,
 			);
 			path = DeferredTests;
 			sourceTree = "<group>";
 		};
-		523E00AE199915C600E07C3C /* Supporting Files */ = {
+		DB12D8151B30D23200020970 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				523E00AF199915C600E07C3C /* Info.plist */,
+				DB12D8161B30D23200020970 /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		523E00C41999161E00E07C3C /* Locking */ = {
+		DB12D84A1B30D2A500020970 /* Locking */ = {
 			isa = PBXGroup;
 			children = (
-				523E00C0199915E800E07C3C /* LockProtected.swift */,
-				523E00C1199915E800E07C3C /* ReadWriteLock.swift */,
+				DB12D8421B30D29C00020970 /* LockProtected.swift */,
+				DB12D8431B30D29C00020970 /* ReadWriteLock.swift */,
 			);
 			name = Locking;
 			sourceTree = "<group>";
 		};
-		523E00C91999169900E07C3C /* Locking */ = {
+		DB12D8511B30D2CF00020970 /* Locking */ = {
 			isa = PBXGroup;
 			children = (
-				523E00CA199916A200E07C3C /* LockProtectedTests.swift */,
-				523E00CB199916A200E07C3C /* ReadWriteLockTests.swift */,
+				DB12D84B1B30D2CC00020970 /* LockProtectedTests.swift */,
+				DB12D84C1B30D2CC00020970 /* ReadWriteLockTests.swift */,
 			);
 			name = Locking;
-			sourceTree = "<group>";
-		};
-		52B9AF1A19C35F110039E5D7 /* DeferredMac */ = {
-			isa = PBXGroup;
-			children = (
-				52B9AF1D19C35F110039E5D7 /* DeferredMac.h */,
-				52B9AF1B19C35F110039E5D7 /* Supporting Files */,
-			);
-			path = DeferredMac;
-			sourceTree = "<group>";
-		};
-		52B9AF1B19C35F110039E5D7 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				52B9AF1C19C35F110039E5D7 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		52B9AF2719C35F110039E5D7 /* DeferredMacTests */ = {
-			isa = PBXGroup;
-			children = (
-				52B9AF2819C35F110039E5D7 /* Supporting Files */,
-			);
-			path = DeferredMacTests;
-			sourceTree = "<group>";
-		};
-		52B9AF2819C35F110039E5D7 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				52B9AF2919C35F110039E5D7 /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		523E009E199915C600E07C3C /* Headers */ = {
+		DB12D8021B30D23100020970 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				523E00A7199915C600E07C3C /* Deferred.h in Headers */,
+				DB12D80B1B30D23100020970 /* Deferred.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52B9AF1619C35F110039E5D7 /* Headers */ = {
+		DB12D8231B30D23A00020970 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52B9AF1E19C35F110039E5D7 /* DeferredMac.h in Headers */,
+				DB12D83F1B30D25A00020970 /* Deferred.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		523E00A0199915C600E07C3C /* Deferred */ = {
+		DB12D8041B30D23100020970 /* Deferred */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 523E00B4199915C600E07C3C /* Build configuration list for PBXNativeTarget "Deferred" */;
+			buildConfigurationList = DB12D81B1B30D23200020970 /* Build configuration list for PBXNativeTarget "Deferred" */;
 			buildPhases = (
-				523E009C199915C600E07C3C /* Sources */,
-				523E009D199915C600E07C3C /* Frameworks */,
-				523E009E199915C600E07C3C /* Headers */,
-				523E009F199915C600E07C3C /* Resources */,
+				DB12D8001B30D23100020970 /* Sources */,
+				DB12D8011B30D23100020970 /* Frameworks */,
+				DB12D8021B30D23100020970 /* Headers */,
+				DB12D8031B30D23100020970 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -231,34 +204,35 @@
 			);
 			name = Deferred;
 			productName = Deferred;
-			productReference = 523E00A1199915C600E07C3C /* Deferred.framework */;
+			productReference = DB12D8051B30D23100020970 /* Deferred.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		523E00AB199915C600E07C3C /* DeferredTests */ = {
+		DB12D80F1B30D23200020970 /* DeferredTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 523E00B7199915C600E07C3C /* Build configuration list for PBXNativeTarget "DeferredTests" */;
+			buildConfigurationList = DB12D81E1B30D23200020970 /* Build configuration list for PBXNativeTarget "DeferredTests" */;
 			buildPhases = (
-				523E00A8199915C600E07C3C /* Sources */,
-				523E00A9199915C600E07C3C /* Frameworks */,
-				523E00AA199915C600E07C3C /* Resources */,
+				DB12D80C1B30D23200020970 /* Sources */,
+				DB12D80D1B30D23200020970 /* Frameworks */,
+				DB12D80E1B30D23200020970 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				DB12D8131B30D23200020970 /* PBXTargetDependency */,
 			);
 			name = DeferredTests;
 			productName = DeferredTests;
-			productReference = 523E00AC199915C600E07C3C /* DeferredTests.xctest */;
+			productReference = DB12D8101B30D23200020970 /* DeferredTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		52B9AF1819C35F110039E5D7 /* DeferredMac */ = {
+		DB12D8251B30D23A00020970 /* DeferredMac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 52B9AF3019C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMac" */;
+			buildConfigurationList = DB12D8391B30D23A00020970 /* Build configuration list for PBXNativeTarget "DeferredMac" */;
 			buildPhases = (
-				52B9AF1419C35F110039E5D7 /* Sources */,
-				52B9AF1519C35F110039E5D7 /* Frameworks */,
-				52B9AF1619C35F110039E5D7 /* Headers */,
-				52B9AF1719C35F110039E5D7 /* Resources */,
+				DB12D8211B30D23A00020970 /* Sources */,
+				DB12D8221B30D23A00020970 /* Frameworks */,
+				DB12D8231B30D23A00020970 /* Headers */,
+				DB12D8241B30D23A00020970 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -266,93 +240,94 @@
 			);
 			name = DeferredMac;
 			productName = DeferredMac;
-			productReference = 52B9AF1919C35F110039E5D7 /* DeferredMac.framework */;
+			productReference = DB12D8261B30D23A00020970 /* Deferred.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		52B9AF2219C35F110039E5D7 /* DeferredMacTests */ = {
+		DB12D82F1B30D23A00020970 /* DeferredMacTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 52B9AF3119C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMacTests" */;
+			buildConfigurationList = DB12D83C1B30D23A00020970 /* Build configuration list for PBXNativeTarget "DeferredMacTests" */;
 			buildPhases = (
-				52B9AF1F19C35F110039E5D7 /* Sources */,
-				52B9AF2019C35F110039E5D7 /* Frameworks */,
-				52B9AF2119C35F110039E5D7 /* Resources */,
+				DB12D82C1B30D23A00020970 /* Sources */,
+				DB12D82D1B30D23A00020970 /* Frameworks */,
+				DB12D82E1B30D23A00020970 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				52B9AF2619C35F110039E5D7 /* PBXTargetDependency */,
+				DB12D8331B30D23A00020970 /* PBXTargetDependency */,
 			);
 			name = DeferredMacTests;
 			productName = DeferredMacTests;
-			productReference = 52B9AF2319C35F110039E5D7 /* DeferredMacTests.xctest */;
+			productReference = DB12D8301B30D23A00020970 /* DeferredTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		523E0098199915C500E07C3C /* Project object */ = {
+		DB12D7FC1B30D23100020970 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
-				ORGANIZATIONNAME = "Big Nerd Ranch";
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Big Nerd Ranch Inc";
 				TargetAttributes = {
-					523E00A0199915C600E07C3C = {
-						CreatedOnToolsVersion = 6.0;
+					DB12D8041B30D23100020970 = {
+						CreatedOnToolsVersion = 6.3.2;
 					};
-					523E00AB199915C600E07C3C = {
-						CreatedOnToolsVersion = 6.0;
+					DB12D80F1B30D23200020970 = {
+						CreatedOnToolsVersion = 6.3.2;
 					};
-					52B9AF1819C35F110039E5D7 = {
-						CreatedOnToolsVersion = 6.1;
+					DB12D8251B30D23A00020970 = {
+						CreatedOnToolsVersion = 6.3.2;
 					};
-					52B9AF2219C35F110039E5D7 = {
-						CreatedOnToolsVersion = 6.1;
+					DB12D82F1B30D23A00020970 = {
+						CreatedOnToolsVersion = 6.3.2;
 					};
 				};
 			};
-			buildConfigurationList = 523E009B199915C600E07C3C /* Build configuration list for PBXProject "Deferred" */;
+			buildConfigurationList = DB12D7FF1B30D23100020970 /* Build configuration list for PBXProject "Deferred" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 523E0097199915C500E07C3C;
-			productRefGroup = 523E00A2199915C600E07C3C /* Products */;
+			mainGroup = DB12D7FB1B30D23100020970;
+			productRefGroup = DB12D8061B30D23100020970 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				523E00A0199915C600E07C3C /* Deferred */,
-				523E00AB199915C600E07C3C /* DeferredTests */,
-				52B9AF1819C35F110039E5D7 /* DeferredMac */,
-				52B9AF2219C35F110039E5D7 /* DeferredMacTests */,
+				DB12D8041B30D23100020970 /* Deferred */,
+				DB12D80F1B30D23200020970 /* DeferredTests */,
+				DB12D8251B30D23A00020970 /* DeferredMac */,
+				DB12D82F1B30D23A00020970 /* DeferredMacTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		523E009F199915C600E07C3C /* Resources */ = {
+		DB12D8031B30D23100020970 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		523E00AA199915C600E07C3C /* Resources */ = {
+		DB12D80E1B30D23200020970 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52B9AF1719C35F110039E5D7 /* Resources */ = {
+		DB12D8241B30D23A00020970 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52B9AF2119C35F110039E5D7 /* Resources */ = {
+		DB12D82E1B30D23A00020970 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -362,56 +337,63 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		523E009C199915C600E07C3C /* Sources */ = {
+		DB12D8001B30D23100020970 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				523E00C3199915E800E07C3C /* ReadWriteLock.swift in Sources */,
-				523E00C61999162F00E07C3C /* Deferred.swift in Sources */,
-				523E00C2199915E800E07C3C /* LockProtected.swift in Sources */,
+				DB12D8481B30D29C00020970 /* ReadWriteLock.swift in Sources */,
+				DB12D8441B30D29C00020970 /* Deferred.swift in Sources */,
+				DB12D8461B30D29C00020970 /* LockProtected.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		523E00A8199915C600E07C3C /* Sources */ = {
+		DB12D80C1B30D23200020970 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				523E00CD199916A200E07C3C /* ReadWriteLockTests.swift in Sources */,
-				523E00C81999166700E07C3C /* DeferredTests.swift in Sources */,
-				523E00CC199916A200E07C3C /* LockProtectedTests.swift in Sources */,
+				DB12D84F1B30D2CC00020970 /* ReadWriteLockTests.swift in Sources */,
+				DB12D8181B30D23200020970 /* DeferredTests.swift in Sources */,
+				DB12D84D1B30D2CC00020970 /* LockProtectedTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52B9AF1419C35F110039E5D7 /* Sources */ = {
+		DB12D8211B30D23A00020970 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52B9AF3519C35F380039E5D7 /* ReadWriteLock.swift in Sources */,
-				52B9AF3219C35F260039E5D7 /* Deferred.swift in Sources */,
-				52B9AF3419C35F380039E5D7 /* LockProtected.swift in Sources */,
+				DB12D8491B30D29C00020970 /* ReadWriteLock.swift in Sources */,
+				DB12D8451B30D29C00020970 /* Deferred.swift in Sources */,
+				DB12D8471B30D29C00020970 /* LockProtected.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52B9AF1F19C35F110039E5D7 /* Sources */ = {
+		DB12D82C1B30D23A00020970 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52B9AF3319C35F2A0039E5D7 /* DeferredTests.swift in Sources */,
+				DB12D8501B30D2CC00020970 /* ReadWriteLockTests.swift in Sources */,
+				DB12D8401B30D26100020970 /* DeferredTests.swift in Sources */,
+				DB12D84E1B30D2CC00020970 /* LockProtectedTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		52B9AF2619C35F110039E5D7 /* PBXTargetDependency */ = {
+		DB12D8131B30D23200020970 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 52B9AF1819C35F110039E5D7 /* DeferredMac */;
-			targetProxy = 52B9AF2519C35F110039E5D7 /* PBXContainerItemProxy */;
+			target = DB12D8041B30D23100020970 /* Deferred */;
+			targetProxy = DB12D8121B30D23200020970 /* PBXContainerItemProxy */;
+		};
+		DB12D8331B30D23A00020970 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DB12D8251B30D23A00020970 /* DeferredMac */;
+			targetProxy = DB12D8321B30D23A00020970 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		523E00B2199915C600E07C3C /* Debug */ = {
+		DB12D8191B30D23200020970 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -431,9 +413,12 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -446,7 +431,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -457,7 +443,7 @@
 			};
 			name = Debug;
 		};
-		523E00B3199915C600E07C3C /* Release */ = {
+		DB12D81A1B30D23200020970 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -475,18 +461,21 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -496,9 +485,10 @@
 			};
 			name = Release;
 		};
-		523E00B5199915C600E07C3C /* Debug */ = {
+		DB12D81C1B30D23200020970 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -506,16 +496,19 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Deferred/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		523E00B6199915C600E07C3C /* Release */ = {
+		DB12D81D1B30D23200020970 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -523,49 +516,47 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = Deferred/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
-		523E00B8199915C600E07C3C /* Debug */ = {
+		DB12D81F1B30D23200020970 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = DeferredTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		523E00B9199915C600E07C3C /* Release */ = {
+		DB12D8201B30D23200020970 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = DeferredTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
-		52B9AF2C19C35F110039E5D7 /* Debug */ = {
+		DB12D83A1B30D23A00020970 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -575,40 +566,43 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = DeferredMac/Info.plist;
+				INFOPLIST_FILE = Deferred/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = Deferred;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		52B9AF2D19C35F110039E5D7 /* Release */ = {
+		DB12D83B1B30D23A00020970 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = DeferredMac/Info.plist;
+				INFOPLIST_FILE = Deferred/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = Deferred;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
-		52B9AF2E19C35F110039E5D7 /* Debug */ = {
+		DB12D83D1B30D23A00020970 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
@@ -617,27 +611,26 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = DeferredMacTests/Info.plist;
+				INFOPLIST_FILE = DeferredTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = DeferredTests;
 				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		52B9AF2F19C35F110039E5D7 /* Release */ = {
+		DB12D83E1B30D23A00020970 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = DeferredMacTests/Info.plist;
+				INFOPLIST_FILE = DeferredTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bignerdranch.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = DeferredTests;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -645,50 +638,52 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		523E009B199915C600E07C3C /* Build configuration list for PBXProject "Deferred" */ = {
+		DB12D7FF1B30D23100020970 /* Build configuration list for PBXProject "Deferred" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				523E00B2199915C600E07C3C /* Debug */,
-				523E00B3199915C600E07C3C /* Release */,
+				DB12D8191B30D23200020970 /* Debug */,
+				DB12D81A1B30D23200020970 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		523E00B4199915C600E07C3C /* Build configuration list for PBXNativeTarget "Deferred" */ = {
+		DB12D81B1B30D23200020970 /* Build configuration list for PBXNativeTarget "Deferred" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				523E00B5199915C600E07C3C /* Debug */,
-				523E00B6199915C600E07C3C /* Release */,
+				DB12D81C1B30D23200020970 /* Debug */,
+				DB12D81D1B30D23200020970 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		523E00B7199915C600E07C3C /* Build configuration list for PBXNativeTarget "DeferredTests" */ = {
+		DB12D81E1B30D23200020970 /* Build configuration list for PBXNativeTarget "DeferredTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				523E00B8199915C600E07C3C /* Debug */,
-				523E00B9199915C600E07C3C /* Release */,
+				DB12D81F1B30D23200020970 /* Debug */,
+				DB12D8201B30D23200020970 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		52B9AF3019C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMac" */ = {
+		DB12D8391B30D23A00020970 /* Build configuration list for PBXNativeTarget "DeferredMac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				52B9AF2C19C35F110039E5D7 /* Debug */,
-				52B9AF2D19C35F110039E5D7 /* Release */,
+				DB12D83A1B30D23A00020970 /* Debug */,
+				DB12D83B1B30D23A00020970 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		52B9AF3119C35F110039E5D7 /* Build configuration list for PBXNativeTarget "DeferredMacTests" */ = {
+		DB12D83C1B30D23A00020970 /* Build configuration list for PBXNativeTarget "DeferredMacTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				52B9AF2E19C35F110039E5D7 /* Debug */,
-				52B9AF2F19C35F110039E5D7 /* Release */,
+				DB12D83D1B30D23A00020970 /* Debug */,
+				DB12D83E1B30D23A00020970 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 523E0098199915C500E07C3C /* Project object */;
+	rootObject = DB12D7FC1B30D23100020970 /* Project object */;
 }

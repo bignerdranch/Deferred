@@ -152,7 +152,6 @@ class ReadWriteLockTests: XCTestCase {
         }
     }
 
-    /*
     func measureReadLockSingleThread(var lock: ReadWriteLock, iters: Int) {
         let doNothing: () -> () = {}
         self.measureBlock {
@@ -186,34 +185,34 @@ class ReadWriteLockTests: XCTestCase {
     }
 
     func testSingleThreadPerformanceGCDLockRead() {
-        measureReadLockSingleThread(gcdLock, iters: 200_000)
+        measureReadLockSingleThread(gcdLock, iters: 250_000)
     }
     func testSingleThreadPerformanceGCDLockWrite() {
-        measureWriteLockSingleThread(gcdLock, iters: 200_000)
+        measureWriteLockSingleThread(gcdLock, iters: 250_000)
     }
 
     func testSingleThreadPerformanceSpinLockRead() {
-        measureReadLockSingleThread(spinLock, iters: 1_000_000)
+        measureReadLockSingleThread(spinLock, iters: 250_000)
     }
     func testSingleThreadPerformanceSpinLockWrite() {
-        measureWriteLockSingleThread(spinLock, iters: 1_000_000)
+        measureWriteLockSingleThread(spinLock, iters: 250_000)
     }
 
     func testSingleThreadPerformanceCASSpinLockRead() {
-        measureReadLockSingleThread(casSpinLock, iters: 1_000_000)
+        measureReadLockSingleThread(casSpinLock, iters: 250_000)
     }
     func testSingleThreadPerformanceCASSpinLockWrite() {
-        measureWriteLockSingleThread(casSpinLock, iters: 1_000_000)
+        measureWriteLockSingleThread(casSpinLock, iters: 250_000)
     }
 
     func test90PercentReads4ThreadsGCDLock() {
         measureLock90PercentReadsNThreads(gcdLock, iters: 2_500, nthreads: 4)
     }
     func test90PercentReads4ThreadsSpinLock() {
-        measureLock90PercentReadsNThreads(spinLock, iters: 250_000, nthreads: 4)
+        measureLock90PercentReadsNThreads(spinLock, iters: 2_500, nthreads: 4)
     }
     func test90PercentReads4ThreadsCASSpinLock() {
-        measureLock90PercentReadsNThreads(casSpinLock, iters: 250_000, nthreads: 4)
+        measureLock90PercentReadsNThreads(casSpinLock, iters: 2_500, nthreads: 4)
     }
-    */
+
 }

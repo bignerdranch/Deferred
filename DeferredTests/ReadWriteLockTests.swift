@@ -60,7 +60,12 @@ class ReadWriteLockTests: XCTestCase {
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        queue = nil
+
+        casSpinLock = nil
+        spinLock = nil
+        gcdLock = nil
+
         super.tearDown()
     }
 

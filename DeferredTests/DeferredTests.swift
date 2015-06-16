@@ -210,6 +210,12 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(1, handler: nil)
     }
 
+    func testAllEmptyArray() {
+        let d = [Deferred<Int>]()
+        let array = all(d)
+        XCTAssert(array.isFilled)
+    }
+
     func testAny() {
         var d = [Deferred<Int>]()
 

@@ -18,7 +18,7 @@ public class Deferred<T> {
     private var protected: LockProtected<Protected>
     private let defaultQueue: dispatch_queue_t
 
-    init(value: T? = nil, defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
+    public init(value: T? = nil, defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
         protected = LockProtected(item: (value, []))
         self.defaultQueue = defaultQueue
     }

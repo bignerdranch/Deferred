@@ -11,26 +11,16 @@ import Foundation
 // TODO: Replace this with a class var
 private var DeferredDefaultQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 
-public final class Deferred<T> {
+public class Deferred<T> {
     typealias UponBlock = (dispatch_queue_t, T -> ())
     private typealias Protected = (protectedValue: T?, uponBlocks: [UponBlock])
 
     private var protected: LockProtected<Protected>
     private let defaultQueue: dispatch_queue_t
 
-    private init(value: T?, queue: dispatch_queue_t) {
+    public init(value: T? = nil, defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
         protected = LockProtected(item: (value, []))
-        self.defaultQueue = queue
-    }
-
-    // Initialize an unfilled Deferred
-    public convenience init(defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
-        self.init(value: nil, queue: defaultQueue)
-    }
-
-    // Initialize a filled Deferred with the given value
-    public convenience init(value: T, defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
-        self.init(value: value, queue: defaultQueue)
+        self.defaultQueue = defaultQueue
     }
 
     // Check whether or not the receiver is filled

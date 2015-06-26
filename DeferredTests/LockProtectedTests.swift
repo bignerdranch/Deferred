@@ -51,7 +51,7 @@ class LockProtectedTests: XCTestCase {
         dispatch_async(self.queue) {
             self.protected.withWriteLock { dateItemsTuple -> () in
                 for i in 0 ..< 5 {
-                    dateItemsTuple.0 = NSDate.date()
+                    dateItemsTuple.0 = NSDate()
                     dateItemsTuple.1.append(i)
                     timeIntervalSleep(0.1)
                 }

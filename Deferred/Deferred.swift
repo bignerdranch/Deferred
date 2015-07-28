@@ -67,15 +67,16 @@ public final class Deferred<T> {
         return protected.withReadLock { $0.protectedValue }
     }
 
-    public func uponQueue(queue: dispatch_queue_t, block: T -> ()) {
+    public func upon(_ inQueue: dispatch_queue_t? = nil, function: T -> ()) {
+        let queue = inQueue ?? defaultQueue
         let maybeValue: T? = protected.withWriteLock{ data in
             if data.protectedValue == nil {
-                data.uponBlocks.append( (queue, block) )
+                data.uponBlocks.append( (queue, function) )
             }
             return data.protectedValue
         }
         if let value = maybeValue {
-            dispatch_async(queue) { block(value) }
+            dispatch_async(queue) { function(value) }
         }
     }
 }
@@ -100,8 +101,8 @@ extension Deferred {
 extension Deferred {
     public func bindQueue<U>(queue: dispatch_queue_t, f: T -> Deferred<U>) -> Deferred<U> {
         let d = Deferred<U>()
-        self.uponQueue(queue) {
-            f($0).uponQueue(queue) {
+        upon(queue) {
+            f($0).upon(queue) {
                 d.fill($0)
             }
         }
@@ -114,10 +115,6 @@ extension Deferred {
 }
 
 extension Deferred {
-    public func upon(block: T ->()) {
-        uponQueue(defaultQueue, block: block)
-    }
-
     public func bind<U>(f: T -> Deferred<U>) -> Deferred<U> {
         return bindQueue(defaultQueue, f: f)
     }
@@ -144,7 +141,7 @@ public func all<Value, Collection: CollectionType where Collection.Generator.Ele
 
     for deferred in array {
         dispatch_group_enter(group)
-        deferred.uponQueue(DeferredDefaultQueue) { _ in
+        deferred.upon(DeferredDefaultQueue) { _ in
             dispatch_group_leave(group)
         }
     }

@@ -3,7 +3,7 @@
 //  ReadWriteLock
 //
 //  Created by John Gallagher on 7/17/14.
-//  Copyright (c) 2014 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Foundation

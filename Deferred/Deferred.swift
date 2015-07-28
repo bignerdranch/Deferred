@@ -99,7 +99,7 @@ extension Deferred {
 }
 
 extension Deferred {
-    public func bind<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> Deferred<U>) -> Deferred<U> {
+    public func flatMap<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> Deferred<U>) -> Deferred<U> {
         let d = Deferred<U>()
         upon(queue) {
             transform($0).upon(queue) {
@@ -110,13 +110,13 @@ extension Deferred {
     }
 
     public func map<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> U) -> Deferred<U> {
-        return bind(upon: queue) { t in Deferred<U>(value: transform(t)) }
+        return flatMap(upon: queue) { t in Deferred<U>(value: transform(t)) }
     }
 }
 
 extension Deferred {
     public func both<U>(other: Deferred<U>) -> Deferred<(T,U)> {
-        return self.bind { t in other.map { u in (t, u) } }
+        return self.flatMap { t in other.map { u in (t, u) } }
     }
 }
 

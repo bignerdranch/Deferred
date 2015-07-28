@@ -133,25 +133,26 @@ extension Deferred {
     }
 }
 
-public func all<T>(deferreds: [Deferred<T>]) -> Deferred<[T]> {
-    if deferreds.count == 0 {
+public func all<Value, Collection: CollectionType where Collection.Generator.Element == Deferred<Value>>(deferreds: Collection) -> Deferred<[Value]> {
+    let array = Array(deferreds)
+    if array.isEmpty {
         return Deferred(value: [])
     }
 
-    let combined = Deferred<[T]>()
-    var results: [T] = []
-    results.reserveCapacity(deferreds.count)
+    let combined = Deferred<[Value]>()
+    let group = dispatch_group_create()
 
-    var block: (T -> ())!
-    block = { t in
-        results.append(t)
-        if results.count == deferreds.count {
-            combined.fill(results)
-        } else {
-            deferreds[results.count].upon(block)
+    for deferred in array {
+        dispatch_group_enter(group)
+        deferred.uponQueue(DeferredDefaultQueue) { _ in
+            dispatch_group_leave(group)
         }
     }
-    deferreds[0].upon(block)
+
+    dispatch_group_notify(group, DeferredDefaultQueue) {
+        let results = array.map { $0.value }
+        combined.fill(results)
+    }
 
     return combined
 }

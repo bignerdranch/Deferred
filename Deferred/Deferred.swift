@@ -99,28 +99,18 @@ extension Deferred {
 }
 
 extension Deferred {
-    public func bindQueue<U>(queue: dispatch_queue_t, f: T -> Deferred<U>) -> Deferred<U> {
+    public func bind<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> Deferred<U>) -> Deferred<U> {
         let d = Deferred<U>()
         upon(queue) {
-            f($0).upon(queue) {
+            transform($0).upon(queue) {
                 d.fill($0)
             }
         }
         return d
     }
 
-    public func mapQueue<U>(queue: dispatch_queue_t, f: T -> U) -> Deferred<U> {
-        return bindQueue(queue) { t in Deferred<U>(value: f(t)) }
-    }
-}
-
-extension Deferred {
-    public func bind<U>(f: T -> Deferred<U>) -> Deferred<U> {
-        return bindQueue(defaultQueue, f: f)
-    }
-
-    public func map<U>(f: T -> U) -> Deferred<U> {
-        return mapQueue(defaultQueue, f: f)
+    public func map<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> U) -> Deferred<U> {
+        return bind(upon: queue) { t in Deferred<U>(value: transform(t)) }
     }
 }
 

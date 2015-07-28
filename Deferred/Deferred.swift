@@ -9,28 +9,28 @@
 import Foundation
 
 // TODO: Replace this with a class var
-private var DeferredDefaultQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+private var DeferredDefaultQueue: dispatch_queue_t {
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+}
 
 public final class Deferred<T> {
     typealias UponBlock = (dispatch_queue_t, T -> ())
     private typealias Protected = (protectedValue: T?, uponBlocks: [UponBlock])
 
     private var protected: LockProtected<Protected>
-    private let defaultQueue: dispatch_queue_t
 
-    private init(value: T?, queue: dispatch_queue_t) {
+    private init(value: T?) {
         protected = LockProtected(item: (value, []))
-        self.defaultQueue = queue
     }
 
     // Initialize an unfilled Deferred
-    public convenience init(defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
-        self.init(value: nil, queue: defaultQueue)
+    public convenience init() {
+        self.init(value: nil)
     }
 
     // Initialize a filled Deferred with the given value
-    public convenience init(value: T, defaultQueue: dispatch_queue_t = DeferredDefaultQueue) {
-        self.init(value: value, queue: defaultQueue)
+    public convenience init(value: T) {
+        self.init(value: value)
     }
 
     // Check whether or not the receiver is filled
@@ -67,8 +67,7 @@ public final class Deferred<T> {
         return protected.withReadLock { $0.protectedValue }
     }
 
-    public func upon(_ inQueue: dispatch_queue_t? = nil, function: T -> ()) {
-        let queue = inQueue ?? defaultQueue
+    public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: T -> ()) {
         let maybeValue: T? = protected.withWriteLock{ data in
             if data.protectedValue == nil {
                 data.uponBlocks.append( (queue, function) )
@@ -131,7 +130,7 @@ public func all<Value, Collection: CollectionType where Collection.Generator.Ele
 
     for deferred in array {
         dispatch_group_enter(group)
-        deferred.upon(DeferredDefaultQueue) { _ in
+        deferred.upon { _ in
             dispatch_group_leave(group)
         }
     }

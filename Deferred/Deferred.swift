@@ -13,13 +13,13 @@ private var DeferredDefaultQueue: dispatch_queue_t {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 }
 
-public final class Deferred<T> {
-    typealias UponBlock = (dispatch_queue_t, T -> ())
-    private typealias Protected = (protectedValue: T?, uponBlocks: [UponBlock])
+public final class Deferred<Value> {
+    typealias UponBlock = (dispatch_queue_t, Value -> ())
+    private typealias Protected = (protected: Value?, uponBlocks: [UponBlock])
 
     private var protected: LockProtected<Protected>
 
-    private init(value: T?) {
+    private init(value: Value?) {
         protected = LockProtected(item: (value, []))
     }
 
@@ -29,50 +29,50 @@ public final class Deferred<T> {
     }
 
     // Initialize a filled Deferred with the given value
-    public convenience init(value: T) {
+    public convenience init(value: Value) {
         self.init(value: value)
     }
 
     // Check whether or not the receiver is filled
     public var isFilled: Bool {
-        return protected.withReadLock { $0.protectedValue != nil }
+        return protected.withReadLock { $0.protected != nil }
     }
 
-    private func _fill(value: T, assertIfFilled: Bool) {
-        let (filledValue, blocks) = protected.withWriteLock { data -> (T, [UponBlock]) in
+    private func _fill(value: Value, assertIfFilled: Bool) {
+        let (filledValue, blocks) = protected.withWriteLock { data -> (Value, [UponBlock]) in
             if assertIfFilled {
-                precondition(data.protectedValue == nil, "Cannot fill an already-filled Deferred")
-                data.protectedValue = value
-            } else if data.protectedValue == nil {
-                data.protectedValue = value
+                precondition(data.protected == nil, "Cannot fill an already-filled Deferred")
+                data.protected = value
+            } else if data.protected == nil {
+                data.protected = value
             }
             let blocks = data.uponBlocks
             data.uponBlocks.removeAll(keepCapacity: false)
-            return (data.protectedValue!, blocks)
+            return (data.protected!, blocks)
         }
         for (queue, block) in blocks {
             dispatch_async(queue) { block(filledValue) }
         }
     }
 
-    public func fill(value: T) {
+    public func fill(value: Value) {
         _fill(value, assertIfFilled: true)
     }
 
-    public func fillIfUnfilled(value: T) {
+    public func fillIfUnfilled(value: Value) {
         _fill(value, assertIfFilled: false)
     }
 
-    public func peek() -> T? {
-        return protected.withReadLock { $0.protectedValue }
+    public func peek() -> Value? {
+        return protected.withReadLock { $0.protected }
     }
 
-    public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: T -> ()) {
-        let maybeValue: T? = protected.withWriteLock{ data in
-            if data.protectedValue == nil {
+    public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
+        let maybeValue: Value? = protected.withWriteLock{ data in
+            if data.protected == nil {
                 data.uponBlocks.append( (queue, function) )
             }
-            return data.protectedValue
+            return data.protected
         }
         if let value = maybeValue {
             dispatch_async(queue) { function(value) }
@@ -81,7 +81,7 @@ public final class Deferred<T> {
 }
 
 extension Deferred {
-    public var value: T {
+    public var value: Value {
         // fast path - return if already filled
         if let v = peek() {
             return v
@@ -89,7 +89,7 @@ extension Deferred {
 
         // slow path - block until filled
         let group = dispatch_group_create()
-        var result: T!
+        var result: Value!
         dispatch_group_enter(group)
         self.upon { result = $0; dispatch_group_leave(group) }
         dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
@@ -98,8 +98,8 @@ extension Deferred {
 }
 
 extension Deferred {
-    public func flatMap<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> Deferred<U>) -> Deferred<U> {
-        let d = Deferred<U>()
+    public func flatMap<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
+        let d = Deferred<NewValue>()
         upon(queue) {
             transform($0).upon(queue) {
                 d.fill($0)
@@ -108,13 +108,13 @@ extension Deferred {
         return d
     }
 
-    public func map<U>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: T -> U) -> Deferred<U> {
-        return flatMap(upon: queue) { t in Deferred<U>(value: transform(t)) }
+    public func map<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
+        return flatMap(upon: queue) { t in Deferred<NewValue>(value: transform(t)) }
     }
 }
 
 extension Deferred {
-    public func both<U>(other: Deferred<U>) -> Deferred<(T,U)> {
+    public func both<OtherValue>(other: Deferred<OtherValue>) -> Deferred<(Value, OtherValue)> {
         return self.flatMap { t in other.map { u in (t, u) } }
     }
 }

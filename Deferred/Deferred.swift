@@ -157,8 +157,8 @@ public func all<Value, Collection: CollectionType where Collection.Generator.Ele
     return combined
 }
 
-public func any<T>(deferreds: [Deferred<T>]) -> Deferred<Deferred<T>> {
-    let combined = Deferred<Deferred<T>>()
+public func any<Value, Sequence: SequenceType where Sequence.Generator.Element == Deferred<Value>>(deferreds: Sequence) -> Deferred<Deferred<Value>> {
+    let combined = Deferred<Deferred<Value>>()
     for d in deferreds {
         d.upon { _ in combined.fillIfUnfilled(d) }
     }

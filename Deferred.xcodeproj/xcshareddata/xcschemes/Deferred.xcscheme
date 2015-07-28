@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0610"
-   version = "1.3">
+   LastUpgradeVersion = "0700"
+   version = "1.8">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -14,9 +14,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "523E00A0199915C600E07C3C"
+               BlueprintIdentifier = "DB3294F81B68066C002160CC"
                BuildableName = "Deferred.framework"
                BlueprintName = "Deferred"
+               ReferencedContainer = "container:Deferred.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DBA0D2E61B680F7E00A498CB"
+               BuildableName = "DeferredTests.xctest"
+               BlueprintName = "DeferredTests"
                ReferencedContainer = "container:Deferred.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,7 +42,28 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DBA0D2E61B680F7E00A498CB"
+               BuildableName = "DeferredTests.xctest"
+               BlueprintName = "DeferredTests"
+               ReferencedContainer = "container:Deferred.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "DB3294F81B68066C002160CC"
+            BuildableName = "Deferred.framework"
+            BlueprintName = "Deferred"
+            ReferencedContainer = "container:Deferred.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+      <AdditionalOptions>
+      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -38,11 +73,12 @@
       buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "523E00A0199915C600E07C3C"
+            BlueprintIdentifier = "DB3294F81B68066C002160CC"
             BuildableName = "Deferred.framework"
             BlueprintName = "Deferred"
             ReferencedContainer = "container:Deferred.xcodeproj">
@@ -60,7 +96,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "523E00A0199915C600E07C3C"
+            BlueprintIdentifier = "DB3294F81B68066C002160CC"
             BuildableName = "Deferred.framework"
             BlueprintName = "Deferred"
             ReferencedContainer = "container:Deferred.xcodeproj">

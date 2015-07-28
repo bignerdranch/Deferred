@@ -109,7 +109,11 @@ extension Deferred {
     }
 
     public func map<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
-        return flatMap(upon: queue) { t in Deferred<NewValue>(value: transform(t)) }
+        let d = Deferred<NewValue>()
+        upon(queue) {
+            d.fill(transform($0))
+        }
+        return d
     }
 }
 

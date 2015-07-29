@@ -47,6 +47,7 @@ class ReadWriteLockTests: XCTestCase {
     var gcdLock: DispatchLock!
     var spinLock: SpinLock!
     var casSpinLock: CASSpinLock!
+    var pthreadLock: PThreadReadWriteLock!
     var queue: dispatch_queue_t!
 
     override func setUp() {
@@ -55,6 +56,7 @@ class ReadWriteLockTests: XCTestCase {
         gcdLock = DispatchLock()
         spinLock = SpinLock()
         casSpinLock = CASSpinLock()
+        pthreadLock = PThreadReadWriteLock()
 
         queue = dispatch_queue_create("ReadWriteLockTests", DISPATCH_QUEUE_CONCURRENT)
     }
@@ -65,13 +67,14 @@ class ReadWriteLockTests: XCTestCase {
         casSpinLock = nil
         spinLock = nil
         gcdLock = nil
+        pthreadLock = nil
 
         super.tearDown()
     }
 
     func testMultipleConcurrentReaders() {
         // do not test spinLock, as it does not allow concurrent reading
-        let locks: [ReadWriteLock] = [casSpinLock]
+        let locks: [ReadWriteLock] = [casSpinLock, pthreadLock]
         for lock in locks {
             // start up 32 readers that block for 0.1 seconds each...
             for _ in 0 ..< 32 {
@@ -92,7 +95,7 @@ class ReadWriteLockTests: XCTestCase {
 
     func testMultipleConcurrentWriters() {
         // all three lock types ensure writes happen exclusively
-        let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock]
+        let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock, pthreadLock, gcdLock]
         for lock in locks {
             var x: Int32 = 0
 
@@ -116,7 +119,7 @@ class ReadWriteLockTests: XCTestCase {
 
     func testSimultaneousReadersAndWriters() {
         // all three lock types ensure reads cannot run while writes do
-        let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock]
+        let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock, pthreadLock, gcdLock]
 
         for lock in locks {
             var x: Int32 = 0
@@ -210,14 +213,24 @@ class ReadWriteLockTests: XCTestCase {
         measureWriteLockSingleThread(casSpinLock, iters: 250_000)
     }
 
+    func testSingleThreadPerformancePThreadLockRead() {
+        measureReadLockSingleThread(pthreadLock, iters: 250_000)
+    }
+    func testSingleThreadPerformancePThreadLockWrite() {
+        measureWriteLockSingleThread(pthreadLock, iters: 250_000)
+    }
+
     func test90PercentReads4ThreadsGCDLock() {
-        measureLock90PercentReadsNThreads(gcdLock, iters: 2_500, nthreads: 4)
+        measureLock90PercentReadsNThreads(gcdLock, iters: 5_000, nthreads: 4)
     }
     func test90PercentReads4ThreadsSpinLock() {
-        measureLock90PercentReadsNThreads(spinLock, iters: 2_500, nthreads: 4)
+        measureLock90PercentReadsNThreads(spinLock, iters: 5_000, nthreads: 4)
     }
     func test90PercentReads4ThreadsCASSpinLock() {
-        measureLock90PercentReadsNThreads(casSpinLock, iters: 2_500, nthreads: 4)
+        measureLock90PercentReadsNThreads(casSpinLock, iters: 5_000, nthreads: 4)
+    }
+    func test90PercentReads4ThreadsPThreadLock() {
+        measureLock90PercentReadsNThreads(pthreadLock, iters: 5_000, nthreads: 4)
     }
 
 }

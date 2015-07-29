@@ -154,3 +154,30 @@ public final class CASSpinLock: ReadWriteLock {
         return result
     }
 }
+
+public final class PThreadReadWriteLock: ReadWriteLock {
+    private var lock: UnsafeMutablePointer<pthread_rwlock_t>
+
+    public init() {
+        lock = UnsafeMutablePointer.alloc(1)
+        let status = pthread_rwlock_init(lock, nil)
+        assert(status == 0)
+    }
+
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
+        let result: T
+        pthread_rwlock_rdlock(lock)
+        result = body()
+        pthread_rwlock_unlock(lock)
+        return result
+    }
+
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+        let result: T
+        pthread_rwlock_wrlock(lock)
+        result = body()
+        pthread_rwlock_unlock(lock)
+        return result
+    }
+
+}

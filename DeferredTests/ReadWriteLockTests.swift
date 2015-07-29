@@ -44,7 +44,7 @@ class PerfTestThread: NSThread {
 }
 
 class ReadWriteLockTests: XCTestCase {
-    var gcdLock: GCDReadWriteLock!
+    var gcdLock: DispatchLock!
     var spinLock: SpinLock!
     var casSpinLock: CASSpinLock!
     var queue: dispatch_queue_t!
@@ -52,7 +52,7 @@ class ReadWriteLockTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        gcdLock = GCDReadWriteLock()
+        gcdLock = DispatchLock()
         spinLock = SpinLock()
         casSpinLock = CASSpinLock()
 
@@ -71,7 +71,7 @@ class ReadWriteLockTests: XCTestCase {
 
     func testMultipleConcurrentReaders() {
         // do not test spinLock, as it does not allow concurrent reading
-        let locks: [ReadWriteLock] = [gcdLock, casSpinLock]
+        let locks: [ReadWriteLock] = [casSpinLock]
         for lock in locks {
             // start up 32 readers that block for 0.1 seconds each...
             for _ in 0 ..< 32 {

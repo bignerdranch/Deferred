@@ -13,25 +13,25 @@ public protocol ReadWriteLock {
     func withWriteLock<T>(block: () -> T) -> T
 }
 
-public final class GCDReadWriteLock: ReadWriteLock {
-    private let queue = dispatch_queue_create("GCDReadWriteLock", DISPATCH_QUEUE_CONCURRENT)
+public struct DispatchLock: ReadWriteLock {
+    private let semaphore = dispatch_semaphore_create(1)
 
     public init() {}
 
-    public func withReadLock<T>(block: () -> T) -> T {
-        var result: T!
-        dispatch_sync(queue) {
-            result = block()
-        }
+    private func withLock<T>(block: () -> T) -> T {
+        let result: T
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+        result = block()
+        dispatch_semaphore_signal(semaphore)
         return result
     }
 
+    public func withReadLock<T>(block: () -> T) -> T {
+        return withLock(block)
+    }
+
     public func withWriteLock<T>(block: () -> T) -> T {
-        var result: T!
-        dispatch_barrier_sync(queue) {
-            result = block()
-        }
-        return result
+        return withLock(block)
     }
 }
 

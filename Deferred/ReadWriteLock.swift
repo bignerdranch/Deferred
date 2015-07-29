@@ -36,7 +36,7 @@ public struct DispatchLock: ReadWriteLock {
 }
 
 public final class SpinLock: ReadWriteLock {
-    private var lock: UnsafeMutablePointer<Int32>
+    private var lock: UnsafeMutablePointer<OSSpinLock>
 
     public init() {
         lock = UnsafeMutablePointer.alloc(1)

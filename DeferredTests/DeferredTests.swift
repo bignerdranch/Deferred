@@ -41,7 +41,7 @@ class DeferredTests: XCTestCase {
     func testValueBlocksWhileUnfilled() {
         let unfilled = Deferred<Int>()
 
-        var expect = expectationWithDescription("value blocks while unfilled")
+        let expect = expectationWithDescription("value blocks while unfilled")
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             _ = unfilled.value
             XCTFail("value did not block")
@@ -88,7 +88,7 @@ class DeferredTests: XCTestCase {
     func testUponWithFilled() {
         let d = Deferred(value: 1)
 
-        for i in 0 ..< 10 {
+        for _ in 0 ..< 10 {
             let expect = expectationWithDescription("upon blocks called with correct value")
             d.upon { value in
                 XCTAssertEqual(value, 1)
@@ -117,7 +117,7 @@ class DeferredTests: XCTestCase {
     func testUponCalledWhenFilled() {
         let d = Deferred<Int>()
 
-        for i in 0 ..< 10 {
+        for _ in 0 ..< 10 {
             let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")
             d.upon { value in
                 XCTAssertEqual(value, 1)
@@ -178,7 +178,7 @@ class DeferredTests: XCTestCase {
     func testAll() {
         var d = [Deferred<Int>]()
 
-        for i in 0 ..< 10 {
+        for _ in 0 ..< 10 {
             d.append(Deferred())
         }
 
@@ -206,10 +206,16 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(1, handler: nil)
     }
 
+    func testAllEmptyArray() {
+        let d = [Deferred<Int>]()
+        let array = all(d)
+        XCTAssert(array.isFilled)
+    }
+
     func testAny() {
         var d = [Deferred<Int>]()
 
-        for i in 0 ..< 10 {
+        for _ in 0 ..< 10 {
             d.append(Deferred())
         }
 

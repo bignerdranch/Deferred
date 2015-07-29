@@ -9,8 +9,8 @@
 import Foundation
 
 public protocol ReadWriteLock {
-    func withReadLock<T>(block: () -> T) -> T
-    func withWriteLock<T>(block: () -> T) -> T
+    func withReadLock<T>(@noescape body: () -> T) -> T
+    func withWriteLock<T>(@noescape body: () -> T) -> T
 }
 
 public struct DispatchLock: ReadWriteLock {
@@ -18,20 +18,20 @@ public struct DispatchLock: ReadWriteLock {
 
     public init() {}
 
-    private func withLock<T>(block: () -> T) -> T {
+    private func withLock<T>(@noescape body: () -> T) -> T {
         let result: T
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-        result = block()
+        result = body()
         dispatch_semaphore_signal(semaphore)
         return result
     }
 
-    public func withReadLock<T>(block: () -> T) -> T {
-        return withLock(block)
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
     }
 
-    public func withWriteLock<T>(block: () -> T) -> T {
-        return withLock(block)
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
     }
 }
 
@@ -47,18 +47,20 @@ public final class SpinLock: ReadWriteLock {
         lock.dealloc(1)
     }
 
-    public func withReadLock<T>(block: () -> T) -> T {
+    private func withLock<T>(@noescape body: () -> T) -> T {
+        let result: T
         OSSpinLockLock(lock)
-        let result = block()
+        result = body()
         OSSpinLockUnlock(lock)
         return result
     }
 
-    public func withWriteLock<T>(block: () -> T) -> T {
-        OSSpinLockLock(lock)
-        let result = block()
-        OSSpinLockUnlock(lock)
-        return result
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
+    }
+
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
     }
 }
 
@@ -82,7 +84,7 @@ public final class CASSpinLock: ReadWriteLock {
         _state.dealloc(1)
     }
 
-    public func withWriteLock<T>(block: () -> T) -> T {
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
         // spin until we acquire write lock
         do {
             let state = _state.memory
@@ -102,7 +104,7 @@ public final class CASSpinLock: ReadWriteLock {
         } while true
 
         // write lock acquired - run block
-        let result = block()
+        let result = body()
 
         // unlock
         do {
@@ -118,7 +120,7 @@ public final class CASSpinLock: ReadWriteLock {
         return result
     }
 
-    public func withReadLock<T>(block: () -> T) -> T {
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
         // spin until we acquire read lock
         do {
             let state = _state.memory
@@ -131,7 +133,7 @@ public final class CASSpinLock: ReadWriteLock {
         } while true
 
         // read lock acquired - run block
-        let result = block()
+        let result = body()
 
         // decrement reader count
         do {

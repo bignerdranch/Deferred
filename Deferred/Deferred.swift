@@ -42,7 +42,7 @@ public enum Timeout {
     }
 }
 
-public final class Deferred<Value> {
+public struct Deferred<Value> {
     private let accessQueue: dispatch_queue_t
     private let onFilled: dispatch_block_t
 
@@ -63,12 +63,12 @@ public final class Deferred<Value> {
     }
 
     // Initialize an unfilled Deferred
-    public convenience init() {
+    public init() {
         self.init(nil)
     }
 
     // Initialize a filled Deferred with the given value
-    public convenience init(value: Value) {
+    public init(value: Value) {
         self.init(value)
     }
 

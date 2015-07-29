@@ -15,6 +15,8 @@
 		DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */; };
 		DB3294FD1B68066C002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB3295541B680872002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB91CEB41B684F4600F99EB3 /* DispatchBlockFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB91CEB31B684F4600F99EB3 /* DispatchBlockFlags.swift */; };
+		DB91CEB51B684F4600F99EB3 /* DispatchBlockFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB91CEB31B684F4600F99EB3 /* DispatchBlockFlags.swift */; };
 		DBA0D2DD1B680F7400A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3295181B680713002160CC /* Deferred.framework */; };
 		DBA0D2EC1B680F7E00A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3294F91B68066C002160CC /* Deferred.framework */; };
 		DBA0D2F51B680F9D00A498CB /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AA1B680E7600394A66 /* DeferredTests.swift */; };
@@ -59,6 +61,7 @@
 		DB3295501B680744002160CC /* Deferred.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Deferred.xcconfig; sourceTree = "<group>"; };
 		DB3295511B680744002160CC /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		DB3295521B680744002160CC /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
+		DB91CEB31B684F4600F99EB3 /* DispatchBlockFlags.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchBlockFlags.swift; sourceTree = "<group>"; };
 		DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -123,6 +126,7 @@
 			children = (
 				DB3294FC1B68066C002160CC /* Deferred.h */,
 				DB0F80A11B680E6C00394A66 /* Deferred.swift */,
+				DB91CEB31B684F4600F99EB3 /* DispatchBlockFlags.swift */,
 				DB0F80A21B680E6C00394A66 /* LockProtected.swift */,
 				DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */,
 				DB3294FE1B68066C002160CC /* Info.plist */,
@@ -330,6 +334,7 @@
 				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A61B680E6C00394A66 /* LockProtected.swift in Sources */,
+				DB91CEB41B684F4600F99EB3 /* DispatchBlockFlags.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +345,7 @@
 				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A71B680E6C00394A66 /* LockProtected.swift in Sources */,
+				DB91CEB51B684F4600F99EB3 /* DispatchBlockFlags.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

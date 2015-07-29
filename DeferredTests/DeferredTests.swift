@@ -9,9 +9,9 @@
 import XCTest
 import Deferred
 
-func dispatch_main_after(interval: NSTimeInterval, block: () -> ()) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSTimeInterval(NSEC_PER_SEC)*interval)),
-            dispatch_get_main_queue(), block)
+func after(interval: NSTimeInterval, upon queue: dispatch_queue_t = dispatch_get_main_queue(), function: () -> ()) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSTimeInterval(NSEC_PER_SEC) * interval)),
+        queue, function)
 }
 
 class DeferredTests: XCTestCase {
@@ -46,7 +46,7 @@ class DeferredTests: XCTestCase {
             _ = unfilled.value
             XCTFail("value did not block")
         }
-        dispatch_main_after(0.1) {
+        after(0.1) {
             expect.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -59,7 +59,7 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(d.value, 3)
             expect.fulfill()
         }
-        dispatch_main_after(0.1) {
+        after(0.1) {
             d.fill(3)
         }
         waitForExpectationsWithTimeout(1, handler: nil)
@@ -107,7 +107,7 @@ class DeferredTests: XCTestCase {
         }
 
         let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")
-        dispatch_main_after(0.1) {
+        after(0.1) {
             expect.fulfill()
         }
 
@@ -126,7 +126,7 @@ class DeferredTests: XCTestCase {
             }
         }
 
-        dispatch_main_after(0.1) {
+        after(0.1) {
             d.fill(1)
         }
 
@@ -191,7 +191,7 @@ class DeferredTests: XCTestCase {
             d[i].fill(i)
         }
 
-        dispatch_main_after(0.1) {
+        after(0.1) {
             XCTAssertFalse(w.isFilled) // unfilled because d[0] is still unfilled
             d[0].fill(0)
 
@@ -229,7 +229,7 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(w.value.value, 3)
 
             d[4].fill(4)
-            dispatch_main_after(0.1) {
+            after(0.1) {
                 XCTAssertTrue(w.value === d[3])
                 XCTAssertEqual(w.value.value, 3)
                 expectation.fulfill()

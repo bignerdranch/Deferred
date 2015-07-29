@@ -81,8 +81,14 @@ class DeferredTests: XCTestCase {
     func testIsFilled() {
         let d = Deferred<Int>()
         XCTAssertFalse(d.isFilled)
+
+        let expect = expectationWithDescription("isFilled is true when filled")
+        d.upon { _ in
+            XCTAssertTrue(d.isFilled)
+            expect.fulfill()
+        }
         d.fill(1)
-        XCTAssertTrue(d.isFilled)
+        waitForExpectationsWithTimeout(1, handler: nil)
     }
 
     func testUponWithFilled() {
@@ -126,9 +132,7 @@ class DeferredTests: XCTestCase {
             }
         }
 
-        after(0.1) {
-            d.fill(1)
-        }
+        d.fill(1)
 
         waitForExpectationsWithTimeout(1, handler: nil)
     }

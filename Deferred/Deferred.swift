@@ -10,7 +10,7 @@ import Foundation
 
 // TODO: Replace this with a class var
 private var DeferredDefaultQueue: dispatch_queue_t {
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
 }
 
 public final class Deferred<Value> {

@@ -6,94 +6,123 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-import Foundation
+private final class Storage<T> {
 
-// TODO: Replace this with a class var
+    var value: T
+
+    init(_ value: T) {
+        self.value = value
+    }
+
+}
+
+// Used for keying into the queue-specific storage
+private var QueueSideTableKey = 0
+
+// This cannot be a class var, new storage would be created for every
+// specialization. It also could not be used as a default argument as it is now.
 private var DeferredDefaultQueue: dispatch_queue_t {
     return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
 }
 
-public final class Deferred<Value> {
-    typealias UponBlock = (dispatch_queue_t, Value -> ())
-    private typealias Protected = (protected: Value?, uponBlocks: [UponBlock])
+public enum Timeout {
+    case Now
+    case Forever
+    case Interval(NSTimeInterval)
 
-    private var protected: LockProtected<Protected>
-
-    private init(value: Value?) {
-        protected = LockProtected(item: (value, []))
-    }
-
-    // Initialize an unfilled Deferred
-    public convenience init() {
-        self.init(value: nil)
-    }
-
-    // Initialize a filled Deferred with the given value
-    public convenience init(value: Value) {
-        self.init(value: value)
-    }
-
-    // Check whether or not the receiver is filled
-    public var isFilled: Bool {
-        return protected.withReadLock { $0.protected != nil }
-    }
-
-    private func _fill(value: Value, assertIfFilled: Bool) {
-        let (filledValue, blocks) = protected.withWriteLock { data -> (Value, [UponBlock]) in
-            if assertIfFilled {
-                precondition(data.protected == nil, "Cannot fill an already-filled Deferred")
-                data.protected = value
-            } else if data.protected == nil {
-                data.protected = value
-            }
-            let blocks = data.uponBlocks
-            data.uponBlocks.removeAll(keepCapacity: false)
-            return (data.protected!, blocks)
-        }
-        for (queue, block) in blocks {
-            dispatch_async(queue) { block(filledValue) }
-        }
-    }
-
-    public func fill(value: Value) {
-        _fill(value, assertIfFilled: true)
-    }
-
-    public func fillIfUnfilled(value: Value) {
-        _fill(value, assertIfFilled: false)
-    }
-
-    public func peek() -> Value? {
-        return protected.withReadLock { $0.protected }
-    }
-
-    public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
-        let maybeValue: Value? = protected.withWriteLock{ data in
-            if data.protected == nil {
-                data.uponBlocks.append( (queue, function) )
-            }
-            return data.protected
-        }
-        if let value = maybeValue {
-            dispatch_async(queue) { function(value) }
+    private var rawValue: dispatch_time_t {
+        switch self {
+        case .Now:
+            return DISPATCH_TIME_NOW
+        case .Forever:
+            return DISPATCH_TIME_FOREVER
+        case .Interval(let time):
+            return dispatch_time(DISPATCH_TIME_NOW, Int64(time * Double(NSEC_PER_SEC)))
         }
     }
 }
 
-extension Deferred {
-    public var value: Value {
-        // fast path - return if already filled
-        if let v = peek() {
-            return v
+public final class Deferred<Value> {
+    private let accessQueue: dispatch_queue_t
+    private let onFilled: dispatch_block_t
+
+    private static var currentStorage: Storage<Value?> {
+        let boxPtr = dispatch_get_specific(&QueueSideTableKey)
+        assert(boxPtr != nil, "Deferred side-table should not be accessed off-queue")
+        let boxRef = Unmanaged<Storage<Value?>>.fromOpaque(COpaquePointer(boxPtr))
+        return boxRef.takeUnretainedValue()
+    }
+
+    private init(_ value: Value?) {
+        accessQueue = dispatch_queue_create("Deferred", DISPATCH_QUEUE_CONCURRENT)
+        onFilled = dispatch_block_create(nil) {}
+        deferred_queue_set_specific_object(accessQueue, &QueueSideTableKey, Storage(value))
+        if value != nil {
+            onFilled()
+        }
+    }
+
+    // Initialize an unfilled Deferred
+    public convenience init() {
+        self.init(nil)
+    }
+
+    // Initialize a filled Deferred with the given value
+    public convenience init(value: Value) {
+        self.init(value)
+    }
+
+    // Check whether or not the receiver is filled
+    public var isFilled: Bool {
+        return dispatch_block_wait(onFilled, DISPATCH_TIME_NOW) == 0
+    }
+
+    public func fill(value: Value, assertIfFilled: Bool = true) {
+        dispatch_barrier_async(accessQueue) { [filled = onFilled] in
+            let box = Deferred.currentStorage
+            if box.value == nil {
+                box.value = value
+                filled()
+            } else if assertIfFilled {
+                preconditionFailure("Cannot fill an already-filled Deferred")
+            }
+        }
+    }
+
+    public func fillIfUnfilled(value: Value) {
+        fill(value, assertIfFilled: false)
+    }
+
+    public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
+        dispatch_async(accessQueue) { [block = onFilled] in
+            dispatch_block_notify(block, queue) { [box = Deferred.currentStorage] in
+                box.value.map(function)
+            }
+        }
+    }
+
+    public func wait(time: Timeout) -> Value? {
+        var value: Value?
+        let block = dispatch_block_create(nil) {
+            value = Deferred.currentStorage.value
         }
 
-        // slow path - block until filled
-        let group = dispatch_group_create()
-        var result: Value!
-        dispatch_group_enter(group)
-        self.upon { result = $0; dispatch_group_leave(group) }
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
-        return result
+        dispatch_block_notify(onFilled, accessQueue, block)
+        if dispatch_block_wait(block, time.rawValue) != 0 {
+            dispatch_block_cancel(block)
+        }
+
+        return value
+    }
+}
+
+extension Deferred {
+    public func peek() -> Value? {
+        return wait(.Now)
+    }
+
+    public var value: Value {
+        return unsafeUnwrap(wait(.Forever))
     }
 }
 

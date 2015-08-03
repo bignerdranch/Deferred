@@ -164,6 +164,12 @@ public final class PThreadReadWriteLock: ReadWriteLock {
         assert(status == 0)
     }
 
+    deinit {
+        let status = pthread_rwlock_destroy(lock)
+        assert(status == 0)
+        lock.dealloc(1)
+    }
+
     public func withReadLock<T>(@noescape body: () -> T) -> T {
         let result: T
         pthread_rwlock_rdlock(lock)

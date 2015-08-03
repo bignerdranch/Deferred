@@ -40,7 +40,7 @@ public final class SpinLock: ReadWriteLock {
 
     public init() {
         lock = UnsafeMutablePointer.alloc(1)
-        lock.memory = OS_SPINLOCK_INIT
+        lock.initialize(OS_SPINLOCK_INIT)
     }
 
     deinit {

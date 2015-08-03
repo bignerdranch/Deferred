@@ -3,15 +3,11 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/19/14.
-//  Copyright (c) 2014 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
-#if os(iOS)
 import Deferred
-#else
-import DeferredMac
-#endif
 
 func dispatch_main_after(interval: NSTimeInterval, block: () -> ()) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSTimeInterval(NSEC_PER_SEC)*interval)),

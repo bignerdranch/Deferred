@@ -8,35 +8,35 @@
 
 import Foundation
 
-public protocol ReadWriteLock: class {
-    func withReadLock<T>(block: () -> T) -> T
-    func withWriteLock<T>(block: () -> T) -> T
+public protocol ReadWriteLock {
+    func withReadLock<T>(@noescape body: () -> T) -> T
+    func withWriteLock<T>(@noescape body: () -> T) -> T
 }
 
-public final class GCDReadWriteLock: ReadWriteLock {
-    private let queue = dispatch_queue_create("GCDReadWriteLock", DISPATCH_QUEUE_CONCURRENT)
+public struct DispatchLock: ReadWriteLock {
+    private let semaphore = dispatch_semaphore_create(1)
 
     public init() {}
 
-    public func withReadLock<T>(block: () -> T) -> T {
-        var result: T!
-        dispatch_sync(queue) {
-            result = block()
-        }
+    private func withLock<T>(@noescape body: () -> T) -> T {
+        let result: T
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+        result = body()
+        dispatch_semaphore_signal(semaphore)
         return result
     }
 
-    public func withWriteLock<T>(block: () -> T) -> T {
-        var result: T!
-        dispatch_barrier_sync(queue) {
-            result = block()
-        }
-        return result
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
+    }
+
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
     }
 }
 
 public final class SpinLock: ReadWriteLock {
-    private var lock: UnsafeMutablePointer<Int32>
+    private var lock: UnsafeMutablePointer<OSSpinLock>
 
     public init() {
         lock = UnsafeMutablePointer.alloc(1)
@@ -47,18 +47,20 @@ public final class SpinLock: ReadWriteLock {
         lock.dealloc(1)
     }
 
-    public func withReadLock<T>(block: () -> T) -> T {
+    private func withLock<T>(@noescape body: () -> T) -> T {
+        let result: T
         OSSpinLockLock(lock)
-        let result = block()
+        result = body()
         OSSpinLockUnlock(lock)
         return result
     }
 
-    public func withWriteLock<T>(block: () -> T) -> T {
-        OSSpinLockLock(lock)
-        let result = block()
-        OSSpinLockUnlock(lock)
-        return result
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
+    }
+
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+        return withLock(body)
     }
 }
 
@@ -82,7 +84,7 @@ public final class CASSpinLock: ReadWriteLock {
         _state.dealloc(1)
     }
 
-    public func withWriteLock<T>(block: () -> T) -> T {
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
         // spin until we acquire write lock
         do {
             let state = _state.memory
@@ -102,7 +104,7 @@ public final class CASSpinLock: ReadWriteLock {
         } while true
 
         // write lock acquired - run block
-        let result = block()
+        let result = body()
 
         // unlock
         do {
@@ -118,7 +120,7 @@ public final class CASSpinLock: ReadWriteLock {
         return result
     }
 
-    public func withReadLock<T>(block: () -> T) -> T {
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
         // spin until we acquire read lock
         do {
             let state = _state.memory
@@ -131,7 +133,7 @@ public final class CASSpinLock: ReadWriteLock {
         } while true
 
         // read lock acquired - run block
-        let result = block()
+        let result = body()
 
         // decrement reader count
         do {
@@ -151,4 +153,37 @@ public final class CASSpinLock: ReadWriteLock {
 
         return result
     }
+}
+
+public final class PThreadReadWriteLock: ReadWriteLock {
+    private var lock: UnsafeMutablePointer<pthread_rwlock_t>
+
+    public init() {
+        lock = UnsafeMutablePointer.alloc(1)
+        let status = pthread_rwlock_init(lock, nil)
+        assert(status == 0)
+    }
+
+    deinit {
+        let status = pthread_rwlock_destroy(lock)
+        assert(status == 0)
+        lock.dealloc(1)
+    }
+
+    public func withReadLock<T>(@noescape body: () -> T) -> T {
+        let result: T
+        pthread_rwlock_rdlock(lock)
+        result = body()
+        pthread_rwlock_unlock(lock)
+        return result
+    }
+
+    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+        let result: T
+        pthread_rwlock_wrlock(lock)
+        result = body()
+        pthread_rwlock_unlock(lock)
+        return result
+    }
+
 }

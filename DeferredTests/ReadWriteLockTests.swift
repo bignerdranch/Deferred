@@ -44,17 +44,24 @@ class PerfTestThread: NSThread {
 }
 
 class ReadWriteLockTests: XCTestCase {
-    var gcdLock: GCDReadWriteLock!
+    var dispatchLock: DispatchLock!
     var spinLock: SpinLock!
     var casSpinLock: CASSpinLock!
+    var pthreadLock: PThreadReadWriteLock!
     var queue: dispatch_queue_t!
+    var allLocks: [ReadWriteLock]!
+    var locksAllowingConcurrentReads: [ReadWriteLock]!
 
     override func setUp() {
         super.setUp()
 
-        gcdLock = GCDReadWriteLock()
+        dispatchLock = DispatchLock()
         spinLock = SpinLock()
         casSpinLock = CASSpinLock()
+        pthreadLock = PThreadReadWriteLock()
+
+        allLocks = [dispatchLock, spinLock, casSpinLock, pthreadLock]
+        locksAllowingConcurrentReads = [casSpinLock, pthreadLock]
 
         queue = dispatch_queue_create("ReadWriteLockTests", DISPATCH_QUEUE_CONCURRENT)
     }
@@ -62,17 +69,19 @@ class ReadWriteLockTests: XCTestCase {
     override func tearDown() {
         queue = nil
 
+        allLocks = nil
+        locksAllowingConcurrentReads = nil
+
         casSpinLock = nil
         spinLock = nil
-        gcdLock = nil
+        dispatchLock = nil
+        pthreadLock = nil
 
         super.tearDown()
     }
 
     func testMultipleConcurrentReaders() {
-        // do not test spinLock, as it does not allow concurrent reading
-        let locks: [ReadWriteLock] = [gcdLock, casSpinLock]
-        for lock in locks {
+        for lock in locksAllowingConcurrentReads {
             // start up 32 readers that block for 0.1 seconds each...
             for _ in 0 ..< 32 {
                 let expectation = expectationWithDescription("read \(lock)")
@@ -91,9 +100,7 @@ class ReadWriteLockTests: XCTestCase {
     }
 
     func testMultipleConcurrentWriters() {
-        // all three lock types ensure writes happen exclusively
-        let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock]
-        for lock in locks {
+        for lock in allLocks {
             var x: Int32 = 0
 
             // spin up 5 writers concurrently...
@@ -115,10 +122,7 @@ class ReadWriteLockTests: XCTestCase {
     }
 
     func testSimultaneousReadersAndWriters() {
-        // all three lock types ensure reads cannot run while writes do
-        let locks: [ReadWriteLock] = [gcdLock, casSpinLock, spinLock]
-
-        for lock in locks {
+        for lock in allLocks {
             var x: Int32 = 0
 
             let startReader: (Int) -> () = { i in
@@ -190,10 +194,10 @@ class ReadWriteLockTests: XCTestCase {
     }
 
     func testSingleThreadPerformanceGCDLockRead() {
-        measureReadLockSingleThread(gcdLock, iters: 250_000)
+        measureReadLockSingleThread(dispatchLock, iters: 250_000)
     }
     func testSingleThreadPerformanceGCDLockWrite() {
-        measureWriteLockSingleThread(gcdLock, iters: 250_000)
+        measureWriteLockSingleThread(dispatchLock, iters: 250_000)
     }
 
     func testSingleThreadPerformanceSpinLockRead() {
@@ -210,14 +214,24 @@ class ReadWriteLockTests: XCTestCase {
         measureWriteLockSingleThread(casSpinLock, iters: 250_000)
     }
 
+    func testSingleThreadPerformancePThreadLockRead() {
+        measureReadLockSingleThread(pthreadLock, iters: 250_000)
+    }
+    func testSingleThreadPerformancePThreadLockWrite() {
+        measureWriteLockSingleThread(pthreadLock, iters: 250_000)
+    }
+
     func test90PercentReads4ThreadsGCDLock() {
-        measureLock90PercentReadsNThreads(gcdLock, iters: 2_500, nthreads: 4)
+        measureLock90PercentReadsNThreads(dispatchLock, iters: 5_000, nthreads: 4)
     }
     func test90PercentReads4ThreadsSpinLock() {
-        measureLock90PercentReadsNThreads(spinLock, iters: 2_500, nthreads: 4)
+        measureLock90PercentReadsNThreads(spinLock, iters: 5_000, nthreads: 4)
     }
     func test90PercentReads4ThreadsCASSpinLock() {
-        measureLock90PercentReadsNThreads(casSpinLock, iters: 2_500, nthreads: 4)
+        measureLock90PercentReadsNThreads(casSpinLock, iters: 5_000, nthreads: 4)
+    }
+    func test90PercentReads4ThreadsPThreadLock() {
+        measureLock90PercentReadsNThreads(pthreadLock, iters: 5_000, nthreads: 4)
     }
 
 }

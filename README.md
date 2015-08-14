@@ -174,7 +174,7 @@ func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
 ```
 
 ### Further Information
-For further info, please refer to [the documentation][docs.md]
+For further info, please refer to [the documentation](docs.md)
 as well as comments in the generated headers.
 
 If you have a question not answered by either,

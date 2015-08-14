@@ -128,7 +128,7 @@ This closure is responsible for aborting the operation if needed.
 Now, if someone defaults the `Deferred<Value>` to some `Value`,
 the `upon` closure will run and cancel the in-flight operation.
 
-Let's look at cancelling our `.Friends` asynchronous request:
+Let's look at cancelling our `AsynchronousFriends` request:
 
 ```swift
 /* * * CLIENT * * */

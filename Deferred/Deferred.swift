@@ -77,7 +77,7 @@ public struct Deferred<Value> {
         return dispatch_block_wait(onFilled, DISPATCH_TIME_NOW) == 0
     }
 
-    public func fill(value: Value, assertIfFilled: Bool = true) {
+    public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UWord = __LINE__) {
         dispatch_barrier_async(accessQueue) { [filled = onFilled] in
             let box = Deferred.currentStorage
             switch (box.value, assertIfFilled) {
@@ -87,7 +87,7 @@ public struct Deferred<Value> {
             case (.Some, false):
                 break
             case (.Some, _):
-                preconditionFailure("Cannot fill an already-filled Deferred")
+                preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
             }
         }
     }

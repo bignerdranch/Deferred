@@ -80,10 +80,13 @@ public struct Deferred<Value> {
     public func fill(value: Value, assertIfFilled: Bool = true) {
         dispatch_barrier_async(accessQueue) { [filled = onFilled] in
             let box = Deferred.currentStorage
-            if box.value == nil {
+            switch (box.value, assertIfFilled) {
+            case (.None, _):
                 box.value = value
                 filled()
-            } else if assertIfFilled {
+            case (.Some, false):
+                break
+            case (.Some, _):
                 preconditionFailure("Cannot fill an already-filled Deferred")
             }
         }

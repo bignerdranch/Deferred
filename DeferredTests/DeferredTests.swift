@@ -282,4 +282,25 @@ class DeferredTests: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
     }
+    
+    func testDeferredOptionalBehavesCorrectly() {
+        let d = Deferred<Optional<Int>>(value: .None)
+
+        let beforeExpectation = expectationWithDescription("already filled with nil optional")
+        d.upon {
+            XCTAssert($0 == .None)
+            beforeExpectation.fulfill()
+        }
+
+        d.fillIfUnfilled(42)
+
+        let afterExpectation = expectationWithDescription("stays filled with same optional")
+        d.upon {
+            XCTAssert($0 == .None)
+            afterExpectation.fulfill()
+        }
+        
+        waitForExpectationsWithTimeout(0.5, handler: nil)
+    }
+    
 }

@@ -92,10 +92,6 @@ public struct Deferred<Value> {
         }
     }
 
-    public func fillIfUnfilled(value: Value) {
-        fill(value, assertIfFilled: false)
-    }
-
     public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
         dispatch_async(accessQueue) { [block = onFilled] in
             dispatch_block_notify(block, queue) { [box = Deferred.currentStorage] in
@@ -182,7 +178,7 @@ public func all<Value, Collection: CollectionType where Collection.Generator.Ele
 public func any<Value, Sequence: SequenceType where Sequence.Generator.Element == Deferred<Value>>(deferreds: Sequence) -> Deferred<Deferred<Value>> {
     let combined = Deferred<Deferred<Value>>()
     for d in deferreds {
-        d.upon { _ in combined.fillIfUnfilled(d) }
+        d.upon { _ in combined.fill(d, assertIfFilled: false) }
     }
     return combined
 }

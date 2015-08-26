@@ -71,10 +71,10 @@ class DeferredTests: XCTestCase {
         XCTAssertEqual(d.value, 1)
     }
 
-    func testFillIfUnfilled() {
+    func testFillMultipleTimes() {
         let d = Deferred(value: 1)
         XCTAssertEqual(d.value, 1)
-        d.fillIfUnfilled(2)
+        d.fill(2, assertIfFilled: false)
         XCTAssertEqual(d.value, 1)
     }
 
@@ -277,7 +277,7 @@ class DeferredTests: XCTestCase {
             beforeExpectation.fulfill()
         }
 
-        d.fillIfUnfilled(42)
+        d.fill(42, assertIfFilled: false)
 
         let afterExpectation = expectationWithDescription("stays filled with same optional")
         d.upon {

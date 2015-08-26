@@ -8,7 +8,8 @@
 
 import Foundation
 
-// TODO: Replace this with a class var
+// This cannot be a class var, new storage would be created for every
+// specialization. It also could not be used as a default argument as it is now.
 private var DeferredDefaultQueue: dispatch_queue_t {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 }

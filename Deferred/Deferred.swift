@@ -6,8 +6,6 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-import Foundation
-
 // This cannot be a class var, new storage would be created for every
 // specialization. It also could not be used as a default argument as it is now.
 private var DeferredDefaultQueue: dispatch_queue_t {

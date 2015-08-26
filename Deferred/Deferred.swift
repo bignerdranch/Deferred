@@ -12,24 +12,24 @@ private var DeferredDefaultQueue: dispatch_queue_t {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 }
 
-public final class Deferred<Value> {
+public struct Deferred<Value> {
     typealias UponBlock = (dispatch_queue_t, Value -> ())
     private typealias Protected = (protected: Value?, uponBlocks: [UponBlock])
 
     private var protected: LockProtected<Protected>
 
-    private init(value: Value?) {
+    private init(_ value: Value?) {
         protected = LockProtected(item: (value, []))
     }
 
     // Initialize an unfilled Deferred
-    public convenience init() {
-        self.init(value: nil)
+    public init() {
+        self.init(nil)
     }
 
     // Initialize a filled Deferred with the given value
-    public convenience init(value: Value) {
-        self.init(value: value)
+    public init(value: Value) {
+        self.init(value)
     }
 
     // Check whether or not the receiver is filled

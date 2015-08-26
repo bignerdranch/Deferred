@@ -240,4 +240,31 @@ class DeferredTests: XCTestCase {
 
         waitForExpectationsWithTimeout(1, handler: nil)
     }
+
+    /// Deferred values behave as values: All copies reflect the same value.
+    /// The wrinkle of course is that the value might not be observable till a later
+    /// date.
+    func testAllCopiesOfADeferredValueRepresentTheSameDeferredValue() {
+        let parent = Deferred<Int>()
+        let child1 = parent
+        let child2 = parent
+        let allDeferreds = [parent, child1, child2]
+
+        let anyValue = 42
+        let expectedValues = [Int](count: count(allDeferreds), repeatedValue: anyValue)
+
+        let allShouldBeFulfilled = expectationWithDescription("filling any copy fulfills all")
+        all(allDeferreds).upon {
+            [weak allShouldBeFulfilled] allValues in
+            allShouldBeFulfilled?.fulfill()
+
+            XCTAssertEqual(allValues, expectedValues, "all deferreds are the same value")
+        }
+
+        let randomIndex = arc4random_uniform(numericCast(allDeferreds.count))
+        let oneOfTheDeferreds = allDeferreds[numericCast(randomIndex)]
+        oneOfTheDeferreds.fill(anyValue)
+
+        waitForExpectationsWithTimeout(0.5, handler: nil)
+    }
 }

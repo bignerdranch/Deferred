@@ -37,8 +37,8 @@ public final class Deferred<Value> {
     public var isFilled: Bool {
         return protected.withReadLock { $0.protected != nil }
     }
-
-    private func _fill(value: Value, assertIfFilled: Bool) {
+    
+    public func fill(value: Value, assertIfFilled: Bool = true) {
         let (filledValue, blocks) = protected.withWriteLock { data -> (Value, [UponBlock]) in
             if assertIfFilled {
                 precondition(data.protected == nil, "Cannot fill an already-filled Deferred")
@@ -55,12 +55,8 @@ public final class Deferred<Value> {
         }
     }
 
-    public func fill(value: Value) {
-        _fill(value, assertIfFilled: true)
-    }
-
     public func fillIfUnfilled(value: Value) {
-        _fill(value, assertIfFilled: false)
+        fill(value, assertIfFilled: false)
     }
 
     public func peek() -> Value? {

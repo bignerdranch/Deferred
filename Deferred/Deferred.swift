@@ -37,7 +37,7 @@ public struct Deferred<Value> {
         return protected.withReadLock { $0.protected != nil }
     }
     
-    public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UWord = __LINE__) {
+    public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
         let (filledValue, blocks) = protected.withWriteLock { data -> (Value, [UponBlock]) in
             if assertIfFilled {
                 precondition(data.protected == nil, "Cannot fill an already-filled Deferred", file: file, line: line)
@@ -58,7 +58,7 @@ public struct Deferred<Value> {
         return protected.withReadLock { $0.protected }
     }
 
-    public func upon(_ queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
+    public func upon(queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
         let maybeValue: Value? = protected.withWriteLock{ data in
             if data.protected == nil {
                 data.uponBlocks.append( (queue, function) )

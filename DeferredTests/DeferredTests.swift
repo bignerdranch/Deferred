@@ -217,7 +217,7 @@ class DeferredTests: XCTestCase {
     }
 
     func testAny() {
-        let d = map(0 ..< 10) { _ in Deferred<Int>() }
+        let d = (0 ..< 10).map { _ in Deferred<Int>() }
         let w = any(d)
 
         d[3].fill(3)
@@ -251,7 +251,7 @@ class DeferredTests: XCTestCase {
         let allDeferreds = [parent, child1, child2]
 
         let anyValue = 42
-        let expectedValues = [Int](count: count(allDeferreds), repeatedValue: anyValue)
+        let expectedValues = [Int](count: allDeferreds.count, repeatedValue: anyValue)
 
         let allShouldBeFulfilled = expectationWithDescription("filling any copy fulfills all")
         all(allDeferreds).upon {

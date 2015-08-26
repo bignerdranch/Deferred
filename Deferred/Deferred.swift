@@ -114,7 +114,7 @@ extension Deferred {
 
 extension Deferred {
     public func both<OtherValue>(other: Deferred<OtherValue>) -> Deferred<(Value, OtherValue)> {
-        return self.flatMap { t in other.map { u in (t, u) } }
+        return flatMap { t in other.map { u in (t, u) } }
     }
 }
 

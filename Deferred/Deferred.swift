@@ -191,8 +191,7 @@ extension Deferred {
     :param: transform A function to start a new deferred given the receiving
     value.
     
-    :returns: A new deferred value that is determined once the receiving
-    deferred is determined by beginning some new operation using that value.
+    :returns: The new deferred value returned by the `transform`.
     **/
     public func flatMap<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
         let d = Deferred<NewValue>()

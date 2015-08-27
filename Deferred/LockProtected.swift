@@ -10,7 +10,7 @@ import Foundation
 
 /// A `LockProtected` holds onto a value of type T, but only allows access to it
 /// from within a locking statement. This prevents accidental unsafe access when
-/// thread safety is desired..
+/// thread safety is desired.
 public final class LockProtected<T> {
     private var lock: ReadWriteLock
     private var item: T

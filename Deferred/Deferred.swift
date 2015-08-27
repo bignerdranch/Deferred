@@ -86,7 +86,7 @@ public struct Deferred<Value> {
     Call some function once the value is determined.
     
     If the value is already determined, the function will be submitted to the
-    queue immediately. An `upon` call is alreadys executed asnychronously.
+    queue immediately. An `upon` call is always executed asynchronously.
     
     :param: queue A dispatch queue for executing the given function on.
     :param: function A function that uses the determined value.
@@ -138,10 +138,10 @@ extension Deferred {
     becomes determined.
 
     :param: queue A dispatch queue for starting the new operation on.
-    :param: transform A function to start a new deferred given the recieving
+    :param: transform A function to start a new deferred given the receiving
     value.
 
-    :returns: A new deferred value that is determined once the recieving
+    :returns: A new deferred value that is determined once the receiving
     deferred is determined by beginning some new operation using that value.
     **/
     public func flatMap<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
@@ -159,7 +159,7 @@ extension Deferred {
 
     :param: queue A dispatch queue for executing the transform on.
     :param: transform A function to create something using the deferred value.
-    :returns: A new deferred value that is determined once the recieving
+    :returns: A new deferred value that is determined once the receiving
     deferred is determined.
     **/
     public func map<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
@@ -173,7 +173,7 @@ extension Deferred {
 
 extension Deferred {
     /**
-    Composes the recieving value with another.
+    Composes the receiving value with another.
 
     :param: other Any other deferred value.
 

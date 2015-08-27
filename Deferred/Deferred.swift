@@ -187,6 +187,11 @@ extension Deferred {
     Begins another asynchronous operation with the deferred value once it
     becomes determined.
     
+    `flatMap` is similar to `map`, but `transform` returns another `Deferred`
+    instead of an immediate value. Use `flatMap` when you want this deferred
+    value to feed into another asynchronous fetch. You might hear this referred
+    to as "chaining" or "binding".
+    
     :param: queue A dispatch queue for starting the new operation on.
     :param: transform A function to start a new deferred given the receiving
     value.
@@ -205,6 +210,9 @@ extension Deferred {
     
     /**
     Transforms the deferred value once it becomes determined.
+    
+    `map` executes a transform immediately when the deferred value is
+    determined.
     
     :param: queue A dispatch queue for executing the transform on.
     :param: transform A function to create something using the deferred value.

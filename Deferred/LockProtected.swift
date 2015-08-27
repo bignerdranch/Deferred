@@ -33,9 +33,9 @@ public final class LockProtected<T> {
     :param: block A function that reads from the contained item.
     :returns: The value returned from the given function.
     */
-    public func withReadLock<U>(block: T -> U) -> U {
+    public func withReadLock<U>(body: T -> U) -> U {
         return lock.withReadLock { [unowned self] in
-            return block(self.item)
+            return body(self.item)
         }
     }
 
@@ -47,9 +47,9 @@ public final class LockProtected<T> {
     
     :returns: The value returned from the given function.
     */
-    public func withWriteLock<U>(block: (inout T) -> U) -> U {
+    public func withWriteLock<U>(body: (inout T) -> U) -> U {
         return lock.withWriteLock { [unowned self] in
-            return block(&self.item)
+            return body(&self.item)
         }
     }
 }

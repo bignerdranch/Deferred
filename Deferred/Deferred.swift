@@ -32,8 +32,6 @@ public enum Timeout {
     /// Wait indefinitely.
     case Forever
     /// Wait for a given number of seconds.
-    ///
-    /// :note: An `.Interval(0.0)` will achieve different results from `.Now`.
     case Interval(NSTimeInterval)
 
     private var rawValue: dispatch_time_t {

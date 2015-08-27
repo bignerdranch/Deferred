@@ -15,12 +15,12 @@ extension dispatch_block_flags_t: RawOptionSetType {
         return dispatch_block_flags_t(0)
     }
 
-    /// Convert from a bitmask of `UInt`.
+    /// Converts from a bitmask of `UInt`.
     public init(rawValue: UInt) {
         self.init(rawValue)
     }
 
-    /// Create an instance initialized with `nil`.
+    /// Creates an instance initialized with `nil`.
     public init(nilLiteral: ()) {
         self.init(0)
     }

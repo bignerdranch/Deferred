@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "Deferred"
-  s.version      = "2.0b1"
+  s.version      = "2.0b2"
   s.summary      = "An implementation of OCaml's Deferred for Swift."
 
   s.description  = <<-DESC
@@ -21,7 +21,8 @@ Pod::Spec.new do |s|
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.authors             = {"John Gallagher" => "jgallagher@bignerdranch.com", 
-                           "Zachary Waldowski" => "zachary@bignerdranch.com"}
+                           "Zachary Waldowski" => "zachary@bignerdranch.com",
+                           "Brian Hardy" => "brian@bignerdranch.com"}
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

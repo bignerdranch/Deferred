@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "v2.0b1" }
+  s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "v#{s.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

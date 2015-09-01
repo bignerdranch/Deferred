@@ -69,6 +69,10 @@ public struct Deferred<Value> {
             dispatch_async(queue) { function(value) }
         }
     }
+    
+    public func uponMainQueue(function: Value -> ()) {
+        upon(dispatch_get_main_queue(), function: function)
+    }
 }
 
 extension Deferred {

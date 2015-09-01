@@ -136,6 +136,21 @@ class DeferredTests: XCTestCase {
 
         waitForExpectationsWithTimeout(1, handler: nil)
     }
+    
+    func testUponMainQueueCalledWhenFilled() {
+        let d = Deferred<Int>()
+        
+        let expectation = expectationWithDescription("uponMainQueue block called on main queue")
+        d.uponMainQueue { value in
+            XCTAssertTrue(NSThread.isMainThread())
+            XCTAssertEqual(value, 1)
+            XCTAssertEqual(d.value, 1)
+            expectation.fulfill()
+        }
+        
+        d.fill(1)
+        waitForExpectationsWithTimeout(1, handler: nil)
+    }
 
     func testConcurrentUpon() {
         let d = Deferred<Int>()

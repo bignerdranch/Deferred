@@ -303,4 +303,18 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(0.5, handler: nil)
     }
     
+    func testIsFilledCanBeCalledMultipleTimesNotFilled() {
+        let d = Deferred<Int>()
+        XCTAssertFalse(d.isFilled)
+        XCTAssertFalse(d.isFilled)
+        XCTAssertFalse(d.isFilled)
+    }
+    
+    func testIsFilledCanBeCalledMultipleTimesWhenFilled() {
+        let d = Deferred<Int>(value: 42)
+        XCTAssertTrue(d.isFilled)
+        XCTAssertTrue(d.isFilled)
+        XCTAssertTrue(d.isFilled)
+    }
+    
 }

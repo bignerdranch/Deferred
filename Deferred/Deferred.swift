@@ -45,6 +45,7 @@ public struct Deferred<Value> {
         onFilled = dispatch_block_create([]) {}
         deferred_queue_set_specific_object(accessQueue, &QueueSideTableKey, Storage(value))
         if value != nil {
+            dispatch_block_cancel(onFilled)
             onFilled()
         }
     }
@@ -61,7 +62,7 @@ public struct Deferred<Value> {
     
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return dispatch_block_wait(onFilled, DISPATCH_TIME_NOW) == 0
+        return dispatch_block_testcancel(onFilled) != 0
     }
     
     /// Determines the deferred value with a given result.
@@ -86,6 +87,7 @@ public struct Deferred<Value> {
             let box = Deferred.currentStorage
             if box.value == nil {
                 box.value = value
+                dispatch_block_cancel(filled)
                 filled()
             } else if assertIfFilled {
                 preconditionFailure("Cannot fill an already-filled Deferred")

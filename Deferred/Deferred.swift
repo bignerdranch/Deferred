@@ -103,6 +103,15 @@ public struct Deferred<Value> {
         }
     }
     
+    /**
+    Call some function on the main queue once the value is determined.
+    
+    If the value is already determined, the function will be submitted to the
+    main queue immediately. The function is always executed asynchronously, even
+    if the Deferred is filled from the main queue.
+    
+    :param: function A function that uses the determined value.
+    */
     public func uponMainQueue(function: Value -> ()) {
         upon(dispatch_get_main_queue(), function: function)
     }

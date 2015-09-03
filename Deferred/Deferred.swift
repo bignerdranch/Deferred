@@ -6,6 +6,21 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
+extension dispatch_block_flags_t: OptionSetType {}
+
+private final class Storage<T> {
+
+    var value: T
+
+    init(_ value: T) {
+        self.value = value
+    }
+
+}
+
+// Used for keying into the queue-specific storage
+private var QueueSideTableKey = 0
+
 // This cannot be a class var, new storage would be created for every
 // specialization. It also could not be used as a default argument as it is now.
 private var DeferredDefaultQueue: dispatch_queue_t {
@@ -15,13 +30,23 @@ private var DeferredDefaultQueue: dispatch_queue_t {
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value> {
-    typealias UponBlock = (dispatch_queue_t, Value -> ())
-    private typealias Protected = (protected: Value?, uponBlocks: [UponBlock])
+    private let accessQueue: dispatch_queue_t
+    private let onFilled: dispatch_block_t
     
-    private var protected: LockProtected<Protected>
+    private static var currentStorage: Storage<Value?> {
+        let boxPtr = dispatch_get_specific(&QueueSideTableKey)
+        assert(boxPtr != nil, "Deferred side-table should not be accessed off-queue")
+        let boxRef = Unmanaged<Storage<Value?>>.fromOpaque(COpaquePointer(boxPtr))
+        return boxRef.takeUnretainedValue()
+    }
     
     private init(_ value: Value?) {
-        protected = LockProtected(item: (value, []))
+        accessQueue = dispatch_queue_create("Deferred", DISPATCH_QUEUE_CONCURRENT)
+        onFilled = dispatch_block_create([]) {}
+        deferred_queue_set_specific_object(accessQueue, &QueueSideTableKey, Storage(value))
+        if value != nil {
+            onFilled()
+        }
     }
     
     /// Initialize an unfilled Deferred.
@@ -36,7 +61,7 @@ public struct Deferred<Value> {
     
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return protected.withReadLock { $0.protected != nil }
+        return dispatch_block_wait(onFilled, DISPATCH_TIME_NOW) == 0
     }
     
     /// Determines the deferred value with a given result.
@@ -57,29 +82,15 @@ public struct Deferred<Value> {
     /// :param: value The resolved value of the deferred.
     /// :param: assertIfFilled If `false`, race checking is disabled.
     public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
-        let (filledValue, blocks) = protected.withWriteLock { data -> (Value, [UponBlock]) in
-            if assertIfFilled {
-                precondition(data.protected == nil, "Cannot fill an already-filled Deferred", file: file, line: line)
-                data.protected = value
-            } else if data.protected == nil {
-                data.protected = value
+        dispatch_barrier_async(accessQueue) { [filled = onFilled] in
+            let box = Deferred.currentStorage
+            if box.value == nil {
+                box.value = value
+                filled()
+            } else if assertIfFilled {
+                preconditionFailure("Cannot fill an already-filled Deferred")
             }
-            let blocks = data.uponBlocks
-            data.uponBlocks.removeAll(keepCapacity: false)
-            return (data.protected!, blocks)
         }
-        for (queue, block) in blocks {
-            dispatch_async(queue) { block(filledValue) }
-        }
-    }
-    
-    /**
-    Checks for and returns a determined value.
-    
-    :returns: The determined value, if already filled, or `nil`.
-    */
-    public func peek() -> Value? {
-        return protected.withReadLock { $0.protected }
     }
     
     /**
@@ -92,14 +103,12 @@ public struct Deferred<Value> {
     :param: function A function that uses the determined value.
     */
     public func upon(queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
-        let maybeValue: Value? = protected.withWriteLock{ data in
-            if data.protected == nil {
-                data.uponBlocks.append( (queue, function) )
+        dispatch_async(accessQueue) { [block = onFilled] in
+            dispatch_block_notify(block, queue) { [box = Deferred.currentStorage] in
+                if let value = box.value {
+                    function(value)
+                }
             }
-            return data.protected
-        }
-        if let value = maybeValue {
-            dispatch_async(queue) { function(value) }
         }
     }
     
@@ -115,9 +124,41 @@ public struct Deferred<Value> {
     public func uponMainQueue(function: Value -> ()) {
         upon(dispatch_get_main_queue(), function: function)
     }
+
+    /**
+    Waits synchronously for the value to become determined.
+
+    If the value is already determined, the call returns immediately with the
+    value.
+
+    :param: time A length of time to wait for the value to be determined.
+    :returns: The determined value, if filled within the timeout, or `nil`.
+    */
+    public func wait(time: Timeout) -> Value? {
+        var value: Value?
+        let block = dispatch_block_create([]) {
+            value = Deferred.currentStorage.value
+        }
+
+        dispatch_block_notify(onFilled, accessQueue, block)
+        if dispatch_block_wait(block, time.rawValue) != 0 {
+            dispatch_block_cancel(block)
+        }
+
+        return value
+    }
 }
 
 extension Deferred {
+    /**
+    Checks for and returns a determined value.
+
+    :returns: The determined value, if already filled, or `nil`.
+    */
+    public func peek() -> Value? {
+        return wait(.Now)
+    }
+
     /**
     Waits for the value to become determined, then returns it.
 
@@ -130,18 +171,7 @@ extension Deferred {
     :returns: The determined value.
     */
     public var value: Value {
-        // fast path - return if already filled
-        if let v = peek() {
-            return v
-        }
-
-        // slow path - block until filled
-        let group = dispatch_group_create()
-        var result: Value!
-        dispatch_group_enter(group)
-        self.upon { result = $0; dispatch_group_leave(group) }
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
-        return result
+        return unsafeUnwrap(wait(.Forever))
     }
 }
 

@@ -28,6 +28,21 @@ class DeferredTests: XCTestCase {
         super.tearDown()
     }
 
+    func testWaitWithTimeout() {
+        let deferred = Deferred<Int>()
+
+        let expect = expectationWithDescription("value blocks while unfilled")
+        after(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            deferred.fill(42)
+            expect.fulfill()
+        }
+
+        let peek = deferred.wait(.Interval(0.5))
+        XCTAssertNil(peek)
+
+        waitForExpectationsWithTimeout(1.5, handler: nil)
+    }
+
     func testPeek() {
         let d1 = Deferred<Int>()
         let d2 = Deferred(value: 1)

@@ -66,6 +66,14 @@ private final class FilledFutureBox<Value>: FutureBoxBase<Value> {
 ///
 /// Forwards operations to an arbitrary underlying future having the same
 /// `Value` type, hiding the specifics of the underlying `FutureType`.
+///
+/// Authors can use this type to:
+///
+/// - Prevent clients from coupling to the specific kind of `FutureType` your
+///   implementation is currently using.
+/// - Publicly expose only the `FutureType` aspect of a deferred value,
+///   ensuring that only your implementation can fill the deferred value
+///   using the `PromiseType` aspect.
 public struct AnyFuture<Value>: FutureType {
     private let box: FutureBoxBase<Value>
     init(_ box: FutureBoxBase<Value>) {

@@ -31,8 +31,9 @@ OS_INLINE dispatch_block_t deferred_upon_block(dispatch_block_flags_t flags, voi
 }
 
 dispatch_queue_t deferred_create_queue(_Nullable id storage, _Nonnull id *_Nonnull outOnFilledToken) {
-    dispatch_queue_t queue = dispatch_queue_create("Deferred", DISPATCH_QUEUE_CONCURRENT);
-    dispatch_block_t block = dispatch_block_create(0, ^{});
+    dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_UTILITY, 0);
+    dispatch_queue_t queue = dispatch_queue_create("Deferred", attr);
+    dispatch_block_t block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, ^{});
 
     if (storage != nil) {
         deferred_fill_locked(queue, block, storage);
@@ -57,7 +58,7 @@ void deferred_queue_fill(dispatch_queue_t queue, id onFilledToken, id storage, v
 }
 
 void deferred_queue_upon(dispatch_queue_t queue, id onFilledToken, void(^accessHandler)(id)) {
-    dispatch_block_notify(onFilledToken, queue, deferred_upon_block(0, accessHandler));
+    dispatch_block_notify(onFilledToken, queue, deferred_upon_block(DISPATCH_BLOCK_ASSIGN_CURRENT|DISPATCH_BLOCK_INHERIT_QOS_CLASS, accessHandler));
 }
 
 _Bool deferred_queue_wait(dispatch_queue_t queue, id token, dispatch_time_t when, __attribute__((noescape)) void(^accessHandler)(id storage)) {

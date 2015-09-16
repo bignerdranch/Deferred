@@ -152,7 +152,7 @@ extension Deferred {
 
     :returns: The determined value.
     */
-    public var value: Value {
+    internal var value: Value {
         return unsafeUnwrap(wait(.Forever))
     }
 }

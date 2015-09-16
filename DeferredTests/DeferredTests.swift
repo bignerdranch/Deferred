@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import Deferred
+@testable import Deferred
 
 func after(interval: NSTimeInterval, upon queue: dispatch_queue_t = dispatch_get_main_queue(), function: () -> ()) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSTimeInterval(NSEC_PER_SEC) * interval)),

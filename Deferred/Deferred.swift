@@ -193,7 +193,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     ///
     /// :param: value The resolved value of the deferred.
     /// :param: assertIfFilled If `false`, race checking is disabled.
-    public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
+    public func fill(value: Value, assertIfFilled: Bool, file: StaticString, line: UInt) {
         let succeeded = storage.fill(value, onFill: markFilled)
         switch (succeeded, assertIfFilled) {
         case (false, true):

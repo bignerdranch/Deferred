@@ -207,52 +207,6 @@ extension Deferred: PromiseType {}
 
 extension Deferred {
     /**
-    Begins another asynchronous operation with the deferred value once it
-    becomes determined.
-
-    `flatMap` is similar to `map`, but `transform` returns another `Deferred`
-    instead of an immediate value. Use `flatMap` when you want this deferred
-    value to feed into another asynchronous fetch. You might hear this referred
-    to as "chaining" or "binding".
-
-    :param: queue A dispatch queue for starting the new operation on.
-    :param: transform A function to start a new deferred given the receiving
-    value.
-
-    :returns: The new deferred value returned by the `transform`.
-    **/
-    public func flatMap<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
-        let d = Deferred<NewValue>()
-        upon(queue) {
-            transform($0).upon(queue) {
-                d.fill($0)
-            }
-        }
-        return d
-    }
-
-    /**
-    Transforms the deferred value once it becomes determined.
-
-    `map` executes a transform immediately when the deferred value is
-    determined.
-
-    :param: queue A dispatch queue for executing the transform on.
-    :param: transform A function to create something using the deferred value.
-    :returns: A new deferred value that is determined once the receiving
-    deferred is determined.
-    **/
-    public func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
-        let d = Deferred<NewValue>()
-        upon(queue) {
-            d.fill(transform($0))
-        }
-        return d
-    }
-}
-
-extension Deferred {
-    /**
     Composes the receiving value with another.
 
     :param: other Any other deferred value.

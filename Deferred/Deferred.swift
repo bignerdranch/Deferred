@@ -204,17 +204,3 @@ public struct Deferred<Value> {
 extension Deferred: FutureType {}
 
 extension Deferred: PromiseType {}
-
-extension Deferred {
-    /**
-    Composes the receiving value with another.
-
-    :param: other Any other deferred value.
-
-    :returns: A value that becomes determined after both the reciever and the
-    given values become determined.
-    */
-    public func both<OtherValue>(other: Deferred<OtherValue>) -> Deferred<(Value, OtherValue)> {
-        return flatMap { t in other.map { u in (t, u) } }
-    }
-}

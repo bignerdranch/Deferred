@@ -152,3 +152,15 @@ public extension FutureType {
         return d
     }
 }
+
+public extension FutureType {
+    /// Composes this future with another.
+    ///
+    /// - parameter other: Any other future.
+    /// - returns: A value that becomes determined after both the reciever and
+    ///   the given future become determined.
+    /// - seealso: SequenceType.allFutures
+    func and<OtherFuture: FutureType>(other: OtherFuture) -> Deferred<(Value, OtherFuture.Value)> {
+        return flatMap { t in other.map { u in (t, u) } }
+    }
+}

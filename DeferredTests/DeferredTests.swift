@@ -189,10 +189,10 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
-    func testBoth() {
+    func testAnd() {
         let d1 = Deferred<Int>()
         let d2 = Deferred<String>()
-        let both = d1.both(d2)
+        let both = d1.and(d2)
 
         XCTAssertFalse(both.isFilled)
 

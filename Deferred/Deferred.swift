@@ -96,29 +96,12 @@ private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value
     
 }
 
+// MARK: -
+
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
-public struct Deferred<Value> {
-    
+public struct Deferred<Value>: FutureType, PromiseType {
     private var storage = DeferredBuffer<Value>.create()
-
-    private func upon(queue: dispatch_queue_t, var options: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
-        options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
-        let block = dispatch_block_create(options) {
-            self.storage.withValue(body)
-        }
-        dispatch_block_notify(storage.onFilled, queue, block)
-        return block
-    }
-    
-    private func markFilled(marker: OnFillMarker) {
-        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
-        dispatch_block_cancel(marker)
-        // Executing the block "unblocks" it, calling all the `_notify` blocks
-        marker()
-    }
-
-    // MARK: -
     
     /// Initialize an unfilled Deferred.
     public init() {
@@ -131,36 +114,20 @@ public struct Deferred<Value> {
         markFilled(storage.onFilled)
     }
 
+    // MARK: FutureType
+
+    private func upon(queue: dispatch_queue_t, var options: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+        options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
+        let block = dispatch_block_create(options) {
+            self.storage.withValue(body)
+        }
+        dispatch_block_notify(storage.onFilled, queue, block)
+        return block
+    }
+
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
         return dispatch_block_testcancel(storage.onFilled) != 0
-    }
-
-    /// Determines the deferred value with a given result.
-    ///
-    /// Filling a deferred value should usually be attempted only once, and by
-    /// default filling will trap upon improper usage.
-    ///
-    /// * In playgrounds and unoptimized builds (the default for a "Debug"
-    ///   configuration), program execution will be stopped at the caller in
-    ///   a debuggable state.
-    /// * In -O builds (the default for a "Release" configuration), program
-    ///   execution will stop.
-    /// * In -Ounchecked builds, the programming error is assumed to not exist.
-    ///
-    /// If your deferred requires multiple potential fillers to race, you may
-    /// disable the precondition.
-    ///
-    /// :param: value The resolved value of the deferred.
-    /// :param: assertIfFilled If `false`, race checking is disabled.
-    public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
-        let succeeded = storage.fill(value, onFill: markFilled)
-        switch (succeeded, assertIfFilled) {
-        case (false, true):
-            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
-        case (_, _):
-            break
-        }
     }
     
     /**
@@ -199,8 +166,40 @@ public struct Deferred<Value> {
 
         return value
     }
+
+    // MARK: PromiseType
+
+    private func markFilled(marker: OnFillMarker) {
+        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
+        dispatch_block_cancel(marker)
+        // Executing the block "unblocks" it, calling all the `_notify` blocks
+        marker()
+    }
+    
+    /// Determines the deferred value with a given result.
+    ///
+    /// Filling a deferred value should usually be attempted only once, and by
+    /// default filling will trap upon improper usage.
+    ///
+    /// * In playgrounds and unoptimized builds (the default for a "Debug"
+    ///   configuration), program execution will be stopped at the caller in
+    ///   a debuggable state.
+    /// * In -O builds (the default for a "Release" configuration), program
+    ///   execution will stop.
+    /// * In -Ounchecked builds, the programming error is assumed to not exist.
+    ///
+    /// If your deferred requires multiple potential fillers to race, you may
+    /// disable the precondition.
+    ///
+    /// :param: value The resolved value of the deferred.
+    /// :param: assertIfFilled If `false`, race checking is disabled.
+    public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
+        let succeeded = storage.fill(value, onFill: markFilled)
+        switch (succeeded, assertIfFilled) {
+        case (false, true):
+            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
+        case (_, _):
+            break
+        }
+    }
 }
-
-extension Deferred: FutureType {}
-
-extension Deferred: PromiseType {}

@@ -82,3 +82,30 @@ public extension FutureType {
         upon(dispatch_get_main_queue(), body: body)
     }
 }
+
+public extension FutureType {
+    /// Checks for and returns a determined value.
+    ///
+    /// - returns: The determined value, if already filled, or `nil`.
+    func peek() -> Value? {
+        return wait(.Now)
+    }
+
+    /// Waits for the value to become determined, then returns it.
+    ///
+    /// This is equivalent to unwrapping the value of calling `wait(.Forever)`,
+    /// but may be more efficient.
+    ///
+    /// This getter will unnecessarily block execution. It might be useful for
+    /// testing, but otherwise it should be strictly avoided.
+    ///
+    /// - returns: The determined value.
+    internal var value: Value {
+        return unsafeUnwrap(wait(.Forever))
+    }
+
+    /// Check whether or not the receiver is filled.
+    internal var isFilled: Bool {
+        return wait(.Now) != nil
+    }
+}

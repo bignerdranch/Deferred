@@ -44,3 +44,28 @@ public protocol PromiseType {
     /// - parameter assertIfFilled: If `false`, race checking is disabled.
     func fill(value: Value, assertIfFilled: Bool, file: StaticString, line: UInt)
 }
+
+public extension PromiseType {
+    /// Determines the deferred value with a given result.
+    ///
+    /// Filling a deferred value should usually be attempted only once. An
+    /// implementing type may choose to enforce this by default. If an
+    /// implementing type requires multiple potential fillers to race, the
+    /// precondition may be disabled.
+    ///
+    /// * In playgrounds and unoptimized builds (the default for a "Debug"
+    ///   configuration), program execution should be stopped at the caller in
+    ///   a debuggable state.
+    ///
+    /// * In -O builds (the default for a "Release" configuration), program
+    ///   execution should stop.
+    ///
+    /// * In -Ounchecked builds, the programming error should be assumed to not
+    ///   exist.
+    ///
+    /// - parameter value: A resolved value for the instance.
+    /// - parameter assertIfFilled: If `false`, race checking is disabled.
+    func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
+        fill(value, assertIfFilled: assertIfFilled, file: file, line: line)
+    }
+}

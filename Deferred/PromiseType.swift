@@ -19,6 +19,9 @@
 public protocol PromiseType {
     /// A type that represents the result of some asynchronous operation.
     typealias Value
+    
+    /// Create the promise in a default, unfilled state
+    init()
 
     /// Check whether or not the receiver is filled.
     var isFilled: Bool { get }

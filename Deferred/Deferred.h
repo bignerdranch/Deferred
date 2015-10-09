@@ -13,3 +13,5 @@ FOUNDATION_EXPORT double DeferredVersionNumber;
 
 //! Project version string for Deferred.
 FOUNDATION_EXPORT const unsigned char DeferredVersionString[];
+
+#import <Deferred/DeferredDispatchBridge.h>

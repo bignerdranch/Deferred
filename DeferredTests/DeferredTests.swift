@@ -334,4 +334,49 @@ class DeferredTests: XCTestCase {
         XCTAssertTrue(d.isFilled)
     }
 
+    // The QoS APIs do not behave as expected on the iOS Simulator, so we only
+    // run these tests on real devices. This check isn't the most future-proof;
+    // if there's ever another archiecture that runs the simulator, this will
+    // need to be modified.
+    //
+    // TODO: Add a clause for a tvOS test target
+    #if os(OSX) || (os(iOS) && !(arch(i386) || arch(x86_64)))
+
+    func testThatMainThreadPostsUponWithUserInitiatedQoSClass() {
+        let d = Deferred<Int>()
+
+        var qos = QOS_CLASS_UNSPECIFIED
+        let expectation = expectationWithDescription("deferred is filled in")
+
+        d.upon { [weak expectation] _ in
+            qos = qos_class_self()
+            expectation?.fulfill()
+        }
+
+        d.fill(42)
+
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssert(qos.rawValue == qos_class_main().rawValue)
+    }
+
+    func testThatLowerQoSPostsUponWithSameQoSClass() {
+        let d = Deferred<Int>()
+        let q = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+
+        var qos = QOS_CLASS_UNSPECIFIED
+        let expectation = expectationWithDescription("deferred is filled in")
+
+        d.upon(q) { [weak expectation] _ in
+            qos = qos_class_self()
+            expectation?.fulfill()
+        }
+
+        d.fill(42)
+
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssert(qos.rawValue == QOS_CLASS_UTILITY.rawValue)
+    }
+
+    #endif // end QoS tests that require a real device
+
 }

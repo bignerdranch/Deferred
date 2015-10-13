@@ -23,10 +23,8 @@ private let ObjectDestructor: dispatch_function_t = { contextPtr in
     storageRef.release()
 }
 
-// This cannot be a class var, new storage would be created for every
-// specialization. It also could not be used as a default argument as it is now.
-private var DeferredDefaultQueue: dispatch_queue_t {
-    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+private var genericQueue: dispatch_queue_t! {
+    return dispatch_get_global_queue(qos_class_self(), 0)
 }
 
 /// A deferred is a value that may become determined (or "filled") at some point
@@ -109,7 +107,7 @@ public struct Deferred<Value> {
     :param: queue A dispatch queue for executing the given function on.
     :param: function A function that uses the determined value.
     */
-    public func upon(queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
+    public func upon(queue: dispatch_queue_t = genericQueue, function: Value -> ()) {
         upon(.InheritQOS) { value in
             dispatch_async(queue) {
                 function(value)
@@ -206,7 +204,7 @@ extension Deferred {
 
     :returns: The new deferred value returned by the `transform`.
     **/
-    public func flatMap<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
+    public func flatMap<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             transform($0).upon(queue) {
@@ -227,7 +225,7 @@ extension Deferred {
     :returns: A new deferred value that is determined once the receiving
     deferred is determined.
     **/
-    public func map<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
+    public func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             d.fill(transform($0))
@@ -273,7 +271,7 @@ public func all<Value, Collection: CollectionType where Collection.Generator.Ele
         }
     }
 
-    dispatch_group_notify(group, DeferredDefaultQueue) {
+    dispatch_group_notify(group, genericQueue) {
         let results = array.map { $0.value }
         combined.fill(results)
     }

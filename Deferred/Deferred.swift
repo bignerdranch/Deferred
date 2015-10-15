@@ -8,17 +8,6 @@
 
 import Dispatch
 
-// A generic catch-all queue for when you just want to throw some work into the
-// concurrent pile. As an alternative to the `QOS_CLASS_UTILITY` global queue,
-// work dispatched onto this queue matches the QoS of the caller, which is
-// generally the right behavior.
-//
-// The technique is described and used in Core Foundation:
-// http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
-private var genericQueue: dispatch_queue_t! {
-    return dispatch_get_global_queue(qos_class_self(), 0)
-}
-
 // Atomic compare-and-swap, but safe for owned (retaining) pointers:
 //  - ObjC: "MyObject *__strong *"
 //  - Swift: "UnsafeMutablePointer<MyObject>"
@@ -183,21 +172,8 @@ public struct Deferred<Value> {
     :param: queue A dispatch queue for executing the given function on.
     :param: body A function that uses the determined value.
     */
-    public func upon(queue: dispatch_queue_t = genericQueue, body: Value -> ()) {
+    public func upon(queue: dispatch_queue_t, body: Value -> ()) {
         _ = upon(queue, options: DISPATCH_BLOCK_INHERIT_QOS_CLASS, body: body)
-    }
-
-    /**
-    Call some function on the main queue once the value is determined.
-    
-    If the value is already determined, the function will be submitted to the
-    main queue immediately. The function is always executed asynchronously, even
-    if the Deferred is filled from the main queue.
-    
-    :param: body A function that uses the determined value.
-    */
-    public func uponMainQueue(body: Value -> ()) {
-        upon(dispatch_get_main_queue(), body: body)
     }
 
     /**

@@ -15,7 +15,7 @@ public enum Timeout {
     /// Wait indefinitely.
     case Forever
     /// Wait for a given number of seconds.
-    case Interval(NSTimeInterval)
+    case Interval(Double)
 }
 
 extension Timeout {

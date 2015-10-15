@@ -6,8 +6,6 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-import Foundation
-
 /// A `LockProtected` holds onto a value of type T, but only allows access to it
 /// from within a locking statement. This prevents accidental unsafe access when
 /// thread safety is desired.

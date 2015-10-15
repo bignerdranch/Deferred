@@ -6,6 +6,8 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
+import Dispatch
+
 private final class Storage<T> {
 
     let value: T

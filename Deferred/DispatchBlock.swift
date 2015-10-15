@@ -1,4 +1,3 @@
-import Dispatch
 import Foundation
 
 extension dispatch_block_flags_t: OptionSetType {

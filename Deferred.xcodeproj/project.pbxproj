@@ -15,6 +15,8 @@
 		DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */; };
 		DB282A691B98B697008034C9 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A681B98B697008034C9 /* FutureType.swift */; };
 		DB282A6A1B98B697008034C9 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A681B98B697008034C9 /* FutureType.swift */; };
+		DB282A6C1B98B815008034C9 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A6B1B98B815008034C9 /* PromiseType.swift */; };
+		DB282A6D1B98B815008034C9 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A6B1B98B815008034C9 /* PromiseType.swift */; };
 		DB3294FD1B68066C002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB3295541B680872002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBA0D2DD1B680F7400A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3295181B680713002160CC /* Deferred.framework */; };
@@ -54,6 +56,7 @@
 		DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
 		DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
 		DB282A681B98B697008034C9 /* FutureType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureType.swift; sourceTree = "<group>"; };
+		DB282A6B1B98B815008034C9 /* PromiseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
 		DB3294F91B68066C002160CC /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB3294FC1B68066C002160CC /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB3294FE1B68066C002160CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -131,6 +134,7 @@
 				DB0F80A11B680E6C00394A66 /* Deferred.swift */,
 				DB282A681B98B697008034C9 /* FutureType.swift */,
 				DB0F80A21B680E6C00394A66 /* LockProtected.swift */,
+				DB282A6B1B98B815008034C9 /* PromiseType.swift */,
 				DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */,
 				DBE3AD011BB452D200682E29 /* Timeout.swift */,
 				DB3294FE1B68066C002160CC /* Info.plist */,
@@ -337,6 +341,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB282A691B98B697008034C9 /* FutureType.swift in Sources */,
+				DB282A6C1B98B815008034C9 /* PromiseType.swift in Sources */,
 				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */,
 				DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */,
@@ -349,6 +354,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB282A6A1B98B697008034C9 /* FutureType.swift in Sources */,
+				DB282A6D1B98B815008034C9 /* PromiseType.swift in Sources */,
 				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */,
 				DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */,

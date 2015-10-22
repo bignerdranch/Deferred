@@ -227,6 +227,8 @@ public struct Deferred<Value> {
 
 extension Deferred: FutureType {}
 
+extension Deferred: PromiseType {}
+
 extension Deferred {
     /**
     Checks for and returns a determined value.

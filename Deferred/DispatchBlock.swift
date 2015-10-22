@@ -8,7 +8,7 @@ extension dispatch_block_flags_t: OptionSetType {
     /// barrier finish executing.
     /// - note: This flag has no effect when the block is invoked directly.
     /// - seealso: dispatch_barrier_async(_:_:)
-    public static let Barrier = DISPATCH_BLOCK_BARRIER
+    public static var Barrier: dispatch_block_flags_t { return DISPATCH_BLOCK_BARRIER }
 
     /// Flag indicating that a dispatch block should execute disassociated
     /// from current execution context attributes such as QOS class.
@@ -18,7 +18,7 @@ extension dispatch_block_flags_t: OptionSetType {
     ///  - If submitted to a queue, the block object will be executed with the
     ///    attributes of the queue (or any attributes specifically assigned to
     ///    the dispatch block).
-    public static let DetachContext = DISPATCH_BLOCK_DETACHED
+    public static var DetachContext: dispatch_block_flags_t { return DISPATCH_BLOCK_DETACHED }
 
     /// Flag indicating that a dispatch block should be assigned the execution
     /// context attributes that are current at the time the block is created.
@@ -35,7 +35,7 @@ extension dispatch_block_flags_t: OptionSetType {
     /// this flag.
     /// - seealso: DispatchBlock.Flags.RemoveQOS
     /// - seealso: DispatchBlock(flags:QOS:priority:body:)
-    public static let CurrentContext = DISPATCH_BLOCK_ASSIGN_CURRENT
+    public static var CurrentContext: dispatch_block_flags_t { return DISPATCH_BLOCK_ASSIGN_CURRENT }
 
     /// Flag indicating that a dispatch block should be not be assigned a QOS
     /// class.
@@ -49,7 +49,7 @@ extension dispatch_block_flags_t: OptionSetType {
     /// This flag is ignored if a specific QOS class is added during block
     /// creation.
     /// - seealso: DispatchBlock(flags:QOS:priority:body:)
-    public static let RemoveQOS = DISPATCH_BLOCK_NO_QOS_CLASS
+    public static var RemoveQOS: dispatch_block_flags_t { return DISPATCH_BLOCK_NO_QOS_CLASS }
 
     /// Flag indicating that execution of a dispatch block submitted to a queue
     /// should prefer the QOS class assigned to the queue over the QOS class
@@ -63,7 +63,7 @@ extension dispatch_block_flags_t: OptionSetType {
     /// is invoked directly.
     /// - note: This flag is ignored if `EnforceQOS` is also passed.
     /// - seealso: DispatchBlock.Flags.Enforce
-    public static let InheritQOS = DISPATCH_BLOCK_INHERIT_QOS_CLASS
+    public static var InheritQOS: dispatch_block_flags_t { return DISPATCH_BLOCK_INHERIT_QOS_CLASS }
 
     /// Flag indicating that execution of a dispatch block submitted to a queue
     /// should prefer the QOS class assigned to the block at the time of
@@ -74,7 +74,7 @@ extension dispatch_block_flags_t: OptionSetType {
     /// for synchronous execution or when the dispatch block object is invoked
     /// directly.
     /// - seealso: dispatch_sync(_:_:)
-    public static let EnforceQOS = DISPATCH_BLOCK_ENFORCE_QOS_CLASS
+    public static var EnforceQOS: dispatch_block_flags_t { return DISPATCH_BLOCK_ENFORCE_QOS_CLASS }
 
 }
 

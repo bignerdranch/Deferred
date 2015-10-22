@@ -356,7 +356,7 @@ class DeferredTests: XCTestCase {
         d.fill(42)
 
         waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssert(qos.rawValue == qos_class_main().rawValue)
+        XCTAssert((qos.rawValue & qos_class_main().rawValue) != 0)
     }
 
     func testThatLowerQoSPostsUponWithSameQoSClass() {
@@ -374,7 +374,7 @@ class DeferredTests: XCTestCase {
         d.fill(42)
 
         waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssert(qos.rawValue == QOS_CLASS_UTILITY.rawValue)
+        XCTAssert((qos.rawValue & QOS_CLASS_UTILITY.rawValue) != 0)
     }
 
     #endif // end QoS tests that require a real device

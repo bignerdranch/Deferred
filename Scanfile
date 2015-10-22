@@ -1,0 +1,3 @@
+skip_html_open true
+slack_only_on_failure true
+clean true

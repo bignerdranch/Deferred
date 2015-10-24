@@ -18,6 +18,11 @@ private final class Storage<T> {
 
 }
 
+// Atomic compare-and-swap, but safe for owned (retaining) pointers:
+//  - ObjC: "MyObject *__strong *"
+//  - Swift: "UnsafeMutablePointer<MyObject>"
+// If the swap is made, the new value is retained by its owning pointer.
+// If the swap is not made, the new value is not retained.
 private func compareAndSwap<T: AnyObject>(old old: T?, new: T?, to toPtr: UnsafeMutablePointer<T?>) -> Bool {
     let oldRef = old.map(Unmanaged.passUnretained)
     let newRef = new.map(Unmanaged.passRetained)
@@ -32,6 +37,10 @@ private func compareAndSwap<T: AnyObject>(old old: T?, new: T?, to toPtr: Unsafe
     }
 }
 
+// Raw Deferred storage. Using `ManagedBuffer` has advantages over a custom class:
+//  - The side-table data is efficiently stored in tail-allocated buffer space.
+//  - The Element buffer has a stable pointer when locked to a single element.
+//  - Better holdsUniqueReference support allows for future optimization.
 private final class DeferredBuffer<Value, SideData>: ManagedBuffer<SideData, Storage<Value>?> {
     
     static func create(sideData: () -> SideData) -> DeferredBuffer<Value, SideData> {
@@ -71,6 +80,13 @@ private final class DeferredBuffer<Value, SideData>: ManagedBuffer<SideData, Sto
     
 }
 
+// A generic catch-all queue for when you just want to throw some work into the
+// concurrent pile. As an alternative to the `QOS_CLASS_UTILITY` global queue,
+// work dispatched onto this queue matches the QoS of the caller, which is
+// generally the right behavior.
+//
+// The technique is described and used in Core Foundation:
+// http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
 private var genericQueue: dispatch_queue_t! {
     return dispatch_get_global_queue(qos_class_self(), 0)
 }

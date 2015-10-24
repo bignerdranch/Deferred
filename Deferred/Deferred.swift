@@ -18,11 +18,57 @@ private final class Storage<T> {
 
 }
 
-private var DeferredStorageKey = 0
+private func compareAndSwap<T: AnyObject>(old old: T?, new: T?, to toPtr: UnsafeMutablePointer<T?>) -> Bool {
+    let oldRef = old.map(Unmanaged.passUnretained)
+    let newRef = new.map(Unmanaged.passRetained)
+    let oldPtr = oldRef?.toOpaque() ?? nil
+    let newPtr = newRef?.toOpaque() ?? nil
+    if OSAtomicCompareAndSwapPtr(UnsafeMutablePointer(oldPtr), UnsafeMutablePointer(newPtr), UnsafeMutablePointer(toPtr)) {
+        oldRef?.release()
+        return true
+    } else {
+        newRef?.release()
+        return false
+    }
+}
 
-private let ObjectDestructor: dispatch_function_t = { contextPtr in
-    let storageRef = Unmanaged<AnyObject>.fromOpaque(COpaquePointer(contextPtr))
-    storageRef.release()
+private final class DeferredBuffer<Value, SideData>: ManagedBuffer<SideData, Storage<Value>?> {
+    
+    static func create(sideData: () -> SideData) -> DeferredBuffer<Value, SideData> {
+        return create(1, initialValue: { _ in sideData() }) as! DeferredBuffer<Value, SideData>
+    }
+    
+    deinit {
+        // super's init automatically destroys the Value
+        withUnsafeMutablePointerToElements { elementsPtr in
+            // UnsafeMutablePointer.destroy() is faster than destroy(_:)
+            elementsPtr.destroy()
+        }
+    }
+    
+    func initializeWith(value: Value?) {
+        let box = value.map(Storage.init)
+        withUnsafeMutablePointerToElements { elementsPtr in
+            elementsPtr.initialize(box)
+        }
+    }
+    
+    func withValue(body: Value -> Void) {
+        withUnsafeMutablePointerToElements { elementsPtr in
+            guard let box = elementsPtr.memory else { return }
+            body(box.value)
+        }
+    }
+    
+    func fill(value: Value, onFill: SideData -> Void) -> Bool {
+        let box = Storage(value)
+        return withUnsafeMutablePointers { (valuePtr, elementsPtr) in
+            guard compareAndSwap(old: nil, new: box, to: elementsPtr) else { return false }
+            onFill(valuePtr.memory)
+            return true
+        }
+    }
+    
 }
 
 private var genericQueue: dispatch_queue_t! {
@@ -32,45 +78,41 @@ private var genericQueue: dispatch_queue_t! {
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value> {
-    private let accessQueue: dispatch_queue_t = {
-        let attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_UTILITY, 0)
-        return dispatch_queue_create("Deferred", attr)
-    }()
-    private let onFilled = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {})!
-
-    private var isFilledLocked: Bool {
-        return dispatch_get_specific(&DeferredStorageKey) != nil
+    
+    private var storage = DeferredBuffer<Value, dispatch_block_t>.create {
+        dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {})
     }
 
-    private func fillLocked(value: Value) {
-        let storage = Storage(value)
-        let storagePtr = Unmanaged.passRetained(storage).toOpaque()
-        dispatch_queue_set_specific(accessQueue, &DeferredStorageKey, UnsafeMutablePointer(storagePtr), ObjectDestructor)
+    private func upon(queue: dispatch_queue_t, options inFlags: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+        let flags = dispatch_block_flags_t(inFlags.rawValue | DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue)
+        let block = dispatch_block_create(flags) {
+            self.storage.withValue(body)
+        }
+        dispatch_block_notify(storage.value, queue, block)
+        return block
+    }
+    
+    private func markFilled(onFilled: dispatch_block_t) {
         dispatch_block_cancel(onFilled)
         onFilled()
     }
 
-    private func upon(options inFlags: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
-        let flags = dispatch_block_flags_t(inFlags.rawValue | DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue)
-        let block = dispatch_block_create(flags) {
-            let storagePtr = dispatch_get_specific(&DeferredStorageKey)
-            guard storagePtr != nil else { return }
-
-            let storageRef = Unmanaged<Storage<Value>>.fromOpaque(COpaquePointer(storagePtr))
-            let storage = storageRef.takeUnretainedValue()
-
-            let value = storage.value
-            body(value)
-        }
-        dispatch_block_notify(onFilled, accessQueue, block)
-        return block
-    }
-
     // MARK: -
+    
+    /// Initialize an unfilled Deferred.
+    public init() {
+        storage.initializeWith(nil)
+    }
+    
+    /// Initialize a filled Deferred with the given value.
+    public init(value: Value) {
+        storage.initializeWith(value)
+        markFilled(storage.value)
+    }
 
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return dispatch_block_testcancel(onFilled) != 0
+        return dispatch_block_testcancel(storage.value) != 0
     }
 
     /// Determines the deferred value with a given result.
@@ -91,15 +133,12 @@ public struct Deferred<Value> {
     /// :param: value The resolved value of the deferred.
     /// :param: assertIfFilled If `false`, race checking is disabled.
     public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
-        dispatch_barrier_async(accessQueue) {
-            switch (self.isFilledLocked, assertIfFilled) {
-            case (false, _):
-                self.fillLocked(value)
-            case (true, false):
-                break
-            case (true, true):
-                preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
-            }
+        let succeeded = storage.fill(value, onFill: markFilled)
+        switch (succeeded, assertIfFilled) {
+        case (false, true):
+            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
+        case (_, _):
+            break
         }
     }
     
@@ -113,14 +152,8 @@ public struct Deferred<Value> {
     :param: body A function that uses the determined value.
     */
     public func upon(queue: dispatch_queue_t = genericQueue, body: Value -> ()) {
-        _ = upon(options: DISPATCH_BLOCK_INHERIT_QOS_CLASS) { value in
-            dispatch_async(queue) {
-                body(value)
-            }
-        }
+        _ = upon(queue, options: DISPATCH_BLOCK_INHERIT_QOS_CLASS, body: body)
     }
-    
-
 
     /**
     Call some function on the main queue once the value is determined.
@@ -145,8 +178,9 @@ public struct Deferred<Value> {
     :returns: The determined value, if filled within the timeout, or `nil`.
     */
     public func wait(time: Timeout) -> Value? {
+        let queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
         var value: Value?
-        let handler = upon(options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS) {
+        let handler = upon(queue, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS) {
             value = $0
         }
 
@@ -156,14 +190,6 @@ public struct Deferred<Value> {
         }
 
         return value
-    }
-}
-
-extension Deferred {
-    /// Initialize a filled Deferred with the given value.
-    public init(value: Value) {
-        self.init()
-        fillLocked(value)
     }
 }
 

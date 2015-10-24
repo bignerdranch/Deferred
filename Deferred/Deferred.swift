@@ -50,7 +50,7 @@ public struct Deferred<Value> {
         onFilled()
     }
 
-    private func upon(options inFlags: dispatch_block_flags_t, function: Value -> Void) -> dispatch_block_t {
+    private func upon(options inFlags: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
         let flags = dispatch_block_flags_t(inFlags.rawValue | DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue)
         let block = dispatch_block_create(flags) {
             let storagePtr = dispatch_get_specific(&DeferredStorageKey)
@@ -60,7 +60,7 @@ public struct Deferred<Value> {
             let storage = storageRef.takeUnretainedValue()
 
             let value = storage.value
-            function(value)
+            body(value)
         }
         dispatch_block_notify(onFilled, accessQueue, block)
         return block
@@ -110,12 +110,12 @@ public struct Deferred<Value> {
     queue immediately. An `upon` call is always executed asynchronously.
     
     :param: queue A dispatch queue for executing the given function on.
-    :param: function A function that uses the determined value.
+    :param: body A function that uses the determined value.
     */
-    public func upon(queue: dispatch_queue_t = genericQueue, function: Value -> ()) {
+    public func upon(queue: dispatch_queue_t = genericQueue, body: Value -> ()) {
         _ = upon(options: DISPATCH_BLOCK_INHERIT_QOS_CLASS) { value in
             dispatch_async(queue) {
-                function(value)
+                body(value)
             }
         }
     }
@@ -129,10 +129,10 @@ public struct Deferred<Value> {
     main queue immediately. The function is always executed asynchronously, even
     if the Deferred is filled from the main queue.
     
-    :param: function A function that uses the determined value.
+    :param: body A function that uses the determined value.
     */
-    public func uponMainQueue(function: Value -> ()) {
-        upon(dispatch_get_main_queue(), function: function)
+    public func uponMainQueue(body: Value -> ()) {
+        upon(dispatch_get_main_queue(), body: body)
     }
 
     /**

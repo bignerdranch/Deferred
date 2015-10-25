@@ -31,7 +31,7 @@ class AnyFutureTests: XCTestCase {
 
         let expect = expectationWithDescription("value blocks while unfilled")
         after(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            deferred.fill(42)
+            try! deferred.fill(42)
             expect.fulfill()
         }
 
@@ -68,7 +68,7 @@ class AnyFutureTests: XCTestCase {
             }
         }
 
-        d.fill(1)
+        try! d.fill(1)
 
         waitForExpectationsWithTimeout(1, handler: nil)
     }

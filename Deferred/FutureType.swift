@@ -123,7 +123,7 @@ public extension FutureType {
         let d = Deferred<NewFuture.Value>()
         upon(queue) {
             transform($0).upon(queue) {
-                d.fill($0)
+                d.fill($0, assertIfFilled: true)
             }
         }
         return d
@@ -142,7 +142,7 @@ public extension FutureType {
     func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
-            d.fill(transform($0))
+            d.fill(transform($0), assertIfFilled: true)
         }
         return d
     }

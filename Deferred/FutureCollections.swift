@@ -45,7 +45,7 @@ public extension CollectionType where Generator.Element: FutureType {
 
         dispatch_group_notify(group, genericQueue) {
             let results = array.map { $0.value }
-            combined.fill(results)
+            combined.fill(results, assertIfFilled: true)
         }
 
         return combined

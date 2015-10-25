@@ -29,23 +29,12 @@ public protocol PromiseType {
     /// Determines the deferred value with a given result.
     ///
     /// Filling a deferred value should usually be attempted only once. An
-    /// implementing type may choose to enforce this by default. If an
-    /// implementing type requires multiple potential fillers to race, the
-    /// precondition may be disabled.
-    ///
-    /// * In playgrounds and unoptimized builds (the default for a "Debug"
-    ///   configuration), program execution should be stopped at the caller in
-    ///   a debuggable state.
-    ///
-    /// * In -O builds (the default for a "Release" configuration), program
-    ///   execution should stop.
-    ///
-    /// * In -Ounchecked builds, the programming error should be assumed to not
-    ///   exist.
+    /// implementing type may choose to enforce this by throwing an error. If a
+    /// user or implementing type requires multiple potential fillers to race,
+    /// such a check may be skipped.
     ///
     /// - parameter value: A resolved value for the instance.
-    /// - parameter assertIfFilled: If `false`, race checking is disabled.
-    func fill(value: Value, assertIfFilled: Bool, file: StaticString, line: UInt)
+    func fill(value: Value) throws
 }
 
 public extension PromiseType {
@@ -68,7 +57,13 @@ public extension PromiseType {
     ///
     /// - parameter value: A resolved value for the instance.
     /// - parameter assertIfFilled: If `false`, race checking is disabled.
-    func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
-        fill(value, assertIfFilled: assertIfFilled, file: file, line: line)
+    func fill(value: Value, assertIfFilled: Bool, file: StaticString = __FILE__, line: UInt = __LINE__) {
+        do {
+            try fill(value)
+        } catch where !assertIfFilled {
+            return
+        } catch {
+            preconditionFailure("Cannot fill an already-filled \(self.dynamicType)", file: file, line: line)
+        }
     }
 }

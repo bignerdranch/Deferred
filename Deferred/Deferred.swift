@@ -193,13 +193,18 @@ public struct Deferred<Value>: FutureType, PromiseType {
     ///
     /// :param: value The resolved value of the deferred.
     /// :param: assertIfFilled If `false`, race checking is disabled.
-    public func fill(value: Value, assertIfFilled: Bool, file: StaticString, line: UInt) {
-        let succeeded = storage.fill(value, onFill: markFilled)
-        switch (succeeded, assertIfFilled) {
-        case (false, true):
-            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
-        case (_, _):
-            break
+    public func fill(value: Value) throws {
+        if !storage.fill(value, onFill: markFilled) {
+            throw DeferredError.AlreadyFilled
         }
     }
+}
+
+// MARK: Errors
+
+/// Errors that occur in the course of operation of `Deferred`.
+public enum DeferredError: ErrorType {
+    /// The recieving deferred value has already been filled; filling should
+    /// only occur once.
+    case AlreadyFilled
 }

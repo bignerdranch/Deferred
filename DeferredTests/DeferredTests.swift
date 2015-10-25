@@ -33,7 +33,7 @@ class DeferredTests: XCTestCase {
 
         let expect = expectationWithDescription("value blocks while unfilled")
         after(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            deferred.fill(42)
+            try! deferred.fill(42)
             expect.fulfill()
         }
 
@@ -77,14 +77,14 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
         after(0.1) {
-            d.fill(3)
+            try! d.fill(3)
         }
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testFill() {
         let d = Deferred<Int>()
-        d.fill(1)
+        try! d.fill(1)
         XCTAssertEqual(d.value, 1)
     }
 
@@ -104,7 +104,7 @@ class DeferredTests: XCTestCase {
             XCTAssertTrue(d.isFilled)
             expect.fulfill()
         }
-        d.fill(1)
+        try! d.fill(1)
         waitForExpectationsWithTimeout(1, handler: nil)
     }
 
@@ -149,7 +149,7 @@ class DeferredTests: XCTestCase {
             }
         }
 
-        d.fill(1)
+        try! d.fill(1)
 
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
@@ -165,7 +165,7 @@ class DeferredTests: XCTestCase {
             expectation.fulfill()
         }
         
-        d.fill(1)
+        try! d.fill(1)
         waitForExpectationsWithTimeout(1, handler: nil)
     }
 
@@ -183,7 +183,7 @@ class DeferredTests: XCTestCase {
         }
 
         // ...then fill it (also in parallel)
-        dispatch_async(queue) { d.fill(1) }
+        dispatch_async(queue) { try! d.fill(1) }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
@@ -194,8 +194,8 @@ class DeferredTests: XCTestCase {
         let d2 = Deferred<String>()
         let both = d1.and(d2)
 
-        d1.fill(1)
-        d2.fill("foo")
+        try! d1.fill(1)
+        try! d2.fill("foo")
 
         let expectation = expectationWithDescription("paired deferred should be filled")
         both.upon { _ in
@@ -222,12 +222,12 @@ class DeferredTests: XCTestCase {
 
         // skip first
         for i in 1 ..< d.count {
-            d[i].fill(i)
+            try! d[i].fill(i)
         }
 
         after(0.1) {
             XCTAssertFalse(w.isFilled) // unfilled because d[0] is still unfilled
-            d[0].fill(0)
+            try! d[0].fill(0)
 
             after(0.1) {
                 XCTAssertTrue(w.value == [Int](0 ..< d.count))
@@ -248,7 +248,7 @@ class DeferredTests: XCTestCase {
         let d = (0 ..< 10).map { _ in Deferred<Int>() }
         let w = d.firstFuture
 
-        d[3].fill(3)
+        try! d[3].fill(3)
 
         let outerExpectation = expectationWithDescription("any is filled")
         let innerExpectation = expectationWithDescription("any is not changed")
@@ -256,7 +256,7 @@ class DeferredTests: XCTestCase {
         after(0.1) {
             XCTAssertEqual(w.value, 3)
 
-            d[4].fill(4)
+            try! d[4].fill(4)
 
             after(0.1) {
                 XCTAssertEqual(w.value, 3)
@@ -291,7 +291,7 @@ class DeferredTests: XCTestCase {
 
         let randomIndex = arc4random_uniform(numericCast(allDeferreds.count))
         let oneOfTheDeferreds = allDeferreds[numericCast(randomIndex)]
-        oneOfTheDeferreds.fill(anyValue)
+        try! oneOfTheDeferreds.fill(anyValue)
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
     }
@@ -349,7 +349,7 @@ class DeferredTests: XCTestCase {
             expectation?.fulfill()
         }
 
-        d.fill(42)
+        try! d.fill(42)
 
         waitForExpectationsWithTimeout(1, handler: nil)
         XCTAssert((qos.rawValue & qos_class_main().rawValue) != 0)
@@ -367,7 +367,7 @@ class DeferredTests: XCTestCase {
             expectation?.fulfill()
         }
 
-        d.fill(42)
+        try! d.fill(42)
 
         waitForExpectationsWithTimeout(1, handler: nil)
         XCTAssert((qos.rawValue & QOS_CLASS_UTILITY.rawValue) != 0)

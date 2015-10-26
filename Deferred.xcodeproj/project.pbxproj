@@ -263,7 +263,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Big Nerd Ranch";
 				TargetAttributes = {
 					DB3294F81B68066C002160CC = {
@@ -397,6 +397,7 @@
 			baseConfigurationReference = DB32954F1B680744002160CC /* Debug.xcconfig */;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
 			name = Debug;

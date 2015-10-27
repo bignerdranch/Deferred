@@ -241,12 +241,12 @@ class DeferredTests: XCTestCase {
         let innerExpectation = expectationWithDescription("any is not changed")
 
         after(0.1) {
-            XCTAssertEqual(w.value.value, 3)
+            XCTAssertEqual(w.value, 3)
 
             d[4].fill(4)
 
             after(0.1) {
-                XCTAssertEqual(w.value.value, 3)
+                XCTAssertEqual(w.value, 3)
                 innerExpectation.fulfill()
             }
 

@@ -243,10 +243,10 @@ Choose the deferred value that is determined first.
 :return: A deferred value that is determined with the first of the given
 deferred values to be determined.
 **/
-public func any<Value, Sequence: SequenceType where Sequence.Generator.Element == Deferred<Value>>(deferreds: Sequence) -> Deferred<Deferred<Value>> {
-    let combined = Deferred<Deferred<Value>>()
+public func any<Value, Sequence: SequenceType where Sequence.Generator.Element == Deferred<Value>>(deferreds: Sequence) -> Deferred<Value> {
+    let combined = Deferred<Value>()
     for d in deferreds {
-        d.upon { _ in combined.fill(d, assertIfFilled: false) }
+        d.upon { t in combined.fill(t, assertIfFilled: false) }
     }
     return combined
 }

@@ -116,7 +116,7 @@ There are three functions available for combining multiple `Deferred` instances:
 // `both` creates a new Deferred that is filled once both inputs are available
 let d1: Deferred<Int> = ...
 let d2: Deferred<String> = ...
-let dBoth : Deferred<(Int,String) = d1.both(d2)
+let dBoth : Deferred<(Int,String)> = d1.both(d2)
 
 // `all` creates a new Deferred that is filled once all inputs are available.
 // All of the input Deferreds must contain the same type.

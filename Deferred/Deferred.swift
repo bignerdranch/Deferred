@@ -36,7 +36,7 @@ public struct Deferred<Value> {
         let attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_UTILITY, 0)
         return dispatch_queue_create("Deferred", attr)
     }()
-    private let onFilled = DispatchBlock(flags: .RemoveQOS) {}
+    private let onFilled = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {})!
 
     private var isFilledLocked: Bool {
         return dispatch_get_specific(&DeferredStorageKey) != nil
@@ -46,12 +46,13 @@ public struct Deferred<Value> {
         let storage = Storage(value)
         let storagePtr = Unmanaged.passRetained(storage).toOpaque()
         dispatch_queue_set_specific(accessQueue, &DeferredStorageKey, UnsafeMutablePointer(storagePtr), ObjectDestructor)
-        onFilled.cancel()
-        onFilled.callAndWait()
+        dispatch_block_cancel(onFilled)
+        onFilled()
     }
 
-    private func upon(flags: DispatchBlock.Flags, function: Value -> Void) -> DispatchBlock {
-        return onFilled.upon(accessQueue, flags: flags.union(.CurrentContext)) {
+    private func upon(options inFlags: dispatch_block_flags_t, function: Value -> Void) -> dispatch_block_t {
+        let flags = dispatch_block_flags_t(inFlags.rawValue | DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue)
+        let block = dispatch_block_create(flags) {
             let storagePtr = dispatch_get_specific(&DeferredStorageKey)
             guard storagePtr != nil else { return }
 
@@ -61,13 +62,15 @@ public struct Deferred<Value> {
             let value = storage.value
             function(value)
         }
+        dispatch_block_notify(onFilled, accessQueue, block)
+        return block
     }
 
     // MARK: -
 
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return onFilled.isCancelled
+        return dispatch_block_testcancel(onFilled) != 0
     }
 
     /// Determines the deferred value with a given result.
@@ -110,7 +113,7 @@ public struct Deferred<Value> {
     :param: function A function that uses the determined value.
     */
     public func upon(queue: dispatch_queue_t = genericQueue, function: Value -> ()) {
-        upon(.InheritQOS) { value in
+        _ = upon(options: DISPATCH_BLOCK_INHERIT_QOS_CLASS) { value in
             dispatch_async(queue) {
                 function(value)
             }
@@ -143,12 +146,12 @@ public struct Deferred<Value> {
     */
     public func wait(time: Timeout) -> Value? {
         var value: Value?
-        let handler = upon(.EnforceQOS) {
+        let handler = upon(options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS) {
             value = $0
         }
 
-        guard handler.waitUntilFinished(time) else {
-            handler.cancel()
+        guard dispatch_block_wait(handler, time.rawValue) == 0 else {
+            dispatch_block_cancel(handler)
             return nil
         }
 

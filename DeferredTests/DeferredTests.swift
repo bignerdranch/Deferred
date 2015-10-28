@@ -186,9 +186,10 @@ class DeferredTests: XCTestCase {
         d2.fill("foo")
 
         let expectation = expectationWithDescription("paired deferred should be filled")
-        both.upon { _ in
-            XCTAssert(d1.isFilled)
-            XCTAssert(d2.isFilled)
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            while !both.isFilled {
+                usleep(1) // spin
+            }
             XCTAssertEqual(both.value.0, 1)
             XCTAssertEqual(both.value.1, "foo")
             expectation.fulfill()
@@ -217,7 +218,10 @@ class DeferredTests: XCTestCase {
             XCTAssertFalse(w.isFilled) // unfilled because d[0] is still unfilled
             d[0].fill(0)
 
-            after(0.1) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                while !w.isFilled {
+                    usleep(1) // spin
+                }
                 XCTAssertTrue(w.value == [Int](0 ..< d.count))
                 innerExpectation.fulfill()
             }
@@ -238,21 +242,18 @@ class DeferredTests: XCTestCase {
         let w = any(d)
 
         d[3].fill(3)
-
-        let outerExpectation = expectationWithDescription("any is filled")
-        let innerExpectation = expectationWithDescription("any is not changed")
-
-        after(0.1) {
+        let expectation = expectationWithDescription("any is filled")
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            while !w.isFilled {
+                usleep(1) // spin
+            }
             XCTAssertEqual(w.value, 3)
 
             d[4].fill(4)
-
             after(0.1) {
                 XCTAssertEqual(w.value, 3)
-                innerExpectation.fulfill()
+                expectation.fulfill()
             }
-
-            outerExpectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(testTimeout, handler: nil)

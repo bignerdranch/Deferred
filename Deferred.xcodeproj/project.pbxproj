@@ -21,6 +21,10 @@
 		DB282A761B98CE2C008034C9 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A741B98CE2C008034C9 /* FutureCollections.swift */; };
 		DB3294FD1B68066C002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB3295541B680872002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB79DC3A1BE188660071E070 /* AnyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */; };
+		DB79DC3B1BE188660071E070 /* AnyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */; };
+		DB79DC3C1BE1886B0071E070 /* AnyFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376E1B98EDDC00F3A2AE /* AnyFutureTests.swift */; };
+		DB79DC3D1BE1886C0071E070 /* AnyFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376E1B98EDDC00F3A2AE /* AnyFutureTests.swift */; };
 		DBA0D2DD1B680F7400A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3295181B680713002160CC /* Deferred.framework */; };
 		DBA0D2EC1B680F7E00A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3294F91B68066C002160CC /* Deferred.framework */; };
 		DBA0D2F51B680F9D00A498CB /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AA1B680E7600394A66 /* DeferredTests.swift */; };
@@ -73,6 +77,8 @@
 		DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE3AD011BB452D200682E29 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
+		DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyFuture.swift; sourceTree = "<group>"; };
+		DBA8376E1B98EDDC00F3A2AE /* AnyFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyFutureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				DB3294FC1B68066C002160CC /* Deferred.h */,
+				DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */,
 				DB0F80A11B680E6C00394A66 /* Deferred.swift */,
 				DB282A741B98CE2C008034C9 /* FutureCollections.swift */,
 				DB282A681B98B697008034C9 /* FutureType.swift */,
@@ -149,6 +156,7 @@
 		DB3295431B680731002160CC /* DeferredTests */ = {
 			isa = PBXGroup;
 			children = (
+				DBA8376E1B98EDDC00F3A2AE /* AnyFutureTests.swift */,
 				DB0F80AA1B680E7600394A66 /* DeferredTests.swift */,
 				DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */,
 				DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */,
@@ -349,6 +357,7 @@
 				DB282A6C1B98B815008034C9 /* PromiseType.swift in Sources */,
 				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */,
+				DB79DC3A1BE188660071E070 /* AnyFuture.swift in Sources */,
 				DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A61B680E6C00394A66 /* LockProtected.swift in Sources */,
 			);
@@ -363,6 +372,7 @@
 				DB282A6D1B98B815008034C9 /* PromiseType.swift in Sources */,
 				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */,
+				DB79DC3B1BE188660071E070 /* AnyFuture.swift in Sources */,
 				DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A71B680E6C00394A66 /* LockProtected.swift in Sources */,
 			);
@@ -373,6 +383,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DBA0D2F81B680F9E00A498CB /* DeferredTests.swift in Sources */,
+				DB79DC3D1BE1886C0071E070 /* AnyFutureTests.swift in Sources */,
 				DBA0D2F91B680F9E00A498CB /* LockProtectedTests.swift in Sources */,
 				DBA0D2FA1B680F9E00A498CB /* ReadWriteLockTests.swift in Sources */,
 			);
@@ -383,6 +394,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DBA0D2F51B680F9D00A498CB /* DeferredTests.swift in Sources */,
+				DB79DC3C1BE1886B0071E070 /* AnyFutureTests.swift in Sources */,
 				DBA0D2F61B680F9D00A498CB /* LockProtectedTests.swift in Sources */,
 				DBA0D2F71B680F9D00A498CB /* ReadWriteLockTests.swift in Sources */,
 			);

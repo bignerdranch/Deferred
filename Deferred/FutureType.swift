@@ -160,7 +160,7 @@ public extension FutureType {
     /// - returns: A value that becomes determined after both the reciever and
     ///   the given future become determined.
     /// - seealso: SequenceType.allFutures
-    func and<OtherFuture: FutureType>(other: OtherFuture) -> Deferred<(Value, OtherFuture.Value)> {
-        return flatMap { t in other.map { u in (t, u) } }
+    func and<OtherFuture: FutureType>(other: OtherFuture) -> AnyFuture<(Value, OtherFuture.Value)> {
+        return AnyFuture(base: flatMap { t in other.map { u in (t, u) } })
     }
 }

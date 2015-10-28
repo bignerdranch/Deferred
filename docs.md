@@ -125,8 +125,8 @@ for i in 0 ..< 10 {
 		deferreds.append(...)
 }
 var allDeferreds: Deferred<[Int]> = all(deferreds)
-// Once all 10 input deferreds are filled, allDeferreds[i] will contain the result
-// of deferreds[i].
+// Once all 10 input deferreds are filled, allDeferreds.value[i] will contain the result
+// of deferreds[i].value.
 
 // `any` creates a new Deferred that is filled once any one of its inputs is available.
 // If multiple inputs become available simultaneously, no guarantee is made about which

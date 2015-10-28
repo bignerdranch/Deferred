@@ -1,17 +1,18 @@
 language: objective-c
 osx_image: xcode7.1
 install:
-- gem install scan --no-rdoc --no-ri --no-document
-- gem install cocoapods --no-rdoc --no-ri --no-document
+- gem install xcpretty --no-rdoc --no-ri --no-document
+#- gem install cocoapods --no-rdoc --no-ri --no-document
 - curl -OlL "https://github.com/Carthage/Carthage/releases/download/0.9.3/Carthage.pkg"
 - sudo installer -pkg "Carthage.pkg" -target /
 - rm "Carthage.pkg"
 script:
-- scan -s "Deferred"
-- scan -s "MobileDeferred"
+- set -o pipefail && xcodebuild -scheme 'Deferred' test | xcpretty -c
+- set -o pipefail && xcodebuild -scheme 'MobileDeferred' -sdk iphonesimulator test | xcpretty -c
 - carthage build --no-skip-current
 env:
   global:
-  - secure: MnNd0SSyFQODgxY5SISooask58r90x4a3TQ7m3Tact8DhodPdVCb3y0qluypOoHFarGEpgSFCOCKNIWqfo7uyMEgu7BQgpAzcKRz7rWQJNAxXSCagK4RKD1LzG1nSwnGF4oqgcrdfrQ25zArC/MppuMLrzPO5uavA+ZkWJoMJsgYMzraAgdoU3ySkAJ815zgPNnAdCnla2kqpy1DC7pElAGWwBaZ3YhHfRlCzYKYfKaNO1QK+u88ZFtnoH9Xnt/1fveiUiwAoBEwyodna/mUz68DchqGu8VFVv+4/BouPZAqBY0e0Rl9BrAADPJ4cPkydCQy6p6ZY6oXWj4Mdxveg41HDXq7UTPk9osyBASG5wIM7R6jYY6jIBNGCWZe0a4dR65yjU5Zp3abEguTA+S4yZXwLZm2QdkPvmCtTVSH11z8H0Ni93MvSfSmZxGzU/abaJhud0QavSX+8gkSDJIxD5+eLWO8V8xmqmA0xcmdiVDce3D5MNjVitn9b8gEvHhzlsg1tRCHkvhUmdM25b2jAn3FTcY27dtI/LPedFxTaE4uFu5A6msKLH743pxDUG30IvtLuBjWcJsV79l3TKS8qfzt/ecliqnGe4Vsbh+2vFyFKMAfrNiD4hAkI+q7upjXQbvY3RiXSfLsFgLRQt5Fr8qYDj2pgtZnDgQzy7t8/Vo=
-  - secure: QKoLE9zX+EZNTZ+MzRySOTT4UOnfpdFC1a2Yna6RQFuqpc+w/d6mjWAlZX2hhgx1FjJjJBEEzyDMWptVmDsSGhT9kX8Qmj6BS/n6cm9Z3GEw59t4mstkOTgyrHfgh33qMaFGjsdcK+WJxnM/tHYsRtHZxFLCjG8dqbODs9aWIJY=
-  - secure: Sb8MCz+PnQRJz0Dq0puvRjzt5YRy17YdSdVGowzBIVAMP9/rl3qGqiCmX9i+V+Mx//9/x5AFYsOw7rZVia4CVSKMmaI4GO56XNTmxzE4AZnXsuVuaSUsPbLVA0irWO4KUDjs6/hEOk2T5Im0f3m+KZ6aXumQkjovYjNVzExp8zY=
+    secure: g2WT2YGdHUZgqnY6zlK2kf9Cg+Qe25o8F0pY4hPTCsAx7gYpImhlj8ivD2AWAfxRIQSLrVb56DDxQ76+DBWQ29fFlPGaoec60jp5XQ8GaPnWR7np2ctuLsBqe0BQJwYoA3OWYvItoLgwwBwDDAs/p/KYvteOrVSE3TxLL83BtFE=
+notifications:
+  slack:
+    secure: DGHh73fkuJ/61KdOzqzKAtlSPG8/nO0h949Nl3MIIg8tXG8Ujagb2nxRsl7Xsu49K+s54ENFpoZEdB63whOC4KMgFqRtnjiJVc2gP380oNh2BrSt0qRcZDIy6nhgbQOzOtvV4tbgh/pCMbflj70Ad0EBSkdNGuMn2bcj/vGl+gY=

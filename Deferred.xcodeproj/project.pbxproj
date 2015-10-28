@@ -29,6 +29,8 @@
 		DBA0D2FA1B680F9E00A498CB /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */; };
 		DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
 		DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
+		DBE3ACF61BB33C9A00682E29 /* DispatchBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3ACF51BB33C9A00682E29 /* DispatchBlock.swift */; };
+		DBE3ACF71BB33C9A00682E29 /* DispatchBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3ACF51BB33C9A00682E29 /* DispatchBlock.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +72,7 @@
 		DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE3AD011BB452D200682E29 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
+		DBE3ACF51BB33C9A00682E29 /* DispatchBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchBlock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +138,7 @@
 				DB0F80A21B680E6C00394A66 /* LockProtected.swift */,
 				DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */,
 				DBE3AD011BB452D200682E29 /* Timeout.swift */,
+				DBE3ACF51BB33C9A00682E29 /* DispatchBlock.swift */,
 				DB7457711BA693FB00A67836 /* DispatchDeferred.h */,
 				DB7457721BA693FB00A67836 /* DispatchDeferred.m */,
 				DB3294FE1B68066C002160CC /* Info.plist */,
@@ -344,6 +348,7 @@
 			files = (
 				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */,
+				DBE3ACF61BB33C9A00682E29 /* DispatchBlock.swift in Sources */,
 				DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A61B680E6C00394A66 /* LockProtected.swift in Sources */,
 				DB7457751BA693FB00A67836 /* DispatchDeferred.m in Sources */,
@@ -356,6 +361,7 @@
 			files = (
 				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */,
+				DBE3ACF71BB33C9A00682E29 /* DispatchBlock.swift in Sources */,
 				DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A71B680E6C00394A66 /* LockProtected.swift in Sources */,
 				DB7457761BA693FB00A67836 /* DispatchDeferred.m in Sources */,

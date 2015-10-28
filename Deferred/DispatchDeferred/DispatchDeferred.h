@@ -1,5 +1,5 @@
 //
-//  DeferredDispatchBridge.h
+//  DispatchDeferred.h
 //  Deferred
 //
 //  Created by Zachary Waldowski on 7/28/15.

@@ -22,3 +22,5 @@ FRAMEWORK_VERSION = A
 INFOPLIST_FILE = Deferred/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.Deferred
 PRODUCT_NAME = Deferred
+
+SWIFT_INCLUDE_PATHS = $(inherited) $(SRCROOT)/Deferred

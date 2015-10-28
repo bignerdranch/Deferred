@@ -1,12 +1,13 @@
 //
-//  DeferredDispatchBridge.m
+//  DispatchDeferred.m
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/29/15.
 //  Copyright © 2015 Big Nerd Ranch. All rights reserved.
 //
 
-#import "DeferredDispatchBridge.h"
+#import "DispatchDeferred.h"
+#import <Foundation/Foundation.h>
 
 /** Due to limitations in Swift 2.0 Beta 6, the `dispatch_block_*` APIs must be
  used from Objective-C. In a future version of Swift, this code can and should

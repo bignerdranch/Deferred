@@ -6,6 +6,8 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
+import DispatchDeferred.Private
+
 extension dispatch_block_flags_t: OptionSetType {}
 
 private final class Storage<T> {

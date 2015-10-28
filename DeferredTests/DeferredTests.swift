@@ -14,6 +14,8 @@ func dispatch_main_after(interval: NSTimeInterval, block: () -> ()) {
             dispatch_get_main_queue(), block)
 }
 
+private let testTimeout = 2.0
+
 class DeferredTests: XCTestCase {
     
     override func setUp() {
@@ -49,7 +51,7 @@ class DeferredTests: XCTestCase {
         dispatch_main_after(0.1) {
             expect.fulfill()
         }
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testValueUnblocksWhenUnfilledIsFilled() {
@@ -62,7 +64,7 @@ class DeferredTests: XCTestCase {
         dispatch_main_after(0.1) {
             d.fill(3)
         }
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testFill() {
@@ -96,7 +98,7 @@ class DeferredTests: XCTestCase {
             }
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testUponNotCalledWhileUnfilled() {
@@ -111,7 +113,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testUponCalledWhenFilled() {
@@ -130,7 +132,7 @@ class DeferredTests: XCTestCase {
             d.fill(1)
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testConcurrentUpon() {
@@ -150,7 +152,7 @@ class DeferredTests: XCTestCase {
         dispatch_async(queue) { d.fill(1) }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testBoth() {
@@ -172,7 +174,7 @@ class DeferredTests: XCTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testAll() {
@@ -203,7 +205,7 @@ class DeferredTests: XCTestCase {
             outerExpectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
     func testAllEmptyArray() {
@@ -236,6 +238,6 @@ class DeferredTests: XCTestCase {
             }
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 }

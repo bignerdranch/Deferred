@@ -9,6 +9,8 @@
 import XCTest
 import Deferred
 
+private let testTimeout = 15.0
+
 class LockProtectedTests: XCTestCase {
     var protected: LockProtected<(NSDate?,[Int])>!
     var queue: dispatch_queue_t!
@@ -63,7 +65,7 @@ class LockProtectedTests: XCTestCase {
             startReader(i)
         }
 
-        waitForExpectationsWithTimeout(10, handler: nil)
+        waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
 }

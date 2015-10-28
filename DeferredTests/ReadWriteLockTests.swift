@@ -13,6 +13,8 @@ func timeIntervalSleep(duration: NSTimeInterval) {
     usleep(useconds_t(duration * NSTimeInterval(USEC_PER_SEC)))
 }
 
+private let testTimeout = 10.0
+
 class PerfTestThread: NSThread {
     let iters: Int
     var lock: ReadWriteLock
@@ -95,7 +97,7 @@ class ReadWriteLockTests: XCTestCase {
 
             // and make sure all 32 complete in < 3 second. If the readers
             // did not run concurrently, they would take >= 3.2 seconds
-            waitForExpectationsWithTimeout(3, handler: nil)
+            waitForExpectationsWithTimeout(testTimeout, handler: nil)
         }
     }
 
@@ -117,7 +119,7 @@ class ReadWriteLockTests: XCTestCase {
                     }
                 }
             }
-            waitForExpectationsWithTimeout(5, handler: nil)
+            waitForExpectationsWithTimeout(testTimeout, handler: nil)
         }
     }
 
@@ -157,7 +159,7 @@ class ReadWriteLockTests: XCTestCase {
                 startReader(i)
             }
             
-            waitForExpectationsWithTimeout(5, handler: nil)
+            waitForExpectationsWithTimeout(testTimeout, handler: nil)
         }
     }
 

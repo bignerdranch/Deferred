@@ -8,11 +8,9 @@
 
 import DispatchDeferred.Private
 
-extension dispatch_block_flags_t: OptionSetType {}
-
 private final class Storage<T> {
 
-    var value: T
+    let value: T
 
     init(_ value: T) {
         self.value = value
@@ -30,16 +28,22 @@ private var DeferredDefaultQueue: dispatch_queue_t {
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value> {
     private let accessQueue: dispatch_queue_t
+    private let onFilledToken: AnyObject
+
+    private static func unbox(storage: AnyObject) -> Value {
+        let box: Storage<Value> = unsafeDowncast(storage)
+        return box.value
+    }
     
-    private static var currentStorage: Storage<Value?> {
-        let boxPtr = dispatch_get_specific(DeferredStorageKey)
-        assert(boxPtr != nil, "Deferred side-table should not be accessed off-queue")
-        let boxRef = Unmanaged<Storage<Value?>>.fromOpaque(COpaquePointer(boxPtr))
-        return boxRef.takeUnretainedValue()
+    internal init(accessQueue: dispatch_queue_t, onFilledToken: AnyObject) {
+        self.accessQueue = accessQueue
+        self.onFilledToken = onFilledToken
     }
     
     private init(_ value: Value?) {
-        accessQueue = deferred_queue_create(Storage(value), value != nil)
+        var token: AnyObject?
+        let queue = deferred_create_queue(value.map(Storage.init), &token)
+        self.init(accessQueue: queue, onFilledToken: token!)
     }
     
     /// Initialize an unfilled Deferred.
@@ -54,7 +58,7 @@ public struct Deferred<Value> {
     
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return deferred_queue_is_filled(accessQueue)
+        return deferred_is_filled(onFilledToken)
     }
     
     /// Determines the deferred value with a given result.
@@ -75,15 +79,9 @@ public struct Deferred<Value> {
     /// :param: value The resolved value of the deferred.
     /// :param: assertIfFilled If `false`, race checking is disabled.
     public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
-        dispatch_barrier_async(accessQueue) {
-            let box = Deferred.currentStorage
-            if box.value == nil {
-                box.value = value
-                deferred_mark_filled()
-            } else if assertIfFilled {
-                preconditionFailure("Cannot fill an already-filled Deferred")
-            }
-        }
+        deferred_queue_fill(accessQueue, onFilledToken, Storage(value), assertIfFilled ? {
+            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
+        } : nil)
     }
     
     /**
@@ -96,12 +94,9 @@ public struct Deferred<Value> {
     :param: function A function that uses the determined value.
     */
     public func upon(queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
-        dispatch_async(accessQueue) {
-            deferred_upon(queue) { [box = Deferred.currentStorage] in
-                if let value = box.value {
-                    function(value)
-                }
-            }
+        deferred_queue_upon(accessQueue, onFilledToken) {
+            let value = Deferred.unbox($0)
+            dispatch_async(queue) { function(value) }
         }
     }
     
@@ -129,8 +124,8 @@ public struct Deferred<Value> {
     */
     public func wait(time: Timeout) -> Value? {
         var value: Value?
-        deferred_wait(accessQueue, time.rawValue) {
-            value = Deferred.currentStorage.value
+        deferred_queue_wait(accessQueue, onFilledToken, time.rawValue) {
+            value = Deferred.unbox($0)
         }
         return value
     }

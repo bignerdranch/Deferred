@@ -194,10 +194,7 @@ class DeferredTests: XCTestCase {
         let d2 = Deferred<String>()
         let both = d1.and(d2)
 
-        XCTAssertFalse(both.isFilled)
-
         d1.fill(1)
-        XCTAssertFalse(both.isFilled)
         d2.fill("foo")
 
         let expectation = expectationWithDescription("paired deferred should be filled")

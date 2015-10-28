@@ -1,3 +1,0 @@
-explicit module DispatchDeferred.Private {
-    header "DispatchDeferred.h"
-}

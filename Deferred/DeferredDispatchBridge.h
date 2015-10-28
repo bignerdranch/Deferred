@@ -10,8 +10,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-NS_INLINE void deferred_queue_set_specific_object(dispatch_queue_t queue, const void *key, id object) {
-    dispatch_queue_set_specific(queue, key, (void *)CFBridgingRetain(object), (dispatch_function_t)CFBridgingRelease);
-}
+extern const void *DeferredStorageKey;
+
+extern dispatch_queue_t deferred_queue_create(id object, BOOL isFilled);
+extern BOOL deferred_queue_is_filled(dispatch_queue_t queue);
+void deferred_queue_notify(dispatch_queue_t queue, dispatch_block_t block);
+
+extern void deferred_mark_filled(void);
+extern void deferred_upon(dispatch_queue_t queue, dispatch_block_t block);
+BOOL deferred_wait(dispatch_queue_t queue, dispatch_time_t when, __attribute__((noescape)) dispatch_block_t block);
 
 NS_ASSUME_NONNULL_END

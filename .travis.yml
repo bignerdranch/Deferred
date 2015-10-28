@@ -15,3 +15,5 @@ env:
 notifications:
   slack:
     secure: DGHh73fkuJ/61KdOzqzKAtlSPG8/nO0h949Nl3MIIg8tXG8Ujagb2nxRsl7Xsu49K+s54ENFpoZEdB63whOC4KMgFqRtnjiJVc2gP380oNh2BrSt0qRcZDIy6nhgbQOzOtvV4tbgh/pCMbflj70Ad0EBSkdNGuMn2bcj/vGl+gY=
+    on_success: change
+    on_start: never

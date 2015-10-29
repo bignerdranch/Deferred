@@ -1,0 +1,2 @@
+slack_only_on_failure true
+clean true

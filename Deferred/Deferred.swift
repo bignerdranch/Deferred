@@ -8,14 +8,15 @@
 
 import Dispatch
 
-private final class Storage<T> {
-
-    let value: T
-
-    init(_ value: T) {
-        self.value = value
-    }
-
+// A generic catch-all queue for when you just want to throw some work into the
+// concurrent pile. As an alternative to the `QOS_CLASS_UTILITY` global queue,
+// work dispatched onto this queue matches the QoS of the caller, which is
+// generally the right behavior.
+//
+// The technique is described and used in Core Foundation:
+// http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
+private var genericQueue: dispatch_queue_t! {
+    return dispatch_get_global_queue(qos_class_self(), 0)
 }
 
 // Atomic compare-and-swap, but safe for owned (retaining) pointers:
@@ -37,80 +38,95 @@ private func compareAndSwap<T: AnyObject>(old old: T?, new: T?, to toPtr: Unsafe
     }
 }
 
+// In order to assign the value of a Deferred using atomics, we box it up into
+// an object. See `compareAndSwap` above.
+private final class Box<T> {
+
+    let contents: T
+
+    init(_ contents: T) {
+        self.contents = contents
+    }
+
+}
+
+// A dispatch block (which is different from a plain closure!) constitutes the
+// second half of Deferred. The `dispatch_block_notify` API defines the notifier
+// list used by `Deferred.upon(queue:body:)`.
+private typealias OnFillMarker = dispatch_block_t
+
 // Raw Deferred storage. Using `ManagedBuffer` has advantages over a custom class:
 //  - The side-table data is efficiently stored in tail-allocated buffer space.
 //  - The Element buffer has a stable pointer when locked to a single element.
 //  - Better holdsUniqueReference support allows for future optimization.
-private final class DeferredBuffer<Value, SideData>: ManagedBuffer<SideData, Storage<Value>?> {
+private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value>?> {
     
-    static func create(sideData: () -> SideData) -> DeferredBuffer<Value, SideData> {
-        return create(1, initialValue: { _ in sideData() }) as! DeferredBuffer<Value, SideData>
+    static func create() -> DeferredBuffer<Value> {
+        return create(1, initialValue: { _ in
+            dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
+                fatalError("This code should never be executed")
+            })
+        }) as! DeferredBuffer<Value>
     }
     
     deinit {
-        // super's init automatically destroys the Value
-        withUnsafeMutablePointerToElements { elementsPtr in
+        // super's deinit automatically destroys the Value
+        withUnsafeMutablePointerToElements { boxPtr in
             // UnsafeMutablePointer.destroy() is faster than destroy(_:)
-            elementsPtr.destroy()
+            boxPtr.destroy()
         }
     }
     
     func initializeWith(value: Value?) {
-        let box = value.map(Storage.init)
-        withUnsafeMutablePointerToElements { elementsPtr in
-            elementsPtr.initialize(box)
+        let box = value.map(Box.init)
+        withUnsafeMutablePointerToElements { boxPtr in
+            boxPtr.initialize(box)
         }
     }
     
     func withValue(body: Value -> Void) {
-        withUnsafeMutablePointerToElements { elementsPtr in
-            guard let box = elementsPtr.memory else { return }
-            body(box.value)
+        withUnsafeMutablePointerToElements { boxPtr in
+            guard let box = boxPtr.memory else { return }
+            body(box.contents)
         }
     }
     
-    func fill(value: Value, onFill: SideData -> Void) -> Bool {
-        let box = Storage(value)
-        return withUnsafeMutablePointers { (valuePtr, elementsPtr) in
-            guard compareAndSwap(old: nil, new: box, to: elementsPtr) else { return false }
-            onFill(valuePtr.memory)
+    func fill(value: Value, onFill: OnFillMarker -> Void) -> Bool {
+        let box = Box(value)
+        return withUnsafeMutablePointers { (onFillPtr, boxPtr) in
+            guard compareAndSwap(old: nil, new: box, to: boxPtr) else { return false }
+            onFill(onFillPtr.memory)
             return true
         }
     }
     
-}
-
-// A generic catch-all queue for when you just want to throw some work into the
-// concurrent pile. As an alternative to the `QOS_CLASS_UTILITY` global queue,
-// work dispatched onto this queue matches the QoS of the caller, which is
-// generally the right behavior.
-//
-// The technique is described and used in Core Foundation:
-// http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
-private var genericQueue: dispatch_queue_t! {
-    return dispatch_get_global_queue(qos_class_self(), 0)
+    // The side-table data (our `dispatch_block_t`) is ManagedBuffer.value.
+    var onFilled: OnFillMarker {
+        return value
+    }
+    
 }
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value> {
     
-    private var storage = DeferredBuffer<Value, dispatch_block_t>.create {
-        dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {})
-    }
+    private var storage = DeferredBuffer<Value>.create()
 
-    private func upon(queue: dispatch_queue_t, options inFlags: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
-        let flags = dispatch_block_flags_t(inFlags.rawValue | DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue)
-        let block = dispatch_block_create(flags) {
+    private func upon(queue: dispatch_queue_t, var options: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+        options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
+        let block = dispatch_block_create(options) {
             self.storage.withValue(body)
         }
-        dispatch_block_notify(storage.value, queue, block)
+        dispatch_block_notify(storage.onFilled, queue, block)
         return block
     }
     
-    private func markFilled(onFilled: dispatch_block_t) {
-        dispatch_block_cancel(onFilled)
-        onFilled()
+    private func markFilled(marker: OnFillMarker) {
+        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
+        dispatch_block_cancel(marker)
+        // Executing the block "unblocks" it, calling all the `_notify` blocks
+        marker()
     }
 
     // MARK: -
@@ -123,12 +139,12 @@ public struct Deferred<Value> {
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
         storage.initializeWith(value)
-        markFilled(storage.value)
+        markFilled(storage.onFilled)
     }
 
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return dispatch_block_testcancel(storage.value) != 0
+        return dispatch_block_testcancel(storage.onFilled) != 0
     }
 
     /// Determines the deferred value with a given result.

@@ -23,6 +23,8 @@
 		DBA0D2F81B680F9E00A498CB /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AA1B680E7600394A66 /* DeferredTests.swift */; };
 		DBA0D2F91B680F9E00A498CB /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */; };
 		DBA0D2FA1B680F9E00A498CB /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */; };
+		DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
+		DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,7 @@
 		DB3295521B680744002160CC /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBE3AD011BB452D200682E29 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +128,7 @@
 				DB0F80A11B680E6C00394A66 /* Deferred.swift */,
 				DB0F80A21B680E6C00394A66 /* LockProtected.swift */,
 				DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */,
+				DBE3AD011BB452D200682E29 /* Timeout.swift */,
 				DB3294FE1B68066C002160CC /* Info.plist */,
 			);
 			path = Deferred;
@@ -255,7 +259,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Big Nerd Ranch";
 				TargetAttributes = {
 					DB3294F81B68066C002160CC = {
@@ -329,6 +333,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
+				DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */,
 				DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A61B680E6C00394A66 /* LockProtected.swift in Sources */,
 			);
@@ -339,6 +344,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
+				DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */,
 				DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */,
 				DB0F80A71B680E6C00394A66 /* LockProtected.swift in Sources */,
 			);
@@ -385,6 +391,7 @@
 			baseConfigurationReference = DB32954F1B680744002160CC /* Debug.xcconfig */;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
 			name = Debug;

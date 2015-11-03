@@ -6,39 +6,147 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-// This cannot be a class var, new storage would be created for every
-// specialization. It also could not be used as a default argument as it is now.
-private var DeferredDefaultQueue: dispatch_queue_t {
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+import Dispatch
+
+// A generic catch-all queue for when you just want to throw some work into the
+// concurrent pile. As an alternative to the `QOS_CLASS_UTILITY` global queue,
+// work dispatched onto this queue matches the QoS of the caller, which is
+// generally the right behavior.
+//
+// The technique is described and used in Core Foundation:
+// http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
+private var genericQueue: dispatch_queue_t! {
+    return dispatch_get_global_queue(qos_class_self(), 0)
+}
+
+// Atomic compare-and-swap, but safe for owned (retaining) pointers:
+//  - ObjC: "MyObject *__strong *"
+//  - Swift: "UnsafeMutablePointer<MyObject>"
+// If the swap is made, the new value is retained by its owning pointer.
+// If the swap is not made, the new value is not retained.
+private func compareAndSwap<T: AnyObject>(old old: T?, new: T?, to toPtr: UnsafeMutablePointer<T?>) -> Bool {
+    let oldRef = old.map(Unmanaged.passUnretained)
+    let newRef = new.map(Unmanaged.passRetained)
+    let oldPtr = oldRef?.toOpaque() ?? nil
+    let newPtr = newRef?.toOpaque() ?? nil
+    if OSAtomicCompareAndSwapPtr(UnsafeMutablePointer(oldPtr), UnsafeMutablePointer(newPtr), UnsafeMutablePointer(toPtr)) {
+        oldRef?.release()
+        return true
+    } else {
+        newRef?.release()
+        return false
+    }
+}
+
+// In order to assign the value of a Deferred using atomics, we box it up into
+// an object. See `compareAndSwap` above.
+private final class Box<T> {
+
+    let contents: T
+
+    init(_ contents: T) {
+        self.contents = contents
+    }
+
+}
+
+// A dispatch block (which is different from a plain closure!) constitutes the
+// second half of Deferred. The `dispatch_block_notify` API defines the notifier
+// list used by `Deferred.upon(queue:body:)`.
+private typealias OnFillMarker = dispatch_block_t
+
+// Raw Deferred storage. Using `ManagedBuffer` has advantages over a custom class:
+//  - The side-table data is efficiently stored in tail-allocated buffer space.
+//  - The Element buffer has a stable pointer when locked to a single element.
+//  - Better holdsUniqueReference support allows for future optimization.
+private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value>?> {
+    
+    static func create() -> DeferredBuffer<Value> {
+        return create(1, initialValue: { _ in
+            dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
+                fatalError("This code should never be executed")
+            })
+        }) as! DeferredBuffer<Value>
+    }
+    
+    deinit {
+        // super's deinit automatically destroys the Value
+        withUnsafeMutablePointerToElements { boxPtr in
+            // UnsafeMutablePointer.destroy() is faster than destroy(_:)
+            boxPtr.destroy()
+        }
+    }
+    
+    func initializeWith(value: Value?) {
+        let box = value.map(Box.init)
+        withUnsafeMutablePointerToElements { boxPtr in
+            boxPtr.initialize(box)
+        }
+    }
+    
+    func withValue(body: Value -> Void) {
+        withUnsafeMutablePointerToElements { boxPtr in
+            guard let box = boxPtr.memory else { return }
+            body(box.contents)
+        }
+    }
+    
+    func fill(value: Value, onFill: OnFillMarker -> Void) -> Bool {
+        let box = Box(value)
+        return withUnsafeMutablePointers { (onFillPtr, boxPtr) in
+            guard compareAndSwap(old: nil, new: box, to: boxPtr) else { return false }
+            onFill(onFillPtr.memory)
+            return true
+        }
+    }
+    
+    // The side-table data (our `dispatch_block_t`) is ManagedBuffer.value.
+    var onFilled: OnFillMarker {
+        return value
+    }
+    
 }
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value> {
-    typealias UponBlock = (dispatch_queue_t, Value -> ())
-    private typealias Protected = (protected: Value?, uponBlocks: [UponBlock])
     
-    private var protected: LockProtected<Protected>
-    
-    private init(_ value: Value?) {
-        protected = LockProtected(item: (value, []))
+    private var storage = DeferredBuffer<Value>.create()
+
+    private func upon(queue: dispatch_queue_t, var options: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+        options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
+        let block = dispatch_block_create(options) {
+            self.storage.withValue(body)
+        }
+        dispatch_block_notify(storage.onFilled, queue, block)
+        return block
     }
+    
+    private func markFilled(marker: OnFillMarker) {
+        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
+        dispatch_block_cancel(marker)
+        // Executing the block "unblocks" it, calling all the `_notify` blocks
+        marker()
+    }
+
+    // MARK: -
     
     /// Initialize an unfilled Deferred.
     public init() {
-        self.init(nil)
+        storage.initializeWith(nil)
     }
     
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
-        self.init(value)
+        storage.initializeWith(value)
+        markFilled(storage.onFilled)
     }
-    
+
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return protected.withReadLock { $0.protected != nil }
+        return dispatch_block_testcancel(storage.onFilled) != 0
     }
-    
+
     /// Determines the deferred value with a given result.
     ///
     /// Filling a deferred value should usually be attempted only once, and by
@@ -57,29 +165,13 @@ public struct Deferred<Value> {
     /// :param: value The resolved value of the deferred.
     /// :param: assertIfFilled If `false`, race checking is disabled.
     public func fill(value: Value, assertIfFilled: Bool = true, file: StaticString = __FILE__, line: UInt = __LINE__) {
-        let (filledValue, blocks) = protected.withWriteLock { data -> (Value, [UponBlock]) in
-            if assertIfFilled {
-                precondition(data.protected == nil, "Cannot fill an already-filled Deferred", file: file, line: line)
-                data.protected = value
-            } else if data.protected == nil {
-                data.protected = value
-            }
-            let blocks = data.uponBlocks
-            data.uponBlocks.removeAll(keepCapacity: false)
-            return (data.protected!, blocks)
+        let succeeded = storage.fill(value, onFill: markFilled)
+        switch (succeeded, assertIfFilled) {
+        case (false, true):
+            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
+        case (_, _):
+            break
         }
-        for (queue, block) in blocks {
-            dispatch_async(queue) { block(filledValue) }
-        }
-    }
-    
-    /**
-    Checks for and returns a determined value.
-    
-    :returns: The determined value, if already filled, or `nil`.
-    */
-    public func peek() -> Value? {
-        return protected.withReadLock { $0.protected }
     }
     
     /**
@@ -89,20 +181,12 @@ public struct Deferred<Value> {
     queue immediately. An `upon` call is always executed asynchronously.
     
     :param: queue A dispatch queue for executing the given function on.
-    :param: function A function that uses the determined value.
+    :param: body A function that uses the determined value.
     */
-    public func upon(queue: dispatch_queue_t = DeferredDefaultQueue, function: Value -> ()) {
-        let maybeValue: Value? = protected.withWriteLock{ data in
-            if data.protected == nil {
-                data.uponBlocks.append( (queue, function) )
-            }
-            return data.protected
-        }
-        if let value = maybeValue {
-            dispatch_async(queue) { function(value) }
-        }
+    public func upon(queue: dispatch_queue_t = genericQueue, body: Value -> ()) {
+        _ = upon(queue, options: DISPATCH_BLOCK_INHERIT_QOS_CLASS, body: body)
     }
-    
+
     /**
     Call some function on the main queue once the value is determined.
     
@@ -110,14 +194,47 @@ public struct Deferred<Value> {
     main queue immediately. The function is always executed asynchronously, even
     if the Deferred is filled from the main queue.
     
-    :param: function A function that uses the determined value.
+    :param: body A function that uses the determined value.
     */
-    public func uponMainQueue(function: Value -> ()) {
-        upon(dispatch_get_main_queue(), function: function)
+    public func uponMainQueue(body: Value -> ()) {
+        upon(dispatch_get_main_queue(), body: body)
+    }
+
+    /**
+    Waits synchronously for the value to become determined.
+
+    If the value is already determined, the call returns immediately with the
+    value.
+
+    :param: time A length of time to wait for the value to be determined.
+    :returns: The determined value, if filled within the timeout, or `nil`.
+    */
+    public func wait(time: Timeout) -> Value? {
+        let queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+        var value: Value?
+        let handler = upon(queue, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS) {
+            value = $0
+        }
+
+        guard dispatch_block_wait(handler, time.rawValue) == 0 else {
+            dispatch_block_cancel(handler)
+            return nil
+        }
+
+        return value
     }
 }
 
 extension Deferred {
+    /**
+    Checks for and returns a determined value.
+
+    :returns: The determined value, if already filled, or `nil`.
+    */
+    public func peek() -> Value? {
+        return wait(.Now)
+    }
+
     /**
     Waits for the value to become determined, then returns it.
 
@@ -129,19 +246,8 @@ extension Deferred {
 
     :returns: The determined value.
     */
-    public var value: Value {
-        // fast path - return if already filled
-        if let v = peek() {
-            return v
-        }
-
-        // slow path - block until filled
-        let group = dispatch_group_create()
-        var result: Value!
-        dispatch_group_enter(group)
-        self.upon { result = $0; dispatch_group_leave(group) }
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
-        return result
+    internal var value: Value {
+        return unsafeUnwrap(wait(.Forever))
     }
 }
 
@@ -161,7 +267,7 @@ extension Deferred {
 
     :returns: The new deferred value returned by the `transform`.
     **/
-    public func flatMap<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
+    public func flatMap<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> Deferred<NewValue>) -> Deferred<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             transform($0).upon(queue) {
@@ -182,7 +288,7 @@ extension Deferred {
     :returns: A new deferred value that is determined once the receiving
     deferred is determined.
     **/
-    public func map<NewValue>(upon queue: dispatch_queue_t = DeferredDefaultQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
+    public func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> NewValue) -> Deferred<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             d.fill(transform($0))
@@ -228,7 +334,7 @@ public func all<Value, Collection: CollectionType where Collection.Generator.Ele
         }
     }
 
-    dispatch_group_notify(group, DeferredDefaultQueue) {
+    dispatch_group_notify(group, genericQueue) {
         let results = array.map { $0.value }
         combined.fill(results)
     }

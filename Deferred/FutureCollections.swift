@@ -16,7 +16,9 @@ public extension SequenceType where Generator.Element: FutureType {
     var firstFuture: Deferred<Generator.Element.Value> {
         let combined = Deferred<Generator.Element.Value>()
         for d in self {
-            d.upon { t in combined.fill(t, assertIfFilled: false) }
+            d.upon {
+                combined.fill($0)
+            }
         }
         return combined
     }
@@ -44,8 +46,9 @@ public extension CollectionType where Generator.Element: FutureType {
         }
 
         dispatch_group_notify(group, genericQueue) {
-            let results = array.map { $0.value }
-            combined.fill(results)
+            combined.fill(array.map {
+                $0.value
+            })
         }
 
         return combined

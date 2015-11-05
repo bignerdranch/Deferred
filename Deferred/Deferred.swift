@@ -178,28 +178,11 @@ public struct Deferred<Value>: FutureType, PromiseType {
     
     /// Determines the deferred value with a given result.
     ///
-    /// Filling a deferred value should usually be attempted only once, and by
-    /// default filling will trap upon improper usage.
+    /// Filling a deferred value should usually be attempted only once.
     ///
-    /// * In playgrounds and unoptimized builds (the default for a "Debug"
-    ///   configuration), program execution will be stopped at the caller in
-    ///   a debuggable state.
-    /// * In -O builds (the default for a "Release" configuration), program
-    ///   execution will stop.
-    /// * In -Ounchecked builds, the programming error is assumed to not exist.
-    ///
-    /// If your deferred requires multiple potential fillers to race, you may
-    /// disable the precondition.
-    ///
-    /// :param: value The resolved value of the deferred.
-    /// :param: assertIfFilled If `false`, race checking is disabled.
-    public func fill(value: Value, assertIfFilled: Bool, file: StaticString, line: UInt) {
-        let succeeded = storage.fill(value, onFill: markFilled)
-        switch (succeeded, assertIfFilled) {
-        case (false, true):
-            preconditionFailure("Cannot fill an already-filled Deferred", file: file, line: line)
-        case (_, _):
-            break
-        }
+    /// - parameter value: The resolved value for the instance.
+    /// - returns: Whether the promise was fulfilled with `value`.
+    public func fill(value: Value) -> Bool {
+        return storage.fill(value, onFill: markFilled)
     }
 }

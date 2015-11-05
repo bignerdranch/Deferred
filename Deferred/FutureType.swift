@@ -161,6 +161,6 @@ public extension FutureType {
     ///   the given future become determined.
     /// - seealso: SequenceType.allFutures
     func and<OtherFuture: FutureType>(other: OtherFuture) -> AnyFuture<(Value, OtherFuture.Value)> {
-        return AnyFuture(base: flatMap { t in other.map { u in (t, u) } })
+        return AnyFuture(flatMap { t in other.map { u in (t, u) } })
     }
 }

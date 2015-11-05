@@ -37,7 +37,7 @@ public extension FutureType {
     ///     myFuture.map { _ in }
     ///
     /// But will behave more efficiently.
-    var ignoringResult: AnyFuture<Void> {
+    var ignoringValue: AnyFuture<Void> {
         return AnyFuture(IgnoredFutureBox(base: self))
     }
 }

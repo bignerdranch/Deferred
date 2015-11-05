@@ -6,7 +6,18 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
+/// A promise models writing the result of some asynchronous operation.
+///
+/// Promises should generally only be determined, or "filled", once. This allows
+/// an implementing type to clear a queue of subscribers, for instance, and
+/// provides consistent sharing of the determined value.
+///
+/// An implementing type should discourage race conditions around filling.
+/// However, certain use cases inherently race (such as cancellation), and any
+/// attempts to check for programmer error should be active by default.
+///
 public protocol PromiseType {
+    /// A type that represents the result of some asynchronous operation.
     typealias Value
 
     /// Check whether or not the receiver is filled.
@@ -14,20 +25,22 @@ public protocol PromiseType {
 
     /// Determines the deferred value with a given result.
     ///
-    /// Filling a deferred value should usually be attempted only once, and by
-    /// default filling will trap upon improper usage.
+    /// Filling a deferred value should usually be attempted only once. An
+    /// implementing type may choose to enforce this by default. If an
+    /// implementing type requires multiple potential fillers to race, the
+    /// precondition may be disabled.
     ///
     /// * In playgrounds and unoptimized builds (the default for a "Debug"
-    ///   configuration), program execution will be stopped at the caller in
+    ///   configuration), program execution should be stopped at the caller in
     ///   a debuggable state.
+    ///
     /// * In -O builds (the default for a "Release" configuration), program
-    ///   execution will stop.
-    /// * In -Ounchecked builds, the programming error is assumed to not exist.
+    ///   execution should stop.
     ///
-    /// If your deferred requires multiple potential fillers to race, you may
-    /// disable the precondition.
+    /// * In -Ounchecked builds, the programming error should be assumed to not
+    ///   exist.
     ///
-    /// :param: value The resolved value of the deferred.
-    /// :param: assertIfFilled If `false`, race checking is disabled.
+    /// - parameter value: A resolved value for the instance.
+    /// - parameter assertIfFilled: If `false`, race checking is disabled.
     func fill(value: Value, assertIfFilled: Bool, file: StaticString, line: UInt)
 }

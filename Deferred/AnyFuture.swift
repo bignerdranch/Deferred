@@ -76,18 +76,23 @@ private final class FilledFutureBox<Value>: FutureBoxBase<Value> {
 ///   using the `PromiseType` aspect.
 public struct AnyFuture<Value>: FutureType {
     private let box: FutureBoxBase<Value>
-    init(_ box: FutureBoxBase<Value>) {
+    init(box: FutureBoxBase<Value>) {
         self.box = box
     }
 
     /// Create a future whose `upon(_:function:)` method forwards to `base`.
-    public init<Future: FutureType where Future.Value == Value>(base: Future) {
-        self.init(AnyFutureBox(base: base))
+    public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
+        self.init(box: AnyFutureBox(base: base))
     }
 
     /// Wrap and forward future as if it were always filled with `value`.
-    public init(value: Value) {
-        self.init(FilledFutureBox(value: value))
+    public init(_ value: Value) {
+        self.init(box: FilledFutureBox(value: value))
+    }
+    
+    /// Create an `AnyFuture` having the same underlying future as `other`.
+    public init(_ other: AnyFuture<Value>) {
+        self.init(box: other.box)
     }
 
     /// Call some function once the underlying future's value is determined.
@@ -104,17 +109,5 @@ public struct AnyFuture<Value>: FutureType {
     /// - returns: The determined value, if filled within the timeout, or `nil`.
     public func wait(time: Timeout) -> Value? {
         return box.wait(time)
-    }
-
-    /// Returns `self`.
-    public var future: AnyFuture<Value> {
-        return self
-    }
-}
-
-public extension FutureType {
-    /// Wraps the future in a type
-    var future: AnyFuture<Value> {
-        return AnyFuture(base: self)
     }
 }

@@ -189,10 +189,10 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
-    func testBoth() {
+    func testAnd() {
         let d1 = Deferred<Int>()
         let d2 = Deferred<String>()
-        let both = d1.both(d2)
+        let both = d1.and(d2)
 
         XCTAssertFalse(both.isFilled)
 
@@ -212,14 +212,14 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
-    func testAll() {
+    func testJoinedValues() {
         var d = [Deferred<Int>]()
 
         for _ in 0 ..< 10 {
             d.append(Deferred())
         }
 
-        let w = all(d)
+        let w = d.joinedValues
         let outerExpectation = expectationWithDescription("all results filled in")
         let innerExpectation = expectationWithDescription("paired deferred should be filled")
 
@@ -242,15 +242,14 @@ class DeferredTests: XCTestCase {
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
 
-    func testAllEmptyArray() {
-        let d = [Deferred<Int>]()
-        let array = all(d)
-        XCTAssert(array.isFilled)
+    func testJoinedValuesEmptyCollection() {
+        let d = EmptyCollection<Deferred<Int>>().joinedValues
+        XCTAssert(d.isFilled)
     }
 
-    func testAny() {
+    func testEarliestFilled() {
         let d = (0 ..< 10).map { _ in Deferred<Int>() }
-        let w = any(d)
+        let w = d.earliestFilled
 
         d[3].fill(3)
 
@@ -286,7 +285,7 @@ class DeferredTests: XCTestCase {
         let expectedValues = [Int](count: allDeferreds.count, repeatedValue: anyValue)
 
         let allShouldBeFulfilled = expectationWithDescription("filling any copy fulfills all")
-        all(allDeferreds).upon {
+        allDeferreds.joinedValues.upon {
             [weak allShouldBeFulfilled] allValues in
             allShouldBeFulfilled?.fulfill()
 

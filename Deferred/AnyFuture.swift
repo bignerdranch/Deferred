@@ -16,7 +16,7 @@ for `FutureType`. The techniques were derived from experimenting with
 */
 
 // Abstract class that fake-conforms to `FutureType` for use by `AnyFuture`.
-class FutureBoxBase<Value>: FutureType {
+private class FutureBoxBase<Value>: FutureType {
     func upon(queue: dispatch_queue_t, body: Value -> ()) {
         fatalError()
     }
@@ -76,23 +76,20 @@ private final class FilledFutureBox<Value>: FutureBoxBase<Value> {
 ///   using the `PromiseType` aspect.
 public struct AnyFuture<Value>: FutureType {
     private let box: FutureBoxBase<Value>
-    init(box: FutureBoxBase<Value>) {
-        self.box = box
-    }
 
     /// Create a future whose `upon(_:function:)` method forwards to `base`.
     public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
-        self.init(box: AnyFutureBox(base: base))
+        self.box = AnyFutureBox(base: base)
     }
 
     /// Wrap and forward future as if it were always filled with `value`.
     public init(_ value: Value) {
-        self.init(box: FilledFutureBox(value: value))
+        self.box = FilledFutureBox(value: value)
     }
     
     /// Create an `AnyFuture` having the same underlying future as `other`.
     public init(_ other: AnyFuture<Value>) {
-        self.init(box: other.box)
+        self.box = other.box
     }
 
     /// Call some function once the underlying future's value is determined.

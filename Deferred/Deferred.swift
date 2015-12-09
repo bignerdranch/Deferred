@@ -39,17 +39,16 @@ private struct DispatchBlockMarker: CallbacksList {
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value>: FutureType, PromiseType {
-    private var storage = MemoStore<Value, DispatchBlockMarker>.create()
+    private var storage: MemoStore<Value, DispatchBlockMarker>
     
     /// Initialize an unfilled Deferred.
     public init() {
-        storage.initializeWith(nil)
+        storage = MemoStore.create()
     }
     
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
-        storage.initializeWith(value)
-        storage.onFilled.markCompleted()
+        storage = MemoStore.create(value)
     }
 
     // MARK: FutureType
@@ -115,7 +114,6 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// - parameter value: The resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
     public func fill(value: Value) -> Bool {
-        // TODO: integrate markCompleted() call into DeferredBuffers
-        return storage.fill(value, onFill: { $0.markCompleted() })
+        return storage.fill(value)
     }
 }

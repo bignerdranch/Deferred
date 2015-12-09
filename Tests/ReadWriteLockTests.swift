@@ -7,7 +7,8 @@
 //
 
 import XCTest
-import Deferred
+@testable import Deferred
+import AtomicSwift
 
 func timeIntervalSleep(duration: NSTimeInterval) {
     usleep(useconds_t(duration * NSTimeInterval(USEC_PER_SEC)))
@@ -112,9 +113,9 @@ class ReadWriteLockTests: XCTestCase {
                     lock.withWriteLock {
                         // ... and make sure each runs in order by checking that
                         // no two blocks increment x at the same time
-                        XCTAssertEqual(OSAtomicIncrement32Barrier(&x), 1)
+                        XCTAssertEqual(__bnr_atomic_increment_32(&x), 1)
                         timeIntervalSleep(0.05)
-                        XCTAssertEqual(OSAtomicDecrement32Barrier(&x), 0)
+                        XCTAssertEqual(__bnr_atomic_decrement_32(&x), 0)
                         expectation.fulfill()
                     }
                 }
@@ -148,7 +149,7 @@ class ReadWriteLockTests: XCTestCase {
             dispatch_async(queue) {
                 lock.withWriteLock {
                     for _ in 0 ..< 5 {
-                        OSAtomicIncrement32Barrier(&x)
+                        __bnr_atomic_increment_32(&x)
                         timeIntervalSleep(0.1)
                     }
                     expectation.fulfill()

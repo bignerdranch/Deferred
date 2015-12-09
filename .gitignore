@@ -1,4 +1,5 @@
 ## Build generated
+.build/
 build/
 DerivedData
 docs/

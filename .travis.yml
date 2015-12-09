@@ -24,4 +24,3 @@ notifications:
 branches:
   only:
     - master
-    - swift-2_0

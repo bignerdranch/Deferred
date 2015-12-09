@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change $TRAVIS_BRANCH check to `master` when we merge Switch 2 support
-if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "swift-2_0" ]; then
+if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
     echo -e "Generating Jazzy output \n"
     jazzy --swift-version 2.1 -m Deferred -g "https://github.com/bignerdranch/Deferred" -a "Big Nerd Ranch" -u "https://github.com/bignerdranch" --module-version=2.0.0 -r "http://bignerdranch.github.io/Deferred/"
 

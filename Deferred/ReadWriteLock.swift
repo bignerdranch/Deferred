@@ -13,29 +13,23 @@ import Dispatch
 /// readers-writer semantics, such that many readers can read at once, or lock
 /// around all reads and writes the same way.
 public protocol ReadWriteLock {
-    /**
-    Call `body()` with a reading lock.
+    /// Call `body` with a reading lock.
+    ///
+    /// If the implementing type models a readers-writer lock, this function may
+    /// behave differently to `withWriteLock(_:)`.
+    ///
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return
 
-    If the implementing type models a readers-writer lock, this function may
-    behave differently to `withWriteLock(_:)`.
-
-    :param: body A function that reads a value while locked.
-    :returns: The value returned from the given function.
-    */
-    func withReadLock<T>(@noescape body: () -> T) -> T
-
-    /**
-    Call `body()` with a writing lock.
-
-    If the implementing type models a readers-writer lock, this function may
-    behave differently to `withReadLock(_:)`.
-
-    :param: body A function that writes a value while locked, then returns some
-    value.
-
-    :returns: The value returned from the given function.
-    */
-    func withWriteLock<T>(@noescape body: () -> T) -> T
+    /// Call `body` with a writing lock.
+    ///
+    /// If the implementing type models a readers-writer lock, this function may
+    /// behave differently to `withReadLock(_:)`.
+    ///
+    /// - parameter body: A function that writes a value while locked, then returns some value.
+    /// - returns: The value returned from the given function.
+    func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return
 }
 
 /// A locking construct using a counting semaphore from Grand Central Dispatch.
@@ -49,34 +43,26 @@ public struct DispatchLock: ReadWriteLock {
     /// Create a normal instance.
     public init() {}
 
-    private func withLock<T>(@noescape body: () -> T) -> T {
-        let result: T
+    private func withLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
-        result = body()
-        dispatch_semaphore_signal(semaphore)
-        return result
+        defer {
+            dispatch_semaphore_signal(semaphore)
+        }
+        return try body()
     }
 
-    /**
-    Call `body()` with a lock.
-
-    :param: body A function that reads a value while locked.
-    :returns: The value returned from the given function.
-    */
-    public func withReadLock<T>(@noescape body: () -> T) -> T {
-        return withLock(body)
+    /// Call `body` with a lock.
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+        return try withLock(body)
     }
 
-    /**
-    Call `body()` with a lock.
-
-    :param: body A function that writes a value while locked, then returns some
-    value.
-
-    :returns: The value returned from the given function.
-    */
-    public func withWriteLock<T>(@noescape body: () -> T) -> T {
-        return withLock(body)
+    /// Call `body` with a lock.
+    /// - parameter body: A function that writes a value while locked, then returns some value.
+    /// - returns: The value returned from the given function.
+    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+        return try withLock(body)
     }
 }
 
@@ -94,37 +80,30 @@ public final class SpinLock: ReadWriteLock {
     }
 
     deinit {
+        lock.destroy()
         lock.dealloc(1)
     }
 
-    private func withLock<T>(@noescape body: () -> T) -> T {
-        let result: T
+    private func withLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         OSSpinLockLock(lock)
-        result = body()
-        OSSpinLockUnlock(lock)
-        return result
+        defer {
+            OSSpinLockUnlock(lock)
+        }
+        return try body()
     }
 
-    /**
-    Call `body()` with a lock.
-
-    :param: body A function that reads a value while locked.
-    :returns: The value returned from the given function.
-    */
-    public func withReadLock<T>(@noescape body: () -> T) -> T {
-        return withLock(body)
+    /// Call `body` with a lock.
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+        return try withLock(body)
     }
 
-    /**
-    Call `body()` with a lock.
-
-    :param: body A function that writes a value while locked, then returns some
-    value.
-
-    :returns: The value returned from the given function.
-    */
-    public func withWriteLock<T>(@noescape body: () -> T) -> T {
-        return withLock(body)
+    /// Call `body` with a lock.
+    /// - parameter body: A function that writes a value while locked, then returns some value.
+    /// - returns: The value returned from the given function.
+    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+        return try withLock(body)
     }
 }
 
@@ -143,24 +122,21 @@ public final class CASSpinLock: ReadWriteLock {
     /// Allocate the spinlock.
     public init() {
         _state = UnsafeMutablePointer.alloc(1)
-        _state.memory = 0
+        _state.initialize(0)
     }
 
     deinit {
+        _state.destroy()
         _state.dealloc(1)
     }
 
-    /**
-    Call `body()` with a writing lock.
-
-    The given function is guaranteed to be called exclusively.
-
-    :param: body A function that writes a value while locked, then returns some
-    value.
-
-    :returns: The value returned from the given function.
-    */
-    public func withWriteLock<T>(@noescape body: () -> T) -> T {
+    /// Call `body` with a writing lock.
+    ///
+    /// The given function is guaranteed to be called exclusively.
+    ///
+    /// - parameter body: A function that writes a value while locked, then returns some value.
+    /// - returns: The value returned from the given function.
+    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         // spin until we acquire write lock
         repeat {
             let state = _state.memory
@@ -178,33 +154,31 @@ public final class CASSpinLock: ReadWriteLock {
                 OSAtomicCompareAndSwap32Barrier(state, state | Masks.WRITER_WAITING_BIT, _state)
             }
         } while true
+        
+        defer {
+            // unlock
+            repeat {
+                let state = _state.memory
+                
+                // clear everything except (possibly) WRITER_WAITING_BIT, which will only be set
+                // if another writer is already here and waiting (which will keep out readers)
+                if OSAtomicCompareAndSwap32Barrier(state, state & Masks.WRITER_WAITING_BIT, _state) {
+                    break
+                }
+            } while true
+        }
 
         // write lock acquired - run block
-        let result = body()
-
-        // unlock
-        repeat {
-            let state = _state.memory
-
-            // clear everything except (possibly) WRITER_WAITING_BIT, which will only be set
-            // if another writer is already here and waiting (which will keep out readers)
-            if OSAtomicCompareAndSwap32Barrier(state, state & Masks.WRITER_WAITING_BIT, _state) {
-                break
-            }
-        } while true
-
-        return result
+        return try body()
     }
 
-    /**
-    Call `body()` with a reading lock.
-
-    The given function may be called concurrently with reads on other threads.
-
-    :param: body A function that reads a value while locked.
-    :returns: The value returned from the given function.
-    */
-    public func withReadLock<T>(@noescape body: () -> T) -> T {
+    /// Call `body` with a reading lock.
+    ///
+    /// The given function may be called concurrently with reads on other threads.
+    ///
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         // spin until we acquire read lock
         repeat {
             let state = _state.memory
@@ -215,27 +189,27 @@ public final class CASSpinLock: ReadWriteLock {
                     break
             }
         } while true
+        
+        defer {
+            // decrement reader count
+            repeat {
+                let state = _state.memory
+                
+                // sanity check that we have a positive reader count before decrementing it
+                assert((state & Masks.MASK_READER_BITS) > 0, "unlocking read lock - invalid reader count")
+                
+                // desired new state: 1 fewer reader, preserving whether or not there is a writer waiting
+                let newState = ((state & Masks.MASK_READER_BITS) - 1) |
+                    (state & Masks.WRITER_WAITING_BIT)
+                
+                if OSAtomicCompareAndSwap32Barrier(state, newState, _state) {
+                    break
+                }
+            } while true
+        }
 
         // read lock acquired - run block
-        let result = body()
-
-        // decrement reader count
-        repeat {
-            let state = _state.memory
-
-            // sanity check that we have a positive reader count before decrementing it
-            assert((state & Masks.MASK_READER_BITS) > 0, "unlocking read lock - invalid reader count")
-
-            // desired new state: 1 fewer reader, preserving whether or not there is a writer waiting
-            let newState = ((state & Masks.MASK_READER_BITS) - 1) |
-                (state & Masks.WRITER_WAITING_BIT)
-
-            if OSAtomicCompareAndSwap32Barrier(state, newState, _state) {
-                break
-            }
-        } while true
-
-        return result
+        return try body()
     }
 }
 
@@ -254,41 +228,36 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     deinit {
         let status = pthread_rwlock_destroy(lock)
         assert(status == 0)
+        lock.destroy()
         lock.dealloc(1)
     }
 
-    /**
-    Call `body()` with a reading lock.
-
-    The given function may be called concurrently with reads on other threads.
-
-    :param: body A function that reads a value while locked.
-    :returns: The value returned from the given function.
-    */
-    public func withReadLock<T>(@noescape body: () -> T) -> T {
-        let result: T
+    /// Call `body` with a reading lock.
+    ///
+    /// The given function may be called concurrently with reads on other threads.
+    ///
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_rdlock(lock)
-        result = body()
-        pthread_rwlock_unlock(lock)
-        return result
+        defer {
+            pthread_rwlock_unlock(lock)
+        }
+        return try body()
     }
 
-    /**
-    Call `body()` with a writing lock.
-
-    The given function is guaranteed to be called exclusively.
-
-    :param: body A function that writes a value while locked, then returns some
-    value.
-
-    :returns: The value returned from the given function.
-    */
-    public func withWriteLock<T>(@noescape body: () -> T) -> T {
-        let result: T
+    /// Call `body` with a writing lock.
+    ///
+    /// The given function is guaranteed to be called exclusively.
+    ///
+    /// - parameter body: A function that writes a value while locked, then returns some value.
+    /// - returns: The value returned from the given function.
+    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_wrlock(lock)
-        result = body()
-        pthread_rwlock_unlock(lock)
-        return result
+        defer {
+            pthread_rwlock_unlock(lock)
+        }
+        return try body()
     }
 
 }

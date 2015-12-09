@@ -7,6 +7,7 @@
 //
 
 import Dispatch
+import AtomicSwift
 
 // Extremely simple surface describing an async rejoin-type notifier for a
 // one-off event.
@@ -28,14 +29,23 @@ protocol CallbacksList {
     func notify(upon queue: dispatch_queue_t, body: dispatch_block_t)
 }
 
+// Reading atomically from an initialized-once, owning pointer:
+//  - ObjC: "MyObject *__strong *"
+//  - Swift: "UnsafeMutablePointer<MyObject?>"
+private func atomicLoad<T: AnyObject>(target: UnsafeMutablePointer<T?>) -> T? {
+    let ptr = __bnr_atomic_load_ptr(UnsafeMutablePointer(target))
+    guard ptr != nil else { return nil }
+    return Unmanaged<T>.fromOpaque(COpaquePointer(ptr)).takeUnretainedValue()
+}
+
 // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:
 //  - ObjC: "MyObject *__strong *"
-//  - Swift: "UnsafeMutablePointer<MyObject!>"
+//  - Swift: "UnsafeMutablePointer<MyObject?>"
 // If the assignment is made, the new value is retained by its owning pointer.
 // If the assignment is not made, the new value is not retained.
 private func atomicInitialize<T: AnyObject>(target: UnsafeMutablePointer<T?>, to desired: T) -> Bool {
     let newPtr = Unmanaged.passRetained(desired).toOpaque()
-    let wonRace = OSAtomicCompareAndSwapPtr(nil, UnsafeMutablePointer(newPtr), UnsafeMutablePointer(target))
+    let wonRace = __bnr_atomic_compare_and_swap_ptr(UnsafeMutablePointer(target), nil, UnsafeMutablePointer(newPtr))
     if !wonRace {
         Unmanaged.passUnretained(desired).release()
     }
@@ -100,7 +110,7 @@ final class MemoStore<Value, OnFill: CallbacksList> {
 
     func withValue(body: Value -> Void) {
         Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { boxPtr in
-            guard let box = boxPtr.memory else { return }
+            guard let box = atomicLoad(boxPtr) else { return }
             body(box.contents)
         }
     }

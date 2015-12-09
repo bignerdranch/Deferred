@@ -8,27 +8,22 @@
 
 import Dispatch
 
-// Atomic compare-and-swap, but safe for owned (retaining) pointers:
+// Atomic compare-and-swap, but safe for an initialize-once, owning pointer:
 //  - ObjC: "MyObject *__strong *"
-//  - Swift: "UnsafeMutablePointer<MyObject>"
-// If the swap is made, the new value is retained by its owning pointer.
-// If the swap is not made, the new value is not retained.
-private func compareAndSwap<T: AnyObject>(old old: T?, new: T?, to toPtr: UnsafeMutablePointer<T?>) -> Bool {
-    let oldRef = old.map(Unmanaged.passUnretained)
-    let newRef = new.map(Unmanaged.passRetained)
-    let oldPtr = oldRef?.toOpaque() ?? nil
-    let newPtr = newRef?.toOpaque() ?? nil
-    if OSAtomicCompareAndSwapPtr(UnsafeMutablePointer(oldPtr), UnsafeMutablePointer(newPtr), UnsafeMutablePointer(toPtr)) {
-        oldRef?.release()
-        return true
-    } else {
-        newRef?.release()
-        return false
+//  - Swift: "UnsafeMutablePointer<MyObject!>"
+// If the assignment is made, the new value is retained by its owning pointer.
+// If the assignment is not made, the new value is not retained.
+private func atomicInitialize<T: AnyObject>(target: UnsafeMutablePointer<T?>, to desired: T) -> Bool {
+    let newPtr = Unmanaged.passRetained(desired).toOpaque()
+    let wonRace = OSAtomicCompareAndSwapPtr(nil, UnsafeMutablePointer(newPtr), UnsafeMutablePointer(target))
+    if !wonRace {
+        Unmanaged.passUnretained(desired).release()
     }
+    return wonRace
 }
 
-// In order to assign the value of a Deferred using atomics, we box it up into
-// an object. See `compareAndSwap` above.
+// In order to assign the value of a scalar in a Deferred using atomics, we must
+// box it up into something word-sized. See `atomicInitialize` above.
 private final class Box<T> {
 
     let contents: T
@@ -83,7 +78,7 @@ private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value
     func fill(value: Value, onFill: OnFillMarker -> Void) -> Bool {
         let box = Box(value)
         return withUnsafeMutablePointers { (onFillPtr, boxPtr) in
-            guard compareAndSwap(old: nil, new: box, to: boxPtr) else { return false }
+            guard atomicInitialize(boxPtr, to: box) else { return false }
             onFill(onFillPtr.memory)
             return true
         }

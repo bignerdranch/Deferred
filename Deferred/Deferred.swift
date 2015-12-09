@@ -34,23 +34,16 @@ private final class Box<T> {
 
 }
 
-// A dispatch block (which is different from a plain closure!) constitutes the
-// second half of Deferred. The `dispatch_block_notify` API defines the notifier
-// list used by `Deferred.upon(queue:body:)`.
-private typealias OnFillMarker = dispatch_block_t
-
 // Raw Deferred storage. Using `ManagedBuffer` has advantages over a custom class:
 //  - The side-table data is efficiently stored in tail-allocated buffer space.
 //  - The Element buffer has a stable pointer when locked to a single element.
 //  - Better holdsUniqueReference support allows for future optimization.
-private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value>?> {
+private final class DeferredBuffer<Value, OnFill: CallbacksList>: ManagedBuffer<OnFill, Box<Value>?> {
     
-    static func create() -> DeferredBuffer<Value> {
+    static func create() -> DeferredBuffer<Value, OnFill> {
         return create(1, initialValue: { _ in
-            dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
-                fatalError("This code should never be executed")
-            })
-        }) as! DeferredBuffer<Value>
+            OnFill()
+        }) as! DeferredBuffer<Value, OnFill>
     }
     
     deinit {
@@ -75,7 +68,7 @@ private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value
         }
     }
     
-    func fill(value: Value, onFill: OnFillMarker -> Void) -> Bool {
+    func fill(value: Value, onFill: OnFill -> Void) -> Bool {
         let box = Box(value)
         return withUnsafeMutablePointers { (onFillPtr, boxPtr) in
             guard atomicInitialize(boxPtr, to: box) else { return false }
@@ -84,8 +77,8 @@ private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value
         }
     }
     
-    // The side-table data (our `dispatch_block_t`) is ManagedBuffer.value.
-    var onFilled: OnFillMarker {
+    // The side-table data (our callbacks list) is ManagedBuffer.value.
+    var onFilled: OnFill {
         return value
     }
     
@@ -93,6 +86,9 @@ private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value
 
 // MARK: - DispatchBlockMarker
 
+// A dispatch block (which is different from a plain closure!) constitutes the
+// second half of Deferred. The `dispatch_block_notify` API defines the notifier
+// list used by `Deferred.upon(queue:body:)`.
 private struct DispatchBlockMarker: CallbacksList {
     let block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
         fatalError("This code should never be executed")
@@ -114,12 +110,12 @@ private struct DispatchBlockMarker: CallbacksList {
     }
 }
 
-// MARK: -
+// MARK: - Deferred
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value>: FutureType, PromiseType {
-    private var storage = DeferredBuffer<Value>.create()
+    private var storage = DeferredBuffer<Value, DispatchBlockMarker>.create()
     
     /// Initialize an unfilled Deferred.
     public init() {
@@ -129,23 +125,24 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
         storage.initializeWith(value)
-        markFilled(storage.onFilled)
+        storage.onFilled.markCompleted()
     }
 
     // MARK: FutureType
 
-    private func upon(queue: dispatch_queue_t, var options: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+    private func upon(queue: dispatch_queue_t, options inOptions: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+        var options = inOptions
         options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
-        let block = dispatch_block_create(options) {
-            self.storage.withValue(body)
+        let block = dispatch_block_create(options) { [storage = storage] in
+            storage.withValue(body)
         }
-        dispatch_block_notify(storage.onFilled, queue, block)
+        storage.onFilled.notify(upon: queue, body: block)
         return block
     }
 
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return dispatch_block_testcancel(storage.onFilled) != 0
+        return storage.onFilled.isCompleted
     }
     
     /**
@@ -186,13 +183,6 @@ public struct Deferred<Value>: FutureType, PromiseType {
     }
 
     // MARK: PromiseType
-
-    private func markFilled(marker: OnFillMarker) {
-        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
-        dispatch_block_cancel(marker)
-        // Executing the block "unblocks" it, calling all the `_notify` blocks
-        marker()
-    }
     
     /// Determines the deferred value with a given result.
     ///
@@ -201,6 +191,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// - parameter value: The resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
     public func fill(value: Value) -> Bool {
-        return storage.fill(value, onFill: markFilled)
+        // TODO: integrate markCompleted() call into DeferredBuffers
+        return storage.fill(value, onFill: { $0.markCompleted() })
     }
 }

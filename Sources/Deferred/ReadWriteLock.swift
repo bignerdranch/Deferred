@@ -7,6 +7,7 @@
 //
 
 import Dispatch
+import AtomicSwift
 
 /// A type that mutually excludes execution of code such that only one unit of
 /// code is running at any given time. An implementing type may choose to have
@@ -65,17 +66,19 @@ public struct DispatchLock: ReadWriteLock {
     }
 }
 
-/// A spin lock provided by Darwin, the low-level system under iOS and OS X.
+/// A spin lock provided by the C11 Standard Library.
 ///
 /// A spin lock polls to check the state of the lock, which is much faster
 /// when there isn't contention but rapidly slows down otherwise.
+///
+/// Read more: https://gcc.gnu.org/wiki/Atomic/C11
 public final class SpinLock: ReadWriteLock {
-    private var lock: UnsafeMutablePointer<OSSpinLock>
+    private var lock: UnsafeMutablePointer<bnr_spinlock_t>
 
     /// Allocate a normal spinlock.
     public init() {
         lock = UnsafeMutablePointer.alloc(1)
-        lock.initialize(OS_SPINLOCK_INIT)
+        lock.initialize(bnr_spinlock_t())
     }
 
     deinit {
@@ -87,9 +90,9 @@ public final class SpinLock: ReadWriteLock {
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        OSSpinLockLock(lock)
+        __bnr_spinlock_lock(lock)
         defer {
-            OSSpinLockUnlock(lock)
+            __bnr_spinlock_unlock(lock)
         }
         return try body()
     }

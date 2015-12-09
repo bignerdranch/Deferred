@@ -21,6 +21,8 @@
 		DB282A761B98CE2C008034C9 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A741B98CE2C008034C9 /* FutureCollections.swift */; };
 		DB3294FD1B68066C002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB3295541B680872002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB6CBC3E1C18E6710002A5F5 /* AtomicSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6CBC371C18E6710002A5F5 /* AtomicSwift.h */; };
+		DB6CBC3F1C18E6710002A5F5 /* AtomicSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6CBC371C18E6710002A5F5 /* AtomicSwift.h */; };
 		DB79DC3A1BE188660071E070 /* AnyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */; };
 		DB79DC3B1BE188660071E070 /* AnyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */; };
 		DB79DC3C1BE1886B0071E070 /* AnyFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376E1B98EDDC00F3A2AE /* AnyFutureTests.swift */; };
@@ -80,6 +82,8 @@
 		DB3295501B680744002160CC /* Deferred.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Deferred.xcconfig; sourceTree = "<group>"; };
 		DB3295511B680744002160CC /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		DB3295521B680744002160CC /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
+		DB6CBC371C18E6710002A5F5 /* AtomicSwift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtomicSwift.h; sourceTree = "<group>"; };
+		DB6CBC391C18E6710002A5F5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		DB79DC3E1BE188C70071E070 /* IgnoringFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IgnoringFuture.swift; path = Deferred/IgnoringFuture.swift; sourceTree = "<group>"; };
 		DB79DC411BE188CF0071E070 /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
 		DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +152,7 @@
 		DB3294FB1B68066C002160CC /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DB6CBC351C18E6710002A5F5 /* AtomicSwift */,
 				DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */,
 				DB0F80A11B680E6C00394A66 /* Deferred.swift */,
 				DB282A741B98CE2C008034C9 /* FutureCollections.swift */,
@@ -197,6 +202,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		DB6CBC351C18E6710002A5F5 /* AtomicSwift */ = {
+			isa = PBXGroup;
+			children = (
+				DB6CBC371C18E6710002A5F5 /* AtomicSwift.h */,
+				DB6CBC391C18E6710002A5F5 /* module.modulemap */,
+			);
+			path = AtomicSwift;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -205,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB3294FD1B68066C002160CC /* Deferred.h in Headers */,
+				DB6CBC3E1C18E6710002A5F5 /* AtomicSwift.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +228,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB3295541B680872002160CC /* Deferred.h in Headers */,
+				DB6CBC3F1C18E6710002A5F5 /* AtomicSwift.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

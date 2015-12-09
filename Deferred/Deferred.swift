@@ -91,6 +91,29 @@ private final class DeferredBuffer<Value>: ManagedBuffer<OnFillMarker, Box<Value
     
 }
 
+// MARK: - DispatchBlockMarker
+
+private struct DispatchBlockMarker: CallbacksList {
+    let block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
+        fatalError("This code should never be executed")
+    })!
+    
+    var isCompleted: Bool {
+        return dispatch_block_testcancel(block) != 0
+    }
+    
+    func markCompleted() {
+        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
+        dispatch_block_cancel(block)
+        // Executing the block "unblocks" it, calling all the `_notify` blocks
+        block()
+    }
+    
+    func notify(upon queue: dispatch_queue_t, body: dispatch_block_t) {
+        dispatch_block_notify(block, queue, body)
+    }
+}
+
 // MARK: -
 
 /// A deferred is a value that may become determined (or "filled") at some point

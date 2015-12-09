@@ -130,33 +130,25 @@ public final class CASSpinLock: ReadWriteLock {
     public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         // spin until we acquire write lock
         repeat {
-            let state = _state.memory
+            let state = __bnr_atomic_load_32(_state)
 
             // if there are no readers and no one holds the write lock, try to grab the write lock immediately
             if (state == 0 || state == Masks.WRITER_WAITING_BIT) &&
-                OSAtomicCompareAndSwap32Barrier(state, Masks.WRITER_BIT, _state) {
+                __bnr_atomic_compare_and_swap_32(_state, state, Masks.WRITER_BIT) {
                     break
             }
 
             // If we get here, someone is reading or writing. Set the WRITER_WAITING_BIT if
             // it isn't already to block any new readers, then wait a bit before
             // trying again. Ignore CAS failure - we'll just try again next iteration
-            if state & Masks.WRITER_WAITING_BIT == 0 {
-                OSAtomicCompareAndSwap32Barrier(state, state | Masks.WRITER_WAITING_BIT, _state)
-            }
+            __bnr_atomic_or_32(_state, Masks.WRITER_WAITING_BIT)
         } while true
 
         defer {
-            // unlock
-            repeat {
-                let state = _state.memory
-
-                // clear everything except (possibly) WRITER_WAITING_BIT, which will only be set
-                // if another writer is already here and waiting (which will keep out readers)
-                if OSAtomicCompareAndSwap32Barrier(state, state & Masks.WRITER_WAITING_BIT, _state) {
-                    break
-                }
-            } while true
+            // unlock by clearing everything except (possibly) WRITER_WAITING_BIT,
+            // which will only be set if another writer is already here and
+            // waiting (which will keep out readers)
+            __bnr_atomic_and_32(_state, Masks.WRITER_WAITING_BIT)
         }
 
         // write lock acquired - run block
@@ -172,28 +164,28 @@ public final class CASSpinLock: ReadWriteLock {
     public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         // spin until we acquire read lock
         repeat {
-            let state = _state.memory
+            let oldCount = __bnr_atomic_load_32(_state) & Masks.MASK_READER_BITS
+            let newCount = oldCount.successor()
 
             // if there is no writer and no writer waiting, try to increment reader count
-            if (state & Masks.MASK_WRITER_BITS) == 0 &&
-                OSAtomicCompareAndSwap32Barrier(state, state + 1, _state) {
-                    break
+            if __bnr_atomic_compare_and_swap_32(_state, oldCount, newCount) {
+                break
             }
         } while true
 
         defer {
             // decrement reader count
             repeat {
-                let state = _state.memory
+                let state = __bnr_atomic_load_32(_state)
+                let readerCount = state & Masks.MASK_READER_BITS
 
                 // sanity check that we have a positive reader count before decrementing it
-                assert((state & Masks.MASK_READER_BITS) > 0, "unlocking read lock - invalid reader count")
+                assert(readerCount > 0, "unlocking read lock - invalid reader count")
 
                 // desired new state: 1 fewer reader, preserving whether or not there is a writer waiting
-                let newState = ((state & Masks.MASK_READER_BITS) - 1) |
-                    (state & Masks.WRITER_WAITING_BIT)
+                let newState = (readerCount - 1) | (state & Masks.WRITER_WAITING_BIT)
 
-                if OSAtomicCompareAndSwap32Barrier(state, newState, _state) {
+                if __bnr_atomic_compare_and_swap_32(_state, state, newState) {
                     break
                 }
             } while true

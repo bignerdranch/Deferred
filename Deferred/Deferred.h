@@ -6,10 +6,8 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-#import <Foundation/Foundation.h>
-
 //! Project version number for Deferred.
-FOUNDATION_EXPORT double DeferredVersionNumber;
+extern double DeferredVersionNumber;
 
 //! Project version string for Deferred.
-FOUNDATION_EXPORT const unsigned char DeferredVersionString[];
+extern const unsigned char DeferredVersionString[];

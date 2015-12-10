@@ -67,7 +67,7 @@ class ReadWriteLockTests: XCTestCase {
 
         queue = dispatch_queue_create("ReadWriteLockTests", DISPATCH_QUEUE_CONCURRENT)
     }
-    
+
     override func tearDown() {
         queue = nil
 
@@ -158,7 +158,7 @@ class ReadWriteLockTests: XCTestCase {
             for i in 32 ..< 64 {
                 startReader(i)
             }
-            
+
             waitForExpectationsWithTimeout(testTimeout, handler: nil)
         }
     }

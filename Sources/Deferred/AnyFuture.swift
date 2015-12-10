@@ -89,7 +89,7 @@ public struct AnyFuture<Value>: FutureType {
     public init(_ value: Value) {
         self.init(box: FilledFutureBox(value: value))
     }
-    
+
     /// Create an `AnyFuture` having the same underlying future as `other`.
     public init(_ other: AnyFuture<Value>) {
         self.init(box: other.box)

@@ -17,12 +17,12 @@ func after(interval: NSTimeInterval, upon queue: dispatch_queue_t = dispatch_get
 private let testTimeout = 2.0
 
 class DeferredTests: XCTestCase {
-    
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
@@ -153,10 +153,10 @@ class DeferredTests: XCTestCase {
 
         waitForExpectationsWithTimeout(testTimeout, handler: nil)
     }
-    
+
     func testUponMainQueueCalledWhenFilled() {
         let d = Deferred<Int>()
-        
+
         let expectation = expectationWithDescription("uponMainQueue block called on main queue")
         d.uponMainQueue { value in
             XCTAssertTrue(NSThread.isMainThread())
@@ -164,7 +164,7 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(d.value, 1)
             expectation.fulfill()
         }
-        
+
         d.fill(1)
         waitForExpectationsWithTimeout(1, handler: nil)
     }
@@ -298,7 +298,7 @@ class DeferredTests: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
     }
-    
+
     func testDeferredOptionalBehavesCorrectly() {
         let d = Deferred<Optional<Int>>(value: .None)
 
@@ -315,10 +315,10 @@ class DeferredTests: XCTestCase {
             XCTAssert($0 == .None)
             afterExpectation.fulfill()
         }
-        
+
         waitForExpectationsWithTimeout(0.5, handler: nil)
     }
-    
+
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
         let d = Deferred<Int>()
         XCTAssertFalse(d.isFilled)

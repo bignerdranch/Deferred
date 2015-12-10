@@ -12,15 +12,15 @@ import Dispatch
 // one-off event.
 protocol CallbacksList {
     init()
-    
+
     var isCompleted: Bool { get }
-    
+
     /// Unblock the waiter list.
     ///
     /// - precondition: `isCompleted` is false.
     /// - postcondition: `isCompleted` is true.
     func markCompleted()
-    
+
     /// Become notified when the list becomes unblocked.
     ///
     /// If `isCompleted`, an implementer should immediately submit the `body`
@@ -46,7 +46,7 @@ private func atomicInitialize<T: AnyObject>(target: UnsafeMutablePointer<T?>, to
 // box it up into something word-sized. See `atomicInitialize` above.
 private final class Box<T> {
     let contents: T
-    
+
     init(_ contents: T) {
         self.contents = contents
     }
@@ -59,29 +59,29 @@ final class MemoStore<Value, OnFill: CallbacksList> {
     //  - The buffer has a stable pointer when locked to a single element.
     //  - Better `holdsUniqueReference` support allows for future optimization.
     private typealias Manager = ManagedBufferPointer<OnFill, Box<Value>?>
-    
+
     static func createWithValue(value: Value?) -> MemoStore<Value, OnFill> {
         let marker = OnFill()
         let boxed = value.map(Box.init)
-        
+
         // Create storage. Swift uses a two-stage tail-allocated system
         // like ObjC's class_createInstance(2) with the extraBytes parameter.
         let ptr = Manager(bufferClass: self, minimumCapacity: 1, initialValue: { (_, _) in
             marker
         })
-        
+
         // Assign the initial value to managed storage
         ptr.withUnsafeMutablePointerToElements {
             $0.initialize(boxed)
         }
-        
+
         // Unblock the (empty) callbacks if needed.
         // FIXME: Should there be a way to express that this could be done
         // unsafely for performance? GCD doesn't need to.
         if value != nil {
             marker.markCompleted()
         }
-        
+
         // Kindly give back an instance of the ManagedBufferPointer's buffer - self.
         return unsafeDowncast(ptr.buffer)
     }
@@ -89,7 +89,7 @@ final class MemoStore<Value, OnFill: CallbacksList> {
     private init() {
         fatalError("Unavailable method cannot be called")
     }
-    
+
     deinit {
         // UnsafeMutablePointer.destroy() is faster than destroy(_:) for single elements
         Manager(unsafeBufferObject: self).withUnsafeMutablePointers {
@@ -97,14 +97,14 @@ final class MemoStore<Value, OnFill: CallbacksList> {
             $1.destroy()
         }
     }
-    
+
     func withValue(body: Value -> Void) {
         Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { boxPtr in
             guard let box = boxPtr.memory else { return }
             body(box.contents)
         }
     }
-    
+
     func fill(value: Value) -> Bool {
         let box = Box(value)
         return Manager(unsafeBufferObject: self).withUnsafeMutablePointers { (onFillPtr, boxPtr) in
@@ -113,7 +113,7 @@ final class MemoStore<Value, OnFill: CallbacksList> {
             return true
         }
     }
-    
+
     var onFilled: OnFill {
         return Manager(unsafeBufferObject: self).value
     }

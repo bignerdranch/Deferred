@@ -17,18 +17,18 @@ private struct DispatchBlockMarker: CallbacksList {
     let block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
         fatalError("This code should never be executed")
     })!
-    
+
     var isCompleted: Bool {
         return dispatch_block_testcancel(block) != 0
     }
-    
+
     func markCompleted() {
         // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
         dispatch_block_cancel(block)
         // Executing the block "unblocks" it, calling all the `_notify` blocks
         block()
     }
-    
+
     func notify(upon queue: dispatch_queue_t, body: dispatch_block_t) {
         dispatch_block_notify(block, queue, body)
     }
@@ -40,12 +40,12 @@ private struct DispatchBlockMarker: CallbacksList {
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value>: FutureType, PromiseType {
     private var storage: MemoStore<Value, DispatchBlockMarker>
-    
+
     /// Initialize an unfilled Deferred.
     public init() {
         storage = MemoStore.createWithValue(nil)
     }
-    
+
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
         storage = MemoStore.createWithValue(value)
@@ -67,13 +67,13 @@ public struct Deferred<Value>: FutureType, PromiseType {
     public var isFilled: Bool {
         return storage.onFilled.isCompleted
     }
-    
+
     /**
     Call some function once the value is determined.
-    
+
     If the value is already determined, the function will be submitted to the
     queue immediately. An `upon` call is always executed asynchronously.
-    
+
     :param: queue A dispatch queue for executing the given function on.
     :param: body A function that uses the determined value.
     */
@@ -106,7 +106,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     }
 
     // MARK: PromiseType
-    
+
     /// Determines the deferred value with a given result.
     ///
     /// Filling a deferred value should usually be attempted only once.

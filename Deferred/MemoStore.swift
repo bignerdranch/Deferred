@@ -85,8 +85,10 @@ final class MemoStore<Value, OnFill: CallbacksList> {
         // Kindly give back an instance of the ManagedBufferPointer's buffer - self.
         return unsafeDowncast(ptr.buffer)
     }
-    
-    private init() {}
+
+    private init() {
+        fatalError("Unavailable method cannot be called")
+    }
     
     deinit {
         // UnsafeMutablePointer.destroy() is faster than destroy(_:) for single elements

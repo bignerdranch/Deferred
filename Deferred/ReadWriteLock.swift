@@ -32,6 +32,16 @@ public protocol ReadWriteLock {
     func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return
 }
 
+extension ReadWriteLock {
+    /// Call `body` with a lock.
+    ///
+    /// - parameter body: A function that writes a value while locked, then returns some value.
+    /// - returns: The value returned from the given function.
+    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+        return try withReadLock(body)
+    }
+}
+
 /// A locking construct using a counting semaphore from Grand Central Dispatch.
 /// This locking type behaves the same for both read and write locks.
 ///
@@ -43,26 +53,15 @@ public struct DispatchLock: ReadWriteLock {
     /// Create a normal instance.
     public init() {}
 
-    private func withLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    /// Call `body` with a lock.
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
         defer {
             dispatch_semaphore_signal(semaphore)
         }
         return try body()
-    }
-
-    /// Call `body` with a lock.
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        return try withLock(body)
-    }
-
-    /// Call `body` with a lock.
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
-    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        return try withLock(body)
     }
 }
 
@@ -84,26 +83,15 @@ public final class SpinLock: ReadWriteLock {
         lock.dealloc(1)
     }
 
-    private func withLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    /// Call `body` with a lock.
+    /// - parameter body: A function that reads a value while locked.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         OSSpinLockLock(lock)
         defer {
             OSSpinLockUnlock(lock)
         }
         return try body()
-    }
-
-    /// Call `body` with a lock.
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        return try withLock(body)
-    }
-
-    /// Call `body` with a lock.
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
-    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        return try withLock(body)
     }
 }
 

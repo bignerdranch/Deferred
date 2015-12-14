@@ -19,7 +19,7 @@
 public protocol PromiseType {
     /// A type that represents the result of some asynchronous operation.
     typealias Value
-    
+
     /// Create the promise in a default, unfilled state
     init()
 

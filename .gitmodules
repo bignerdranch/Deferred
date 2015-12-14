@@ -1,0 +1,3 @@
+[submodule "Packages/AtomicSwift-1.0.5"]
+	path = Packages/AtomicSwift-1.0.5
+	url = https://github.com/bignerdranch/AtomicSwift.git

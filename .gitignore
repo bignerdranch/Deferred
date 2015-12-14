@@ -1,4 +1,5 @@
 ## Build generated
+.build/
 build/
 DerivedData
 docs/
@@ -18,6 +19,7 @@ xcuserdata
 *.xccheckout
 *.moved-aside
 *.xcuserstate
+*.xcscmblueprint
 
 ## Obj-C/Swift specific
 *.hmap

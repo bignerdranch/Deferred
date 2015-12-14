@@ -142,6 +142,8 @@ public final class CASSpinLock: ReadWriteLock {
             // it isn't already to block any new readers, then wait a bit before
             // trying again. Ignore CAS failure - we'll just try again next iteration
             __bnr_atomic_or_32(_state, Masks.WRITER_WAITING_BIT)
+
+            __bnr_atomic_spin()
         } while true
 
         defer {
@@ -171,6 +173,8 @@ public final class CASSpinLock: ReadWriteLock {
             if __bnr_atomic_compare_and_swap_32(_state, oldCount, newCount) {
                 break
             }
+
+            __bnr_atomic_spin()
         } while true
 
         defer {
@@ -188,6 +192,8 @@ public final class CASSpinLock: ReadWriteLock {
                 if __bnr_atomic_compare_and_swap_32(_state, state, newState) {
                     break
                 }
+
+                __bnr_atomic_spin()
             } while true
         }
 

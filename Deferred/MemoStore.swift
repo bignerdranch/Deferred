@@ -60,7 +60,7 @@ final class MemoStore<Value, OnFill: CallbacksList> {
     //  - Better `holdsUniqueReference` support allows for future optimization.
     private typealias Manager = ManagedBufferPointer<OnFill, Box<Value>?>
     
-    static func create(value: Value? = nil) -> MemoStore<Value, OnFill> {
+    static func createWithValue(value: Value?) -> MemoStore<Value, OnFill> {
         let marker = OnFill()
         let boxed = value.map(Box.init)
         

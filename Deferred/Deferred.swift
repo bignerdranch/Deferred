@@ -43,12 +43,12 @@ public struct Deferred<Value>: FutureType, PromiseType {
     
     /// Initialize an unfilled Deferred.
     public init() {
-        storage = MemoStore.create()
+        storage = MemoStore.createWithValue(nil)
     }
     
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
-        storage = MemoStore.create(value)
+        storage = MemoStore.createWithValue(value)
     }
 
     // MARK: FutureType

@@ -160,8 +160,8 @@ public extension FutureType {
     /// - returns: A value that becomes determined after both the reciever and
     ///   the given future become determined.
     /// - seealso: SequenceType.allFutures
-    func and<OtherFuture: FutureType>(other: OtherFuture) -> AnyFuture<(Value, OtherFuture.Value)> {
-        return AnyFuture(flatMap { t in other.map { u in (t, u) } })
+    func and<OtherFuture: FutureType>(other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
+        return Future(flatMap { t in other.map { u in (t, u) } })
     }
     
     /// Composes this future with others.
@@ -171,8 +171,8 @@ public extension FutureType {
     /// - returns: A value that becomes determined after the reciever and both
     ///   other futures become determined.
     /// - seealso: SequenceType.allFutures
-    func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> AnyFuture<(Value, Other1.Value, Other2.Value)> {
-        return AnyFuture(flatMap { t in
+    func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
+        return Future(flatMap { t in
             one.flatMap { u in
                 two.map { v in (t, u, v) }
             }
@@ -187,8 +187,8 @@ public extension FutureType {
     /// - returns: A value that becomes determined after the reciever and both
     ///   other futures become determined.
     /// - seealso: SequenceType.allFutures
-    func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> AnyFuture<(Value, Other1.Value, Other2.Value, Other3.Value)> {
-        return AnyFuture(flatMap { t in
+    func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
+        return Future(flatMap { t in
             one.flatMap { u in
                 two.flatMap { v in
                     three.map { w in (t, u, v, w) }

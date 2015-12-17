@@ -13,14 +13,14 @@ public extension SequenceType where Generator.Element: FutureType {
     ///
     /// - returns: A deferred value that is determined with the first of the
     ///   given futures to be determined.
-    var earliestFilled: AnyFuture<Generator.Element.Value> {
+    var earliestFilled: Future<Generator.Element.Value> {
         let combined = Deferred<Generator.Element.Value>()
         for future in self {
             future.upon {
                 combined.fill($0)
             }
         }
-        return AnyFuture(combined)
+        return Future(combined)
     }
 }
 
@@ -29,9 +29,9 @@ public extension CollectionType where Generator.Element: FutureType {
     ///
     /// - returns: A deferred array that is determined once all the given values
     ///   are determined, in the same order.
-    var joinedValues: AnyFuture<[Generator.Element.Value]> {
+    var joinedValues: Future<[Generator.Element.Value]> {
         if isEmpty {
-            return AnyFuture([])
+            return Future([])
         }
 
         let array = Array(self)
@@ -51,6 +51,6 @@ public extension CollectionType where Generator.Element: FutureType {
             })
         }
 
-        return AnyFuture(combined)
+        return Future(combined)
     }
 }

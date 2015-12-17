@@ -1,5 +1,5 @@
 //
-//  AnyFuture.swift
+//  ExistentialFuture.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/29/15.
@@ -9,14 +9,15 @@
 import Dispatch
 
 /*
-The types in this file provide an optimized implementation of type erasure
-for `FutureType`. The techniques were derived from experimenting with
-`AnySequence` and `Mirror` in a playground, and the following post:
+The types in this file provide an implementation of type erasure for `FutureType`.
+The techniques were derived from experimenting with `AnySequence` and `Mirror`
+in a playground, the following post, and the Swift standard library:
  - https://realm.io/news/type-erased-wrappers-in-swift/
+ - https://github.com/apple/swift/blob/master/stdlib/public/core/ExistentialCollection.swift.gyb
 */
 
-// Abstract class that fake-conforms to `FutureType` for use by `AnyFuture`.
-private class FutureBoxBase<Value>: FutureType {
+// Abstract class that fake-conforms to `FutureType` for use by `Future`.
+private class FutureBase<Value>: FutureType {
     func upon(queue: dispatch_queue_t, body: Value -> ()) {
         fatalError()
     }
@@ -27,11 +28,10 @@ private class FutureBoxBase<Value>: FutureType {
 }
 
 // Concrete future wrapper given an instance of a `FutureType`.
-private final class AnyFutureBox<Future: FutureType>: FutureBoxBase<Future.Value> {
+private final class ForwardingFuture<Future: FutureType>: FutureBase<Future.Value> {
     let base: Future
     init(base: Future) {
         self.base = base
-        super.init()
     }
 
     override func upon(queue: dispatch_queue_t, body: Future.Value -> ()) {
@@ -44,11 +44,10 @@ private final class AnyFutureBox<Future: FutureType>: FutureBoxBase<Future.Value
 }
 
 // Concrete future wrapper for an always-filled future.
-private final class FilledFutureBox<Value>: FutureBoxBase<Value> {
+private final class FilledFuture<Value>: FutureBase<Value> {
     let value: Value
     init(value: Value) {
         self.value = value
-        super.init()
     }
 
     override func upon(queue: dispatch_queue_t, body: Value -> ()) {
@@ -74,21 +73,21 @@ private final class FilledFutureBox<Value>: FutureBoxBase<Value> {
 /// - Publicly expose only the `FutureType` aspect of a deferred value,
 ///   ensuring that only your implementation can fill the deferred value
 ///   using the `PromiseType` aspect.
-public struct AnyFuture<Value>: FutureType {
-    private let box: FutureBoxBase<Value>
+public struct Future<Value>: FutureType {
+    private let box: FutureBase<Value>
 
     /// Create a future whose `upon(_:function:)` method forwards to `base`.
     public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
-        self.box = AnyFutureBox(base: base)
+        self.box = ForwardingFuture(base: base)
     }
 
     /// Wrap and forward future as if it were always filled with `value`.
     public init(_ value: Value) {
-        self.box = FilledFutureBox(value: value)
+        self.box = FilledFuture(value: value)
     }
     
-    /// Create an `AnyFuture` having the same underlying future as `other`.
-    public init(_ other: AnyFuture<Value>) {
+    /// Create a future having the same underlying future as `other`.
+    public init(_ other: Future<Value>) {
         self.box = other.box
     }
 

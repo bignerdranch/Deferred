@@ -37,6 +37,8 @@
 		DBA0D2F81B680F9E00A498CB /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AA1B680E7600394A66 /* DeferredTests.swift */; };
 		DBA0D2F91B680F9E00A498CB /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */; };
 		DBA0D2FA1B680F9E00A498CB /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */; };
+		DBBC7E4B1C17E0BB004A6FDC /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */; };
+		DBBC7E4C1C17E0BB004A6FDC /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */; };
 		DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
 		DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
 /* End PBXBuildFile section */
@@ -84,6 +86,7 @@
 		DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBA8376B1B98EBA100F3A2AE /* AnyFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyFuture.swift; sourceTree = "<group>"; };
 		DBA8376E1B98EDDC00F3A2AE /* AnyFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyFutureTests.swift; sourceTree = "<group>"; };
+		DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoStore.swift; sourceTree = "<group>"; };
 		DBE3AD011BB452D200682E29 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -152,6 +155,7 @@
 				DB282A681B98B697008034C9 /* FutureType.swift */,
 				DB79DC3E1BE188C70071E070 /* IgnoringFuture.swift */,
 				DB0F80A21B680E6C00394A66 /* LockProtected.swift */,
+				DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */,
 				DB282A6B1B98B815008034C9 /* PromiseType.swift */,
 				DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */,
 				DBE3AD011BB452D200682E29 /* Timeout.swift */,
@@ -363,6 +367,7 @@
 				DB282A691B98B697008034C9 /* FutureType.swift in Sources */,
 				DB282A751B98CE2C008034C9 /* FutureCollections.swift in Sources */,
 				DB282A6C1B98B815008034C9 /* PromiseType.swift in Sources */,
+				DBBC7E4B1C17E0BB004A6FDC /* MemoStore.swift in Sources */,
 				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */,
 				DB79DC3A1BE188660071E070 /* AnyFuture.swift in Sources */,
@@ -379,6 +384,7 @@
 				DB282A6A1B98B697008034C9 /* FutureType.swift in Sources */,
 				DB282A761B98CE2C008034C9 /* FutureCollections.swift in Sources */,
 				DB282A6D1B98B815008034C9 /* PromiseType.swift in Sources */,
+				DBBC7E4C1C17E0BB004A6FDC /* MemoStore.swift in Sources */,
 				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
 				DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */,
 				DB79DC3B1BE188660071E070 /* AnyFuture.swift in Sources */,

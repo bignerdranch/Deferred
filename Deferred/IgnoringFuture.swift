@@ -8,36 +8,41 @@
 
 import Dispatch
 
-// Concrete future wrapper given an instance of a `FutureType`, but masks its
-// value.
-private final class IgnoredFutureBox<Future: FutureType>: FutureBoxBase<Void> {
-    let base: Future
-    init(base: Future) {
+/// A wrapped future that discards the result of the future. The wrapped
+/// future is determined when the underlying future is determined, but it
+/// is always determined with the empty tuple. In this way, it models the
+/// empty "completion" of some event.
+///
+/// This is semantically identical to the following:
+///
+///     myFuture.map { _ in }
+///
+/// But may behave more efficiently.
+public struct IgnoringFuture<Base: FutureType>: FutureType {
+    private let base: Base
+    
+    /// Creates a future that ignores the result of `base`.
+    public init(_ base: Base) {
         self.base = base
-        super.init()
     }
-
-    override func upon(queue: dispatch_queue_t, body: () -> ()) {
+    
+    /// Call some function once the event completes.
+    ///
+    /// If the event is already completed, the function will be submitted to the
+    /// queue immediately. An `upon` call is always execute asynchronously.
+    ///
+    /// - parameter queue: A dispatch queue for executing the given function on.
+    public func upon(queue: dispatch_queue_t, body: () -> Void) {
         return base.upon(queue) { _ in body() }
     }
-
-    override func wait(time: Timeout) -> ()? {
+    
+    /// Waits synchronously for the event to complete.
+    ///
+    /// If the event is already completed, the call returns immediately.
+    ///
+    /// - parameter time: A length of time to wait for event to complete.
+    /// - returns: Nothing, if filled within the timeout, or `nil`.
+    public func wait(time: Timeout) -> ()? {
         return base.wait(time).map { _ in }
-    }
-
-}
-
-public extension FutureType {
-    /// A wrapped future that discards the result of the future. The wrapped
-    /// future is determined when the underlying future is determined, but it
-    /// is always determined with the empty tuple.
-    ///
-    /// This is semantically identical to the following:
-    ///
-    ///     myFuture.map { _ in }
-    ///
-    /// But will behave more efficiently.
-    var ignoringValue: AnyFuture<Void> {
-        return AnyFuture(IgnoredFutureBox(base: self))
     }
 }

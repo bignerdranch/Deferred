@@ -1,5 +1,5 @@
 //
-//  AnyFutureTests.swift
+//  ExistentialFutureTests.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 9/3/15.
@@ -9,9 +9,9 @@
 import XCTest
 @testable import Deferred
 
-class AnyFutureTests: XCTestCase {
+class ExistentialFutureTests: XCTestCase {
 
-    var anyFuture: AnyFuture<Int>!
+    var anyFuture: Future<Int>!
 
     override func tearDown() {
         anyFuture = nil
@@ -20,14 +20,14 @@ class AnyFutureTests: XCTestCase {
     }
 
     func testFilledAnyFutureWaitAlwaysReturns() {
-        anyFuture = AnyFuture(42)
+        anyFuture = Future(42)
         let peek = anyFuture.wait(.Forever)
         XCTAssertNotNil(peek)
     }
 
     func testAnyWaitWithTimeout() {
         let deferred = Deferred<Int>()
-        anyFuture = AnyFuture(deferred)
+        anyFuture = Future(deferred)
 
         let expect = expectationWithDescription("value blocks while unfilled")
         after(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
@@ -42,7 +42,7 @@ class AnyFutureTests: XCTestCase {
     }
 
     func testFilledAnyFutureUpon() {
-        let d = AnyFuture(1)
+        let d = Future(1)
 
         for _ in 0 ..< 10 {
             let expect = expectationWithDescription("upon blocks called with correct value")
@@ -57,7 +57,7 @@ class AnyFutureTests: XCTestCase {
 
     func testUnfilledAnyUponCalledWhenFilled() {
         let d = Deferred<Int>()
-        anyFuture = AnyFuture(d)
+        anyFuture = Future(d)
 
         for _ in 0 ..< 10 {
             let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")

@@ -25,29 +25,21 @@ public final class LockProtected<T> {
         self.lock = lock
     }
 
-    /**
-    Give read access to the item within the given function.
-
-    :param: block A function that reads from the contained item.
-    :returns: The value returned from the given function.
-    */
-    public func withReadLock<U>(body: T -> U) -> U {
-        return lock.withReadLock { [unowned self] in
-            return body(self.item)
+    /// Give read access to the item within `body`.
+    /// - parameter body: A function that reads from the contained item.
+    /// - returns: The value returned from the given function.
+    public func withReadLock<Return>(@noescape body: T throws -> Return) rethrows -> Return {
+        return try lock.withReadLock {
+            try body(self.item)
         }
     }
 
-    /**
-    Give write access to the item within the given function.
-
-    :param: block A function that writes to the contained item, and returns some
-    value.
-
-    :returns: The value returned from the given function.
-    */
-    public func withWriteLock<U>(body: (inout T) -> U) -> U {
-        return lock.withWriteLock { [unowned self] in
-            return body(&self.item)
+    /// Give write access to the item within the given function.
+    /// - parameter body: A function that writes to the contained item, and returns some value.
+    /// - returns: The value returned from the given function.
+    public func withWriteLock<Return>(@noescape body: (inout T) throws -> Return) rethrows -> Return {
+        return try lock.withWriteLock {
+            try body(&self.item)
         }
     }
 }

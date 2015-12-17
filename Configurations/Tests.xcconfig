@@ -1,11 +1,11 @@
-LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]          = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
-LD_RUNPATH_SEARCH_PATHS[sdk=iphoneos*]        = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
-LD_RUNPATH_SEARCH_PATHS[sdk=iphonesimulator*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+COMBINE_HIDPI_IMAGES = YES
 
-INFOPLIST_FILE = DeferredTests/Info.plist
-PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*] = com.bignerdranch.DeferredTests
-PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*] = com.bignerdranch.DeferredTests
-PRODUCT_BUNDLE_IDENTIFIER[sdk=iphonesimulator*] = com.bignerdranch.DeferredTests
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]           = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
+LD_RUNPATH_SEARCH_PATHS[sdk=iphoneos*]         = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS[sdk=iphonesimulator*]  = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS[sdk=appletvos*]        = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+LD_RUNPATH_SEARCH_PATHS[sdk=appletvsimulator*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+
+INFOPLIST_FILE = Tests/Info.plist
+PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.$(TARGET_NAME)
 PRODUCT_NAME = $(TARGET_NAME)
-
-CODE_SIGN_IDENTITY[sdk=iphoneos*] = iPhone Developer

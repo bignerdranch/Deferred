@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DB6ADFF11C237DF800D77BF1"
+               BlueprintIdentifier = "DB6AE00D1C237E0400D77BF1"
                BuildableName = "Deferred.framework"
-               BlueprintName = "Deferred"
+               BlueprintName = "TVDeferred"
                ReferencedContainer = "container:Deferred.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DB6ADFFA1C237DF800D77BF1"
-               BuildableName = "DeferredTests.xctest"
-               BlueprintName = "DeferredTests"
+               BlueprintIdentifier = "DB6AE0161C237E0400D77BF1"
+               BuildableName = "TVDeferredTests.xctest"
+               BlueprintName = "TVDeferredTests"
                ReferencedContainer = "container:Deferred.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,9 +47,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DB6ADFFA1C237DF800D77BF1"
-               BuildableName = "DeferredTests.xctest"
-               BlueprintName = "DeferredTests"
+               BlueprintIdentifier = "DB6AE0161C237E0400D77BF1"
+               BuildableName = "TVDeferredTests.xctest"
+               BlueprintName = "TVDeferredTests"
                ReferencedContainer = "container:Deferred.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -57,9 +57,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DB6ADFF11C237DF800D77BF1"
+            BlueprintIdentifier = "DB6AE00D1C237E0400D77BF1"
             BuildableName = "Deferred.framework"
-            BlueprintName = "Deferred"
+            BlueprintName = "TVDeferred"
             ReferencedContainer = "container:Deferred.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -79,9 +79,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DB6ADFF11C237DF800D77BF1"
+            BlueprintIdentifier = "DB6AE00D1C237E0400D77BF1"
             BuildableName = "Deferred.framework"
-            BlueprintName = "Deferred"
+            BlueprintName = "TVDeferred"
             ReferencedContainer = "container:Deferred.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -97,9 +97,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DB6ADFF11C237DF800D77BF1"
+            BlueprintIdentifier = "DB6AE00D1C237E0400D77BF1"
             BuildableName = "Deferred.framework"
-            BlueprintName = "Deferred"
+            BlueprintName = "TVDeferred"
             ReferencedContainer = "container:Deferred.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

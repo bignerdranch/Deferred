@@ -7,184 +7,247 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A11B680E6C00394A66 /* Deferred.swift */; };
-		DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A11B680E6C00394A66 /* Deferred.swift */; };
-		DB0F80A61B680E6C00394A66 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A21B680E6C00394A66 /* LockProtected.swift */; };
-		DB0F80A71B680E6C00394A66 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A21B680E6C00394A66 /* LockProtected.swift */; };
-		DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */; };
-		DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */; };
-		DB282A691B98B697008034C9 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A681B98B697008034C9 /* FutureType.swift */; };
-		DB282A6A1B98B697008034C9 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A681B98B697008034C9 /* FutureType.swift */; };
-		DB282A6C1B98B815008034C9 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A6B1B98B815008034C9 /* PromiseType.swift */; };
-		DB282A6D1B98B815008034C9 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A6B1B98B815008034C9 /* PromiseType.swift */; };
-		DB282A751B98CE2C008034C9 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A741B98CE2C008034C9 /* FutureCollections.swift */; };
-		DB282A761B98CE2C008034C9 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB282A741B98CE2C008034C9 /* FutureCollections.swift */; };
-		DB3294FD1B68066C002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB3295541B680872002160CC /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB3294FC1B68066C002160CC /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB79DC3A1BE188660071E070 /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376B1B98EBA100F3A2AE /* ExistentialFuture.swift */; };
-		DB79DC3B1BE188660071E070 /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376B1B98EBA100F3A2AE /* ExistentialFuture.swift */; };
-		DB79DC3C1BE1886B0071E070 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376E1B98EDDC00F3A2AE /* ExistentialFutureTests.swift */; };
-		DB79DC3D1BE1886C0071E070 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA8376E1B98EDDC00F3A2AE /* ExistentialFutureTests.swift */; };
-		DB79DC3F1BE188C70071E070 /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB79DC3E1BE188C70071E070 /* IgnoringFuture.swift */; };
-		DB79DC401BE188C70071E070 /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB79DC3E1BE188C70071E070 /* IgnoringFuture.swift */; };
-		DB79DC421BE188CF0071E070 /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB79DC411BE188CF0071E070 /* IgnoringFutureTests.swift */; };
-		DB79DC431BE188CF0071E070 /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB79DC411BE188CF0071E070 /* IgnoringFutureTests.swift */; };
-		DBA0D2DD1B680F7400A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3295181B680713002160CC /* Deferred.framework */; };
-		DBA0D2EC1B680F7E00A498CB /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB3294F91B68066C002160CC /* Deferred.framework */; };
-		DBA0D2F51B680F9D00A498CB /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AA1B680E7600394A66 /* DeferredTests.swift */; };
-		DBA0D2F61B680F9D00A498CB /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */; };
-		DBA0D2F71B680F9D00A498CB /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */; };
-		DBA0D2F81B680F9E00A498CB /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AA1B680E7600394A66 /* DeferredTests.swift */; };
-		DBA0D2F91B680F9E00A498CB /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */; };
-		DBA0D2FA1B680F9E00A498CB /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */; };
-		DBBC7E4B1C17E0BB004A6FDC /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */; };
-		DBBC7E4C1C17E0BB004A6FDC /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */; };
-		DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
-		DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3AD011BB452D200682E29 /* Timeout.swift */; };
+		DB6ADFD71C237DD500D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB6ADFDE1C237DD500D77BF1 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADFD31C237DD500D77BF1 /* Deferred.framework */; };
+		DB6ADFE31C237DD500D77BF1 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */; };
+		DB6ADFFC1C237DF800D77BF1 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADFF21C237DF800D77BF1 /* Deferred.framework */; };
+		DB6AE0181C237E0400D77BF1 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6AE00E1C237E0400D77BF1 /* Deferred.framework */; };
+		DB6AE0421C237F8800D77BF1 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0381C237F8800D77BF1 /* Deferred.swift */; };
+		DB6AE0431C237F8800D77BF1 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0381C237F8800D77BF1 /* Deferred.swift */; };
+		DB6AE0441C237F8800D77BF1 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0381C237F8800D77BF1 /* Deferred.swift */; };
+		DB6AE0451C237F8800D77BF1 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0381C237F8800D77BF1 /* Deferred.swift */; };
+		DB6AE0461C237F8800D77BF1 /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */; };
+		DB6AE0471C237F8800D77BF1 /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */; };
+		DB6AE0481C237F8800D77BF1 /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */; };
+		DB6AE0491C237F8800D77BF1 /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */; };
+		DB6AE04A1C237F8800D77BF1 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */; };
+		DB6AE04B1C237F8800D77BF1 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */; };
+		DB6AE04C1C237F8800D77BF1 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */; };
+		DB6AE04D1C237F8800D77BF1 /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */; };
+		DB6AE04E1C237F8800D77BF1 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03B1C237F8800D77BF1 /* FutureType.swift */; };
+		DB6AE04F1C237F8800D77BF1 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03B1C237F8800D77BF1 /* FutureType.swift */; };
+		DB6AE0501C237F8800D77BF1 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03B1C237F8800D77BF1 /* FutureType.swift */; };
+		DB6AE0511C237F8800D77BF1 /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03B1C237F8800D77BF1 /* FutureType.swift */; };
+		DB6AE0521C237F8800D77BF1 /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */; };
+		DB6AE0531C237F8800D77BF1 /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */; };
+		DB6AE0541C237F8800D77BF1 /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */; };
+		DB6AE0551C237F8800D77BF1 /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */; };
+		DB6AE0561C237F8800D77BF1 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */; };
+		DB6AE0571C237F8800D77BF1 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */; };
+		DB6AE0581C237F8800D77BF1 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */; };
+		DB6AE0591C237F8800D77BF1 /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */; };
+		DB6AE05A1C237F8800D77BF1 /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */; };
+		DB6AE05B1C237F8800D77BF1 /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */; };
+		DB6AE05C1C237F8800D77BF1 /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */; };
+		DB6AE05D1C237F8800D77BF1 /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */; };
+		DB6AE05E1C237F8800D77BF1 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */; };
+		DB6AE05F1C237F8800D77BF1 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */; };
+		DB6AE0601C237F8800D77BF1 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */; };
+		DB6AE0611C237F8800D77BF1 /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */; };
+		DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */; };
+		DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */; };
+		DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */; };
+		DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */; };
+		DB6AE0661C237F8800D77BF1 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0411C237F8800D77BF1 /* Timeout.swift */; };
+		DB6AE0671C237F8800D77BF1 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0411C237F8800D77BF1 /* Timeout.swift */; };
+		DB6AE0681C237F8800D77BF1 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0411C237F8800D77BF1 /* Timeout.swift */; };
+		DB6AE0691C237F8800D77BF1 /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE0411C237F8800D77BF1 /* Timeout.swift */; };
+		DB6AE06A1C237FAA00D77BF1 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */; };
+		DB6AE06B1C237FAB00D77BF1 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */; };
+		DB6AE0701C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06C1C237FB200D77BF1 /* ExistentialFutureTests.swift */; };
+		DB6AE0711C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06C1C237FB200D77BF1 /* ExistentialFutureTests.swift */; };
+		DB6AE0721C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06C1C237FB200D77BF1 /* ExistentialFutureTests.swift */; };
+		DB6AE0731C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */; };
+		DB6AE0741C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */; };
+		DB6AE0751C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */; };
+		DB6AE0761C237FB200D77BF1 /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */; };
+		DB6AE0771C237FB200D77BF1 /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */; };
+		DB6AE0781C237FB200D77BF1 /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */; };
+		DB6AE0791C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */; };
+		DB6AE07A1C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */; };
+		DB6AE07B1C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */; };
+		DB6AE07C1C237FB900D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB6AE07D1C237FBC00D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB6AE07E1C237FBE00D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		DBA0D2DE1B680F7400A498CB /* PBXContainerItemProxy */ = {
+		DB6ADFDF1C237DD500D77BF1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = DB3294F01B68066C002160CC /* Project object */;
+			containerPortal = DB6ADFCA1C237DD500D77BF1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = DB3295171B680713002160CC;
-			remoteInfo = MobileDeferred;
-		};
-		DBA0D2ED1B680F7E00A498CB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DB3294F01B68066C002160CC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DB3294F81B68066C002160CC;
+			remoteGlobalIDString = DB6ADFD21C237DD500D77BF1;
 			remoteInfo = Deferred;
+		};
+		DB6ADFFD1C237DF800D77BF1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DB6ADFCA1C237DD500D77BF1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DB6ADFF11C237DF800D77BF1;
+			remoteInfo = Deferred;
+		};
+		DB6AE0191C237E0400D77BF1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DB6ADFCA1C237DD500D77BF1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DB6AE00D1C237E0400D77BF1;
+			remoteInfo = TVDeferred;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		DB0F80A11B680E6C00394A66 /* Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Deferred.swift; sourceTree = "<group>"; };
-		DB0F80A21B680E6C00394A66 /* LockProtected.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
-		DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
-		DB0F80AA1B680E7600394A66 /* DeferredTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
-		DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
-		DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
-		DB282A681B98B697008034C9 /* FutureType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureType.swift; sourceTree = "<group>"; };
-		DB282A6B1B98B815008034C9 /* PromiseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
-		DB282A741B98CE2C008034C9 /* FutureCollections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCollections.swift; sourceTree = "<group>"; };
-		DB3294F91B68066C002160CC /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DB3294FC1B68066C002160CC /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
-		DB3294FE1B68066C002160CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB3295181B680713002160CC /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DB3295461B680731002160CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB32954E1B680744002160CC /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
-		DB32954F1B680744002160CC /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		DB3295501B680744002160CC /* Deferred.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Deferred.xcconfig; sourceTree = "<group>"; };
-		DB3295511B680744002160CC /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
-		DB3295521B680744002160CC /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
-		DB79DC3E1BE188C70071E070 /* IgnoringFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFuture.swift; sourceTree = "<group>"; };
-		DB79DC411BE188CF0071E070 /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
-		DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBA8376B1B98EBA100F3A2AE /* ExistentialFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFuture.swift; sourceTree = "<group>"; };
-		DBA8376E1B98EDDC00F3A2AE /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
-		DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoStore.swift; sourceTree = "<group>"; };
-		DBE3AD011BB452D200682E29 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
+		DB6ADFD31C237DD500D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6ADFD61C237DD500D77BF1 /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
+		DB6ADFD81C237DD500D77BF1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB6ADFDD1C237DD500D77BF1 /* MobileDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
+		DB6ADFE41C237DD500D77BF1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB6ADFF21C237DF800D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6ADFFB1C237DF800D77BF1 /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6AE00E1C237E0400D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6AE0171C237E0400D77BF1 /* TVDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TVDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6AE02A1C237E1300D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6AE0331C237E1F00D77BF1 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		DB6AE0341C237E1F00D77BF1 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Framework.xcconfig; sourceTree = "<group>"; };
+		DB6AE0361C237E1F00D77BF1 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
+		DB6AE0381C237F8800D77BF1 /* Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Deferred.swift; sourceTree = "<group>"; };
+		DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFuture.swift; sourceTree = "<group>"; };
+		DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCollections.swift; sourceTree = "<group>"; };
+		DB6AE03B1C237F8800D77BF1 /* FutureType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureType.swift; sourceTree = "<group>"; };
+		DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFuture.swift; sourceTree = "<group>"; };
+		DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
+		DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoStore.swift; sourceTree = "<group>"; };
+		DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
+		DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
+		DB6AE0411C237F8800D77BF1 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
+		DB6AE06C1C237FB200D77BF1 /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
+		DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
+		DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
+		DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		DB3294F51B68066C002160CC /* Frameworks */ = {
+		DB6ADFCF1C237DD500D77BF1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB3295141B680713002160CC /* Frameworks */ = {
+		DB6ADFDA1C237DD500D77BF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6ADFDE1C237DD500D77BF1 /* Deferred.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6ADFEE1C237DF800D77BF1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DBA0D2D51B680F7400A498CB /* Frameworks */ = {
+		DB6ADFF81C237DF800D77BF1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBA0D2DD1B680F7400A498CB /* Deferred.framework in Frameworks */,
+				DB6ADFFC1C237DF800D77BF1 /* Deferred.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DBA0D2E41B680F7E00A498CB /* Frameworks */ = {
+		DB6AE00A1C237E0400D77BF1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBA0D2EC1B680F7E00A498CB /* Deferred.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0141C237E0400D77BF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6AE0181C237E0400D77BF1 /* Deferred.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0261C237E1300D77BF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		DB3294EF1B68066C002160CC = {
+		DB6ADFC91C237DD500D77BF1 = {
 			isa = PBXGroup;
 			children = (
-				DB32954D1B680744002160CC /* Configurations */,
-				DB3294FB1B68066C002160CC /* Deferred */,
-				DB3295431B680731002160CC /* DeferredTests */,
-				DB3294FA1B68066C002160CC /* Products */,
+				DB6AE0321C237E1F00D77BF1 /* Configurations */,
+				DB6ADFD51C237DD500D77BF1 /* Sources */,
+				DB6ADFE11C237DD500D77BF1 /* Tests */,
+				DB6ADFD41C237DD500D77BF1 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		DB3294FA1B68066C002160CC /* Products */ = {
+		DB6ADFD41C237DD500D77BF1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DB3294F91B68066C002160CC /* Deferred.framework */,
-				DB3295181B680713002160CC /* Deferred.framework */,
-				DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */,
-				DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */,
+				DB6ADFD31C237DD500D77BF1 /* Deferred.framework */,
+				DB6ADFDD1C237DD500D77BF1 /* MobileDeferredTests.xctest */,
+				DB6ADFF21C237DF800D77BF1 /* Deferred.framework */,
+				DB6ADFFB1C237DF800D77BF1 /* DeferredTests.xctest */,
+				DB6AE00E1C237E0400D77BF1 /* Deferred.framework */,
+				DB6AE0171C237E0400D77BF1 /* TVDeferredTests.xctest */,
+				DB6AE02A1C237E1300D77BF1 /* Deferred.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DB3294FB1B68066C002160CC /* Deferred */ = {
+		DB6ADFD51C237DD500D77BF1 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				DB3294FC1B68066C002160CC /* Deferred.h */,
-				DBA8376B1B98EBA100F3A2AE /* ExistentialFuture.swift */,
-				DB0F80A11B680E6C00394A66 /* Deferred.swift */,
-				DB282A741B98CE2C008034C9 /* FutureCollections.swift */,
-				DB282A681B98B697008034C9 /* FutureType.swift */,
-				DB79DC3E1BE188C70071E070 /* IgnoringFuture.swift */,
-				DB0F80A21B680E6C00394A66 /* LockProtected.swift */,
-				DBBC7E4A1C17E0BB004A6FDC /* MemoStore.swift */,
-				DB282A6B1B98B815008034C9 /* PromiseType.swift */,
-				DB0F80A31B680E6C00394A66 /* ReadWriteLock.swift */,
-				DBE3AD011BB452D200682E29 /* Timeout.swift */,
-				DB3294FE1B68066C002160CC /* Info.plist */,
+				DB6ADFD61C237DD500D77BF1 /* Deferred.h */,
+				DB6AE0381C237F8800D77BF1 /* Deferred.swift */,
+				DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */,
+				DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */,
+				DB6AE03B1C237F8800D77BF1 /* FutureType.swift */,
+				DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */,
+				DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */,
+				DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */,
+				DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */,
+				DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */,
+				DB6AE0411C237F8800D77BF1 /* Timeout.swift */,
+				DB6ADFD81C237DD500D77BF1 /* Info.plist */,
 			);
-			path = Deferred;
+			path = Sources;
 			sourceTree = "<group>";
 		};
-		DB3295431B680731002160CC /* DeferredTests */ = {
+		DB6ADFE11C237DD500D77BF1 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				DBA8376E1B98EDDC00F3A2AE /* ExistentialFutureTests.swift */,
-				DB0F80AA1B680E7600394A66 /* DeferredTests.swift */,
-				DB79DC411BE188CF0071E070 /* IgnoringFutureTests.swift */,
-				DB0F80AB1B680E7600394A66 /* LockProtectedTests.swift */,
-				DB0F80AC1B680E7600394A66 /* ReadWriteLockTests.swift */,
-				DB3295461B680731002160CC /* Info.plist */,
+				DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */,
+				DB6AE06C1C237FB200D77BF1 /* ExistentialFutureTests.swift */,
+				DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */,
+				DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */,
+				DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */,
+				DB6ADFE41C237DD500D77BF1 /* Info.plist */,
 			);
-			path = DeferredTests;
-			sourceTree = SOURCE_ROOT;
+			path = Tests;
+			sourceTree = "<group>";
 		};
-		DB32954D1B680744002160CC /* Configurations */ = {
+		DB6AE0321C237E1F00D77BF1 /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
-				DB32954E1B680744002160CC /* Base.xcconfig */,
-				DB32954F1B680744002160CC /* Debug.xcconfig */,
-				DB3295501B680744002160CC /* Deferred.xcconfig */,
-				DB3295511B680744002160CC /* Release.xcconfig */,
-				DB3295521B680744002160CC /* Tests.xcconfig */,
+				DB6AE0331C237E1F00D77BF1 /* Base.xcconfig */,
+				DB6AE0341C237E1F00D77BF1 /* Debug.xcconfig */,
+				DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */,
+				DB6AE0361C237E1F00D77BF1 /* Release.xcconfig */,
+				DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */,
 			);
 			path = Configurations;
 			sourceTree = "<group>";
@@ -192,33 +255,85 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		DB3294F61B68066C002160CC /* Headers */ = {
+		DB6ADFD01C237DD500D77BF1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB3294FD1B68066C002160CC /* Deferred.h in Headers */,
+				DB6ADFD71C237DD500D77BF1 /* Deferred.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB3295151B680713002160CC /* Headers */ = {
+		DB6ADFEF1C237DF800D77BF1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB3295541B680872002160CC /* Deferred.h in Headers */,
+				DB6AE07C1C237FB900D77BF1 /* Deferred.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE00B1C237E0400D77BF1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6AE07D1C237FBC00D77BF1 /* Deferred.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0271C237E1300D77BF1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6AE07E1C237FBE00D77BF1 /* Deferred.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		DB3294F81B68066C002160CC /* Deferred */ = {
+		DB6ADFD21C237DD500D77BF1 /* MobileDeferred */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DB32950D1B68066C002160CC /* Build configuration list for PBXNativeTarget "Deferred" */;
+			buildConfigurationList = DB6ADFE71C237DD500D77BF1 /* Build configuration list for PBXNativeTarget "MobileDeferred" */;
 			buildPhases = (
-				DB3294F41B68066C002160CC /* Sources */,
-				DB3294F51B68066C002160CC /* Frameworks */,
-				DB3294F61B68066C002160CC /* Headers */,
-				DB3294F71B68066C002160CC /* Resources */,
+				DB6ADFCE1C237DD500D77BF1 /* Sources */,
+				DB6ADFCF1C237DD500D77BF1 /* Frameworks */,
+				DB6ADFD01C237DD500D77BF1 /* Headers */,
+				DB6ADFD11C237DD500D77BF1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MobileDeferred;
+			productName = Deferred;
+			productReference = DB6ADFD31C237DD500D77BF1 /* Deferred.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DB6ADFDC1C237DD500D77BF1 /* MobileDeferredTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB6ADFEA1C237DD500D77BF1 /* Build configuration list for PBXNativeTarget "MobileDeferredTests" */;
+			buildPhases = (
+				DB6ADFD91C237DD500D77BF1 /* Sources */,
+				DB6ADFDA1C237DD500D77BF1 /* Frameworks */,
+				DB6ADFDB1C237DD500D77BF1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DB6ADFE01C237DD500D77BF1 /* PBXTargetDependency */,
+			);
+			name = MobileDeferredTests;
+			productName = DeferredTests;
+			productReference = DB6ADFDD1C237DD500D77BF1 /* MobileDeferredTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DB6ADFF11C237DF800D77BF1 /* Deferred */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB6AE0031C237DF800D77BF1 /* Build configuration list for PBXNativeTarget "Deferred" */;
+			buildPhases = (
+				DB6ADFED1C237DF800D77BF1 /* Sources */,
+				DB6ADFEE1C237DF800D77BF1 /* Frameworks */,
+				DB6ADFEF1C237DF800D77BF1 /* Headers */,
+				DB6ADFF01C237DF800D77BF1 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -226,131 +341,181 @@
 			);
 			name = Deferred;
 			productName = Deferred;
-			productReference = DB3294F91B68066C002160CC /* Deferred.framework */;
+			productReference = DB6ADFF21C237DF800D77BF1 /* Deferred.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		DB3295171B680713002160CC /* MobileDeferred */ = {
+		DB6ADFFA1C237DF800D77BF1 /* DeferredTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DB3295291B680713002160CC /* Build configuration list for PBXNativeTarget "MobileDeferred" */;
+			buildConfigurationList = DB6AE0061C237DF800D77BF1 /* Build configuration list for PBXNativeTarget "DeferredTests" */;
 			buildPhases = (
-				DB3295131B680713002160CC /* Sources */,
-				DB3295141B680713002160CC /* Frameworks */,
-				DB3295151B680713002160CC /* Headers */,
-				DB3295161B680713002160CC /* Resources */,
+				DB6ADFF71C237DF800D77BF1 /* Sources */,
+				DB6ADFF81C237DF800D77BF1 /* Frameworks */,
+				DB6ADFF91C237DF800D77BF1 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-			);
-			name = MobileDeferred;
-			productName = MobileDeferred;
-			productReference = DB3295181B680713002160CC /* Deferred.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		DBA0D2D71B680F7400A498CB /* MobileDeferredTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DBA0D2E01B680F7400A498CB /* Build configuration list for PBXNativeTarget "MobileDeferredTests" */;
-			buildPhases = (
-				DBA0D2D41B680F7400A498CB /* Sources */,
-				DBA0D2D51B680F7400A498CB /* Frameworks */,
-				DBA0D2D61B680F7400A498CB /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DBA0D2DF1B680F7400A498CB /* PBXTargetDependency */,
-			);
-			name = MobileDeferredTests;
-			productName = MobileDeferredTestsNew;
-			productReference = DBA0D2D81B680F7400A498CB /* MobileDeferredTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		DBA0D2E61B680F7E00A498CB /* DeferredTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DBA0D2EF1B680F7E00A498CB /* Build configuration list for PBXNativeTarget "DeferredTests" */;
-			buildPhases = (
-				DBA0D2E31B680F7E00A498CB /* Sources */,
-				DBA0D2E41B680F7E00A498CB /* Frameworks */,
-				DBA0D2E51B680F7E00A498CB /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DBA0D2EE1B680F7E00A498CB /* PBXTargetDependency */,
+				DB6ADFFE1C237DF800D77BF1 /* PBXTargetDependency */,
 			);
 			name = DeferredTests;
-			productName = DeferredTestsNew;
-			productReference = DBA0D2E71B680F7E00A498CB /* DeferredTests.xctest */;
+			productName = DeferredTests;
+			productReference = DB6ADFFB1C237DF800D77BF1 /* DeferredTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DB6AE00D1C237E0400D77BF1 /* TVDeferred */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB6AE01F1C237E0400D77BF1 /* Build configuration list for PBXNativeTarget "TVDeferred" */;
+			buildPhases = (
+				DB6AE0091C237E0400D77BF1 /* Sources */,
+				DB6AE00A1C237E0400D77BF1 /* Frameworks */,
+				DB6AE00B1C237E0400D77BF1 /* Headers */,
+				DB6AE00C1C237E0400D77BF1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TVDeferred;
+			productName = TVDeferred;
+			productReference = DB6AE00E1C237E0400D77BF1 /* Deferred.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DB6AE0161C237E0400D77BF1 /* TVDeferredTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB6AE0221C237E0400D77BF1 /* Build configuration list for PBXNativeTarget "TVDeferredTests" */;
+			buildPhases = (
+				DB6AE0131C237E0400D77BF1 /* Sources */,
+				DB6AE0141C237E0400D77BF1 /* Frameworks */,
+				DB6AE0151C237E0400D77BF1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DB6AE01A1C237E0400D77BF1 /* PBXTargetDependency */,
+			);
+			name = TVDeferredTests;
+			productName = TVDeferredTests;
+			productReference = DB6AE0171C237E0400D77BF1 /* TVDeferredTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DB6AE0291C237E1300D77BF1 /* NanoDeferred */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB6AE02F1C237E1300D77BF1 /* Build configuration list for PBXNativeTarget "NanoDeferred" */;
+			buildPhases = (
+				DB6AE0251C237E1300D77BF1 /* Sources */,
+				DB6AE0261C237E1300D77BF1 /* Frameworks */,
+				DB6AE0271C237E1300D77BF1 /* Headers */,
+				DB6AE0281C237E1300D77BF1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NanoDeferred;
+			productName = NanoDeferred;
+			productReference = DB6AE02A1C237E1300D77BF1 /* Deferred.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		DB3294F01B68066C002160CC /* Project object */ = {
+		DB6ADFCA1C237DD500D77BF1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0710;
+				LastSwiftUpdateCheck = 0720;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Big Nerd Ranch";
 				TargetAttributes = {
-					DB3294F81B68066C002160CC = {
-						CreatedOnToolsVersion = 7.0;
+					DB6ADFD21C237DD500D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
 					};
-					DB3295171B680713002160CC = {
-						CreatedOnToolsVersion = 7.0;
+					DB6ADFDC1C237DD500D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
 					};
-					DBA0D2D71B680F7400A498CB = {
-						CreatedOnToolsVersion = 7.0;
+					DB6ADFF11C237DF800D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
 					};
-					DBA0D2E61B680F7E00A498CB = {
-						CreatedOnToolsVersion = 7.0;
+					DB6ADFFA1C237DF800D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					DB6AE00D1C237E0400D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					DB6AE0161C237E0400D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					DB6AE0291C237E1300D77BF1 = {
+						CreatedOnToolsVersion = 7.2;
 					};
 				};
 			};
-			buildConfigurationList = DB3294F31B68066C002160CC /* Build configuration list for PBXProject "Deferred" */;
+			buildConfigurationList = DB6ADFCD1C237DD500D77BF1 /* Build configuration list for PBXProject "Deferred" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = DB3294EF1B68066C002160CC;
-			productRefGroup = DB3294FA1B68066C002160CC /* Products */;
+			mainGroup = DB6ADFC91C237DD500D77BF1;
+			productRefGroup = DB6ADFD41C237DD500D77BF1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DB3294F81B68066C002160CC /* Deferred */,
-				DBA0D2E61B680F7E00A498CB /* DeferredTests */,
-				DB3295171B680713002160CC /* MobileDeferred */,
-				DBA0D2D71B680F7400A498CB /* MobileDeferredTests */,
+				DB6ADFF11C237DF800D77BF1 /* Deferred */,
+				DB6ADFFA1C237DF800D77BF1 /* DeferredTests */,
+				DB6ADFD21C237DD500D77BF1 /* MobileDeferred */,
+				DB6ADFDC1C237DD500D77BF1 /* MobileDeferredTests */,
+				DB6AE00D1C237E0400D77BF1 /* TVDeferred */,
+				DB6AE0161C237E0400D77BF1 /* TVDeferredTests */,
+				DB6AE0291C237E1300D77BF1 /* NanoDeferred */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		DB3294F71B68066C002160CC /* Resources */ = {
+		DB6ADFD11C237DD500D77BF1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB3295161B680713002160CC /* Resources */ = {
+		DB6ADFDB1C237DD500D77BF1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DBA0D2D61B680F7400A498CB /* Resources */ = {
+		DB6ADFF01C237DF800D77BF1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DBA0D2E51B680F7E00A498CB /* Resources */ = {
+		DB6ADFF91C237DF800D77BF1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE00C1C237E0400D77BF1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0151C237E0400D77BF1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0281C237E1300D77BF1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,124 +525,150 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		DB3294F41B68066C002160CC /* Sources */ = {
+		DB6ADFCE1C237DD500D77BF1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB282A691B98B697008034C9 /* FutureType.swift in Sources */,
-				DB282A751B98CE2C008034C9 /* FutureCollections.swift in Sources */,
-				DB282A6C1B98B815008034C9 /* PromiseType.swift in Sources */,
-				DBBC7E4B1C17E0BB004A6FDC /* MemoStore.swift in Sources */,
-				DB0F80A81B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
-				DBE3AD021BB452D200682E29 /* Timeout.swift in Sources */,
-				DB79DC3A1BE188660071E070 /* ExistentialFuture.swift in Sources */,
-				DB0F80A41B680E6C00394A66 /* Deferred.swift in Sources */,
-				DB0F80A61B680E6C00394A66 /* LockProtected.swift in Sources */,
-				DB79DC3F1BE188C70071E070 /* IgnoringFuture.swift in Sources */,
+				DB6AE04F1C237F8800D77BF1 /* FutureType.swift in Sources */,
+				DB6AE0531C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB6AE0431C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB6AE0571C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB6AE05B1C237F8800D77BF1 /* MemoStore.swift in Sources */,
+				DB6AE05F1C237F8800D77BF1 /* PromiseType.swift in Sources */,
+				DB6AE0671C237F8800D77BF1 /* Timeout.swift in Sources */,
+				DB6AE04B1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB6AE0471C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB3295131B680713002160CC /* Sources */ = {
+		DB6ADFD91C237DD500D77BF1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB282A6A1B98B697008034C9 /* FutureType.swift in Sources */,
-				DB282A761B98CE2C008034C9 /* FutureCollections.swift in Sources */,
-				DB282A6D1B98B815008034C9 /* PromiseType.swift in Sources */,
-				DBBC7E4C1C17E0BB004A6FDC /* MemoStore.swift in Sources */,
-				DB0F80A91B680E6C00394A66 /* ReadWriteLock.swift in Sources */,
-				DBE3AD031BB452D200682E29 /* Timeout.swift in Sources */,
-				DB79DC3B1BE188660071E070 /* ExistentialFuture.swift in Sources */,
-				DB0F80A51B680E6C00394A66 /* Deferred.swift in Sources */,
-				DB0F80A71B680E6C00394A66 /* LockProtected.swift in Sources */,
-				DB79DC401BE188C70071E070 /* IgnoringFuture.swift in Sources */,
+				DB6ADFE31C237DD500D77BF1 /* DeferredTests.swift in Sources */,
+				DB6AE0771C237FB200D77BF1 /* LockProtectedTests.swift in Sources */,
+				DB6AE07A1C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */,
+				DB6AE0711C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */,
+				DB6AE0741C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DBA0D2D41B680F7400A498CB /* Sources */ = {
+		DB6ADFED1C237DF800D77BF1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBA0D2F81B680F9E00A498CB /* DeferredTests.swift in Sources */,
-				DB79DC3D1BE1886C0071E070 /* ExistentialFutureTests.swift in Sources */,
-				DB79DC431BE188CF0071E070 /* IgnoringFutureTests.swift in Sources */,
-				DBA0D2F91B680F9E00A498CB /* LockProtectedTests.swift in Sources */,
-				DBA0D2FA1B680F9E00A498CB /* ReadWriteLockTests.swift in Sources */,
+				DB6AE04E1C237F8800D77BF1 /* FutureType.swift in Sources */,
+				DB6AE0521C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB6AE0421C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB6AE0561C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB6AE05A1C237F8800D77BF1 /* MemoStore.swift in Sources */,
+				DB6AE05E1C237F8800D77BF1 /* PromiseType.swift in Sources */,
+				DB6AE0661C237F8800D77BF1 /* Timeout.swift in Sources */,
+				DB6AE04A1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB6AE0461C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DBA0D2E31B680F7E00A498CB /* Sources */ = {
+		DB6ADFF71C237DF800D77BF1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBA0D2F51B680F9D00A498CB /* DeferredTests.swift in Sources */,
-				DB79DC3C1BE1886B0071E070 /* ExistentialFutureTests.swift in Sources */,
-				DB79DC421BE188CF0071E070 /* IgnoringFutureTests.swift in Sources */,
-				DBA0D2F61B680F9D00A498CB /* LockProtectedTests.swift in Sources */,
-				DBA0D2F71B680F9D00A498CB /* ReadWriteLockTests.swift in Sources */,
+				DB6AE06A1C237FAA00D77BF1 /* DeferredTests.swift in Sources */,
+				DB6AE0761C237FB200D77BF1 /* LockProtectedTests.swift in Sources */,
+				DB6AE0791C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */,
+				DB6AE0701C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */,
+				DB6AE0731C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0091C237E0400D77BF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6AE0501C237F8800D77BF1 /* FutureType.swift in Sources */,
+				DB6AE0541C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB6AE0441C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB6AE0581C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB6AE05C1C237F8800D77BF1 /* MemoStore.swift in Sources */,
+				DB6AE0601C237F8800D77BF1 /* PromiseType.swift in Sources */,
+				DB6AE0681C237F8800D77BF1 /* Timeout.swift in Sources */,
+				DB6AE04C1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB6AE0481C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0131C237E0400D77BF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6AE06B1C237FAB00D77BF1 /* DeferredTests.swift in Sources */,
+				DB6AE0781C237FB200D77BF1 /* LockProtectedTests.swift in Sources */,
+				DB6AE07B1C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */,
+				DB6AE0721C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */,
+				DB6AE0751C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6AE0251C237E1300D77BF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB6AE0511C237F8800D77BF1 /* FutureType.swift in Sources */,
+				DB6AE0551C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB6AE0451C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB6AE0591C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB6AE05D1C237F8800D77BF1 /* MemoStore.swift in Sources */,
+				DB6AE0611C237F8800D77BF1 /* PromiseType.swift in Sources */,
+				DB6AE0691C237F8800D77BF1 /* Timeout.swift in Sources */,
+				DB6AE04D1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB6AE0491C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		DBA0D2DF1B680F7400A498CB /* PBXTargetDependency */ = {
+		DB6ADFE01C237DD500D77BF1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DB3295171B680713002160CC /* MobileDeferred */;
-			targetProxy = DBA0D2DE1B680F7400A498CB /* PBXContainerItemProxy */;
+			target = DB6ADFD21C237DD500D77BF1 /* MobileDeferred */;
+			targetProxy = DB6ADFDF1C237DD500D77BF1 /* PBXContainerItemProxy */;
 		};
-		DBA0D2EE1B680F7E00A498CB /* PBXTargetDependency */ = {
+		DB6ADFFE1C237DF800D77BF1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DB3294F81B68066C002160CC /* Deferred */;
-			targetProxy = DBA0D2ED1B680F7E00A498CB /* PBXContainerItemProxy */;
+			target = DB6ADFF11C237DF800D77BF1 /* Deferred */;
+			targetProxy = DB6ADFFD1C237DF800D77BF1 /* PBXContainerItemProxy */;
+		};
+		DB6AE01A1C237E0400D77BF1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DB6AE00D1C237E0400D77BF1 /* TVDeferred */;
+			targetProxy = DB6AE0191C237E0400D77BF1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		DB32950B1B68066C002160CC /* Debug */ = {
+		DB6ADFE51C237DD500D77BF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB32954F1B680744002160CC /* Debug.xcconfig */;
+			baseConfigurationReference = DB6AE0341C237E1F00D77BF1 /* Debug.xcconfig */;
 			buildSettings = {
-				ENABLE_TESTABILITY = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};
-		DB32950C1B68066C002160CC /* Release */ = {
+		DB6ADFE61C237DD500D77BF1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295511B680744002160CC /* Release.xcconfig */;
+			baseConfigurationReference = DB6AE0361C237E1F00D77BF1 /* Release.xcconfig */;
 			buildSettings = {
-				SDKROOT = macosx;
+				SDKROOT = iphoneos;
 			};
 			name = Release;
 		};
-		DB32950E1B68066C002160CC /* Debug */ = {
+		DB6ADFE81C237DD500D77BF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295501B680744002160CC /* Deferred.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		DB32950F1B68066C002160CC /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295501B680744002160CC /* Deferred.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-			};
-			name = Release;
-		};
-		DB32952A1B680713002160CC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295501B680744002160CC /* Deferred.xcconfig */;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
@@ -488,9 +679,9 @@
 			};
 			name = Debug;
 		};
-		DB32952B1B680713002160CC /* Release */ = {
+		DB6ADFE91C237DD500D77BF1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295501B680744002160CC /* Deferred.xcconfig */;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
@@ -500,93 +691,198 @@
 			};
 			name = Release;
 		};
-		DBA0D2E11B680F7400A498CB /* Debug */ = {
+		DB6ADFEB1C237DD500D77BF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295521B680744002160CC /* Tests.xcconfig */;
+			baseConfigurationReference = DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};
-		DBA0D2E21B680F7400A498CB /* Release */ = {
+		DB6ADFEC1C237DD500D77BF1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295521B680744002160CC /* Tests.xcconfig */;
+			baseConfigurationReference = DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
 				SDKROOT = iphoneos;
 			};
 			name = Release;
 		};
-		DBA0D2F01B680F7E00A498CB /* Debug */ = {
+		DB6AE0041C237DF800D77BF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295521B680744002160CC /* Tests.xcconfig */;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		DBA0D2F11B680F7E00A498CB /* Release */ = {
+		DB6AE0051C237DF800D77BF1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB3295521B680744002160CC /* Tests.xcconfig */;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DB6AE0071C237DF800D77BF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */;
+			buildSettings = {
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		DB6AE0081C237DF800D77BF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */;
+			buildSettings = {
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DB6AE0201C237E0400D77BF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SDKROOT = appletvos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		DB6AE0211C237E0400D77BF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+		DB6AE0231C237E0400D77BF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */;
+			buildSettings = {
+				SDKROOT = appletvos;
+			};
+			name = Debug;
+		};
+		DB6AE0241C237E0400D77BF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */;
+			buildSettings = {
+				SDKROOT = appletvos;
+			};
+			name = Release;
+		};
+		DB6AE0301C237E1300D77BF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SDKROOT = watchos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		DB6AE0311C237E1300D77BF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SDKROOT = watchos;
+				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DB3294F31B68066C002160CC /* Build configuration list for PBXProject "Deferred" */ = {
+		DB6ADFCD1C237DD500D77BF1 /* Build configuration list for PBXProject "Deferred" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DB32950B1B68066C002160CC /* Debug */,
-				DB32950C1B68066C002160CC /* Release */,
+				DB6ADFE51C237DD500D77BF1 /* Debug */,
+				DB6ADFE61C237DD500D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DB32950D1B68066C002160CC /* Build configuration list for PBXNativeTarget "Deferred" */ = {
+		DB6ADFE71C237DD500D77BF1 /* Build configuration list for PBXNativeTarget "MobileDeferred" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DB32950E1B68066C002160CC /* Debug */,
-				DB32950F1B68066C002160CC /* Release */,
+				DB6ADFE81C237DD500D77BF1 /* Debug */,
+				DB6ADFE91C237DD500D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DB3295291B680713002160CC /* Build configuration list for PBXNativeTarget "MobileDeferred" */ = {
+		DB6ADFEA1C237DD500D77BF1 /* Build configuration list for PBXNativeTarget "MobileDeferredTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DB32952A1B680713002160CC /* Debug */,
-				DB32952B1B680713002160CC /* Release */,
+				DB6ADFEB1C237DD500D77BF1 /* Debug */,
+				DB6ADFEC1C237DD500D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DBA0D2E01B680F7400A498CB /* Build configuration list for PBXNativeTarget "MobileDeferredTests" */ = {
+		DB6AE0031C237DF800D77BF1 /* Build configuration list for PBXNativeTarget "Deferred" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DBA0D2E11B680F7400A498CB /* Debug */,
-				DBA0D2E21B680F7400A498CB /* Release */,
+				DB6AE0041C237DF800D77BF1 /* Debug */,
+				DB6AE0051C237DF800D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
-		DBA0D2EF1B680F7E00A498CB /* Build configuration list for PBXNativeTarget "DeferredTests" */ = {
+		DB6AE0061C237DF800D77BF1 /* Build configuration list for PBXNativeTarget "DeferredTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DBA0D2F01B680F7E00A498CB /* Debug */,
-				DBA0D2F11B680F7E00A498CB /* Release */,
+				DB6AE0071C237DF800D77BF1 /* Debug */,
+				DB6AE0081C237DF800D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+		};
+		DB6AE01F1C237E0400D77BF1 /* Build configuration list for PBXNativeTarget "TVDeferred" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB6AE0201C237E0400D77BF1 /* Debug */,
+				DB6AE0211C237E0400D77BF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		DB6AE0221C237E0400D77BF1 /* Build configuration list for PBXNativeTarget "TVDeferredTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB6AE0231C237E0400D77BF1 /* Debug */,
+				DB6AE0241C237E0400D77BF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		DB6AE02F1C237E1300D77BF1 /* Build configuration list for PBXNativeTarget "NanoDeferred" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB6AE0301C237E1300D77BF1 /* Debug */,
+				DB6AE0311C237E1300D77BF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = DB3294F01B68066C002160CC /* Project object */;
+	rootObject = DB6ADFCA1C237DD500D77BF1 /* Project object */;
 }

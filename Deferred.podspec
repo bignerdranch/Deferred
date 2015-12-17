@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "Deferred"
-  s.version      = "2.0b2"
+  s.version      = "2.0b4"
   s.summary      = "An implementation of OCaml's Deferred for Swift."
 
   s.description  = <<-DESC
@@ -20,15 +20,16 @@ Pod::Spec.new do |s|
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.authors             = {"John Gallagher" => "jgallagher@bignerdranch.com", 
+  s.authors             = {"John Gallagher" => "jgallagher@bignerdranch.com",
                            "Zachary Waldowski" => "zachary@bignerdranch.com",
                            "Brian Hardy" => "brian@bignerdranch.com"}
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.ios.deployment_target = "8.0"
-  s.osx.deployment_target = "10.10"
-
+  s.ios.deployment_target     = "8.0"
+  s.osx.deployment_target     = "10.10"
+  s.watchos.deployment_target = "2.0"
+  s.tvos.deployment_target    = "9.0"
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "v#{s.version}" }
@@ -36,10 +37,8 @@ Pod::Spec.new do |s|
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.source_files  = "Deferred"
+  s.source_files  = "Sources"
 
-  s.public_header_files = "Deferred/Deferred.h"
-  
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.requires_arc = true
 

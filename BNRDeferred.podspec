@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.name         = "Deferred"
+  s.name         = "BNRDeferred"
   s.version      = "2.0b4"
   s.summary      = "An implementation of OCaml's Deferred for Swift."
 
@@ -38,6 +38,8 @@ Pod::Spec.new do |s|
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.source_files  = "Sources"
+  s.header_dir    = "Deferred"
+  s.module_name   = "Deferred"
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.requires_arc = true

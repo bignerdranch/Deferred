@@ -6,7 +6,7 @@
 - Swift: v2.1 for now. :warning: **NOTE:** Not 2.0!
 - License: MIT
 - Carthage: Yup.
-- CocoaPods: Not yet, but feel free to submit a PR!
+- CocoaPods: As [`BNRDeferred`](https://cocoapods.org/pods/BNRDeferred).
 
 ## Intuition
 A `Deferred<Value>` is a value that might be unknown now

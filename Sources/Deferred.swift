@@ -91,18 +91,26 @@ public struct Deferred<Value>: FutureType, PromiseType {
     :returns: The determined value, if filled within the timeout, or `nil`.
     */
     public func wait(time: Timeout) -> Value? {
-        let queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
-        var value: Value?
-        let handler = upon(queue, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS) {
-            value = $0
+        var result: Value?
+        func assign(value: Value) {
+            result = value
         }
+
+        // Pure FutureType implementations implement isFilled in terms of wait()
+        if case .Now = time where isFilled {
+            storage.withValue(assign)
+            return result
+        }
+
+        let queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+        let handler = upon(queue, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, body: assign)
 
         guard dispatch_block_wait(handler, time.rawValue) == 0 else {
             dispatch_block_cancel(handler)
             return nil
         }
 
-        return value
+        return result
     }
 
     // MARK: PromiseType

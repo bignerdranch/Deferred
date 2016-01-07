@@ -96,8 +96,9 @@ public struct Deferred<Value>: FutureType, PromiseType {
             result = value
         }
 
-        // Pure FutureType implementations implement isFilled in terms of wait()
-        if case .Now = time where isFilled {
+        // FutureType can't generally do this; `isFilled` is normally
+        // implemented in terms of wait() normally.
+        if isFilled {
             storage.withValue(assign)
             return result
         }

@@ -378,4 +378,14 @@ class DeferredTests: XCTestCase {
 
     #endif // end QoS tests that require a real device
 
+    func testFillAndIsFilledPostcondition() {
+        let deferred = Deferred<Int>()
+        XCTAssertFalse(deferred.isFilled)
+        deferred.fill(42)
+        XCTAssertNotNil(deferred.peek())
+        XCTAssertTrue(deferred.isFilled)
+        XCTAssertNotNil(deferred.wait(.Now))
+        XCTAssertNotNil(deferred.wait(.Interval(0.1)))  // pass
+    }
+
 }

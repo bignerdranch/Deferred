@@ -73,4 +73,15 @@ class ExistentialFutureTests: XCTestCase {
         waitForExpectationsWithTimeout(1, handler: nil)
     }
 
+    func testFillAndIsFilledPostcondition() {
+        let deferred = Deferred<Int>()
+        anyFuture = Future(deferred)
+        XCTAssertFalse(anyFuture.isFilled)
+        deferred.fill(42)
+        XCTAssertNotNil(anyFuture.peek())
+        XCTAssertTrue(anyFuture.isFilled)
+        XCTAssertNotNil(anyFuture.wait(.Now))
+        XCTAssertNotNil(anyFuture.wait(.Interval(0.1)))  // pass
+    }
+
 }

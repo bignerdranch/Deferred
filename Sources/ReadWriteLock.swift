@@ -7,6 +7,9 @@
 //
 
 import Dispatch
+#if SWIFT_PACKAGE
+import AtomicSwift
+#endif
 
 /// A type that mutually excludes execution of code such that only one unit of
 /// code is running at any given time. An implementing type may choose to have

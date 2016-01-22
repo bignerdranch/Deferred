@@ -8,6 +8,9 @@
 
 import XCTest
 import Deferred
+#if SWIFT_PACKAGE
+import AtomicSwift
+#endif
 
 func timeIntervalSleep(duration: NSTimeInterval) {
     usleep(useconds_t(duration * NSTimeInterval(USEC_PER_SEC)))

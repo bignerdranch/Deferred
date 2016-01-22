@@ -7,6 +7,9 @@
 //
 
 import Dispatch
+#if SWIFT_PACKAGE
+import AtomicSwift
+#endif
 
 // Extremely simple surface describing an async rejoin-type notifier for a
 // one-off event.

@@ -423,7 +423,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = "Big Nerd Ranch";
 				TargetAttributes = {
 					DB6ADFD21C237DD500D77BF1 = {
@@ -654,6 +654,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DB6AE0341C237E1F00D77BF1 /* Debug.xcconfig */;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -849,6 +851,7 @@
 				DB6AE0051C237DF800D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DB6AE0061C237DF800D77BF1 /* Build configuration list for PBXNativeTarget "DeferredTests" */ = {
 			isa = XCConfigurationList;
@@ -857,6 +860,7 @@
 				DB6AE0081C237DF800D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DB6AE01F1C237E0400D77BF1 /* Build configuration list for PBXNativeTarget "TVDeferred" */ = {
 			isa = XCConfigurationList;
@@ -865,6 +869,7 @@
 				DB6AE0211C237E0400D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DB6AE0221C237E0400D77BF1 /* Build configuration list for PBXNativeTarget "TVDeferredTests" */ = {
 			isa = XCConfigurationList;
@@ -873,6 +878,7 @@
 				DB6AE0241C237E0400D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DB6AE02F1C237E1300D77BF1 /* Build configuration list for PBXNativeTarget "NanoDeferred" */ = {
 			isa = XCConfigurationList;
@@ -881,6 +887,7 @@
 				DB6AE0311C237E1300D77BF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

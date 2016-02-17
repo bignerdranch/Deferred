@@ -8,6 +8,43 @@
 - Carthage: Yup.
 - CocoaPods: As [`BNRDeferred`](https://cocoapods.org/pods/BNRDeferred).
 
+## Installation
+
+### [Carthage]
+
+[Carthage]: https://github.com/Carthage/Carthage
+
+Add the following to your Cartfile:
+
+```ruby
+github "BigNerdRanch/Deferred" "v2.0b4"
+```
+
+Then run `carthage update`.
+
+Follow the current instructions in [Carthage's README][carthage-installation]
+for up to date installation instructions.
+
+[carthage-installation]: https://github.com/Carthage/Carthage/blob/master/README.md
+
+### [CocoaPods]
+
+[CocoaPods]: http://cocoapods.org
+
+Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
+
+```ruby
+pod 'BNRDeferred'
+```
+
+You will also need to make sure you're opting into using frameworks:
+
+```ruby
+use_frameworks!
+```
+
+Then run `pod install`.
+
 ## Intuition
 A `Deferred<Value>` is a value that might be unknown now
 but is expected to resolve to a definite `Value` at some time in the future.

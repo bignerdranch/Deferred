@@ -124,7 +124,7 @@ public extension FutureType {
     /// - parameter transform: Start a new operation using the deferred value.
     /// - returns: The new deferred value returned by the `transform`.
     /// - seealso: Deferred
-    func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> NewFuture) -> Future<NewFuture.Value> {
+    func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = genericQueue, _ transform: Value -> NewFuture) -> Future<NewFuture.Value> {
         let d = Deferred<NewFuture.Value>()
         upon(queue) {
             transform($0).upon(queue) {
@@ -144,7 +144,7 @@ public extension FutureType {
     /// - parameter transform: Create something using the deferred value.
     /// - returns: A new future that is filled once the reciever is determined.
     /// - seealso: Deferred
-    func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, transform: Value -> NewValue) -> Future<NewValue> {
+    func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, _ transform: Value -> NewValue) -> Future<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             d.fill(transform($0))

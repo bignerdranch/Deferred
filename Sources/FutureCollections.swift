@@ -31,7 +31,7 @@ public extension CollectionType where Generator.Element: FutureType {
     ///   are determined, in the same order.
     var joinedValues: Future<[Generator.Element.Value]> {
         if isEmpty {
-            return Future([])
+            return Future(value: [])
         }
 
         let array = Array(self)

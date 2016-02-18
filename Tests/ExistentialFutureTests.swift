@@ -20,7 +20,7 @@ class ExistentialFutureTests: XCTestCase {
     }
 
     func testFilledAnyFutureWaitAlwaysReturns() {
-        anyFuture = Future(42)
+        anyFuture = Future(value: 42)
         let peek = anyFuture.wait(.Forever)
         XCTAssertNotNil(peek)
     }
@@ -42,7 +42,7 @@ class ExistentialFutureTests: XCTestCase {
     }
 
     func testFilledAnyFutureUpon() {
-        let d = Future(1)
+        let d = Future(value: 1)
 
         for _ in 0 ..< 10 {
             let expect = expectationWithDescription("upon blocks called with correct value")

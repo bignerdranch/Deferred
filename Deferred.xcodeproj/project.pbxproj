@@ -73,6 +73,10 @@
 		DB8710281C758B4500A898FD /* LazyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8710261C758B4500A898FD /* LazyFuture.swift */; };
 		DB8710291C758B4500A898FD /* LazyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8710261C758B4500A898FD /* LazyFuture.swift */; };
 		DB87102A1C758B4500A898FD /* LazyFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8710261C758B4500A898FD /* LazyFuture.swift */; };
+		DB87102C1C7592C100A898FD /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87102B1C7592C100A898FD /* FutureFlatMap.swift */; };
+		DB87102D1C7592DC00A898FD /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87102B1C7592C100A898FD /* FutureFlatMap.swift */; };
+		DB87102E1C7592DD00A898FD /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87102B1C7592C100A898FD /* FutureFlatMap.swift */; };
+		DB87102F1C7592DE00A898FD /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87102B1C7592C100A898FD /* FutureFlatMap.swift */; };
 		DB8710311C7592F500A898FD /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8710301C7592F500A898FD /* FutureMap.swift */; };
 		DB8710321C7592F500A898FD /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8710301C7592F500A898FD /* FutureMap.swift */; };
 		DB8710331C7592F500A898FD /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8710301C7592F500A898FD /* FutureMap.swift */; };
@@ -139,6 +143,7 @@
 		DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
 		DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
 		DB8710261C758B4500A898FD /* LazyFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LazyFuture.swift; sourceTree = "<group>"; };
+		DB87102B1C7592C100A898FD /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureFlatMap.swift; sourceTree = "<group>"; };
 		DB8710301C7592F500A898FD /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
 		DBDAC8FD1CAA9E530087EA91 /* FutureFlatten.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureFlatten.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -230,6 +235,8 @@
 				DB6AE0381C237F8800D77BF1 /* Deferred.swift */,
 				DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */,
 				DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */,
+				DBDAC8FD1CAA9E530087EA91 /* FutureFlatten.swift */,
+				DB87102B1C7592C100A898FD /* FutureFlatMap.swift */,
 				DB8710301C7592F500A898FD /* FutureMap.swift */,
 				DB6AE03B1C237F8800D77BF1 /* FutureType.swift */,
 				DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */,
@@ -558,6 +565,7 @@
 				DB8710321C7592F500A898FD /* FutureMap.swift in Sources */,
 				DB8710281C758B4500A898FD /* LazyFuture.swift in Sources */,
 				DB6AE04B1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB87102D1C7592DC00A898FD /* FutureFlatMap.swift in Sources */,
 				DB6AE0471C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -590,6 +598,7 @@
 				DB8710311C7592F500A898FD /* FutureMap.swift in Sources */,
 				DB8710271C758B4500A898FD /* LazyFuture.swift in Sources */,
 				DB6AE04A1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB87102C1C7592C100A898FD /* FutureFlatMap.swift in Sources */,
 				DB6AE0461C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -622,6 +631,7 @@
 				DB8710331C7592F500A898FD /* FutureMap.swift in Sources */,
 				DB8710291C758B4500A898FD /* LazyFuture.swift in Sources */,
 				DB6AE04C1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB87102E1C7592DD00A898FD /* FutureFlatMap.swift in Sources */,
 				DB6AE0481C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -654,6 +664,7 @@
 				DB8710341C7592F500A898FD /* FutureMap.swift in Sources */,
 				DB87102A1C758B4500A898FD /* LazyFuture.swift in Sources */,
 				DB6AE04D1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB87102F1C7592DE00A898FD /* FutureFlatMap.swift in Sources */,
 				DB6AE0491C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,6 +7,9 @@
 //
 
 import Dispatch
+#if SWIFT_PACKAGE
+import AtomicSwift
+#endif
 
 /// A type that mutually excludes execution of code such that only one unit of
 /// code is running at any given time. An implementing type may choose to have
@@ -98,24 +101,25 @@ public final class SpinLock: ReadWriteLock {
 /// A custom spin-lock with readers-writer semantics. The spin lock will poll
 /// to check the state of the lock, allowing many readers at the same time.
 public final class CASSpinLock: ReadWriteLock {
-    private struct Masks {
-        static let WRITER_BIT: Int32         = 0x40000000
-        static let WRITER_WAITING_BIT: Int32 = 0x20000000
-        static let MASK_WRITER_BITS          = WRITER_BIT | WRITER_WAITING_BIT
-        static let MASK_READER_BITS          = ~MASK_WRITER_BITS
+    // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
+    // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
+    private enum Constants {
+        static var WriterMask:   Int32 { return Int32(bitPattern: 0xFFF00000) }
+        static var ReaderMask:   Int32 { return Int32(bitPattern: 0x000FFFFF) }
+        static var WriterOffset: Int32 { return Int32(bitPattern: 0x00100000) }
     }
 
-    private var _state: UnsafeMutablePointer<Int32>
+    private var state: UnsafeMutablePointer<Int32>
 
     /// Allocate the spinlock.
     public init() {
-        _state = UnsafeMutablePointer.alloc(1)
-        _state.initialize(0)
+        state = UnsafeMutablePointer.alloc(1)
+        state.initialize(0)
     }
 
     deinit {
-        _state.destroy()
-        _state.dealloc(1)
+        state.destroy()
+        state.dealloc(1)
     }
 
     /// Call `body` with a writing lock.
@@ -127,36 +131,31 @@ public final class CASSpinLock: ReadWriteLock {
     public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         // spin until we acquire write lock
         repeat {
-            let state = _state.memory
-
-            // if there are no readers and no one holds the write lock, try to grab the write lock immediately
-            if (state == 0 || state == Masks.WRITER_WAITING_BIT) &&
-                OSAtomicCompareAndSwap32Barrier(state, Masks.WRITER_BIT, _state) {
-                    break
+            // wait for any active writer to release the lock
+            while (state.memory & Constants.WriterMask) != 0 {
+                _OSAtomicSpin()
             }
 
-            // If we get here, someone is reading or writing. Set the WRITER_WAITING_BIT if
-            // it isn't already to block any new readers, then wait a bit before
-            // trying again. Ignore CAS failure - we'll just try again next iteration
-            if state & Masks.WRITER_WAITING_BIT == 0 {
-                OSAtomicCompareAndSwap32Barrier(state, state | Masks.WRITER_WAITING_BIT, _state)
+            // increment the writer count
+            if (OSAtomicAdd32Barrier(Constants.WriterOffset, state) & Constants.WriterMask) == Constants.WriterOffset {
+                // wait until there are no more readers
+                while (state.memory & Constants.ReaderMask) != 0 {
+                    _OSAtomicSpin()
+                }
+
+                // write lock acquired
+                break
             }
+
+            // there's another writer active; try again
+            OSAtomicAdd32Barrier(-Constants.WriterOffset, state)
         } while true
         
         defer {
-            // unlock
-            repeat {
-                let state = _state.memory
-                
-                // clear everything except (possibly) WRITER_WAITING_BIT, which will only be set
-                // if another writer is already here and waiting (which will keep out readers)
-                if OSAtomicCompareAndSwap32Barrier(state, state & Masks.WRITER_WAITING_BIT, _state) {
-                    break
-                }
-            } while true
+            // decrement writers, potentially unblock readers
+            OSAtomicAdd32Barrier(-Constants.WriterOffset, state)
         }
 
-        // write lock acquired - run block
         return try body()
     }
 
@@ -169,34 +168,26 @@ public final class CASSpinLock: ReadWriteLock {
     public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
         // spin until we acquire read lock
         repeat {
-            let state = _state.memory
-
-            // if there is no writer and no writer waiting, try to increment reader count
-            if (state & Masks.MASK_WRITER_BITS) == 0 &&
-                OSAtomicCompareAndSwap32Barrier(state, state + 1, _state) {
-                    break
+            // wait for active writer to release the lock
+            while (state.memory & Constants.WriterMask) != 0 {
+                _OSAtomicSpin()
             }
+
+            // increment the reader count
+            if (OSAtomicIncrement32Barrier(state) & Constants.WriterMask) == 0 {
+                // read lock required
+                break
+            }
+
+            // a writer became active while locking; try again
+            OSAtomicDecrement32Barrier(state)
         } while true
         
         defer {
-            // decrement reader count
-            repeat {
-                let state = _state.memory
-                
-                // sanity check that we have a positive reader count before decrementing it
-                assert((state & Masks.MASK_READER_BITS) > 0, "unlocking read lock - invalid reader count")
-                
-                // desired new state: 1 fewer reader, preserving whether or not there is a writer waiting
-                let newState = ((state & Masks.MASK_READER_BITS) - 1) |
-                    (state & Masks.WRITER_WAITING_BIT)
-                
-                if OSAtomicCompareAndSwap32Barrier(state, newState, _state) {
-                    break
-                }
-            } while true
+            // decrement readers, potentially unblock writers
+            OSAtomicDecrement32Barrier(state)
         }
 
-        // read lock acquired - run block
         return try body()
     }
 }

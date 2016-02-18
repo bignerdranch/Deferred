@@ -11,7 +11,7 @@ import XCTest
 
 class IgnoringFutureTests: XCTestCase {
 
-    var future: IgnoringFuture<Deferred<Int>>!
+    var future: Future<Void>!
 
     override func tearDown() {
         future = nil
@@ -21,7 +21,7 @@ class IgnoringFutureTests: XCTestCase {
 
     func testWaitWithTimeout() {
         let deferred = Deferred<Int>()
-        future = IgnoringFuture(deferred)
+        future = deferred.ignore()
 
         let expect = expectationWithDescription("value blocks while unfilled")
         after(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
@@ -37,7 +37,7 @@ class IgnoringFutureTests: XCTestCase {
 
     func testIgnoredUponCalledWhenFilled() {
         let d = Deferred<Int>()
-        future = IgnoringFuture(d)
+        future = d.ignore()
 
         for _ in 0 ..< 10 {
             let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")

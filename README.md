@@ -17,7 +17,7 @@
 Add the following to your Cartfile:
 
 ```ruby
-github "BigNerdRanch/Deferred" "v2.0b4"
+github "bignerdranch/Deferred" "2.0b5"
 ```
 
 Then run `carthage update`.

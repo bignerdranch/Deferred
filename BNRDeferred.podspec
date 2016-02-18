@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "BNRDeferred"
-  s.version      = "2.0b4"
+  s.version      = "2.0b5"
   s.summary      = "An implementation of OCaml's Deferred for Swift."
 
   s.description  = <<-DESC
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target    = "9.0"
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "v#{s.version}" }
+  s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "#{s.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

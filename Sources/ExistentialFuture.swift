@@ -82,7 +82,7 @@ public struct Future<Value>: FutureType {
     }
 
     /// Wrap and forward future as if it were always filled with `value`.
-    public init(_ value: Value) {
+    public init(value: Value) {
         self.box = FilledFuture(value: value)
     }
     

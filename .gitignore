@@ -22,6 +22,6 @@ xcuserdata
 *.xcuserstate
 *.xcscmblueprint
 
-## Obj-C/Swift specific
-*.hmap
-*.ipa
+
+# Fastlane/Scan
+test_output/

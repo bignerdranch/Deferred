@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "BNRDeferred"
-  s.version      = "2.0b5"
+  s.version      = "2.0b6"
   s.summary      = "An implementation of OCaml's Deferred for Swift."
 
   s.description  = <<-DESC

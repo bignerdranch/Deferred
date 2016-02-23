@@ -51,8 +51,8 @@ private final class FilledFuture<Value>: FutureBase<Value> {
     }
 
     override func upon(queue: dispatch_queue_t, body: Value -> ()) {
-        dispatch_async(queue) {
-            body(self.value)
+        dispatch_async(queue) { [value] in
+            body(value)
         }
     }
 

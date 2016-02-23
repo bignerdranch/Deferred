@@ -1,9 +1,6 @@
 ## Build generated
-.build/
 build/
-DerivedData
-docs/
-Packages/
+DerivedData/
 
 ## Various settings
 *.pbxuser
@@ -17,11 +14,16 @@ Packages/
 xcuserdata
 
 ## Other
-*.xccheckout
 *.moved-aside
-*.xcuserstate
+*.xccheckout
 *.xcscmblueprint
 
+# Swift Package Manager
+Packages/
+.build/
+
+# Jazzy
+docs/
 
 # Fastlane/Scan
 test_output/

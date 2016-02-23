@@ -39,7 +39,9 @@ private struct DispatchBlockMarker: CallbacksList {
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value>: FutureType, PromiseType {
-    private var storage: MemoStore<Value, DispatchBlockMarker>
+
+    private let storage: MemoStore<Value>
+    private let onFilled = DispatchBlockMarker()
     
     /// Initialize an unfilled Deferred.
     public init() {
@@ -49,6 +51,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// Initialize a filled Deferred with the given value.
     public init(value: Value) {
         storage = MemoStore.createWithValue(value)
+        onFilled.markCompleted()
     }
 
     // MARK: FutureType
@@ -56,16 +59,16 @@ public struct Deferred<Value>: FutureType, PromiseType {
     private func upon(queue: dispatch_queue_t, options inOptions: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
         var options = inOptions
         options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
-        let block = dispatch_block_create(options) { [storage = storage] in
+        let block = dispatch_block_create(options) { [storage] in
             storage.withValue(body)
         }
-        storage.onFilled.notify(upon: queue, body: block)
+        onFilled.notify(upon: queue, body: block)
         return block
     }
 
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return storage.onFilled.isCompleted
+        return onFilled.isCompleted
     }
     
     /**
@@ -123,6 +126,10 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// - parameter value: The resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
     public func fill(value: Value) -> Bool {
-        return storage.fill(value)
+        let wasFilled = storage.fill(value)
+        if wasFilled {
+            onFilled.markCompleted()
+        }
+        return wasFilled
     }
 }

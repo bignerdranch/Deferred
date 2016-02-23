@@ -56,33 +56,21 @@ private final class Box<T> {
 }
 
 // Heap storage that is initialized with a value once-and-only-once, atomically.
-final class MemoStore<Value, OnFill: CallbacksList> {
+final class MemoStore<Value> {
     // Using `ManagedBufferPointer` has advantages over a custom class:
     //  - The data is efficiently stored in tail-allocated buffer space.
     //  - The buffer has a stable pointer when locked to a single element.
     //  - Better `holdsUniqueReference` support allows for future optimization.
-    private typealias Manager = ManagedBufferPointer<OnFill, Box<Value>?>
-    
-    static func createWithValue(value: Value?) -> MemoStore<Value, OnFill> {
-        let marker = OnFill()
-        let boxed = value.map(Box.init)
-        
-        // Create storage. Swift uses a two-stage tail-allocated system
-        // like ObjC's class_createInstance(2) with the extraBytes parameter.
-        let ptr = Manager(bufferClass: self, minimumCapacity: 1, initialValue: { (_, _) in
-            marker
-        })
-        
-        // Assign the initial value to managed storage
-        ptr.withUnsafeMutablePointerToElements {
-            $0.initialize(boxed)
-        }
-        
-        // Unblock the (empty) callbacks if needed.
-        // FIXME: Should there be a way to express that this could be done
-        // unsafely for performance? GCD doesn't need to.
-        if value != nil {
-            marker.markCompleted()
+    private typealias Manager = ManagedBufferPointer<Void, Element>
+    private typealias Element = Box<Value>?
+
+    static func createWithValue(value: Value?) -> MemoStore<Value> {
+        // Create storage. Swift uses a two-stage system.
+        let ptr = Manager(bufferClass: self, minimumCapacity: 1) { buffer, _ in
+            // Assign the initial value to managed storage
+            Manager(unsafeBufferObject: buffer).withUnsafeMutablePointerToElements { boxPtr in
+                boxPtr.initialize(value.map(Box.init))
+            }
         }
         
         // Kindly give back an instance of the ManagedBufferPointer's buffer - self.
@@ -92,32 +80,28 @@ final class MemoStore<Value, OnFill: CallbacksList> {
     private init() {
         fatalError("Unavailable method cannot be called")
     }
+
+    private func withUnsafeMutablePointer<Return>(body: UnsafeMutablePointer<Element> -> Return) -> Return {
+        return Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements(body)
+    }
     
     deinit {
         // UnsafeMutablePointer.destroy() is faster than destroy(_:) for single elements
-        Manager(unsafeBufferObject: self).withUnsafeMutablePointers {
-            $0.destroy()
-            $1.destroy()
+        withUnsafeMutablePointer { boxPtr in
+            boxPtr.destroy()
         }
     }
     
     func withValue(body: Value -> Void) {
-        Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { boxPtr in
+        withUnsafeMutablePointer { boxPtr in
             guard let box = boxPtr.memory else { return }
             body(box.contents)
         }
     }
     
     func fill(value: Value) -> Bool {
-        let box = Box(value)
-        return Manager(unsafeBufferObject: self).withUnsafeMutablePointers { (onFillPtr, boxPtr) in
-            guard atomicInitialize(boxPtr, to: box) else { return false }
-            onFillPtr.memory.markCompleted()
-            return true
+        return withUnsafeMutablePointer { boxPtr in
+            atomicInitialize(boxPtr, to: .init(value))
         }
-    }
-    
-    var onFilled: OnFill {
-        return Manager(unsafeBufferObject: self).value
     }
 }

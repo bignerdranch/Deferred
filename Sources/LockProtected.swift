@@ -42,4 +42,21 @@ public final class LockProtected<T> {
             try body(&self.item)
         }
     }
+
+    private var synchronizedValue: T? {
+        return lock.withAttemptedReadLock { self.item }
+    }
+}
+
+extension LockProtected: CustomDebugStringConvertible {
+
+    /// A textual representation of `self`, suitable for debugging.
+    public var debugDescription: String {
+        if let value = synchronizedValue {
+            return "LockProtected(\(String(reflecting: value)))"
+        } else {
+            return "\(self.dynamicType) (lock contended)"
+        }
+    }
+    
 }

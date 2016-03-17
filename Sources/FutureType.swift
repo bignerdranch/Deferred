@@ -37,7 +37,7 @@ var genericQueue: dispatch_queue_t! {
 /// access, though ideally all members of the future could be called from any
 /// thread.
 ///
-public protocol FutureType {
+public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
@@ -196,4 +196,38 @@ public extension FutureType {
             }
         })
     }
+}
+
+// This is just to get us the syntax-highlighted "(not filled)" in playgrounds.
+private struct NotFilledMarker: CustomDebugStringConvertible {
+
+    static func mirrorFor<T>(subject: T) -> Mirror {
+        return Mirror(subject, unlabeledChildren: CollectionOfOne(NotFilledMarker()), displayStyle: .Tuple)
+    }
+
+    var debugDescription: String {
+        return "not filled"
+    }
+}
+
+extension FutureType {
+
+    /// A textual representation of `self`, suitable for debugging.
+    public var debugDescription: String {
+        var ret = "\(Self.self)"
+        if let value = peek() {
+            ret += "(\(String(reflecting: value)))"
+        } else {
+            ret += " (not filled)"
+        }
+        return ret
+    }
+
+    /// Return the `Mirror` for `self`.
+    public func customMirror() -> Mirror {
+        return peek().map {
+            Mirror(self, children: [ "value": $0 ], displayStyle: .Optional)
+        } ?? NotFilledMarker.mirrorFor(self)
+    }
+
 }

@@ -39,7 +39,7 @@ var genericQueue: dispatch_queue_t! {
 ///
 public protocol FutureType {
     /// A type that represents the result of some asynchronous operation.
-    typealias Value
+    associatedtype Value
 
     /// Call some function once the value is determined.
     ///
@@ -101,7 +101,7 @@ public extension FutureType {
     ///
     /// - returns: The determined value.
     internal var value: Value {
-        return unsafeUnwrap(wait(.Forever))
+        return wait(.Forever)!
     }
 
     /// Check whether or not the receiver is filled.

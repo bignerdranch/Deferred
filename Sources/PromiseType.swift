@@ -18,7 +18,7 @@
 ///
 public protocol PromiseType {
     /// A type that represents the result of some asynchronous operation.
-    typealias Value
+    associatedtype Value
     
     /// Create the promise in a default, unfilled state
     init()
@@ -56,7 +56,7 @@ public extension PromiseType {
     ///
     /// - parameter value: A resolved value for the instance.
     /// - parameter assertIfFilled: If `false`, race checking is disabled.
-    func fill(value: Value, assertIfFilled: Bool, file: StaticString = __FILE__, line: UInt = __LINE__) {
+    func fill(value: Value, assertIfFilled: Bool, file: StaticString = #file, line: UInt = #line) {
         if !fill(value) && assertIfFilled {
             assertionFailure("Cannot fill an already-filled \(self.dynamicType)", file: file, line: line)
         }

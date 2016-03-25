@@ -3,7 +3,7 @@
 - What: Lets you work with values that haven't been determined yet,
         like an array that's coming (one day!) from a web service call.
 - Who: John Gallagher <jgallagher@bignerdranch.com> wrote this.
-- Swift: v2.1 for now. :warning: **NOTE:** Not 2.0!
+- Swift: 2.2
 - License: MIT
 - Carthage: Yup.
 - CocoaPods: As [`BNRDeferred`](https://cocoapods.org/pods/BNRDeferred).

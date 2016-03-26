@@ -61,6 +61,17 @@ private final class FilledFuture<Value>: FutureBase<Value> {
     }
 }
 
+// Concrete future wrapper that will never get filled.
+private final class UnfilledFuture<Value>: FutureBase<Value> {
+    override init() {}
+
+    override func upon(queue: dispatch_queue_t, body: Value -> ()) {}
+
+    override func wait(time: Timeout) -> Value? {
+        return nil
+    }
+}
+
 /// A type-erased wrapper over any future.
 ///
 /// Forwards operations to an arbitrary underlying future having the same
@@ -84,6 +95,11 @@ public struct Future<Value>: FutureType {
     /// Wrap and forward future as if it were always filled with `value`.
     public init(value: Value) {
         self.box = FilledFuture(value: value)
+    }
+
+    /// Create a future that will never get fulfilled.
+    public init() {
+        self.box = UnfilledFuture()
     }
     
     /// Create a future having the same underlying future as `other`.

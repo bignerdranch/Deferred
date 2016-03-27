@@ -37,7 +37,7 @@ var genericQueue: dispatch_queue_t! {
 /// access, though ideally all members of the future could be called from any
 /// thread.
 ///
-public protocol FutureType {
+public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
@@ -196,4 +196,30 @@ public extension FutureType {
             }
         })
     }
+}
+
+extension FutureType {
+
+    /// A textual representation of `self`, suitable for debugging.
+    public var debugDescription: String {
+        var ret = "\(Self.self)"
+        if Value.self == Void.self && isFilled {
+            ret += " (filled)"
+        } else if let value = peek() {
+            ret += "(\(String(reflecting: value)))"
+        } else {
+            ret += " (not filled)"
+        }
+        return ret
+    }
+
+    /// Return the `Mirror` for `self`.
+    public func customMirror() -> Mirror {
+        if Value.self != Void.self, let value = peek() {
+            return Mirror(self, children: [ "value": value ], displayStyle: .Optional)
+        } else {
+            return Mirror(self, children: [ "isFilled": isFilled ], displayStyle: .Tuple)
+        }
+    }
+
 }

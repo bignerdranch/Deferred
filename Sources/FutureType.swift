@@ -8,17 +8,6 @@
 
 import Dispatch
 
-// A generic catch-all dispatch queue for use with futures, when you just want
-// to throw some work into the concurrent pile. As an alternative to the
-// `QOS_CLASS_UTILITY` global queue, work dispatched onto this queue matches
-// the QoS of the caller, which is generally the right behavior.
-//
-// The technique is described and used in Core Foundation:
-// http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
-var genericQueue: dispatch_queue_t! {
-    return dispatch_get_global_queue(qos_class_self(), 0)
-}
-
 /// A future models reading a value which may become available at some point.
 ///
 /// A `FutureType` may be preferable to an architecture using completion
@@ -60,6 +49,24 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     func wait(time: Timeout) -> Value?
 }
 
+extension FutureType {
+    /// A generic catch-all dispatch queue for use with futures, when you just
+    /// want to throw some work into the concurrent pile. As an alternative to
+    /// the `QOS_CLASS_UTILITY` global queue, work dispatched onto this queue
+    /// on platforms with QoS will match the QoS of the caller, which is
+    /// generally the right behavior for data flow.
+    public static var genericQueue: dispatch_queue_t {
+        // The technique is described and used in Core Foundation:
+        // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
+        // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
+        #if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
+        return dispatch_get_global_queue(qos_class_self(), 0)
+        #else
+        return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+        #endif
+    }
+}
+
 public extension FutureType {
     /// Call some function in the background once the value is determined.
     ///
@@ -68,7 +75,7 @@ public extension FutureType {
     ///
     /// - parameter body: A function that uses the determined value.
     func upon(body: Value -> ()) {
-        upon(genericQueue, body: body)
+        upon(Self.genericQueue, body: body)
     }
 
     /// Call some function on the main queue once the value is determined.
@@ -124,7 +131,7 @@ public extension FutureType {
     /// - parameter transform: Start a new operation using the deferred value.
     /// - returns: The new deferred value returned by the `transform`.
     /// - seealso: Deferred
-    func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = genericQueue, _ transform: Value -> NewFuture) -> Future<NewFuture.Value> {
+    func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewFuture) -> Future<NewFuture.Value> {
         let d = Deferred<NewFuture.Value>()
         upon(queue) {
             transform($0).upon(queue) {
@@ -144,7 +151,7 @@ public extension FutureType {
     /// - parameter transform: Create something using the deferred value.
     /// - returns: A new future that is filled once the reciever is determined.
     /// - seealso: Deferred
-    func map<NewValue>(upon queue: dispatch_queue_t = genericQueue, _ transform: Value -> NewValue) -> Future<NewValue> {
+    func map<NewValue>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewValue) -> Future<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             d.fill(transform($0))

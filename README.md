@@ -1,4 +1,7 @@
 # Deferred
+
+This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift.
+
 ## Vital Statistics
 - What: Lets you work with values that haven't been determined yet,
         like an array that's coming (one day!) from a web service call.
@@ -144,7 +147,116 @@ names.upon { names: [Name] in
 }
 ```
 
+## Tasks
+
+### Vending a Future
+
+```swift
+// Potentially long-running operation.
+func performOperation() -> Deferred<Int> {
+    // 1. Create deferred.
+    let deferred = Deferred<Int>()
+
+    // 2. Kick off asynchronous code that will eventually...
+    let queue = ...
+    dispatch_async(queue) {
+        let result = compute_result()
+
+        // 3. ... fill the deferred in with its value
+        deferred.fill(result)
+    }
+
+    // 4. Return the (currently still unfilled) deferred
+    return deferred
+}
+```
+
+### <a name="upon"></a>Taking Action when a Future Is Filled
+
+You can use the `upon(_:body:)` method to run a closure once the `Deferred` has been filled. `upon(_:body:)` can be called multiple times, and the closures will be called in the order they were supplied to `upon(_:body:)`.
+
+By default, `upon(_:)` will run the closures on a background concurrent GCD queue. You can change this by passing a different queue when by using the full `upon(_:body:)` method to specify a queue for the closure.
+
+```swift
+let deferredResult = performOperation()
+
+deferredResult.upon { result in
+    print("got \(result)")
+}
+```
+### Peeking at the Current Value
+
+Use the `peek()` method to determine whether or not the `Deferred` is currently
+filled.
+
+```swift
+let deferredResult = performOperation()
+
+if let result = deferredResult.peek() {
+    print("filled with \(result)")
+} else {
+    print("currently unfilled")
+}
+```
+
+### Blocking on Fulfillment
+
+Use the `wait(_:)` method to wait for a `Deferred` to be filled, and return the value.
+
+The `wait(_:)` method supports a few timeout values, including an arbitrary number of seconds.
+
+```swift
+// WARNING: Blocks the calling thread!
+let result: Int = performOperation().wait(.Forever)!
+```
+
+### Chaining Deferreds
+
+Monadic `map` and `flatMap` are available to chain `Deferred` results. For example, suppose you have a method that asynchronously reads a string, and you want to call `Int.init(_:)` on that string:
+
+```swift
+// Producer
+func readString() -> Deferred<String> {
+    let deferredResult = Deferred<String>()
+    // dispatch_async something to fill deferredResult...
+    return deferredResult
+}
+
+// Consumer
+let deferredInt: Deferred<Int?> = readString().map { Int($0) }
+```
+
+`map(upon:_:)` and `flatMap(upon:_:)`, like `upon(_:body:)`, execute on a concurrent background thread by default (once the instance has been filled). The `upon` peramater is if you want to specify the GCD queue as the consumer.
+
+### Combining Deferreds
+
+There are three functions available for combining multiple `Deferred` instances:
+
+```swift
+// `both` creates a new Deferred that is filled once both inputs are available
+let d1: Deferred<Int> = ...
+let d2: Deferred<String> = ...
+let dBoth : Deferred<(Int, String)> = d1.and(d2)
+
+// `all` creates a new Deferred that is filled once all inputs are available.
+// All of the input Deferreds must contain the same type.
+var deferreds: [Deferred<Int>] = []
+for i in 0 ..< 10 {
+    deferreds.append(...)
+}
+let allDeferreds: Future<[Int]> = deferreds.joinedValues
+// Once all 10 input deferreds are filled, allDeferreds.value[i] will contain the result
+// of deferreds[i].value.
+
+// `earliestFilled` creates a new Deferred that is filled once any one of its inputs is available.
+// If multiple inputs become available simultaneously, no guarantee is made about which
+// will be selected.
+var anyDeferred: Deferred<Int> = deferreds.earliestFilled
+// Once any one of the 10 inputs is filled, anyDeferred will be filled with that value.
+```
+
 ### Cancellation
+
 Cancellation gets pretty ugly with callbacks.
 You often have to fork a bunch of, "Wait, has this been cancelled?"
 checks throughout your code.
@@ -211,8 +323,8 @@ func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
 ```
 
 ### Further Information
-For further info, please refer to [the documentation](docs.md)
-as well as comments in the generated headers.
 
-If you have a question not answered by either,
+For further info, please refer to comments in the generated headers.
+
+If you have a question not answered by this README or the comments,
 please open an issue!

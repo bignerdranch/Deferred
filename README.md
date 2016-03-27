@@ -218,18 +218,19 @@ func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
 ```swift
 // Potentially long-running operation.
 func performOperation() -> Deferred<Int> {
-		// 1. Create deferred.
+    // 1. Create deferred.
     let deferred = Deferred<Int>()
 
-		// 2. Kick off asynchronous code that will eventually...
-    dispatch_async(dispatch_get_main_queue(), {
+    // 2. Kick off asynchronous code that will eventually...
+    let queue = ...
+    dispatch_async(queue) {
         let result = compute_result()
 
-				// 3. ... fill the deferred in with its value
+        // 3. ... fill the deferred in with its value
         deferred.fill(result)
-    })
+    }
 
-		// 4. Return the (currently still unfilled) deferred
+    // 4. Return the (currently still unfilled) deferred
     return deferred
 }
 ```
@@ -238,69 +239,61 @@ func performOperation() -> Deferred<Int> {
 
 ### <a name="upon"></a>Running Closures Upon Fulfillment
 
-You can use the `upon` method to run a closure once the `Deferred` has been
-filled. `upon` can be called multiple times, and the closures will be called
-in the order they were supplied to `upon` (with the normal race condition caveat
-if you are calling `upon` from multiple threads simultaneously).
+You can use the `upon(_:body:)` method to run a closure once the `Deferred` has been filled. `upon(_:body:)` can be called multiple times, and the closures will be called in the order they were supplied to `upon(_:body:)`.
 
-By default, `upon` will run the closures on a background concurrent GCD queue.
-You can change this by passing a different default queue when the `Deferred` is
-created, or by using the `uponQueue` method to specify a queue for the closure.
+By default, `upon(_:)` will run the closures on a background concurrent GCD queue. You can change this by passing a different queue when by using the full `upon(_:body:)` method to specify a queue for the closure.
 
 ```swift
 let deferredResult = performOperation()
 
 deferredResult.upon { result in
-    println("got \(result)")
+    print("got \(result)")
 }
 ```
 
 ### Peeking at Current Value
 
-Use the `peek` method to determine whether or not the `Deferred` is currently
+Use the `peek()` method to determine whether or not the `Deferred` is currently
 filled.
 
 ```swift
 let deferredResult = performOperation()
 
 if let result = deferredResult.peek() {
-		println("filled with \(result)")
+    print("filled with \(result)")
 } else {
-		println("currently unfilled")
+    print("currently unfilled")
 }
 ```
 
 ### Blocking on Fulfillment
 
-Use the `value` property to wait for the `Deferred` to be filled and get the value.
+Use the `wait(_:)` method to wait for a `Deferred` to be filled, and return the value.
+
+The `wait(_:)` method supports a few timeout values, including an arbitrary number of seconds.
 
 ```swift
 // WARNING: Blocks the calling thread!
-let result: Int = performOperation().value
+let result: Int = performOperation().wait(.Forever)!
 ```
 
 ### Chaining Deferreds
 
-Monadic `bind` and `map` are available to chain `Deferred` results. For example,
-suppose you have a method that asynchronously reads a string, and you want to
-call `toInt()` on that string:
+Monadic `map` and `flatMap` are available to chain `Deferred` results. For example, suppose you have a method that asynchronously reads a string, and you want to call `Int.init(_:)` on that string:
 
 ```swift
 // Producer
 func readString() -> Deferred<String> {
-		let deferredResult = Deferred<String>()
-		// dispatch_async something to fill deferredResult...
-		return deferredResult
+    let deferredResult = Deferred<String>()
+    // dispatch_async something to fill deferredResult...
+    return deferredResult
 }
 
 // Consumer
 let deferredInt: Deferred<Int?> = readString().map { Int($0) }
 ```
 
-`bind` and `map`, like `upon`, execute on a concurrent background thread by
-default (once the instance has been filled), unless a different queue is
-passed when the `Deferred` instance is created. `bindQueue` and `mapQueue` are
-available if you want to specify the GCD queue as the consumer.
+`map(upon:_:)` and `flatMap(upon:_:)`, like `upon(_:body:)`, execute on a concurrent background thread by default (once the instance has been filled). The `upon` peramater is if you want to specify the GCD queue as the consumer.
 
 ### Combining Deferreds
 
@@ -310,27 +303,27 @@ There are three functions available for combining multiple `Deferred` instances:
 // `both` creates a new Deferred that is filled once both inputs are available
 let d1: Deferred<Int> = ...
 let d2: Deferred<String> = ...
-let dBoth : Deferred<(Int,String)> = d1.both(d2)
+let dBoth : Deferred<(Int, String)> = d1.and(d2)
 
 // `all` creates a new Deferred that is filled once all inputs are available.
 // All of the input Deferreds must contain the same type.
 var deferreds: [Deferred<Int>] = []
 for i in 0 ..< 10 {
-		deferreds.append(...)
+    deferreds.append(...)
 }
-var allDeferreds: Deferred<[Int]> = all(deferreds)
+let allDeferreds: Future<[Int]> = deferreds.joinedValues
 // Once all 10 input deferreds are filled, allDeferreds.value[i] will contain the result
 // of deferreds[i].value.
 
-// `any` creates a new Deferred that is filled once any one of its inputs is available.
+// `earliestFilled` creates a new Deferred that is filled once any one of its inputs is available.
 // If multiple inputs become available simultaneously, no guarantee is made about which
 // will be selected.
-var anyDeferred: Deferred<Deferred<Int>> = any(deferreds)
-// Once any one of the 10 input deferreds is filled, anyDeferred will contain that
-// Deferred instance, which is guaranteed to be filled.
+var anyDeferred: Deferred<Int> = deferreds.earliestFilled
+// Once any one of the 10 inputs is filled, anyDeferred will be filled with that value.
 ```
 
 ### Further Information
+
 For further info, please refer to comments in the generated headers.
 
 If you have a question not answered by this README or the comments,

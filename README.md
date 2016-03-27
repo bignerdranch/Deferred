@@ -147,73 +147,9 @@ names.upon { names: [Name] in
 }
 ```
 
-### Cancellation
-Cancellation gets pretty ugly with callbacks.
-You often have to fork a bunch of, "Wait, has this been cancelled?"
-checks throughout your code.
+## Tasks
 
-With `Deferred`, it's nothing special:
-You resolve the `Deferred` to a default value,
-and all the work waiting for your `Deferred` to resolve
-is unchanged. It's still a `Value`, whatever its provenance.
-This is the power of regarding a `Deferred<Value>` as just a `Value` that
-hasn't quite been nailed down yet.
-
-That solves cancellation for consumers of the value.
-But generally you have some value-producer work you'd like to abort
-on cancellation, like stopping a web request that's in flight.
-To do this, the producer adds an `upon` closure to the `Deferred<Value>`
-before vending it to your API consumer.
-This closure is responsible for aborting the operation if needed.
-Now, if someone defaults the `Deferred<Value>` to some `Value`,
-the `upon` closure will run and cancel the in-flight operation.
-
-Let's look at cancelling our `AsynchronousFriends` request:
-
-```swift
-/* * * CLIENT * * */
-func refreshFriends() {
-    let friends = AsynchronousFriends(forUser: jimbob)
-    friends.upon { friends in
-        let names = friends.map { $0.name }
-        dataSource.array = names
-        tableView.reloadData()
-    }
-
-    /* Stash the `Deferred<Value>` for defaulting later. */
-    self.friends = friends
-}
-
-func cancelFriends() {
-    self.friends.fillIfUnfulfilled([])
-}
-
-/* * * PRODUCER * * */
-func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
-    let deferredFriends: Deferred<Friend> = Deferred()
-    let request: NSURLRequest = /* … */
-    let task = self.session.dataTaskWithRequest(request) {
-        data, response, error in
-        let friends: [Friend] = parseFriends(data, response, error)
-        // fillIfUnfulfilled since we might be racing with another producer
-        // to fill this value
-        deferredFriends.fillIfUnfulfilled(friends)
-    }
-
-    // arrange to cancel on fill
-    deferredFriends.upon { [weak task] _ in
-        task?.cancel()
-    }
-
-    // start the operation that will eventually resolve the deferred value
-    task.resume()
-
-    // finally, pass the deferred value to the caller
-    return deferredFriends
-}
-```
-
-## Usage - Producer
+### Vending a Future
 
 ```swift
 // Potentially long-running operation.
@@ -235,9 +171,7 @@ func performOperation() -> Deferred<Int> {
 }
 ```
 
-## Usage - Consumer
-
-### <a name="upon"></a>Running Closures Upon Fulfillment
+### <a name="upon"></a>Taking Action when a Future Is Filled
 
 You can use the `upon(_:body:)` method to run a closure once the `Deferred` has been filled. `upon(_:body:)` can be called multiple times, and the closures will be called in the order they were supplied to `upon(_:body:)`.
 
@@ -250,8 +184,7 @@ deferredResult.upon { result in
     print("got \(result)")
 }
 ```
-
-### Peeking at Current Value
+### Peeking at the Current Value
 
 Use the `peek()` method to determine whether or not the `Deferred` is currently
 filled.
@@ -320,6 +253,73 @@ let allDeferreds: Future<[Int]> = deferreds.joinedValues
 // will be selected.
 var anyDeferred: Deferred<Int> = deferreds.earliestFilled
 // Once any one of the 10 inputs is filled, anyDeferred will be filled with that value.
+```
+
+### Cancellation
+
+Cancellation gets pretty ugly with callbacks.
+You often have to fork a bunch of, "Wait, has this been cancelled?"
+checks throughout your code.
+
+With `Deferred`, it's nothing special:
+You resolve the `Deferred` to a default value,
+and all the work waiting for your `Deferred` to resolve
+is unchanged. It's still a `Value`, whatever its provenance.
+This is the power of regarding a `Deferred<Value>` as just a `Value` that
+hasn't quite been nailed down yet.
+
+That solves cancellation for consumers of the value.
+But generally you have some value-producer work you'd like to abort
+on cancellation, like stopping a web request that's in flight.
+To do this, the producer adds an `upon` closure to the `Deferred<Value>`
+before vending it to your API consumer.
+This closure is responsible for aborting the operation if needed.
+Now, if someone defaults the `Deferred<Value>` to some `Value`,
+the `upon` closure will run and cancel the in-flight operation.
+
+Let's look at cancelling our `AsynchronousFriends` request:
+
+```swift
+/* * * CLIENT * * */
+func refreshFriends() {
+    let friends = AsynchronousFriends(forUser: jimbob)
+    friends.upon { friends in
+        let names = friends.map { $0.name }
+        dataSource.array = names
+        tableView.reloadData()
+    }
+
+    /* Stash the `Deferred<Value>` for defaulting later. */
+    self.friends = friends
+}
+
+func cancelFriends() {
+    self.friends.fillIfUnfulfilled([])
+}
+
+/* * * PRODUCER * * */
+func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
+    let deferredFriends: Deferred<Friend> = Deferred()
+    let request: NSURLRequest = /* … */
+    let task = self.session.dataTaskWithRequest(request) {
+        data, response, error in
+        let friends: [Friend] = parseFriends(data, response, error)
+        // fillIfUnfulfilled since we might be racing with another producer
+        // to fill this value
+        deferredFriends.fillIfUnfulfilled(friends)
+    }
+
+    // arrange to cancel on fill
+    deferredFriends.upon { [weak task] _ in
+        task?.cancel()
+    }
+
+    // start the operation that will eventually resolve the deferred value
+    task.resume()
+
+    // finally, pass the deferred value to the caller
+    return deferredFriends
+}
 ```
 
 ### Further Information

@@ -48,7 +48,7 @@ public final class LockProtected<T> {
     }
 }
 
-extension LockProtected: CustomDebugStringConvertible {
+extension LockProtected: CustomDebugStringConvertible, CustomReflectable {
 
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
@@ -58,5 +58,13 @@ extension LockProtected: CustomDebugStringConvertible {
             return "\(self.dynamicType) (lock contended)"
         }
     }
-    
+
+    public func customMirror() -> Mirror {
+        if let value = synchronizedValue {
+            return Mirror(self, children: [ "item": value ], displayStyle: .Optional)
+        } else {
+            return Mirror(self, children: [ "lockContended": true ], displayStyle: .Tuple)
+        }
+    }
+
 }

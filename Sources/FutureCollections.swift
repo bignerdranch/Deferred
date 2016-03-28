@@ -45,7 +45,7 @@ public extension CollectionType where Generator.Element: FutureType {
             }
         }
 
-        dispatch_group_notify(group, genericQueue) {
+        dispatch_group_notify(group, Generator.Element.genericQueue) {
             combined.fill(array.map {
                 $0.value
             })

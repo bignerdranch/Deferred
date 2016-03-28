@@ -17,7 +17,7 @@ in a playground, the following post, and the Swift standard library:
 */
 
 // Abstract class that fake-conforms to `FutureType` for use by `Future`.
-private class FutureBase<Value>: FutureType {
+private class FutureBox<Value>: FutureType {
     func upon(queue: dispatch_queue_t, body: Value -> ()) {
         fatalError()
     }
@@ -28,7 +28,7 @@ private class FutureBase<Value>: FutureType {
 }
 
 // Concrete future wrapper given an instance of a `FutureType`.
-private final class ForwardingFuture<Future: FutureType>: FutureBase<Future.Value> {
+private final class ForwardedTo<Future: FutureType>: FutureBox<Future.Value> {
     let base: Future
     init(base: Future) {
         self.base = base
@@ -44,7 +44,7 @@ private final class ForwardingFuture<Future: FutureType>: FutureBase<Future.Valu
 }
 
 // Concrete future wrapper for an always-filled future.
-private final class FilledFuture<Value>: FutureBase<Value> {
+private final class Always<Value>: FutureBox<Value> {
     let value: Value
     init(value: Value) {
         self.value = value
@@ -61,6 +61,17 @@ private final class FilledFuture<Value>: FutureBase<Value> {
     }
 }
 
+// Concrete future wrapper that will never get filled.
+private final class Never<Value>: FutureBox<Value> {
+    override init() {}
+
+    override func upon(queue: dispatch_queue_t, body: Value -> ()) {}
+
+    override func wait(time: Timeout) -> Value? {
+        return nil
+    }
+}
+
 /// A type-erased wrapper over any future.
 ///
 /// Forwards operations to an arbitrary underlying future having the same
@@ -74,16 +85,21 @@ private final class FilledFuture<Value>: FutureBase<Value> {
 ///   ensuring that only your implementation can fill the deferred value
 ///   using the `PromiseType` aspect.
 public struct Future<Value>: FutureType {
-    private let box: FutureBase<Value>
+    private let box: FutureBox<Value>
 
     /// Create a future whose `upon(_:function:)` method forwards to `base`.
     public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
-        self.box = ForwardingFuture(base: base)
+        self.box = ForwardedTo(base: base)
     }
 
     /// Wrap and forward future as if it were always filled with `value`.
     public init(value: Value) {
-        self.box = FilledFuture(value: value)
+        self.box = Always(value: value)
+    }
+
+    /// Create a future that will never get fulfilled.
+    public init() {
+        self.box = Never()
     }
     
     /// Create a future having the same underlying future as `other`.

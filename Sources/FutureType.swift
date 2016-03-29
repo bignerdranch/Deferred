@@ -67,14 +67,14 @@ extension FutureType {
     }
 }
 
-public extension FutureType {
+extension FutureType {
     /// Call some function in the background once the value is determined.
     ///
     /// If the value is determined, the function will be dispatched immediately.
     /// An `upon` call should always execute asynchronously.
     ///
     /// - parameter body: A function that uses the determined value.
-    func upon(body: Value -> ()) {
+    public func upon(body: Value -> ()) {
         upon(Self.genericQueue, body: body)
     }
 
@@ -85,16 +85,16 @@ public extension FutureType {
     /// asynchronously, even if this function is called from the main queue.
     ///
     /// - parameter body: A function that uses the determined value.
-    func uponMainQueue(body: Value -> ()) {
+    public func uponMainQueue(body: Value -> ()) {
         upon(dispatch_get_main_queue(), body: body)
     }
 }
 
-public extension FutureType {
+extension FutureType {
     /// Checks for and returns a determined value.
     ///
     /// - returns: The determined value, if already filled, or `nil`.
-    func peek() -> Value? {
+    public func peek() -> Value? {
         return wait(.Now)
     }
 
@@ -107,17 +107,17 @@ public extension FutureType {
     /// testing, but otherwise it should be strictly avoided.
     ///
     /// - returns: The determined value.
-    internal var value: Value {
+    var value: Value {
         return wait(.Forever)!
     }
 
     /// Check whether or not the receiver is filled.
-    internal var isFilled: Bool {
+    var isFilled: Bool {
         return wait(.Now) != nil
     }
 }
 
-public extension FutureType {
+extension FutureType {
     /// Begins another asynchronous operation with the deferred value once it
     /// becomes determined.
     ///
@@ -131,7 +131,7 @@ public extension FutureType {
     /// - parameter transform: Start a new operation using the deferred value.
     /// - returns: The new deferred value returned by the `transform`.
     /// - seealso: Deferred
-    func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewFuture) -> Future<NewFuture.Value> {
+    public func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewFuture) -> Future<NewFuture.Value> {
         let d = Deferred<NewFuture.Value>()
         upon(queue) {
             transform($0).upon(queue) {
@@ -151,7 +151,7 @@ public extension FutureType {
     /// - parameter transform: Create something using the deferred value.
     /// - returns: A new future that is filled once the reciever is determined.
     /// - seealso: Deferred
-    func map<NewValue>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewValue) -> Future<NewValue> {
+    public func map<NewValue>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewValue) -> Future<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             d.fill(transform($0))
@@ -160,14 +160,14 @@ public extension FutureType {
     }
 }
 
-public extension FutureType {
+extension FutureType {
     /// Composes this future with another.
     ///
     /// - parameter other: Any other future.
     /// - returns: A value that becomes determined after both the reciever and
     ///   the given future become determined.
     /// - seealso: SequenceType.allFutures
-    func and<OtherFuture: FutureType>(other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
+    public func and<OtherFuture: FutureType>(other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
         return Future(flatMap { t in other.map { u in (t, u) } })
     }
     
@@ -178,7 +178,7 @@ public extension FutureType {
     /// - returns: A value that becomes determined after the reciever and both
     ///   other futures become determined.
     /// - seealso: SequenceType.allFutures
-    func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
+    public func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
         return Future(flatMap { t in
             one.flatMap { u in
                 two.map { v in (t, u, v) }
@@ -194,7 +194,7 @@ public extension FutureType {
     /// - returns: A value that becomes determined after the reciever and both
     ///   other futures become determined.
     /// - seealso: SequenceType.allFutures
-    func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
+    public func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
         return Future(flatMap { t in
             one.flatMap { u in
                 two.flatMap { v in

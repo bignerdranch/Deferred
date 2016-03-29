@@ -8,12 +8,12 @@
 
 import Dispatch
 
-public extension SequenceType where Generator.Element: FutureType {
+extension SequenceType where Generator.Element: FutureType {
     /// Choose the future that is determined first from a collection of futures.
     ///
     /// - returns: A deferred value that is determined with the first of the
     ///   given futures to be determined.
-    var earliestFilled: Future<Generator.Element.Value> {
+    public var earliestFilled: Future<Generator.Element.Value> {
         let combined = Deferred<Generator.Element.Value>()
         for future in self {
             future.upon {
@@ -24,12 +24,12 @@ public extension SequenceType where Generator.Element: FutureType {
     }
 }
 
-public extension CollectionType where Generator.Element: FutureType {
+extension CollectionType where Generator.Element: FutureType {
     /// Compose a number of futures into a single deferred array.
     ///
     /// - returns: A deferred array that is determined once all the given values
     ///   are determined, in the same order.
-    var joinedValues: Future<[Generator.Element.Value]> {
+    public var joinedValues: Future<[Generator.Element.Value]> {
         if isEmpty {
             return Future(value: [])
         }

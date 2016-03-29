@@ -34,8 +34,12 @@ public struct FlattenFuture<Base: FutureType where Base.Value: FutureType>: Futu
     /// - parameter queue: A dispatch queue to execute the function `body` on.
     /// - parameter body: A function that uses the innermost delayed value.
     public func upon(queue: dispatch_queue_t, body: Base.Value.Value -> Void) {
-        base.upon(queue) {
-            $0.upon(queue, body: body)
+        if let nested = base.peek() {
+            nested.upon(queue, body: body)
+        } else {
+            base.upon(queue) {
+                $0.upon(queue, body: body)
+            }
         }
     }
 

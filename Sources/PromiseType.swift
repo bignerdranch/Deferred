@@ -36,7 +36,7 @@ public protocol PromiseType {
     func fill(value: Value) -> Bool
 }
 
-public extension PromiseType {
+extension PromiseType {
     /// Determines the deferred value with a given result.
     ///
     /// Filling a deferred value should usually be attempted only once. An
@@ -56,7 +56,7 @@ public extension PromiseType {
     ///
     /// - parameter value: A resolved value for the instance.
     /// - parameter assertIfFilled: If `false`, race checking is disabled.
-    func fill(value: Value, assertIfFilled: Bool, file: StaticString = #file, line: UInt = #line) {
+    public func fill(value: Value, assertIfFilled: Bool, file: StaticString = #file, line: UInt = #line) {
         if !fill(value) && assertIfFilled {
             assertionFailure("Cannot fill an already-filled \(self.dynamicType)", file: file, line: line)
         }

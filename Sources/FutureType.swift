@@ -44,9 +44,39 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// If the value is already determined, the call returns immediately with the
     /// value.
     ///
+    /// By default, blocks on a call to `upon(_:body:)`.
+    ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
     func wait(time: Timeout) -> Value?
+}
+
+extension FutureType {
+
+    /// Waits synchronously for the value to become determined.
+    ///
+    /// If the value is already determined, the call returns immediately with the
+    /// value.
+    ///
+    /// - parameter time: A length of time to wait for the value to be determined.
+    /// - returns: The determined value, if filled within the timeout, or `nil`.
+    public func wait(time: Timeout) -> Value? {
+        // fast path - return if already filled
+        if let result = peek() {
+            return result
+        }
+
+        // slow path - block until filled
+        var result: Value?
+        let semaphore = dispatch_semaphore_create(0)
+        upon {
+            result = $0
+            dispatch_semaphore_signal(semaphore)
+        }
+        dispatch_semaphore_wait(semaphore, time.rawValue)
+        return result
+    }
+
 }
 
 extension FutureType {

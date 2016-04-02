@@ -69,6 +69,18 @@
 		DB6AE07C1C237FB900D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB6AE07D1C237FBC00D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB6AE07E1C237FBE00D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB8CFEEC1CB047D100D095B7 /* FutureComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */; };
+		DB8CFEED1CB047D100D095B7 /* FutureComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */; };
+		DB8CFEEE1CB047D100D095B7 /* FutureComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */; };
+		DB8CFEEF1CB047D100D095B7 /* FutureComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */; };
+		DB8CFEF11CB047F200D095B7 /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF01CB047F200D095B7 /* FutureMap.swift */; };
+		DB8CFEF21CB047F200D095B7 /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF01CB047F200D095B7 /* FutureMap.swift */; };
+		DB8CFEF31CB047F200D095B7 /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF01CB047F200D095B7 /* FutureMap.swift */; };
+		DB8CFEF41CB047F200D095B7 /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF01CB047F200D095B7 /* FutureMap.swift */; };
+		DB8CFEF61CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
+		DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
+		DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
+		DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +138,9 @@
 		DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
 		DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
 		DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
+		DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureComposition.swift; sourceTree = "<group>"; };
+		DB8CFEF01CB047F200D095B7 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
+		DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureFlatMap.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +230,9 @@
 				DB6AE0381C237F8800D77BF1 /* Deferred.swift */,
 				DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */,
 				DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */,
+				DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */,
+				DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */,
+				DB8CFEF01CB047F200D095B7 /* FutureMap.swift */,
 				DB6AE03B1C237F8800D77BF1 /* FutureType.swift */,
 				DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */,
 				DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */,
@@ -533,12 +551,15 @@
 				DB6AE0531C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB6AE0431C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0571C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB8CFEED1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05B1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE05F1C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0671C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04B1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
 				DB6AE0471C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
+				DB8CFEF21CB047F200D095B7 /* FutureMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,12 +583,15 @@
 				DB6AE0521C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB6AE0421C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB8CFEF61CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0561C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB8CFEEC1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05A1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE05E1C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0661C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04A1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
 				DB6AE0461C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
+				DB8CFEF11CB047F200D095B7 /* FutureMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,12 +615,15 @@
 				DB6AE0541C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB6AE0441C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0581C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB8CFEEE1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05C1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE0601C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0681C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04C1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
 				DB6AE0481C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
+				DB8CFEF31CB047F200D095B7 /* FutureMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -620,12 +647,15 @@
 				DB6AE0551C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB6AE0451C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
+				DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0591C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DB8CFEEF1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05D1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE0611C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0691C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04D1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
 				DB6AE0491C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
+				DB8CFEF41CB047F200D095B7 /* FutureMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

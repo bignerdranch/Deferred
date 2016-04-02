@@ -81,6 +81,10 @@
 		DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
 		DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
 		DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */; };
+		DB8CFEFB1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
+		DB8CFEFC1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
+		DB8CFEFD1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
+		DB8CFEFE1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +145,7 @@
 		DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureComposition.swift; sourceTree = "<group>"; };
 		DB8CFEF01CB047F200D095B7 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
 		DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureFlatMap.swift; sourceTree = "<group>"; };
+		DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExecutorType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +233,7 @@
 			children = (
 				DB6ADFD61C237DD500D77BF1 /* Deferred.h */,
 				DB6AE0381C237F8800D77BF1 /* Deferred.swift */,
+				DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */,
 				DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */,
 				DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */,
 				DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */,
@@ -549,6 +555,7 @@
 			files = (
 				DB6AE04F1C237F8800D77BF1 /* FutureType.swift in Sources */,
 				DB6AE0531C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB8CFEFC1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DB6AE0431C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
@@ -581,6 +588,7 @@
 			files = (
 				DB6AE04E1C237F8800D77BF1 /* FutureType.swift in Sources */,
 				DB6AE0521C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB8CFEFB1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DB6AE0421C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF61CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
@@ -613,6 +621,7 @@
 			files = (
 				DB6AE0501C237F8800D77BF1 /* FutureType.swift in Sources */,
 				DB6AE0541C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB8CFEFD1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DB6AE0441C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
@@ -645,6 +654,7 @@
 			files = (
 				DB6AE0511C237F8800D77BF1 /* FutureType.swift in Sources */,
 				DB6AE0551C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
+				DB8CFEFE1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DB6AE0451C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */,

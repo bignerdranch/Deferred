@@ -28,9 +28,15 @@ private struct DispatchBlockMarker: CallbacksList {
         // Executing the block "unblocks" it, calling all the `_notify` blocks
         block()
     }
-    
-    func notify(upon queue: dispatch_queue_t, body: dispatch_block_t) {
-        dispatch_block_notify(block, queue, body)
+
+    func notify(upon executor: ExecutorType, body: dispatch_block_t) {
+        if let queue = executor.underlyingQueue {
+            dispatch_block_notify(block, queue, body)
+        } else {
+            dispatch_block_notify(block, Deferred<Void>.genericQueue) {
+                executor.submit(body)
+            }
+        }
     }
 }
 
@@ -56,13 +62,13 @@ public struct Deferred<Value>: FutureType, PromiseType {
 
     // MARK: FutureType
 
-    private func upon(queue: dispatch_queue_t, options inOptions: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
+    private func upon(executor: ExecutorType, options inOptions: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
         var options = inOptions
         options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
         let block = dispatch_block_create(options) { [storage] in
             storage.withValue(body)
         }
-        onFilled.notify(upon: queue, body: block)
+        onFilled.notify(upon: executor, body: block)
         return block
     }
 
@@ -70,18 +76,13 @@ public struct Deferred<Value>: FutureType, PromiseType {
     public var isFilled: Bool {
         return onFilled.isCompleted
     }
-    
-    /**
-    Call some function once the value is determined.
-    
-    If the value is already determined, the function will be submitted to the
-    queue immediately. An `upon` call is always executed asynchronously.
-    
-    :param: queue A dispatch queue for executing the given function on.
-    :param: body A function that uses the determined value.
-    */
-    public func upon(queue: dispatch_queue_t, body: Value -> ()) {
-        _ = upon(queue, options: DISPATCH_BLOCK_INHERIT_QOS_CLASS, body: body)
+
+    /// Call some function once the value is determined.
+    ///
+    /// If the value is already determined, the function `body` will be
+    /// submitted to the `executor` immediately.
+    public func upon(executor: ExecutorType, body: Value -> Void) {
+        _ = upon(executor, options: DISPATCH_BLOCK_INHERIT_QOS_CLASS, body: body)
     }
 
     /**
@@ -106,8 +107,8 @@ public struct Deferred<Value>: FutureType, PromiseType {
             return result
         }
 
-        let queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
-        let handler = upon(queue, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, body: assign)
+        let executor = QueueExecutor(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0))
+        let handler = upon(executor, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, body: assign)
 
         guard dispatch_block_wait(handler, time.rawValue) == 0 else {
             dispatch_block_cancel(handler)

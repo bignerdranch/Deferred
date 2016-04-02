@@ -28,7 +28,7 @@ protocol CallbacksList {
     ///
     /// If `isCompleted`, an implementer should immediately submit the `body`
     /// to `queue`.
-    func notify(upon queue: dispatch_queue_t, body: dispatch_block_t)
+    func notify(upon executor: ExecutorType, body: dispatch_block_t)
 }
 
 // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:

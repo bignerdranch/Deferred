@@ -6,8 +6,6 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-import Dispatch
-
 /// A wrapped future that discards the result of the future. The wrapped
 /// future is determined when the underlying future is determined, but it
 /// is always determined with the empty tuple. In this way, it models the
@@ -25,15 +23,13 @@ public struct IgnoringFuture<Base: FutureType>: FutureType {
     public init(_ base: Base) {
         self.base = base
     }
-    
-    /// Call some function once the event completes.
+
+    /// Call some function `body` once the event completes.
     ///
-    /// If the event is already completed, the function will be submitted to the
-    /// queue immediately. An `upon` call is always execute asynchronously.
-    ///
-    /// - parameter queue: A dispatch queue for executing the given function on.
-    public func upon(queue: dispatch_queue_t, body: () -> Void) {
-        return base.upon(queue) { _ in body() }
+    /// If the event is already completed, the function will immediately be
+    /// submitted to `executor`. An `upon` call is always asynchronous.
+    public func upon(executor: ExecutorType, body: () -> Void) {
+        base.upon(executor) { _ in body() }
     }
     
     /// Waits synchronously for the event to complete.

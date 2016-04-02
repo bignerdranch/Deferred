@@ -30,14 +30,14 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
-    /// Call some function once the value is determined.
+    /// Call some function `body` once the value is determined.
     ///
-    /// If the value is determined, the function should be submitted to the
-    /// queue immediately. An `upon` call should always execute asynchronously.
+    /// If the value is determined, the function should be submitted to
+    /// to the `executor` immediately.
     ///
-    /// - parameter queue: A dispatch queue for executing the given function on.
+    /// - parameter executor: A type for handling the `body` on fill.
     /// - parameter body: A function that uses the determined value.
-    func upon(queue: dispatch_queue_t, body: Value -> ())
+    func upon(executor: ExecutorType, body: Value -> Void)
 
     /// Waits synchronously for the value to become determined.
     ///
@@ -68,13 +68,18 @@ extension FutureType {
 }
 
 extension FutureType {
+    /// Calls through to the `ExecutorType` version of `upon(_:body:)`.
+    public func upon(queue: dispatch_queue_t, body: Value -> Void) {
+        upon(QueueExecutor(queue), body: body)
+    }
+
     /// Call some function in the background once the value is determined.
     ///
     /// If the value is determined, the function will be dispatched immediately.
     /// An `upon` call should always execute asynchronously.
     ///
     /// - parameter body: A function that uses the determined value.
-    public func upon(body: Value -> ()) {
+    public func upon(body: Value -> Void) {
         upon(Self.genericQueue, body: body)
     }
 
@@ -85,7 +90,7 @@ extension FutureType {
     /// asynchronously, even if this function is called from the main queue.
     ///
     /// - parameter body: A function that uses the determined value.
-    public func uponMainQueue(body: Value -> ()) {
+    public func uponMainQueue(body: Value -> Void) {
         upon(dispatch_get_main_queue(), body: body)
     }
 }

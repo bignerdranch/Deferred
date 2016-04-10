@@ -30,19 +30,19 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
-    /// Call some function once the value is determined.
+    /// Call some `body` closure once the value is determined.
     ///
-    /// If the value is determined, the function should be submitted to the
-    /// queue immediately. An `upon` call should always execute asynchronously.
+    /// If the value is determined, the closure should be submitted to the
+    /// `executor` immediately.
     ///
-    /// - parameter queue: A dispatch queue for executing the given function on.
-    /// - parameter body: A function that uses the determined value.
-    func upon(queue: dispatch_queue_t, body: Value -> ())
+    /// - parameter executor: A context for handling the `body` on fill.
+    /// - parameter body: A closure that uses the determined value.
+    func upon(executor: ExecutorType, body: Value -> Void)
 
     /// Waits synchronously for the value to become determined.
     ///
-    /// If the value is already determined, the call returns immediately with the
-    /// value.
+    /// If the value is already determined, the call returns immediately with
+    /// the value.
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
@@ -68,24 +68,32 @@ extension FutureType {
 }
 
 extension FutureType {
-    /// Call some function in the background once the value is determined.
+    /// Call some `body` closure once the value is determined.
     ///
-    /// If the value is determined, the function will be dispatched immediately.
-    /// An `upon` call should always execute asynchronously.
+    /// If the value is determined, the closure will be submitted to `queue`
+    /// immediately, but this call is always asynchronous.
     ///
-    /// - parameter body: A function that uses the determined value.
-    public func upon(body: Value -> ()) {
+    /// - seealso: `upon(_:body:)`.
+    public func upon(queue: dispatch_queue_t, body: Value -> Void) {
+        upon(QueueExecutor(queue), body: body)
+    }
+
+    /// Call some `body` closure in the background once the value is determined.
+    ///
+    /// If the value is determined, the closure will be enqueued immediately,
+    /// but this call is always asynchronous.
+    public func upon(body: Value -> Void) {
         upon(Self.genericQueue, body: body)
     }
 
-    /// Call some function on the main queue once the value is determined.
+    /// Call some `body` closure on the main queue once the value is determined.
     ///
-    /// If the value is determined, the function will be submitted to the
-    /// main queue immediately. The function should always be executed
-    /// asynchronously, even if this function is called from the main queue.
+    /// If the value is determined, the closure will be submitted to the
+    /// main queue. It will always execute asynchronously, even if this call is
+    /// made from the main queue.
     ///
-    /// - parameter body: A function that uses the determined value.
-    public func uponMainQueue(body: Value -> ()) {
+    /// - parameter body: A closure that uses the determined value.
+    public func uponMainQueue(body: Value -> Void) {
         upon(dispatch_get_main_queue(), body: body)
     }
 }
@@ -114,94 +122,6 @@ extension FutureType {
     /// Check whether or not the receiver is filled.
     var isFilled: Bool {
         return wait(.Now) != nil
-    }
-}
-
-extension FutureType {
-    /// Begins another asynchronous operation with the deferred value once it
-    /// becomes determined.
-    ///
-    /// `flatMap` is similar to `map`, but `transform` returns a `Deferred`
-    /// instead of an immediate value. Use `flatMap` when you want this future
-    /// to feed into another asynchronous operation. You might hear this
-    /// referred to as "chaining" or "binding".
-    ///
-    /// - parameter queue: Optional dispatch queue for starting the new
-    ///   operation from. Defaults to a global queue matching the current QoS.
-    /// - parameter transform: Start a new operation using the deferred value.
-    /// - returns: The new deferred value returned by the `transform`.
-    /// - seealso: Deferred
-    public func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewFuture) -> Future<NewFuture.Value> {
-        let d = Deferred<NewFuture.Value>()
-        upon(queue) {
-            transform($0).upon(queue) {
-                d.fill($0)
-            }
-        }
-        return Future(d)
-    }
-
-    /// Transforms the future once it becomes determined.
-    ///
-    /// `map` executes a transform immediately when the future's value is
-    /// determined.
-    ///
-    /// - parameter queue: Optional dispatch queue for executing the transform
-    ///   from. Defaults to a global queue matching the current QoS.
-    /// - parameter transform: Create something using the deferred value.
-    /// - returns: A new future that is filled once the reciever is determined.
-    /// - seealso: Deferred
-    public func map<NewValue>(upon queue: dispatch_queue_t = Self.genericQueue, _ transform: Value -> NewValue) -> Future<NewValue> {
-        let d = Deferred<NewValue>()
-        upon(queue) {
-            d.fill(transform($0))
-        }
-        return Future(d)
-    }
-}
-
-extension FutureType {
-    /// Composes this future with another.
-    ///
-    /// - parameter other: Any other future.
-    /// - returns: A value that becomes determined after both the reciever and
-    ///   the given future become determined.
-    /// - seealso: SequenceType.allFutures
-    public func and<OtherFuture: FutureType>(other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
-        return Future(flatMap { t in other.map { u in (t, u) } })
-    }
-    
-    /// Composes this future with others.
-    ///
-    /// - parameter one: Some other future to join with.
-    /// - parameter two: Some other future to join with.
-    /// - returns: A value that becomes determined after the reciever and both
-    ///   other futures become determined.
-    /// - seealso: SequenceType.allFutures
-    public func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
-        return Future(flatMap { t in
-            one.flatMap { u in
-                two.map { v in (t, u, v) }
-            }
-        })
-    }
-    
-    /// Composes this future with others.
-    ///
-    /// - parameter one: Some other future to join with.
-    /// - parameter two: Some other future to join with.
-    /// - parameter three: Some other future to join with.
-    /// - returns: A value that becomes determined after the reciever and both
-    ///   other futures become determined.
-    /// - seealso: SequenceType.allFutures
-    public func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
-        return Future(flatMap { t in
-            one.flatMap { u in
-                two.flatMap { v in
-                    three.map { w in (t, u, v, w) }
-                }
-            }
-        })
     }
 }
 

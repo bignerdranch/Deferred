@@ -6,8 +6,6 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-import Dispatch
-
 /*
 The types in this file provide an implementation of type erasure for `FutureType`.
 The techniques were derived from experimenting with `AnySequence` and `Mirror`
@@ -18,7 +16,7 @@ in a playground, the following post, and the Swift standard library:
 
 // Abstract class that fake-conforms to `FutureType` for use by `Future`.
 private class FutureBox<Value>: FutureType {
-    func upon(queue: dispatch_queue_t, body: Value -> ()) {
+    func upon(executor: ExecutorType, body: Value -> Void) {
         fatalError()
     }
 
@@ -34,8 +32,8 @@ private final class ForwardedTo<Future: FutureType>: FutureBox<Future.Value> {
         self.base = base
     }
 
-    override func upon(queue: dispatch_queue_t, body: Future.Value -> ()) {
-        return base.upon(queue, body: body)
+    override func upon(executor: ExecutorType, body: Future.Value -> Void) {
+        return base.upon(executor, body: body)
     }
 
     override func wait(time: Timeout) -> Future.Value? {
@@ -50,8 +48,8 @@ private final class Always<Value>: FutureBox<Value> {
         self.value = value
     }
 
-    override func upon(queue: dispatch_queue_t, body: Value -> ()) {
-        dispatch_async(queue) { [value] in
+    override func upon(executor: ExecutorType, body: Value -> Void) {
+        executor.submit { [value] in
             body(value)
         }
     }
@@ -65,7 +63,7 @@ private final class Always<Value>: FutureBox<Value> {
 private final class Never<Value>: FutureBox<Value> {
     override init() {}
 
-    override func upon(queue: dispatch_queue_t, body: Value -> ()) {}
+    override func upon(executor: ExecutorType, body: Value -> Void) {}
 
     override func wait(time: Timeout) -> Value? {
         return nil
@@ -87,7 +85,7 @@ private final class Never<Value>: FutureBox<Value> {
 public struct Future<Value>: FutureType {
     private let box: FutureBox<Value>
 
-    /// Create a future whose `upon(_:function:)` method forwards to `base`.
+    /// Create a future whose `upon(_:body:)` method forwards to `base`.
     public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
         self.box = ForwardedTo(base: base)
     }
@@ -107,12 +105,13 @@ public struct Future<Value>: FutureType {
         self.box = other.box
     }
 
-    /// Call some function once the underlying future's value is determined.
+    /// Call some `body` closure once the underlying future's value is
+    /// determined.
     ///
-    /// - parameter queue: A dispatch queue for executing the given function on.
-    /// - parameter function: A function that uses the determined value.
-    public func upon(queue: dispatch_queue_t, body: Value -> ()) {
-        return box.upon(queue, body: body)
+    /// If the value is determined, the closure will be submitted to the
+    /// `executor` immediately.
+    public func upon(executor: ExecutorType, body: Value -> Void) {
+        return box.upon(executor, body: body)
     }
 
     /// Waits synchronously for the underlying future to become determined.

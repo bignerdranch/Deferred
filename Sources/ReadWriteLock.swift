@@ -94,26 +94,18 @@ public struct DispatchLock: ReadWriteLock {
 /// A spin lock polls to check the state of the lock, which is much faster
 /// when there isn't contention but rapidly slows down otherwise.
 public final class SpinLock: ReadWriteLock {
-    private var lock: UnsafeMutablePointer<OSSpinLock>
+    private var lock = OS_SPINLOCK_INIT
 
     /// Allocate a normal spinlock.
-    public init() {
-        lock = UnsafeMutablePointer.alloc(1)
-        lock.initialize(OS_SPINLOCK_INIT)
-    }
-
-    deinit {
-        lock.destroy()
-        lock.dealloc(1)
-    }
+    public init() {}
 
     /// Call `body` with a lock.
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        OSSpinLockLock(lock)
+        OSSpinLockLock(&lock)
         defer {
-            OSSpinLockUnlock(lock)
+            OSSpinLockUnlock(&lock)
         }
         return try body()
     }
@@ -122,9 +114,9 @@ public final class SpinLock: ReadWriteLock {
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
-        guard OSSpinLockTry(lock) else { return nil }
+        guard OSSpinLockTry(&lock) else { return nil }
         defer {
-            OSSpinLockUnlock(lock)
+            OSSpinLockUnlock(&lock)
         }
         return try body()
     }
@@ -141,18 +133,10 @@ public final class CASSpinLock: ReadWriteLock {
         static var WriterOffset: Int32 { return Int32(bitPattern: 0x00100000) }
     }
 
-    private var state: UnsafeMutablePointer<Int32>
+    private var state = Int32.allZeros
 
     /// Allocate the spinlock.
-    public init() {
-        state = UnsafeMutablePointer.alloc(1)
-        state.initialize(0)
-    }
-
-    deinit {
-        state.destroy()
-        state.dealloc(1)
-    }
+    public init() {}
 
     /// Call `body` with a writing lock.
     ///
@@ -164,14 +148,14 @@ public final class CASSpinLock: ReadWriteLock {
         // spin until we acquire write lock
         repeat {
             // wait for any active writer to release the lock
-            while (state.memory & Constants.WriterMask) != 0 {
+            while (state & Constants.WriterMask) != 0 {
                 _OSAtomicSpin()
             }
 
             // increment the writer count
-            if (OSAtomicAdd32Barrier(Constants.WriterOffset, state) & Constants.WriterMask) == Constants.WriterOffset {
+            if (OSAtomicAdd32Barrier(Constants.WriterOffset, &state) & Constants.WriterMask) == Constants.WriterOffset {
                 // wait until there are no more readers
-                while (state.memory & Constants.ReaderMask) != 0 {
+                while (state & Constants.ReaderMask) != 0 {
                     _OSAtomicSpin()
                 }
 
@@ -180,12 +164,12 @@ public final class CASSpinLock: ReadWriteLock {
             }
 
             // there's another writer active; try again
-            OSAtomicAdd32Barrier(-Constants.WriterOffset, state)
+            OSAtomicAdd32Barrier(-Constants.WriterOffset, &state)
         } while true
         
         defer {
             // decrement writers, potentially unblock readers
-            OSAtomicAdd32Barrier(-Constants.WriterOffset, state)
+            OSAtomicAdd32Barrier(-Constants.WriterOffset, &state)
         }
 
         return try body()
@@ -201,23 +185,23 @@ public final class CASSpinLock: ReadWriteLock {
         // spin until we acquire read lock
         repeat {
             // wait for active writer to release the lock
-            while (state.memory & Constants.WriterMask) != 0 {
+            while (state & Constants.WriterMask) != 0 {
                 _OSAtomicSpin()
             }
 
             // increment the reader count
-            if (OSAtomicIncrement32Barrier(state) & Constants.WriterMask) == 0 {
+            if (OSAtomicIncrement32Barrier(&state) & Constants.WriterMask) == 0 {
                 // read lock required
                 break
             }
 
             // a writer became active while locking; try again
-            OSAtomicDecrement32Barrier(state)
+            OSAtomicDecrement32Barrier(&state)
         } while true
         
         defer {
             // decrement readers, potentially unblock writers
-            OSAtomicDecrement32Barrier(state)
+            OSAtomicDecrement32Barrier(&state)
         }
 
         return try body()
@@ -231,14 +215,14 @@ public final class CASSpinLock: ReadWriteLock {
     /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
         // active writer
-        guard (state.memory & Constants.WriterMask) == 0 else { return nil }
+        guard (state & Constants.WriterMask) == 0 else { return nil }
 
         // increment the reader count
-        guard (OSAtomicIncrement32Barrier(state) & Constants.WriterMask) == 0 else { return nil }
+        guard (OSAtomicIncrement32Barrier(&state) & Constants.WriterMask) == 0 else { return nil }
 
         defer {
             // decrement readers, potentially unblock writers
-            OSAtomicDecrement32Barrier(state)
+            OSAtomicDecrement32Barrier(&state)
         }
 
         return try body()
@@ -248,20 +232,17 @@ public final class CASSpinLock: ReadWriteLock {
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads
 public final class PThreadReadWriteLock: ReadWriteLock {
-    private var lock: UnsafeMutablePointer<pthread_rwlock_t>
+    private var lock = pthread_rwlock_t()
 
     /// Create the standard platform lock.
     public init() {
-        lock = UnsafeMutablePointer.alloc(1)
-        let status = pthread_rwlock_init(lock, nil)
+        let status = pthread_rwlock_init(&lock, nil)
         assert(status == 0)
     }
 
     deinit {
-        let status = pthread_rwlock_destroy(lock)
+        let status = pthread_rwlock_destroy(&lock)
         assert(status == 0)
-        lock.destroy()
-        lock.dealloc(1)
     }
 
     /// Call `body` with a reading lock.
@@ -271,9 +252,9 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        pthread_rwlock_rdlock(lock)
+        pthread_rwlock_rdlock(&lock)
         defer {
-            pthread_rwlock_unlock(lock)
+            pthread_rwlock_unlock(&lock)
         }
         return try body()
     }
@@ -285,9 +266,9 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
-        guard pthread_rwlock_tryrdlock(lock) == 0 else { return nil }
+        guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
         defer {
-            pthread_rwlock_unlock(lock)
+            pthread_rwlock_unlock(&lock)
         }
         return try body()
     }
@@ -299,9 +280,9 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     /// - parameter body: A function that writes a value while locked, then returns some value.
     /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        pthread_rwlock_wrlock(lock)
+        pthread_rwlock_wrlock(&lock)
         defer {
-            pthread_rwlock_unlock(lock)
+            pthread_rwlock_unlock(&lock)
         }
         return try body()
     }

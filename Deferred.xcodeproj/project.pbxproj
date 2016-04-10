@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB5F1A331CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
+		DB5F1A341CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
+		DB5F1A351CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
 		DB6ADFD71C237DD500D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB6ADFDE1C237DD500D77BF1 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADFD31C237DD500D77BF1 /* Deferred.framework */; };
 		DB6ADFE31C237DD500D77BF1 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */; };
@@ -112,6 +115,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCustomExecutorTests.swift; sourceTree = "<group>"; };
 		DB6ADFD31C237DD500D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB6ADFD61C237DD500D77BF1 /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB6ADFD81C237DD500D77BF1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -259,6 +263,7 @@
 				DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */,
 				DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */,
 				DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */,
+				DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */,
 				DB6ADFE41C237DD500D77BF1 /* Info.plist */,
 			);
 			path = Tests;
@@ -578,6 +583,7 @@
 				DB6AE0771C237FB200D77BF1 /* LockProtectedTests.swift in Sources */,
 				DB6AE07A1C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */,
 				DB6AE0711C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */,
+				DB5F1A341CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */,
 				DB6AE0741C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -611,6 +617,7 @@
 				DB6AE0761C237FB200D77BF1 /* LockProtectedTests.swift in Sources */,
 				DB6AE0791C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */,
 				DB6AE0701C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */,
+				DB5F1A331CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */,
 				DB6AE0731C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -644,6 +651,7 @@
 				DB6AE0781C237FB200D77BF1 /* LockProtectedTests.swift in Sources */,
 				DB6AE07B1C237FB200D77BF1 /* ReadWriteLockTests.swift in Sources */,
 				DB6AE0721C237FB200D77BF1 /* ExistentialFutureTests.swift in Sources */,
+				DB5F1A351CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */,
 				DB6AE0751C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -66,6 +66,10 @@ extension FutureType {
     /// - seealso: qos_class_t
     /// - seealso: FutureType.flatMap(upon:_:)
     public func flatMap<NewFuture: FutureType>(requestNextValue: Value -> NewFuture) -> Future<NewFuture.Value> {
+        if let value = peek() {
+            return Future(requestNextValue(value))
+        }
+
         return flatMap(upon: Self.genericQueue, requestNextValue)
     }
 }

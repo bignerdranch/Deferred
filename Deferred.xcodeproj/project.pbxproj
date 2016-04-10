@@ -10,6 +10,10 @@
 		DB5F1A331CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
 		DB5F1A341CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
 		DB5F1A351CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
+		DB5F1A371CBAD61500B5BE9E /* ExistentialTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */; };
+		DB5F1A381CBAD61500B5BE9E /* ExistentialTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */; };
+		DB5F1A391CBAD61500B5BE9E /* ExistentialTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */; };
+		DB5F1A3A1CBAD61500B5BE9E /* ExistentialTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */; };
 		DB6ADFD71C237DD500D77BF1 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADFD61C237DD500D77BF1 /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB6ADFDE1C237DD500D77BF1 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADFD31C237DD500D77BF1 /* Deferred.framework */; };
 		DB6ADFE31C237DD500D77BF1 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADFE21C237DD500D77BF1 /* DeferredTests.swift */; };
@@ -112,6 +116,9 @@
 		DB9976B81C2F2E6E005201CE /* VoidResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9976AB1C2F2E6E005201CE /* VoidResultTests.swift */; };
 		DB9976B91C2F2E6E005201CE /* VoidResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9976AB1C2F2E6E005201CE /* VoidResultTests.swift */; };
 		DB9976BA1C2F2E6E005201CE /* VoidResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9976AB1C2F2E6E005201CE /* VoidResultTests.swift */; };
+		DBBDCF3C1D61314A00C595E8 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */; };
+		DBBDCF3D1D61314A00C595E8 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */; };
+		DBBDCF3E1D61314A00C595E8 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */; };
 		DBDAC8C71CA9D4F80087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
 		DBDAC8C81CA9D4F80087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
 		DBDAC8C91CA9D4F80087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
@@ -144,6 +151,7 @@
 
 /* Begin PBXFileReference section */
 		DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCustomExecutorTests.swift; sourceTree = "<group>"; };
+		DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialTask.swift; sourceTree = "<group>"; };
 		DB6ADFD31C237DD500D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB6ADFD61C237DD500D77BF1 /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB6ADFD81C237DD500D77BF1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -185,6 +193,7 @@
 		DB9976A91C2F2E6E005201CE /* ResultRecoveryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultRecoveryTests.swift; sourceTree = "<group>"; };
 		DB9976AA1C2F2E6E005201CE /* TaskResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskResultTests.swift; sourceTree = "<group>"; };
 		DB9976AB1C2F2E6E005201CE /* VoidResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoidResultTests.swift; sourceTree = "<group>"; };
+		DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
 		DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -305,6 +314,7 @@
 				DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */,
 				DB9976A91C2F2E6E005201CE /* ResultRecoveryTests.swift */,
 				DB9976AA1C2F2E6E005201CE /* TaskResultTests.swift */,
+				DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */,
 				DB9976AB1C2F2E6E005201CE /* VoidResultTests.swift */,
 				DB6ADFE41C237DD500D77BF1 /* Info.plist */,
 			);
@@ -336,6 +346,7 @@
 		DBDAC8C51CA9D4E30087EA91 /* Task */ = {
 			isa = PBXGroup;
 			children = (
+				DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */,
 				DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */,
 			);
 			path = Task;
@@ -627,6 +638,7 @@
 				DB8CFEFC1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DBDAC8C81CA9D4F80087EA91 /* TaskType.swift in Sources */,
 				DB6AE0431C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB5F1A381CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0571C237F8800D77BF1 /* LockProtected.swift in Sources */,
@@ -655,6 +667,7 @@
 				DB6AE0741C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 				DB9976B31C2F2E6E005201CE /* ResultRecoveryTests.swift in Sources */,
 				DB9976AD1C2F2E6E005201CE /* Fixtures.swift in Sources */,
+				DBBDCF3D1D61314A00C595E8 /* TaskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -669,6 +682,7 @@
 				DB8CFEFB1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DBDAC8C71CA9D4F80087EA91 /* TaskType.swift in Sources */,
 				DB6AE0421C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB5F1A371CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF61CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0561C237F8800D77BF1 /* LockProtected.swift in Sources */,
@@ -697,6 +711,7 @@
 				DB6AE0731C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 				DB9976B21C2F2E6E005201CE /* ResultRecoveryTests.swift in Sources */,
 				DB9976AC1C2F2E6E005201CE /* Fixtures.swift in Sources */,
+				DBBDCF3C1D61314A00C595E8 /* TaskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -711,6 +726,7 @@
 				DB8CFEFD1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DBDAC8C91CA9D4F80087EA91 /* TaskType.swift in Sources */,
 				DB6AE0441C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB5F1A391CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0581C237F8800D77BF1 /* LockProtected.swift in Sources */,
@@ -739,6 +755,7 @@
 				DB6AE0751C237FB200D77BF1 /* IgnoringFutureTests.swift in Sources */,
 				DB9976B41C2F2E6E005201CE /* ResultRecoveryTests.swift in Sources */,
 				DB9976AE1C2F2E6E005201CE /* Fixtures.swift in Sources */,
+				DBBDCF3E1D61314A00C595E8 /* TaskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -753,6 +770,7 @@
 				DB8CFEFE1CB048B200D095B7 /* ExecutorType.swift in Sources */,
 				DBDAC8EE1CAA10A00087EA91 /* TaskType.swift in Sources */,
 				DB6AE0451C237F8800D77BF1 /* Deferred.swift in Sources */,
+				DB5F1A3A1CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0591C237F8800D77BF1 /* LockProtected.swift in Sources */,

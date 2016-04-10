@@ -7,23 +7,18 @@
 //
 
 extension FutureType {
-    /// Composes this future with another.
+    /// Returns a value that becomes determined after both the callee and the
+    /// given future become determined.
     ///
-    /// - parameter other: Any other future.
-    /// - returns: A value that becomes determined after both the reciever and
-    ///   the given future become determined.
-    /// - seealso: SequenceType.allFutures
+    /// - seealso: SequenceType.joinedValues
     public func and<OtherFuture: FutureType>(other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
         return flatMap { t in other.map { u in (t, u) } }
     }
-    
-    /// Composes this future with others.
+
+    /// Returns a value that becomes determined after the callee and both other
+    /// futures become determined.
     ///
-    /// - parameter one: Some other future to join with.
-    /// - parameter two: Some other future to join with.
-    /// - returns: A value that becomes determined after the reciever and both
-    ///   other futures become determined.
-    /// - seealso: SequenceType.allFutures
+    /// - seealso: SequenceType.joinedValues
     public func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
         return flatMap { t in
             one.flatMap { u in
@@ -31,15 +26,11 @@ extension FutureType {
             }
         }
     }
-    
-    /// Composes this future with others.
+
+    /// Returns a value that becomes determined after the callee and all other
+    /// futures become determined.
     ///
-    /// - parameter one: Some other future to join with.
-    /// - parameter two: Some other future to join with.
-    /// - parameter three: Some other future to join with.
-    /// - returns: A value that becomes determined after the reciever and both
-    ///   other futures become determined.
-    /// - seealso: SequenceType.allFutures
+    /// - seealso: SequenceType.joinedValues
     public func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
         return flatMap { t in
             one.flatMap { u in

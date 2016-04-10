@@ -20,6 +20,20 @@ enum Error: ErrorType {
     case Third
 }
 
+extension XCTestCase {
+    func waitForTaskToComplete<T>(task: Task<T>) -> TaskResult<T>! {
+        let expectation = expectationWithDescription("task completed")
+        var result: TaskResult<T>?
+        task.uponMainQueue { [weak expectation] in
+            result = $0
+            expectation?.fulfill()
+        }
+        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+
+        return result
+    }
+}
+
 extension ResultType {
     var value: Value? {
         return withValues(ifSuccess: { $0 }, ifFailure: { _ in nil })

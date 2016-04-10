@@ -24,10 +24,10 @@ public struct IgnoringFuture<Base: FutureType>: FutureType {
         self.base = base
     }
 
-    /// Call some function `body` once the event completes.
+    /// Call some `body` closure once the event completes.
     ///
-    /// If the event is already completed, the function will immediately be
-    /// submitted to `executor`. An `upon` call is always asynchronous.
+    /// If the event is already completed, the closure will be submitted to the
+    /// `executor` immediately.
     public func upon(executor: ExecutorType, body: () -> Void) {
         base.upon(executor) { _ in body() }
     }

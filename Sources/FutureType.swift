@@ -30,19 +30,19 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
-    /// Call some function `body` once the value is determined.
+    /// Call some `body` closure once the value is determined.
     ///
-    /// If the value is determined, the function should be submitted to
-    /// to the `executor` immediately.
+    /// If the value is determined, the closure should be submitted to the
+    /// `executor` immediately.
     ///
-    /// - parameter executor: A type for handling the `body` on fill.
-    /// - parameter body: A function that uses the determined value.
+    /// - parameter executor: A context for handling the `body` on fill.
+    /// - parameter body: A closure that uses the determined value.
     func upon(executor: ExecutorType, body: Value -> Void)
 
     /// Waits synchronously for the value to become determined.
     ///
-    /// If the value is already determined, the call returns immediately with the
-    /// value.
+    /// If the value is already determined, the call returns immediately with
+    /// the value.
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
@@ -68,28 +68,31 @@ extension FutureType {
 }
 
 extension FutureType {
-    /// Calls through to the `ExecutorType` version of `upon(_:body:)`.
+    /// Call some `body` closure once the value is determined.
+    ///
+    /// If the value is determined, the closure will be submitted to `queue`
+    /// immediately, but this call is always asynchronous.
+    ///
+    /// - seealso: `upon(_:body:)`.
     public func upon(queue: dispatch_queue_t, body: Value -> Void) {
         upon(QueueExecutor(queue), body: body)
     }
 
-    /// Call some function in the background once the value is determined.
+    /// Call some `body` closure in the background once the value is determined.
     ///
-    /// If the value is determined, the function will be dispatched immediately.
-    /// An `upon` call should always execute asynchronously.
-    ///
-    /// - parameter body: A function that uses the determined value.
+    /// If the value is determined, the closure will be enqueued immediately,
+    /// but this call is always asynchronous.
     public func upon(body: Value -> Void) {
         upon(Self.genericQueue, body: body)
     }
 
-    /// Call some function on the main queue once the value is determined.
+    /// Call some `body` closure on the main queue once the value is determined.
     ///
-    /// If the value is determined, the function will be submitted to the
-    /// main queue immediately. The function should always be executed
-    /// asynchronously, even if this function is called from the main queue.
+    /// If the value is determined, the closure will be submitted to the
+    /// main queue. It will always execute asynchronously, even if this call is
+    /// made from the main queue.
     ///
-    /// - parameter body: A function that uses the determined value.
+    /// - parameter body: A closure that uses the determined value.
     public func uponMainQueue(body: Value -> Void) {
         upon(dispatch_get_main_queue(), body: body)
     }

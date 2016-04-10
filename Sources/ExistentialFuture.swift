@@ -85,7 +85,7 @@ private final class Never<Value>: FutureBox<Value> {
 public struct Future<Value>: FutureType {
     private let box: FutureBox<Value>
 
-    /// Create a future whose `upon(_:function:)` method forwards to `base`.
+    /// Create a future whose `upon(_:body:)` method forwards to `base`.
     public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
         self.box = ForwardedTo(base: base)
     }
@@ -105,11 +105,11 @@ public struct Future<Value>: FutureType {
         self.box = other.box
     }
 
-    /// Call some function `body` once the underlying future's value is
+    /// Call some `body` closure once the underlying future's value is
     /// determined.
     ///
-    /// If the value is already determined, the function will be submitted to
-    /// to `executor` immediately. An `upon` call is always asynchronous.
+    /// If the value is determined, the closure will be submitted to the
+    /// `executor` immediately.
     public func upon(executor: ExecutorType, body: Value -> Void) {
         return box.upon(executor, body: body)
     }

@@ -14,6 +14,8 @@ import AtomicSwift
 // Extremely simple surface describing an async rejoin-type notifier for a
 // one-off event.
 protocol CallbacksList {
+    associatedtype FunctionBody = () -> Void
+
     init()
     
     var isCompleted: Bool { get }
@@ -28,7 +30,7 @@ protocol CallbacksList {
     ///
     /// If `isCompleted`, an implementer should immediately submit the `body`
     /// to `queue`.
-    func notify(upon executor: ExecutorType, body: dispatch_block_t)
+    func notify(executor executor: ExecutorType, body: FunctionBody)
 }
 
 // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:

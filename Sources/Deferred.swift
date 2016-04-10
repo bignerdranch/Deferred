@@ -29,7 +29,7 @@ private struct DispatchBlockMarker: CallbacksList {
         block()
     }
 
-    func notify(upon executor: ExecutorType, body: dispatch_block_t) {
+    func notify(executor executor: ExecutorType, body: dispatch_block_t) {
         if let queue = executor.underlyingQueue {
             dispatch_block_notify(block, queue, body)
         } else {
@@ -54,7 +54,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
         storage = MemoStore.createWithValue(nil)
     }
     
-    /// Initialize a filled Deferred with the given value.
+    /// Initialize a Deferred filled with the given value.
     public init(value: Value) {
         storage = MemoStore.createWithValue(value)
         onFilled.markCompleted()
@@ -62,13 +62,13 @@ public struct Deferred<Value>: FutureType, PromiseType {
 
     // MARK: FutureType
 
-    private func upon(executor: ExecutorType, options inOptions: dispatch_block_flags_t, body: Value -> Void) -> dispatch_block_t {
-        var options = inOptions
+    private func upon(executor: ExecutorType, per options: dispatch_block_flags_t, execute body: Value -> Void) -> dispatch_block_t {
+        var options = options
         options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
         let block = dispatch_block_create(options) { [storage] in
             storage.withValue(body)
         }
-        onFilled.notify(upon: executor, body: block)
+        onFilled.notify(executor: executor, body: block)
         return block
     }
 
@@ -77,23 +77,24 @@ public struct Deferred<Value>: FutureType, PromiseType {
         return onFilled.isCompleted
     }
 
-    /// Call some function once the value is determined.
+    /// Call some `body` closure once the value is determined.
     ///
-    /// If the value is already determined, the function `body` will be
-    /// submitted to the `executor` immediately.
+    /// If the value is determined, the function will be submitted to
+    /// to the `executor` immediately.
+    ///
+    /// - parameter executor: A context for handling the `body` on fill.
+    /// - parameter body: A function that uses the determined value.
     public func upon(executor: ExecutorType, body: Value -> Void) {
-        _ = upon(executor, options: DISPATCH_BLOCK_INHERIT_QOS_CLASS, body: body)
+        _ = upon(executor, per: DISPATCH_BLOCK_INHERIT_QOS_CLASS, execute: body)
     }
 
-    /**
-    Waits synchronously for the value to become determined.
-
-    If the value is already determined, the call returns immediately with the
-    value.
-
-    :param: time A length of time to wait for the value to be determined.
-    :returns: The determined value, if filled within the timeout, or `nil`.
-    */
+    /// Waits synchronously for the value to become determined.
+    ///
+    /// If the value is already determined, the call returns immediately with
+    /// the value.
+    ///
+    /// - parameter time: A length of time to wait for the value to be determined.
+    /// - returns: The determined value, if filled within the timeout, or `nil`.
     public func wait(time: Timeout) -> Value? {
         var result: Value?
         func assign(value: Value) {
@@ -108,7 +109,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
         }
 
         let executor = QueueExecutor(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0))
-        let handler = upon(executor, options: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, body: assign)
+        let handler = upon(executor, per: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, execute: assign)
 
         guard dispatch_block_wait(handler, time.rawValue) == 0 else {
             dispatch_block_cancel(handler)

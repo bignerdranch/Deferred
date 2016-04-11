@@ -1,3 +1,32 @@
+<!-- Hi there, README editor! You look awesome today. -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Deferred](#deferred)
+  - [Vital Statistics](#vital-statistics)
+  - [Intuition](#intuition)
+    - [Gotcha: No Double-Stuffed `Deferred`s](#gotcha-no-double-stuffed-deferreds)
+  - [Why Deferred?](#why-deferred)
+    - [Async Programming with Callbacks Is Bad News](#async-programming-with-callbacks-is-bad-news)
+    - [Enter Deferred](#enter-deferred)
+    - [More Than Just a Callback](#more-than-just-a-callback)
+  - [Tasks](#tasks)
+    - [Vending a Future](#vending-a-future)
+    - [Taking Action when a Future Is Filled](#taking-action-when-a-future-is-filled)
+    - [Peeking at the Current Value](#peeking-at-the-current-value)
+    - [Blocking on Fulfillment](#blocking-on-fulfillment)
+    - [Chaining Deferreds](#chaining-deferreds)
+    - [Combining Deferreds](#combining-deferreds)
+    - [Cancellation](#cancellation)
+  - [Getting Started](#getting-started)
+    - [Carthage](#carthage)
+    - [CocoaPods](#cocoapods)
+    - [Swift Package Manager](#swift-package-manager)
+  - [Further Information](#further-information)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Deferred
 
 This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift.
@@ -135,7 +164,9 @@ func performOperation() -> Deferred<Int> {
 }
 ```
 
-### <a name="upon"></a>Taking Action when a Future Is Filled
+### Taking Action when a Future Is Filled
+
+<a name="upon"></a>
 
 You can use the `upon(_:body:)` method to run a closure once the `Deferred` has been filled. `upon(_:body:)` can be called multiple times, and the closures will be called in the order they were supplied to `upon(_:body:)`.
 

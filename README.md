@@ -116,13 +116,12 @@ This gets really messy with callbacks. But with `Deferred`, it's just:
 ```swift
 // Let's use type annotations to make it easier to see what's going on here.
 let friends: Deferred<[Friend]> = fetchFriends(forUser: jimbob)
-let names: Deferred<[Name]> = friends.flatMap { friends in
+let names: Future<[Name]> = friends.flatMap { (friends: [Friend]) -> Future<[Name]> in
     // fork: get an array of not-yet-determined names
     let names: [Deferred<Name>] = friends.map { AsynchronousCall(.Name, friend: $0) }
 
     // join: get a not-yet-determined array of now-determined names
-    let allNames: Deferred<[Name]> = all(names)
-    return allNames
+    return names.joinedValues
 }
 
 names.upon { (names: [Name]) in
@@ -210,7 +209,7 @@ func readString() -> Deferred<String> {
 }
 
 // Consumer
-let deferredInt: Deferred<Int?> = readString().map { Int($0) }
+let deferredInt: Future<Int?> = readString().map { Int($0) }
 ```
 
 `map(upon:_:)` and `flatMap(upon:_:)`, like `upon(_:body:)`, execute on a concurrent background thread by default (once the instance has been filled). The `upon` peramater is if you want to specify the GCD queue as the consumer.

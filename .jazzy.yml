@@ -1,0 +1,21 @@
+# jazzy --swift-version 2.2 -m Deferred -g "https://github.com/bignerdranch/Deferred" -a "Big Nerd Ranch" -u "http://bignerdranch.github.io" --module-version=2.0.0 -r "http://bignerdranch.github.io/Deferred/"
+author: "Big Nerd Ranch"
+author_url: "http://bignerdranch.github.io"
+copyright: "© 2014-2016 [Big Nerd Ranch](https://www.bignerdranch.com) under [MIT license](https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt)."
+github_url: "https://github.com/bignerdranch/Deferred"
+head: |
+  <meta property="og:site_name" content="Deferred programming Guide">
+  <meta property="og:description" content="An implementation of OCaml's Deferred for Swift. It lets you work with values that haven't been determined yet, like an array that's coming later from a web service call.">
+  <meta property="og:image" content="https://www.bignerdranch.com/img/bnr-logo-square.png">
+  <link rel="shortcut icon" type="image/x-icon" href="https://www.bignerdranch.com/favicon.png">
+hide_documentation_coverage: true
+module: Deferred
+module_version: "2.0.0"
+# podspec: BNRDeferred.podspec
+root_url: "http://bignerdranch.github.io/Deferred/"
+swift_version: 2.2
+theme: fullwidth
+
+# CocoaDocs currently using an old Jazzy
+module_name: Deferred
+author_name: Big Nerd Ranch

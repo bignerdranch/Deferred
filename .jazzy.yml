@@ -2,6 +2,35 @@
 author: "Big Nerd Ranch"
 author_url: "http://bignerdranch.github.io"
 copyright: "© 2014-2016 [Big Nerd Ranch](https://www.bignerdranch.com) under [MIT license](https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt)."
+custom_categories:
+  - name: Futures and Promises
+    children:
+    - Deferred
+    - FutureType
+    - PromiseType
+    - Timeout
+  - name: Future Mastery
+    children:
+    - Future
+    - CollectionType
+    - SequenceType
+    - IgnoringFuture
+  - name: Custom Execution
+    children:
+    - ExecutorType
+    - NSOperationQueue
+    - NSRunLoop
+    - CFRunLoop
+  - name: Data Locking
+    children:
+    - LockProtected
+    - ReadWriteLock
+  - name: Locks
+    children:
+    - DispatchLock
+    - SpinLock
+    - CASSpinLock
+    - PThreadReadWriteLock
 github_url: "https://github.com/bignerdranch/Deferred"
 head: |
   <meta property="og:site_name" content="Deferred programming Guide">

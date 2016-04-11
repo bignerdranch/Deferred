@@ -11,42 +11,6 @@ This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/oca
 - Carthage: Yup.
 - CocoaPods: As [`BNRDeferred`](https://cocoapods.org/pods/BNRDeferred).
 
-## Installation
-
-### [Carthage]
-
-[Carthage]: https://github.com/Carthage/Carthage
-
-Add the following to your Cartfile:
-
-```ruby
-github "bignerdranch/Deferred" "2.0b6"
-```
-
-Then run `carthage update`.
-
-Follow the current instructions in [Carthage's README][carthage-installation]
-for up to date installation instructions.
-
-[carthage-installation]: https://github.com/Carthage/Carthage/blob/master/README.md
-
-### [CocoaPods]
-
-[CocoaPods]: http://cocoapods.org
-
-Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
-
-```ruby
-pod 'BNRDeferred'
-```
-
-You will also need to make sure you're opting into using frameworks:
-
-```ruby
-use_frameworks!
-```
-
-Then run `pod install`.
 
 ## Intuition
 A `Deferred<Value>` is a value that might be unknown now
@@ -322,9 +286,68 @@ func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
 }
 ```
 
-### Further Information
+## Getting Started
 
-For further info, please refer to comments in the generated headers.
+Deferred is designed to be used as an embedded framework, which require a minimum deployment target of iOS 8 or OS X Yosemite (10.10). Embedding through any other means may work, but is not officially supported.
 
-If you have a question not answered by this README or the comments,
-please open an issue!
+Linux is not yet supported.
+
+There are a few different options to install Deferred.
+
+### Carthage
+
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized, hands-off package manager built in Swift.
+
+Add the following to your Cartfile:
+
+```ruby
+github "bignerdranch/Deferred" ~> 2.0
+```
+
+Then run `carthage update`.
+
+Follow the current instructions in [Carthage's README][carthage-installation]
+for up to date installation instructions.
+
+[carthage-installation]: https://github.com/Carthage/Carthage/blob/master/README.md
+
+### CocoaPods
+
+[CocoaPods](https://cocoapods.org) is a popular, Ruby-inspired Cocoa package manager.
+
+Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
+
+```ruby
+pod 'BNRDeferred'
+```
+
+You will also need to make sure you're opting into using frameworks:
+
+```ruby
+use_frameworks!
+```
+
+Then run `pod install`.
+
+### Swift Package Manager
+
+We include provisional support for [Swift Package Manager](https://swift.org/package-manager/) on the 2.2 toolchain.
+
+Add us to your `Package.swift`:
+
+```
+import PackageDescription
+
+let package = Package(
+    name: "My Extremely Nerdy App",
+    dependencies: [
+        .Package(url: "https://github.com/bignerdranch/Deferred.git", majorVersion: 2),
+    ]
+)
+```
+
+## Further Information
+
+For further info, please refer to comments in the module interface or [the documentation](http://bignerdranch.github.io/Deferred/).
+
+If you have a question not answered by this README or the comments, please open an issue!

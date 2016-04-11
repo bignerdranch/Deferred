@@ -6,7 +6,7 @@
 - [Deferred](#deferred)
     - [Vital Statistics](#vital-statistics)
   - [Intuition](#intuition)
-    - [Gotcha: No Double-Stuffed `Deferred`s](#gotcha-no-double-stuffed-deferreds)
+      - [Gotcha: No Double-Stuffed `Deferred`s](#gotcha-no-double-stuffed-deferreds)
   - [Why Deferred?](#why-deferred)
     - [Async Programming with Callbacks Is Bad News](#async-programming-with-callbacks-is-bad-news)
     - [Enter Deferred](#enter-deferred)
@@ -42,34 +42,23 @@ This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/oca
 |**Carthage** |[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)                |
 
 ## Intuition
-A `Deferred<Value>` is a value that might be unknown now
-but is expected to resolve to a definite `Value` at some time in the future.
-It is resolved by being "filled" with a `Value`.
 
-A `Deferred<Value>` represents a `Value`.
-If you just want to work with the eventual `Value`, use `upon`.
-If you want to produce a `Deferred<OtherValue>` from the `Deferred<Value>`,
-check out `map` and `flatMap`/`bind`.
+A `Deferred<Value>` is a value that might be unknown now but is expected to resolve to a definite `Value` at some time in the future. It is resolved by being "filled" with a `Value`.
 
-You can wait for an array of values to resolve with `all`,
-or just take the first one to resolve with `any`.
-(`all` for just two deferreds is so common, there's a `both` to save you
-the trouble of putting them in an array.)
+A `Deferred<Value>` represents a `Value`. If you just want to work with the eventual `Value`, use `upon`. If you want to produce an `OtherValue` future from a `Deferred<Value>`, check out `map` and `flatMap`.
 
-### Gotcha: No Double-Stuffed `Deferred`s
-It's an error to `fill` an already-`fill`ed `Deferred`.
-Use `fillIfUnfulfilled` if you think anyone else might also be considering
-filling the `Deferred`, for example, to default it to a value when
-an action is cancelled.
+You can wait for an array of values to resolve with `CollectionType.joinedValues`, or just take the first one to resolve with `SequenceType.earliestFilled`. (`joinedValues ` for just a handful of futures is so common, there's a few versions `FutureType.and` to save you the trouble of putting them in an array.)
 
-In a future version, `fill` might always be `fillIfUnfulfilled`,
-at which point, this gotcha will disappear.
+#### Gotcha: No Double-Stuffed `Deferred`s
+
+It's a no-op to `fill` an already-`fill`ed `Deferred`. Use `fill(_:assertIfFilled:)` if you want to treat this as an error.
 
 ## Why Deferred?
-If you're a computer, people are really slow.
-And networks are REALLY slow.
+
+If you're a computer, people are really slow. And networks are REALLY slow.
 
 ### Async Programming with Callbacks Is Bad News
+
 The standard solution to this in Cocoaland is writing async methods with
 a callback, either to a delegate or a completion block.
 
@@ -79,12 +68,13 @@ gotos. This is hard to understand, hard to reason about, and hard to
 debug.
 
 ### Enter Deferred
+
 When you're writing synchronous code,
 you call a function, you get a return value,
 you work with that return value:
 
 ```swift
-let friends = SynchronousFriends(forUser: jimbob)
+let friends = getFriends(forUser: jimbob)
 let names = friends.map { $0.name }
 dataSource.array = names
 tableView.reloadData()
@@ -93,7 +83,7 @@ tableView.reloadData()
 Deferred enables this comfortable linear flow for async programming:
 
 ```swift
-let friends = AsynchronousFriends(forUser: jimbob)
+let friends = fetchFriends(forUser: jimbob)
 friends.upon { friends in
     let names = friends.map { $0.name }
     dataSource.array = names
@@ -105,10 +95,8 @@ A `Deferred<Value>` is a `Value` whose value is unknown till some future time.
 The method passed to `upon` gets run once the value becomes known.
 
 ### More Than Just a Callback
-You might be thinking, "Wait! That's just a callback!"
-You got me: `upon` is indeed a callback:
-the closure gets the `Value` that the `Deferred` was determined to represent
-and can work with it.
+
+You might be thinking, "Wait! That's just a callback!" You got me: `upon` is indeed a callback: the closure gets the `Value` that the `Deferred` was determined to represent and can work with it.
 
 Where `Deferred` shines is the situations where callbacks make you
 want to run screaming. Like, say, chaining async calls, or fork–join
@@ -124,7 +112,7 @@ This gets really messy with callbacks. But with `Deferred`, it's just:
 
 ```swift
 // Let's use type annotations to make it easier to see what's going on here.
-let friends: Deferred<[Friend]> = AsynchronousFriends(forUser: jimbob)
+let friends: Deferred<[Friend]> = fetchFriends(forUser: jimbob)
 let names: Deferred<[Name]> = friends.flatMap { friends in
     // fork: get an array of not-yet-determined names
     let names: [Deferred<Name>] = friends.map { AsynchronousCall(.Name, friend: $0) }
@@ -133,7 +121,8 @@ let names: Deferred<[Name]> = friends.flatMap { friends in
     let allNames: Deferred<[Name]> = all(names)
     return allNames
 }
-names.upon { names: [Name] in
+
+names.upon { (names: [Name]) in
     // names has been determined - use it!
     dataSource.array = names
     tableView.reloadData()
@@ -228,7 +217,7 @@ let deferredInt: Deferred<Int?> = readString().map { Int($0) }
 There are three functions available for combining multiple `Deferred` instances:
 
 ```swift
-// `both` creates a new Deferred that is filled once both inputs are available
+// `and` creates a new Deferred that is filled once both inputs are available
 let d1: Deferred<Int> = ...
 let d2: Deferred<String> = ...
 let dBoth : Deferred<(Int, String)> = d1.and(d2)
@@ -272,32 +261,40 @@ This closure is responsible for aborting the operation if needed.
 Now, if someone defaults the `Deferred<Value>` to some `Value`,
 the `upon` closure will run and cancel the in-flight operation.
 
-Let's look at cancelling our `AsynchronousFriends` request:
+Let's look at cancelling our `fetchFriends(forUser:)` request:
 
 ```swift
-/* * * CLIENT * * */
-func refreshFriends() {
-    let friends = AsynchronousFriends(forUser: jimbob)
-    friends.upon { friends in
-        let names = friends.map { $0.name }
-        dataSource.array = names
-        tableView.reloadData()
-    }
+// MARK: - Client
 
-    /* Stash the `Deferred<Value>` for defaulting later. */
-    self.friends = friends
+extension FriendsViewController {
+
+	var friends: Deferred<Value>?
+
+	func refreshFriends() {
+	    let friends = fetchFriends(forUser: jimbob)
+	    friends.upon { friends in
+	        let names = friends.map { $0.name }
+	        dataSource.array = names
+	        tableView.reloadData()
+	    }
+	
+	    /* Stash the `Deferred<Value>` for defaulting later. */
+	    self.friends = friends
+	}
+	
+	func cancelFriends() {
+	    self.friends.fill([])
+	}
+
 }
 
-func cancelFriends() {
-    self.friends.fillIfUnfulfilled([])
-}
+// MARK: - Producer
 
-/* * * PRODUCER * * */
-func AsynchronousFriends(forUser: jimbob) -> Deferred<[Friend]> {
-    let deferredFriends: Deferred<Friend> = Deferred()
+func fetchFriends(forUser user: jimbob) -> Deferred<[Friend]> {
+    let deferredFriends = Deferred<[Friend]>()
+    let session: NSURLSession = /* … */
     let request: NSURLRequest = /* … */
-    let task = self.session.dataTaskWithRequest(request) {
-        data, response, error in
+    let task = session.dataTaskWithRequest(request) { data, response, error in
         let friends: [Friend] = parseFriends(data, response, error)
         // fillIfUnfulfilled since we might be racing with another producer
         // to fill this value

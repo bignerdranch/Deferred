@@ -1,35 +1,3 @@
-<!-- Hi there, README editor! You look awesome today. -->
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [Deferred](#deferred)
-    - [Vital Statistics](#vital-statistics)
-  - [Intuition](#intuition)
-      - [Gotcha: No Double-Stuffed `Deferred`s](#gotcha-no-double-stuffed-deferreds)
-  - [Why Deferred?](#why-deferred)
-    - [Async Programming with Callbacks Is Bad News](#async-programming-with-callbacks-is-bad-news)
-    - [Enter Deferred](#enter-deferred)
-    - [More Than Just a Callback](#more-than-just-a-callback)
-  - [Basic Tasks](#basic-tasks)
-    - [Vending a Future](#vending-a-future)
-    - [Taking Action when a Future Is Filled](#taking-action-when-a-future-is-filled)
-    - [Peeking at the Current Value](#peeking-at-the-current-value)
-    - [Blocking on Fulfillment](#blocking-on-fulfillment)
-    - [Chaining Deferreds](#chaining-deferreds)
-    - [Combining Deferreds](#combining-deferreds)
-    - [Cancellation](#cancellation)
-  - [Mastering (the) `Future`](#mastering-the-future)
-    - [Read-Only Views](#read-only-views)
-    - [Other Patterns](#other-patterns)
-  - [Getting Started](#getting-started)
-    - [Carthage](#carthage)
-    - [CocoaPods](#cocoapods)
-    - [Swift Package Manager](#swift-package-manager)
-  - [Further Information](#further-information)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # Deferred
 
 This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift. It lets you work with values that haven't been determined yet, like an array that's coming later (one day!) from a web service call.
@@ -43,6 +11,38 @@ This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/oca
 |**License**  |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt)|
 |**CocoaPods**|[!["BNRDeferred" on CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg?style=flat-square)](https://cocoapods.org/pods/BNRDeferred)                |
 |**Carthage** |[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)                |
+
+## Table of Contents
+
+<!-- Hi there, readme editor! You look awesome today. -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Intuition](#intuition)
+    - [Gotcha: No Double-Stuffed `Deferred`s](#gotcha-no-double-stuffed-deferreds)
+- [Why Deferred?](#why-deferred)
+  - [Async Programming with Callbacks Is Bad News](#async-programming-with-callbacks-is-bad-news)
+  - [Enter Deferred](#enter-deferred)
+  - [More Than Just a Callback](#more-than-just-a-callback)
+- [Basic Tasks](#basic-tasks)
+  - [Vending a Future](#vending-a-future)
+  - [Taking Action when a Future Is Filled](#taking-action-when-a-future-is-filled)
+  - [Peeking at the Current Value](#peeking-at-the-current-value)
+  - [Blocking on Fulfillment](#blocking-on-fulfillment)
+  - [Chaining Deferreds](#chaining-deferreds)
+  - [Combining Deferreds](#combining-deferreds)
+  - [Cancellation](#cancellation)
+- [Mastering (the) `Future`](#mastering-the-future)
+  - [Read-Only Views](#read-only-views)
+  - [Other Patterns](#other-patterns)
+- [Getting Started](#getting-started)
+  - [Carthage](#carthage)
+  - [CocoaPods](#cocoapods)
+  - [Swift Package Manager](#swift-package-manager)
+- [Further Information](#further-information)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Intuition
 

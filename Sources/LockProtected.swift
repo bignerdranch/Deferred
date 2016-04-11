@@ -59,6 +59,7 @@ extension LockProtected: CustomDebugStringConvertible, CustomReflectable {
         }
     }
 
+    /// Returns the `Mirror` for `self`.
     public func customMirror() -> Mirror {
         if let value = synchronizedValue {
             return Mirror(self, children: [ "item": value ], displayStyle: .Optional)

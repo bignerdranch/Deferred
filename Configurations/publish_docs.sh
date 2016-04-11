@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Change $TRAVIS_BRANCH check to `master` when we merge Switch 2 support
-if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-    echo -e "Generating Jazzy output \n"
-    jazzy --config .jazzy.yml
+echo -e "Generating Jazzy output \n"
+jazzy --clean --config .jazzy.yml
 
-    echo -e "Moving into docs directory \n"
+if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+    echo -e "Publishing docs; moving into docs directory \n"
     pushd docs
 
     echo -e "Creating gh-pages repo \n"

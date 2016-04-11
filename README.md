@@ -142,12 +142,12 @@ func performOperation() -> Deferred<Int> {
     // 1. Create deferred.
     let deferred = Deferred<Int>()
 
-    // 2. Kick off asynchronous code that will eventually...
-    let queue = ...
+    // 2. Kick off asynchronous code that will eventually…
+    let queue = /* … */
     dispatch_async(queue) {
         let result = compute_result()
 
-        // 3. ... fill the deferred in with its value
+        // 3. … fill the deferred in with its value
         deferred.fill(result)
     }
 
@@ -205,7 +205,7 @@ Monadic `map` and `flatMap` are available to chain `Deferred` results. For examp
 // Producer
 func readString() -> Deferred<String> {
     let deferredResult = Deferred<String>()
-    // dispatch_async something to fill deferredResult...
+    // dispatch_async something to fill deferredResult…
     return deferredResult
 }
 
@@ -220,26 +220,31 @@ let deferredInt: Deferred<Int?> = readString().map { Int($0) }
 There are three functions available for combining multiple `Deferred` instances:
 
 ```swift
-// `and` creates a new Deferred that is filled once both inputs are available
-let d1: Deferred<Int> = ...
-let d2: Deferred<String> = ...
-let dBoth : Deferred<(Int, String)> = d1.and(d2)
+// MARK: and
 
-// `all` creates a new Deferred that is filled once all inputs are available.
+// `and` creates a new future that is filled once both inputs are available:
+let d1: Deferred<Int> = /* … */
+let d2: Deferred<String> = /* … */
+let dBoth: Future<(Int, String)> = d1.and(d2)
+
+// MARK: joinedValues
+
+// `joinedValues` creates a new future that is filled once all inputs are available.
 // All of the input Deferreds must contain the same type.
 var deferreds: [Deferred<Int>] = []
 for i in 0 ..< 10 {
-    deferreds.append(...)
+    deferreds.append(/* … */)
 }
-let allDeferreds: Future<[Int]> = deferreds.joinedValues
-// Once all 10 input deferreds are filled, allDeferreds.value[i] will contain the result
-// of deferreds[i].value.
 
-// `earliestFilled` creates a new Deferred that is filled once any one of its inputs is available.
-// If multiple inputs become available simultaneously, no guarantee is made about which
-// will be selected.
-var anyDeferred: Deferred<Int> = deferreds.earliestFilled
-// Once any one of the 10 inputs is filled, anyDeferred will be filled with that value.
+// Once all 10 input deferreds are filled, the item at index `i` in the array passed to `upon` will contain the result of `deferreds[i]`.
+let allDeferreds: Future<[Int]> = deferreds.joinedValues
+
+// MARK: earliestFilled
+
+// `earliestFilled` creates a new future that is filled once any one of its inputs is available.
+// If multiple inputs become available simultaneously, no guarantee is made about which will be selected.
+// Once any one of the 10 inputs is filled, `anyDeferred` will be filled with that value.
+let anyDeferred: Future<Int> = deferreds.earliestFilled
 ```
 
 ### Cancellation

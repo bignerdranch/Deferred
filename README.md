@@ -11,7 +11,7 @@
     - [Async Programming with Callbacks Is Bad News](#async-programming-with-callbacks-is-bad-news)
     - [Enter Deferred](#enter-deferred)
     - [More Than Just a Callback](#more-than-just-a-callback)
-  - [Tasks](#tasks)
+  - [Basic Tasks](#basic-tasks)
     - [Vending a Future](#vending-a-future)
     - [Taking Action when a Future Is Filled](#taking-action-when-a-future-is-filled)
     - [Peeking at the Current Value](#peeking-at-the-current-value)
@@ -19,6 +19,9 @@
     - [Chaining Deferreds](#chaining-deferreds)
     - [Combining Deferreds](#combining-deferreds)
     - [Cancellation](#cancellation)
+  - [Mastering (the) `Future`](#mastering-the-future)
+    - [Read-Only Views](#read-only-views)
+    - [Other Patterns](#other-patterns)
   - [Getting Started](#getting-started)
     - [Carthage](#carthage)
     - [CocoaPods](#cocoapods)
@@ -129,7 +132,7 @@ names.upon { (names: [Name]) in
 }
 ```
 
-## Tasks
+## Basic Tasks
 
 ### Vending a Future
 
@@ -268,29 +271,29 @@ Let's look at cancelling our `fetchFriends(forUser:)` request:
 
 extension FriendsViewController {
 
-	var friends: Deferred<Value>?
+    private var friends: Deferred<Value>?
 
-	func refreshFriends() {
-	    let friends = fetchFriends(forUser: jimbob)
-	    friends.upon { friends in
-	        let names = friends.map { $0.name }
-	        dataSource.array = names
-	        tableView.reloadData()
-	    }
-	
-	    /* Stash the `Deferred<Value>` for defaulting later. */
-	    self.friends = friends
-	}
-	
-	func cancelFriends() {
-	    self.friends.fill([])
-	}
+    func refreshFriends() {
+        let friends = fetchFriends(forUser: jimbob)
+        friends.upon { friends in
+            let names = friends.map { $0.name }
+            dataSource.array = names
+            tableView.reloadData()
+        }
+
+        /* Stash the `Deferred<Value>` for defaulting later. */
+        self.friends = friends
+    }
+
+    func cancelFriends() {
+        friends?.fill([])
+    }
 
 }
 
 // MARK: - Producer
 
-func fetchFriends(forUser user: jimbob) -> Deferred<[Friend]> {
+func fetchFriends(forUser user: User) -> Deferred<[Friend]> {
     let deferredFriends = Deferred<[Friend]>()
     let session: NSURLSession = /* … */
     let request: NSURLRequest = /* … */
@@ -313,6 +316,92 @@ func fetchFriends(forUser user: jimbob) -> Deferred<[Friend]> {
     return deferredFriends
 }
 ```
+
+## Mastering (the) `Future`
+
+Deferred is designed to scale with the fundamentals you see above. Large applications can be built using just `Deferred` and its `upon` and `fill` methods.
+
+### Read-Only Views
+
+It sometimes just doesn't make *sense* to be able to `fill` something; if you have a `Deferred` wrapping `UIApplication`'s push notification token, what does it mean if someone in your codebase calls `fill` on it?
+
+You may have noticed that anybody can call `upon` and `fill` on `Deferred` at any time; it's **read-write**. The former is fundamental, but the latter may be a liability as different pieces of code interact with each other. There's no concern to be had about thread safety, but instead about access: how do you limit illogical control flow, make it **read-only**?
+
+For this reason, Deferred is split into `FutureType` and `PromiseType`, both protocols the `Deferred` type conforms to. You can think of these as the "reading" and "writing" sides of a deferred value; a future can only be `upon`ed, and a promise can only be `fill`ed.
+
+Deferred also provides the `Future` type, a wrapper for anything that's a `FutureType` much like the Swift standard library's `Any` types. You can use it protectively to make a `Deferred` read-only. Reconsider the example from above:
+
+```
+extension FriendsViewController {
+
+    // `FriendsViewController` is the only of the `Deferred` in its
+    // `PromiseType` role, and can use it as it pleases.
+    private var friends: Deferred<Value>?
+
+    // Now this method can vend a `Future` and not worry about the
+    // rules of accessing its private `Deferred`.
+    func refreshFriends() -> Future<[Friend]> {
+        let friends = fetchFriends(forUser: jimbob)
+        friends.upon { friends in
+            let names = friends.map { $0.name }
+            dataSource.array = names
+            tableView.reloadData()
+        }
+
+        /* Stash the `Deferred<Value>` for defaulting later. */
+        self.friends = friends
+
+        return Future(friends)
+    }
+
+    func cancelFriends() {
+        friends?.fill([])
+    }
+
+}
+```
+
+The use of `Future` isn't only defensive, it encapsulates and hides implementation details.
+
+```swift
+
+extension FriendsStore {
+
+    // dependency, injected later on
+    var context: NSManagedObjectContext?
+
+    func getLocalFriends(forUser user: User) -> Future<[Friend]> {
+        guard let context = context else {
+            // a future can be created with an immediate value, allowing the benefits
+            // of Deferred's design even if values are available already (consider a
+            // stub object, for instance).
+            return Future([])
+        }
+
+        let predicate: NSPredicate = /* … */
+
+        return Friend.findAll(matching: predicate, inContext: context)
+    }
+
+}
+
+```
+
+### Other Patterns
+
+As a codebase or team using Deferred gets larger, it may become important to reduce repetition and noise.
+
+Deferred's abstractions can be extended using protocols. [`FutureType`](http://bignerdranch.github.io/Deferred/Protocols/FutureType.html) gives you all the power of the `Deferred` type on anything you build, and [`ExecutorType`](http://bignerdranch.github.io/Deferred/Protocols/ExecutorType.html) allows different asynchronous semantics in `upon`.
+
+An example algorithm, included in Deferred, is the `IgnoringFuture`. Simply call `ignored()` to create a future that gets "filled" with `Void`:
+
+```swift
+func whenFriendsAreLoaded() -> IgnoringFuture<Void> {
+    return self.deferredFriends.ignored()
+}
+```
+
+This method erases the `Value` of the `Deferred` without the boilerplate of creating a new `Deferred<Void>` and having to wait on an `upon`.
 
 ## Getting Started
 

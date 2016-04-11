@@ -4,7 +4,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Deferred](#deferred)
-  - [Vital Statistics](#vital-statistics)
+    - [Vital Statistics](#vital-statistics)
   - [Intuition](#intuition)
     - [Gotcha: No Double-Stuffed `Deferred`s](#gotcha-no-double-stuffed-deferreds)
   - [Why Deferred?](#why-deferred)
@@ -29,17 +29,17 @@
 
 # Deferred
 
-This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift.
+This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift. It lets you work with values that haven't been determined yet, like an array that's coming later (one day!) from a web service call.
 
-## Vital Statistics
-- What: Lets you work with values that haven't been determined yet,
-        like an array that's coming (one day!) from a web service call.
-- Who: John Gallagher <jgallagher@bignerdranch.com> wrote this.
-- Swift: 2.2
-- License: MIT
-- Carthage: Yup.
-- CocoaPods: As [`BNRDeferred`](https://cocoapods.org/pods/BNRDeferred).
+### Vital Statistics
 
+|             | **Status**                                                                                                                                                  |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|**Swift**    |[![Swift 2.2 supported](https://img.shields.io/badge/swift-2.2-EF5138.svg?style=flat-square)](https://swift.org)                                             |
+|**Platforms**|![iOS, OS X, tvOS, and watchOS](https://img.shields.io/badge/platform-ios%20%7C%20osx%20%7C%20tvos%20%7C%20watchos-lightgrey.svg?style=flat-square)          |
+|**License**  |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt)|
+|**CocoaPods**|[!["BNRDeferred" on CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg?style=flat-square)](https://cocoapods.org/pods/BNRDeferred)                |
+|**Carthage** |[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)                |
 
 ## Intuition
 A `Deferred<Value>` is a value that might be unknown now

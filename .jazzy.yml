@@ -33,7 +33,7 @@ custom_categories:
     - PThreadReadWriteLock
 github_url: "https://github.com/bignerdranch/Deferred"
 head: |
-  <meta property="og:site_name" content="Deferred programming Guide">
+  <meta property="og:site_name" content="Deferred Programming Guide">
   <meta property="og:description" content="An implementation of OCaml's Deferred for Swift. It lets you work with values that haven't been determined yet, like an array that's coming later from a web service call.">
   <meta property="og:image" content="https://www.bignerdranch.com/img/bnr-logo-square.png">
   <link rel="shortcut icon" type="image/x-icon" href="https://www.bignerdranch.com/favicon.png">

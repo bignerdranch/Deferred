@@ -1,6 +1,6 @@
 # Deferred
 
-This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) for Swift. It lets you work with values that haven't been determined yet, like an array that's coming later (one day!) from a web service call.
+Deferred lets you work with values that haven't been determined yet, like an array that's coming later (one day!) from a web service call. It was originally inspired by [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) library.
 
 ### Vital Statistics
 
@@ -329,7 +329,7 @@ Deferred is designed to scale with the fundamentals you see above. Large applica
 
 It sometimes just doesn't make *sense* to be able to `fill` something; if you have a `Deferred` wrapping `UIApplication`'s push notification token, what does it mean if someone in your codebase calls `fill` on it?
 
-You may have noticed that anybody can call `upon` and `fill` on `Deferred` at any time; it's **read-write**. The former is fundamental, but the latter may be a liability as different pieces of code interact with each other. There's no concern to be had about thread safety, but instead about access: how do you limit illogical control flow, make it **read-only**?
+You may have noticed that anybody can call `upon` on a `Deferred` type; this is fundamental. But the same is true of `fill`, and this may be a liability as different pieces of code interact with each other. How can we make it **read-only**?
 
 For this reason, Deferred is split into `FutureType` and `PromiseType`, both protocols the `Deferred` type conforms to. You can think of these as the "reading" and "writing" sides of a deferred value; a future can only be `upon`ed, and a promise can only be `fill`ed.
 
@@ -365,7 +365,7 @@ extension FriendsViewController {
 }
 ```
 
-The use of `Future` isn't only defensive, it encapsulates and hides implementation details.
+Use of the `Future` type isn't only defensive, it encapsulates and hides implementation details.
 
 ```swift
 

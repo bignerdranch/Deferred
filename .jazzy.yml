@@ -9,23 +9,23 @@ custom_categories:
     - FutureType
     - PromiseType
     - Timeout
-  - name: Future Mastery
+  - name: Transforming Future
     children:
     - Future
     - CollectionType
     - SequenceType
     - IgnoringFuture
-  - name: Custom Execution
+  - name: Controlling Where Callbacks Execute
     children:
     - ExecutorType
     - NSOperationQueue
     - NSRunLoop
     - CFRunLoop
-  - name: Data Locking
+  - name: Coordinating Access to Data
     children:
     - LockProtected
     - ReadWriteLock
-  - name: Locks
+  - name: Coordination Primitives
     children:
     - DispatchLock
     - SpinLock

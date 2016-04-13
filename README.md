@@ -398,7 +398,7 @@ extension FriendsStore {
 
 As a codebase or team using Deferred gets larger, it may become important to reduce repetition and noise.
 
-Deferred's abstractions can be extended using protocols. [`FutureType`](http://bignerdranch.github.io/Deferred/Protocols/FutureType.html) gives you all the power of the `Deferred` type on anything you build, and [`ExecutorType`](http://bignerdranch.github.io/Deferred/Protocols/ExecutorType.html) allows different asynchronous semantics in `upon`.
+Deferred's abstractions can be extended using protocols. [`FutureType`](http://bignerdranch.github.io/Deferred/Protocols/FutureType.html) gives you all the power of the `Deferred` type on anything you build.
 
 An example algorithm, included in Deferred, is the `IgnoringFuture`. Simply call `ignored()` to create a future that gets "filled" with `Void`:
 
@@ -410,9 +410,11 @@ func whenFriendsAreLoaded() -> IgnoringFuture<Void> {
 
 This method erases the `Value` of the `Deferred` without the boilerplate of creating a new `Deferred<Void>` and having to wait on an `upon`.
 
+The [`ExecutorType`](http://bignerdranch.github.io/Deferred/Protocols/ExecutorType.html) protocol allows changing the behavior of an `upon` call, and any derived algorithm such as `map` or `flatMap`. If your app isn't using a `dispatch_queue_t` directly, this allows you to adapt other asynchronous mechanisms like `NSManagedObjectContext.performBlock(_:)` fors Deferred.
+
 ## Getting Started
 
-Deferred is designed to be used as an embedded framework, which require a minimum deployment target of iOS 8 or OS X Yosemite (10.10). Embedding through any other means may work, but is not officially supported.
+Deferred is designed to be used as an embedded framework, which requires a minimum deployment target of iOS 8 or OS X Yosemite (10.10). Embedding through any other means may work, but is not officially supported.
 
 Linux is not yet supported.
 

@@ -35,7 +35,7 @@ Deferred lets you work with values that haven't been determined yet, like an arr
   - [Taking Action when a Future Is Filled](#taking-action-when-a-future-is-filled)
   - [Peeking at the Current Value](#peeking-at-the-current-value)
   - [Blocking on Fulfillment](#blocking-on-fulfillment)
-  - [Chaining Deferreds](#chaining-deferreds)
+  - [Sequencing Deferreds](#sequencing-deferreds)
   - [Combining Deferreds](#combining-deferreds)
   - [Cancellation](#cancellation)
 - [Mastering The `Future` Type](#mastering-the-future-type)
@@ -201,7 +201,7 @@ The `wait(_:)` method supports a few timeout values, including an arbitrary numb
 let result: Int = performOperation().wait(.Forever)!
 ```
 
-### Chaining Deferreds
+### Sequencing Deferreds
 
 Monadic `map` and `flatMap` are available to chain `Deferred` results. For example, suppose you have a method that asynchronously reads a string, and you want to call `Int.init(_:)` on that string:
 

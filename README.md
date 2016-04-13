@@ -4,17 +4,22 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 ### Vital Statistics
 
-|             | **Status**                                                                                                                                                  |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|**Swift**    |[![Swift 2.2 supported](https://img.shields.io/badge/swift-2.2-EF5138.svg?style=flat-square)](https://swift.org)                                             |
-|**Platforms**|![iOS, OS X, tvOS, and watchOS](https://img.shields.io/badge/platform-ios%20%7C%20osx%20%7C%20tvos%20%7C%20watchos-lightgrey.svg?style=flat-square)          |
-|**License**  |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt)|
-|**CocoaPods**|[!["BNRDeferred" on CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg?style=flat-square)](https://cocoapods.org/pods/BNRDeferred)                |
-|**Carthage** |[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)                |
+|                                                                                               |
+|-----------------------------------------------------------------------------------------------|
+|[![Swift 2.2 supported](https://img.shields.io/badge/swift-2.2-EF5138.svg?)][Swift]            |
+|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT License]         |
+|![iOS, OS X, tvOS, and watchOS](https://img.shields.io/cocoapods/p/BNRDeferred.svg)            |
+|[!["BNRDeferred" on CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods] |
+|[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)][Carthage]|
+
+[Swift]: https://swift.org
+[MIT License]: https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt
+[CocoaPods]: https://cocoapods.org/pods/BNRDeferred
+[Carthage]: https://github.com/Carthage/Carthage
 
 ## Table of Contents
 
-<!-- Hi there, readme editor! You look awesome today. -->
+<!-- Hi there, readme editor! You look nice today. -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 

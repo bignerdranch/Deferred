@@ -83,7 +83,7 @@ struct QueueExecutor: ExecutorType {
 
 }
 
-/// An operation queue manages a number of operation objects, making higher-
+/// An operation queue manages a number of operation objects, making high
 /// level features like cancellation and dependencies simple.
 ///
 /// As an `ExecutorType`, `upon` closures are enqueued as non-cancellable

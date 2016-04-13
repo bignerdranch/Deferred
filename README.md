@@ -340,7 +340,7 @@ For this reason, Deferred is split into `FutureType` and `PromiseType`, both pro
 
 Deferred also provides the `Future` type, a wrapper for anything that's a `FutureType` much like the Swift standard library's `Any` types. You can use it protectively to make a `Deferred` read-only. Reconsider the example from above:
 
-```
+```swift
 extension FriendsViewController {
 
     // `FriendsViewController` is the only of the `Deferred` in its
@@ -373,7 +373,6 @@ extension FriendsViewController {
 Use of the `Future` type isn't only defensive, it encapsulates and hides implementation details.
 
 ```swift
-
 extension FriendsStore {
 
     // dependency, injected later on
@@ -393,7 +392,6 @@ extension FriendsStore {
     }
 
 }
-
 ```
 
 ### Other Patterns
@@ -426,7 +424,7 @@ There are a few different options to install Deferred.
 
 Add the following to your Cartfile:
 
-```ruby
+```
 github "bignerdranch/Deferred" ~> 2.0
 ```
 
@@ -461,7 +459,7 @@ We include provisional support for [Swift Package Manager](https://swift.org/pac
 
 Add us to your `Package.swift`:
 
-```
+```swift
 import PackageDescription
 
 let package = Package(

@@ -26,14 +26,14 @@ This is an implementation of [OCaml's Deferred](https://ocaml.janestreet.com/oca
   - [Enter Deferred](#enter-deferred)
   - [More Than Just a Callback](#more-than-just-a-callback)
 - [Basic Tasks](#basic-tasks)
-  - [Vending a Future](#vending-a-future)
+  - [Vending a Future Value](#vending-a-future-value)
   - [Taking Action when a Future Is Filled](#taking-action-when-a-future-is-filled)
   - [Peeking at the Current Value](#peeking-at-the-current-value)
   - [Blocking on Fulfillment](#blocking-on-fulfillment)
   - [Chaining Deferreds](#chaining-deferreds)
   - [Combining Deferreds](#combining-deferreds)
   - [Cancellation](#cancellation)
-- [Mastering (the) `Future`](#mastering-the-future)
+- [Mastering The `Future` Type](#mastering-the-future-type)
   - [Read-Only Views](#read-only-views)
   - [Other Patterns](#other-patterns)
 - [Getting Started](#getting-started)
@@ -133,7 +133,7 @@ names.upon { (names: [Name]) in
 
 ## Basic Tasks
 
-### Vending a Future
+### Vending a Future Value
 
 ```swift
 // Potentially long-running operation.
@@ -321,7 +321,7 @@ func fetchFriends(forUser user: User) -> Deferred<[Friend]> {
 }
 ```
 
-## Mastering (the) `Future`
+## Mastering The `Future` Type
 
 Deferred is designed to scale with the fundamentals you see above. Large applications can be built using just `Deferred` and its `upon` and `fill` methods.
 

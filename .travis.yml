@@ -7,7 +7,10 @@ install:
 - brew install carthage --force-bottle
 - gem specific_install https://github.com/realm/jazzy.git
 env:
-- SCAN_OPEN_REPORT=false
+  matrix:
+  - SCAN_OPEN_REPORT=false
+  global:
+    secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=
 before_script:
 - set -o pipefail
 script:

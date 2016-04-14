@@ -427,7 +427,7 @@ There are a few different options to install Deferred.
 Add the following to your Cartfile:
 
 ```
-github "bignerdranch/Deferred" ~> 2.0
+github "bignerdranch/Deferred" "2.0.0-rc.1"
 ```
 
 Then run `carthage update`.

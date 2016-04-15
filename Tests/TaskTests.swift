@@ -17,4 +17,15 @@ import Deferred
 
 class TaskTests: XCTestCase {
 
+    func testThatFlatMapForwardsCancellationToSubsequentTask() {
+        let firstTask = Task<Int>(value: 1)
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let mappedTask = firstTask.flatMap { _ -> Task<Int> in
+            let d = Deferred<TaskResult<Int>>()
+            return Task(d, cancellation: expectation.fulfill)
+        }
+        mappedTask.cancel()
+        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+    }
+
 }

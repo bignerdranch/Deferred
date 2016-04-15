@@ -63,10 +63,17 @@ extension Task: TaskType {
 
 extension Task {
     /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: Cancellation = {}) {
+    public init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: Cancellation) {
         self.init(base.map {
             Value(with: $0.extract)
         }, cancellation: cancellation)
+    }
+
+    /// Create a task whose `upon(_:body:)` method uses the result of `base`.
+    public init<Task: TaskType where Task.Value.Value == SuccessValue>(_ base: Task) {
+        self.init(base.map {
+            Value(with: $0.extract)
+        }, cancellation: base.cancel)
     }
 
     /// Wrap an operation that has already completed with `value`.

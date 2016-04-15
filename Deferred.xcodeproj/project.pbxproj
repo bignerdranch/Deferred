@@ -15,6 +15,10 @@
 		DB215F2F1CC16F6B00A88450 /* ResultFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F2D1CC16F6B00A88450 /* ResultFuture.swift */; };
 		DB215F301CC16F6B00A88450 /* ResultFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F2D1CC16F6B00A88450 /* ResultFuture.swift */; };
 		DB215F311CC16F6B00A88450 /* ResultFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F2D1CC16F6B00A88450 /* ResultFuture.swift */; };
+		DB215F331CC16F7D00A88450 /* ResultPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F321CC16F7D00A88450 /* ResultPromise.swift */; };
+		DB215F341CC16F7D00A88450 /* ResultPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F321CC16F7D00A88450 /* ResultPromise.swift */; };
+		DB215F351CC16F7D00A88450 /* ResultPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F321CC16F7D00A88450 /* ResultPromise.swift */; };
+		DB215F361CC16F7D00A88450 /* ResultPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB215F321CC16F7D00A88450 /* ResultPromise.swift */; };
 		DB5F1A331CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
 		DB5F1A341CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
 		DB5F1A351CBAC17900B5BE9E /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */; };
@@ -160,6 +164,7 @@
 /* Begin PBXFileReference section */
 		DB215F281CC16F5300A88450 /* TaskCollections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskCollections.swift; sourceTree = "<group>"; };
 		DB215F2D1CC16F6B00A88450 /* ResultFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultFuture.swift; sourceTree = "<group>"; };
+		DB215F321CC16F7D00A88450 /* ResultPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultPromise.swift; sourceTree = "<group>"; };
 		DB5F1A321CBAC17900B5BE9E /* FutureCustomExecutorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCustomExecutorTests.swift; sourceTree = "<group>"; };
 		DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialTask.swift; sourceTree = "<group>"; };
 		DB6ADFD31C237DD500D77BF1 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -358,6 +363,7 @@
 			children = (
 				DB5F1A361CBAD61500B5BE9E /* ExistentialTask.swift */,
 				DB215F2D1CC16F6B00A88450 /* ResultFuture.swift */,
+				DB215F321CC16F7D00A88450 /* ResultPromise.swift */,
 				DB215F281CC16F5300A88450 /* TaskCollections.swift */,
 				DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */,
 			);
@@ -661,6 +667,7 @@
 				DB6AE05F1C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0671C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04B1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB215F341CC16F7D00A88450 /* ResultPromise.swift in Sources */,
 				DB6AE0471C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 				DB8CFEF21CB047F200D095B7 /* FutureMap.swift in Sources */,
 				DB9976931C2F1AAA005201CE /* TaskResult.swift in Sources */,
@@ -707,6 +714,7 @@
 				DB6AE05E1C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0661C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04A1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB215F331CC16F7D00A88450 /* ResultPromise.swift in Sources */,
 				DB6AE0461C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 				DB8CFEF11CB047F200D095B7 /* FutureMap.swift in Sources */,
 				DB9976921C2F1AAA005201CE /* TaskResult.swift in Sources */,
@@ -753,6 +761,7 @@
 				DB6AE0601C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0681C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04C1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB215F351CC16F7D00A88450 /* ResultPromise.swift in Sources */,
 				DB6AE0481C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 				DB8CFEF31CB047F200D095B7 /* FutureMap.swift in Sources */,
 				DB9976941C2F1AAA005201CE /* TaskResult.swift in Sources */,
@@ -799,6 +808,7 @@
 				DB6AE0611C237F8800D77BF1 /* PromiseType.swift in Sources */,
 				DB6AE0691C237F8800D77BF1 /* Timeout.swift in Sources */,
 				DB6AE04D1C237F8800D77BF1 /* FutureCollections.swift in Sources */,
+				DB215F361CC16F7D00A88450 /* ResultPromise.swift in Sources */,
 				DB6AE0491C237F8800D77BF1 /* ExistentialFuture.swift in Sources */,
 				DB8CFEF41CB047F200D095B7 /* FutureMap.swift in Sources */,
 				DB9976951C2F1AAA005201CE /* TaskResult.swift in Sources */,

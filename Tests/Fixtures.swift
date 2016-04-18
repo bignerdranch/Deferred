@@ -48,3 +48,30 @@ extension ResultType {
         return withValues(ifSuccess: { _ in nil }, ifFailure: { $0 })
     }
 }
+
+class CustomExecutorTestCase: XCTestCase {
+
+    private struct Executor: ExecutorType {
+
+        unowned let owner: CustomExecutorTestCase
+
+        func submit(body: () -> Void) {
+            owner.submitCount.withWriteLock { (inout count: Int) in
+                count += 1
+            }
+
+            body()
+        }
+
+    }
+
+    private var submitCount = LockProtected<Int>(item: 0)
+    final var executor: ExecutorType {
+        return Executor(owner: self)
+    }
+
+    func assertExecutorCalled(times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 == times }), file: file, line: line)
+    }
+
+}

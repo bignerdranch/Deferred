@@ -121,9 +121,4 @@ public struct Future<Value>: FutureType {
     public func wait(time: Timeout) -> Value? {
         return box.wait(time)
     }
-
-    /// Return the `Mirror` for `self`.
-    public func customMirror() -> Mirror {
-        return Mirror(reflecting: box)
-    }
 }

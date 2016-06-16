@@ -12,9 +12,9 @@ import Deferred
 private let testTimeout = 2.0
 
 // Should this be promoted to an initializer on Future?
-private func delay<Value>(@autoclosure(escaping) value: Void -> Value, by interval: NSTimeInterval) -> Future<Value> {
+private func delay<Value>(_ value: @autoclosure @escaping(Void) -> Value, by interval: TimeInterval) -> Future<Value> {
     let d = Deferred<Value>()
-    after(interval, upon: Deferred<Value>.genericQueue) { 
+    Deferred<Value>.genericQueue.asyncAfter(deadline: .now() + interval) {
         d.fill(value())
     }
     return Future(d)
@@ -26,14 +26,14 @@ class FutureCustomExecutorTests: XCTestCase {
 
         private var submitCount = LockProtected<Int>(item: 0)
 
-        func submit(body: () -> Void) {
-            submitCount.withWriteLock { (inout count: Int) in
+        func submit(_ body: @escaping() -> Void) {
+            submitCount.withWriteLock { (count: inout Int) in
                 count += 1
             }
             body()
         }
 
-        func assertCalled(times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
+        func assertCalled(_ times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
             XCTAssert(submitCount.withReadLock({ $0 == times }), file: file, line: line)
         }
 
@@ -56,14 +56,14 @@ class FutureCustomExecutorTests: XCTestCase {
     func testUpon() {
         let d = Deferred<Void>()
 
-        let expect = expectationWithDescription("upon block called when deferred is filled")
+        let expect = expectation(description: "upon block called when deferred is filled")
         d.upon(executor) { _ in
             expect.fulfill()
         }
 
         d.fill(())
 
-        waitForExpectationsWithTimeout(testTimeout, handler: nil)
+        waitForExpectations(timeout: testTimeout, handler: nil)
         executor.assertCalled(1)
     }
 
@@ -72,7 +72,7 @@ class FutureCustomExecutorTests: XCTestCase {
         let testValue = 42
         let mapped = marker.map(upon: executor) { testValue }
 
-        let expect = expectationWithDescription("upon block called when deferred is filled")
+        let expect = expectation(description: "upon block called when deferred is filled")
         mapped.upon(executor) {
             XCTAssertEqual($0, testValue)
             expect.fulfill()
@@ -80,7 +80,7 @@ class FutureCustomExecutorTests: XCTestCase {
 
         marker.fill(())
 
-        waitForExpectationsWithTimeout(testTimeout, handler: nil)
+        waitForExpectations(timeout: testTimeout, handler: nil)
         executor.assertCalled(2)
     }
 
@@ -89,7 +89,7 @@ class FutureCustomExecutorTests: XCTestCase {
         let testValue = 42
         let flattened = marker.flatMap(upon: executor) { _ in delay(testValue, by: 0.2) }
 
-        let expect = expectationWithDescription("upon block called when deferred is filled")
+        let expect = expectation(description: "upon block called when deferred is filled")
         flattened.upon(executor) {
             XCTAssertEqual($0, testValue)
             expect.fulfill()
@@ -97,7 +97,7 @@ class FutureCustomExecutorTests: XCTestCase {
 
         marker.fill(())
 
-        waitForExpectationsWithTimeout(testTimeout, handler: nil)
+        waitForExpectations(timeout: testTimeout, handler: nil)
         executor.assertCalled(3)
     }
 

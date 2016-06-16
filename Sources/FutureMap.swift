@@ -16,7 +16,7 @@ extension FutureType {
     /// - parameter executor: Context to execute the transformation on.
     /// - parameter transform: Creates something using the deferred value.
     /// - returns: A new future that is filled once the receiver is determined.
-    public func map<NewValue>(upon executor: ExecutorType, _ transform: Value -> NewValue) -> Future<NewValue> {
+    public func map<NewValue>(upon executor: ExecutorType, _ transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
         let d = Deferred<NewValue>()
         upon(executor) {
             d.fill(transform($0))
@@ -38,7 +38,7 @@ extension FutureType {
     /// - parameter transform: Creates something using the deferred value.
     /// - returns: A new future that is filled once the receiver is determined.
     /// - seealso: FutureType.map(upon:_:)
-    public func map<NewValue>(upon queue: dispatch_queue_t, _ transform: Value -> NewValue) -> Future<NewValue> {
+    public func map<NewValue>(upon queue: DispatchQueue, _ transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
         let d = Deferred<NewValue>()
         upon(queue) {
             d.fill(transform($0))
@@ -57,7 +57,7 @@ extension FutureType {
     /// - returns: A new future that is filled once the receiver is determined.
     /// - seealso: qos_class_t
     /// - seealso: FutureType.map(upon:_:)
-    public func map<NewValue>(transform: Value -> NewValue) -> Future<NewValue> {
+    public func map<NewValue>(_ transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
         return map(upon: Self.genericQueue, transform)
     }
 }

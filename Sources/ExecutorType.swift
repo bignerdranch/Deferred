@@ -43,18 +43,25 @@ import Foundation
 public protocol ExecutorType {
 
     /// Execute the `body` closure.
-    func submit(body: () -> Void)
+    func submit(_ body: @escaping() -> Void)
+
+    func submit(_ workItem: DispatchWorkItem)
 
     /// If the executor is a higher-level wrapper around a dispatch queue,
     /// may be used instead of `submit(_:)` for more efficient execution.
-    var underlyingQueue: dispatch_queue_t? { get }
+    var underlyingQueue: DispatchQueue? { get }
 
 }
 
 extension ExecutorType {
 
+    /// By default, executes the contents of the work item as a closure.
+    public func submit(_ workItem: DispatchWorkItem) {
+        submit(workItem.perform)
+    }
+
     /// By default, `nil`; the executor's `submit(_:)` is used instead.
-    public var underlyingQueue: dispatch_queue_t? {
+    public var underlyingQueue: DispatchQueue? {
         return nil
     }
     
@@ -68,16 +75,16 @@ extension ExecutorType {
 // overloads referenced above can be removed.
 struct QueueExecutor: ExecutorType {
 
-    private let queue: dispatch_queue_t
-    init(_ queue: dispatch_queue_t) {
+    private let queue: DispatchQueue
+    init(_ queue: DispatchQueue) {
         self.queue = queue
     }
 
-    func submit(body: () -> Void) {
-        dispatch_async(queue, body)
+    func submit(_ body: @escaping() -> Void) {
+        queue.async(execute: body)
     }
 
-    var underlyingQueue: dispatch_queue_t? {
+    var underlyingQueue: DispatchQueue? {
         return queue
     }
 
@@ -89,11 +96,11 @@ struct QueueExecutor: ExecutorType {
 /// As an `ExecutorType`, `upon` closures are enqueued as non-cancellable
 /// operations. This is ideal for regulating the call relative to other
 /// operations in the queue.
-extension NSOperationQueue: ExecutorType {
+extension OperationQueue: ExecutorType {
 
     /// Wraps the `body` closure in an operation and enqueues it.
-    public func submit(body: () -> Void) {
-        addOperationWithBlock(body)
+    public func submit(_ body: @escaping() -> Void) {
+        addOperation(body)
     }
 
 }
@@ -109,8 +116,8 @@ extension CFRunLoop: ExecutorType {
     /// in the default mode.
     ///
     /// - seealso: kCFRunLoopDefaultMode
-    public func submit(body: () -> Void) {
-        CFRunLoopPerformBlock(self, kCFRunLoopDefaultMode, body)
+    public func submit(_ body: @escaping() -> Void) {
+        CFRunLoopPerformBlock(self, CFRunLoopMode.defaultMode.rawValue, body)
         CFRunLoopWakeUp(self)
     }
 
@@ -121,13 +128,13 @@ extension CFRunLoop: ExecutorType {
 ///
 /// As an `ExecutorType`, submitted functions are invoked on the next iteration
 /// of the run loop.
-extension NSRunLoop: ExecutorType {
+extension RunLoop: ExecutorType {
 
     /// Enqueues the `body` closure to be executed as the runloop cycles
     /// in the default mode.
     ///
     /// - seealso: NSDefaultRunLoopMode
-    public func submit(body: () -> Void) {
+    public func submit(_ body: @escaping() -> Void) {
         getCFRunLoop().submit(body)
     }
 

@@ -37,7 +37,7 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     ///
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined value.
-    func upon(executor: ExecutorType, body: Value -> Void)
+    func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void)
 
     /// Waits synchronously for the value to become determined.
     ///
@@ -46,7 +46,33 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    func wait(time: Timeout) -> Value?
+    func wait(_ time: Timeout) -> Value?
+}
+
+private extension DispatchQoS.QoSClass {
+
+    static func current() -> DispatchQoS.QoSClass {
+        return .init(qos_class_self())
+    }
+
+    init(_ qos: qos_class_t) {
+        switch qos {
+        case QOS_CLASS_USER_INTERACTIVE:
+            self = .userInteractive
+        case QOS_CLASS_USER_INITIATED:
+            self = .userInitiated
+        case QOS_CLASS_DEFAULT:
+            self = .`default`
+        case QOS_CLASS_UTILITY:
+            self = .utility
+        case QOS_CLASS_BACKGROUND:
+            self = .background
+        default:
+            self = .unspecified
+        }
+
+    }
+
 }
 
 extension FutureType {
@@ -55,14 +81,14 @@ extension FutureType {
     /// the `QOS_CLASS_UTILITY` global queue, work dispatched onto this queue
     /// on platforms with QoS will match the QoS of the caller, which is
     /// generally the right behavior for data flow.
-    public static var genericQueue: dispatch_queue_t {
+    public static var genericQueue: DispatchQueue {
         // The technique is described and used in Core Foundation:
         // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
         // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
         #if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
-        return dispatch_get_global_queue(qos_class_self(), 0)
+        return DispatchQueue.global(qos: .current())
         #else
-        return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+        return DispatchQueue.global(attributes: .qosUtility)
         #endif
     }
 }
@@ -74,7 +100,7 @@ extension FutureType {
     /// immediately, but this call is always asynchronous.
     ///
     /// - seealso: `upon(_:body:)`.
-    public func upon(queue: dispatch_queue_t, body: Value -> Void) {
+    public func upon(_ queue: DispatchQueue, body: @escaping(Value) -> Void) {
         upon(QueueExecutor(queue), body: body)
     }
 
@@ -82,7 +108,7 @@ extension FutureType {
     ///
     /// If the value is determined, the closure will be enqueued immediately,
     /// but this call is always asynchronous.
-    public func upon(body: Value -> Void) {
+    public func upon(_ body: @escaping(Value) -> Void) {
         upon(Self.genericQueue, body: body)
     }
 
@@ -93,8 +119,8 @@ extension FutureType {
     /// made from the main queue.
     ///
     /// - parameter body: A closure that uses the determined value.
-    public func uponMainQueue(body: Value -> Void) {
-        upon(dispatch_get_main_queue(), body: body)
+    public func uponMainQueue(_ body: @escaping(Value) -> Void) {
+        upon(.main, body: body)
     }
 }
 
@@ -103,7 +129,7 @@ extension FutureType {
     ///
     /// - returns: The determined value, if already filled, or `nil`.
     public func peek() -> Value? {
-        return wait(.Now)
+        return wait(.now)
     }
 
     /// Waits for the value to become determined, then returns it.
@@ -116,12 +142,12 @@ extension FutureType {
     ///
     /// - returns: The determined value.
     var value: Value {
-        return wait(.Forever)!
+        return wait(.forever).unsafelyUnwrapped
     }
 
     /// Check whether or not the receiver is filled.
     var isFilled: Bool {
-        return wait(.Now) != nil
+        return wait(.now) != nil
     }
 }
 
@@ -141,11 +167,11 @@ extension FutureType {
     }
 
     /// Return the `Mirror` for `self`.
-    public func customMirror() -> Mirror {
+    public var customMirror: Mirror {
         if Value.self != Void.self, let value = peek() {
-            return Mirror(self, children: [ "value": value ], displayStyle: .Optional)
+            return Mirror(self, children: [ "value": value ], displayStyle: .optional)
         } else {
-            return Mirror(self, children: [ "isFilled": isFilled ], displayStyle: .Tuple)
+            return Mirror(self, children: [ "isFilled": isFilled ], displayStyle: .tuple)
         }
     }
 

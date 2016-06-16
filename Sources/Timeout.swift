@@ -11,23 +11,23 @@ import Dispatch
 /// An amount of time to wait for an event.
 public enum Timeout {
     /// Do not wait at all.
-    case Now
+    case now
     /// Wait indefinitely.
-    case Forever
+    case forever
     /// Wait for a given number of seconds.
-    case Interval(Double)
+    case interval(Double)
 }
 
-extension Timeout {
+extension DispatchTime {
 
-    var rawValue: dispatch_time_t {
-        switch self {
-        case .Now:
-            return DISPATCH_TIME_NOW
-        case .Forever:
-            return DISPATCH_TIME_FOREVER
-        case .Interval(let time):
-            return dispatch_time(DISPATCH_TIME_NOW, Int64(time * Double(NSEC_PER_SEC)))
+    init(_ timeout: Timeout) {
+        switch timeout {
+        case .now:
+            self = .now()
+        case .forever:
+            self = .distantFuture
+        case .interval(let time):
+            self = .now() + time
         }
     }
 

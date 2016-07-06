@@ -16,7 +16,7 @@ import Dispatch
 private struct DispatchBlockMarker: CallbacksList {
     let block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
         fatalError("This code should never be executed")
-    })!
+    })
     
     var isCompleted: Bool {
         return dispatch_block_testcancel(block) != 0

@@ -3,12 +3,14 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "BNRDeferred"
-  s.version      = "2.0.0-rc.1"
-  s.summary      = "An implementation of OCaml's Deferred for Swift."
+  s.version      = "2.0.0"
+  s.summary      = "Work with values that haven't been determined yet."
 
   s.description  = <<-DESC
   Deferred is an asynchronous promise-style API that can be used as an
-  alternative to the "block callback" pattern.
+  alternative to the "block callback" pattern. It lets you work with values that
+  haven't been determined yet, like an array that's coming later (one day!) from
+  a web service call. It was originally inspired by OCaml's Deferred library.
                    DESC
 
   s.homepage     = "https://github.com/bignerdranch/Deferred"

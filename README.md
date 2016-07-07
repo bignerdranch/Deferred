@@ -6,7 +6,7 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 |                                                                                               |
 |-----------------------------------------------------------------------------------------------|
-|[![Swift 2.2 supported](https://img.shields.io/badge/swift-2.2-EF5138.svg?)][Swift]            |
+|[![Swift 2.3 supported](https://img.shields.io/badge/swift-2.3-EF5138.svg?)][Swift]            |
 |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT License]         |
 |![iOS, OS X, tvOS, and watchOS](https://img.shields.io/cocoapods/p/BNRDeferred.svg)            |
 |[!["BNRDeferred" on CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods] |
@@ -414,7 +414,7 @@ The [`ExecutorType`](http://bignerdranch.github.io/Deferred/Protocols/ExecutorTy
 
 ## Getting Started
 
-Deferred is designed to be used as an embedded framework, which requires a minimum deployment target of iOS 8 or OS X Yosemite (10.10). Embedding through any other means may work, but is not officially supported.
+Deferred is designed to be used as an embedded framework, which requires a minimum deployment target of iOS 8 or macOS 10.10. Embedding through any other means may work, but is not officially supported.
 
 Linux is not yet supported.
 
@@ -427,7 +427,7 @@ There are a few different options to install Deferred.
 Add the following to your Cartfile:
 
 ```
-github "bignerdranch/Deferred" "2.0.0-rc.1"
+github "bignerdranch/Deferred" ~> 2.0
 ```
 
 Then run `carthage update`.
@@ -444,7 +444,7 @@ for up to date installation instructions.
 Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
 
 ```ruby
-pod 'BNRDeferred'
+pod 'BNRDeferred', '~> 2.0'
 ```
 
 You will also need to make sure you're opting into using frameworks:
@@ -457,7 +457,7 @@ Then run `pod install`.
 
 ### Swift Package Manager
 
-We include provisional support for [Swift Package Manager](https://swift.org/package-manager/) on the 2.2 toolchain.
+We include provisional support for [Swift Package Manager](https://swift.org/package-manager/) on the 2.x toolchain.
 
 Add us to your `Package.swift`:
 

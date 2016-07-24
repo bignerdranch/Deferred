@@ -132,24 +132,24 @@
 		DB6AE0351C237E1F00D77BF1 /* Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Framework.xcconfig; sourceTree = "<group>"; };
 		DB6AE0361C237E1F00D77BF1 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		DB6AE0371C237E1F00D77BF1 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
-		DB6AE0381C237F8800D77BF1 /* Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Deferred.swift; sourceTree = "<group>"; };
-		DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFuture.swift; sourceTree = "<group>"; };
-		DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCollections.swift; sourceTree = "<group>"; };
-		DB6AE03B1C237F8800D77BF1 /* FutureType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureType.swift; sourceTree = "<group>"; };
-		DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFuture.swift; sourceTree = "<group>"; };
-		DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
-		DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoStore.swift; sourceTree = "<group>"; };
-		DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
-		DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
-		DB6AE0411C237F8800D77BF1 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
+		DB6AE0381C237F8800D77BF1 /* Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Deferred.swift; path = Deferred/Deferred.swift; sourceTree = "<group>"; };
+		DB6AE0391C237F8800D77BF1 /* ExistentialFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExistentialFuture.swift; path = Deferred/ExistentialFuture.swift; sourceTree = "<group>"; };
+		DB6AE03A1C237F8800D77BF1 /* FutureCollections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureCollections.swift; path = Deferred/FutureCollections.swift; sourceTree = "<group>"; };
+		DB6AE03B1C237F8800D77BF1 /* FutureType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureType.swift; path = Deferred/FutureType.swift; sourceTree = "<group>"; };
+		DB6AE03C1C237F8800D77BF1 /* IgnoringFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IgnoringFuture.swift; path = Deferred/IgnoringFuture.swift; sourceTree = "<group>"; };
+		DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LockProtected.swift; path = Deferred/LockProtected.swift; sourceTree = "<group>"; };
+		DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MemoStore.swift; path = Deferred/MemoStore.swift; sourceTree = "<group>"; };
+		DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PromiseType.swift; path = Deferred/PromiseType.swift; sourceTree = "<group>"; };
+		DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReadWriteLock.swift; path = Deferred/ReadWriteLock.swift; sourceTree = "<group>"; };
+		DB6AE0411C237F8800D77BF1 /* Timeout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Timeout.swift; path = Deferred/Timeout.swift; sourceTree = "<group>"; };
 		DB6AE06C1C237FB200D77BF1 /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
 		DB6AE06D1C237FB200D77BF1 /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
 		DB6AE06E1C237FB200D77BF1 /* LockProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
 		DB6AE06F1C237FB200D77BF1 /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
-		DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureComposition.swift; sourceTree = "<group>"; };
-		DB8CFEF01CB047F200D095B7 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
-		DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureFlatMap.swift; sourceTree = "<group>"; };
-		DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExecutorType.swift; sourceTree = "<group>"; };
+		DB8CFEEB1CB047D100D095B7 /* FutureComposition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureComposition.swift; path = Deferred/FutureComposition.swift; sourceTree = "<group>"; };
+		DB8CFEF01CB047F200D095B7 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureMap.swift; path = Deferred/FutureMap.swift; sourceTree = "<group>"; };
+		DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureFlatMap.swift; path = Deferred/FutureFlatMap.swift; sourceTree = "<group>"; };
+		DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExecutorType.swift; path = Deferred/ExecutorType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

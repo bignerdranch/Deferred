@@ -18,6 +18,7 @@ custom_categories:
   - name: Controlling Where Callbacks Execute
     children:
     - ExecutorType
+    - DispatchQueue
     - NSOperationQueue
     - NSRunLoop
     - CFRunLoop
@@ -39,12 +40,8 @@ head: |
   <link rel="shortcut icon" type="image/x-icon" href="//www.bignerdranch.com/favicon.png">
 hide_documentation_coverage: true
 module: Deferred
-module_version: "2.0.0"
+module_version: "3.0.0-alpha.1"
 # podspec: BNRDeferred.podspec
 root_url: "http://bignerdranch.github.io/Deferred/"
-swift_version: 2.2
+swift_version: 3.0
 theme: fullwidth
-
-# CocoaDocs currently using an old Jazzy
-module_name: Deferred
-author_name: Big Nerd Ranch

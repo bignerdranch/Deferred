@@ -20,6 +20,11 @@ enum Error: ErrorType {
     case Third
 }
 
+func afterDelay(delay: NSTimeInterval, upon queue: dispatch_queue_t = dispatch_get_main_queue(), perform body: () -> Void) {
+    let delay = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * NSTimeInterval(NSEC_PER_SEC)))
+    dispatch_after(delay, queue, body)
+}
+
 extension XCTestCase {
     func waitForTaskToComplete<T>(task: Task<T>) -> TaskResult<T>! {
         let expectation = expectationWithDescription("task completed")

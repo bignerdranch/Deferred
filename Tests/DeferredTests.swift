@@ -337,9 +337,10 @@ class DeferredTests: XCTestCase {
     // run these tests on real devices. This check isn't the most future-proof;
     // if there's ever another archiecture that runs the simulator, this will
     // need to be modified.
-    //
-    // TODO: Add a clause for a tvOS test target
-    #if os(OSX) || (os(iOS) && !(arch(i386) || arch(x86_64)))
+    #if os(OSX)
+    || (os(iOS) && !(arch(i386) || arch(x86_64)))
+    || (os(watchOS) && !(arch(i386) || arch(x86_64)))
+    || (os(tvOS) && !arch(x86_64))
 
     func testThatMainThreadPostsUponWithUserInitiatedQoSClass() {
         let d = Deferred<Int>()

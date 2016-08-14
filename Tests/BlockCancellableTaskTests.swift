@@ -63,9 +63,10 @@ class BlockCancellationTests: XCTestCase {
         let task = Task<Int>(upon: queue, onCancel: Error.Second) { 1 }
 
         task.cancel()
-        dispatch_semaphore_signal(semaphore)
 
         let result = waitForTaskToComplete(task)
-        XCTAssertEqual(result.error as? Error, Error.Second)    }
+        dispatch_semaphore_signal(semaphore)
+        XCTAssertEqual(result.error as? Error, Error.Second)
+    }
 
 }

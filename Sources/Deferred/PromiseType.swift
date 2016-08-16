@@ -38,28 +38,25 @@ public protocol PromiseType {
 }
 
 extension PromiseType {
-    /// Determines the deferred value with a given result.
+    /// Determines the deferred `value`.
     ///
-    /// Filling a deferred value should usually be attempted only once. An
-    /// implementing type may choose to enforce this by default. If an
-    /// implementing type requires multiple potential fillers to race, the
-    /// precondition may be disabled.
+    /// Filling a deferred value should usually be attempted only once. A
+    /// user may choose to enforce this.
     ///
     /// * In playgrounds and unoptimized builds (the default for a "Debug"
-    ///   configuration), program execution should be stopped at the caller in
-    ///   a debuggable state.
+    ///   configuration) where the deferred value is already filled, program
+    ///   execution will be stopped in a debuggable state.
     ///
-    /// * In -O builds (the default for a "Release" configuration), program
-    ///   execution should stop.
+    /// * In optimized builds (the default for a "Release" configuration) where
+    ///   the deferred value is already filled, stop program execution.
     ///
-    /// * In -Ounchecked builds, the programming error should be assumed to not
-    ///   exist.
-    ///
-    /// - parameter value: A resolved value for the instance.
-    /// - parameter assertIfFilled: If `false`, race checking is disabled.
-    public func fill(_ value: Value, assertIfFilled: Bool, file: StaticString = #file, line: UInt = #line) {
-        if !fill(value) && assertIfFilled {
-            assertionFailure("Cannot fill an already-filled \(type(of: self))", file: file, line: line)
+    /// * In unchecked builds, filling a deferred value that is already filled
+    ///   is a serious programming error. The optimizer may assume that it is
+    ///   not possible.
+    @_transparent
+    public func mustFill(with value: Value) {
+        if !fill(value) {
+            preconditionFailure("Cannot fill an already-filled \(type(of: self))")
         }
     }
 }

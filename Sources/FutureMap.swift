@@ -31,24 +31,6 @@ extension FutureType {
     /// Returns a future containing the result of mapping `transform` over the
     /// deferred value.
     ///
-    /// `map` executes the `transform` asynchronously when the future's value
-    /// is determined.
-    ///
-    /// - parameter queue: Dispatch queue for calling the `transform`.
-    /// - parameter transform: Creates something using the deferred value.
-    /// - returns: A new future that is filled once the receiver is determined.
-    /// - seealso: FutureType.map(upon:_:)
-    public func map<NewValue>(upon queue: DispatchQueue, _ transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
-        let d = Deferred<NewValue>()
-        upon(queue) {
-            d.fill(transform($0))
-        }
-        return Future(d)
-    }
-
-    /// Returns a future containing the result of mapping `transform` over the
-    /// deferred value.
-    ///
     /// `map` executes the `transform` asynchronously executed on a global queue
     /// matching the current quality-of-service value.
     ///

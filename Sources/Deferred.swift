@@ -8,37 +8,27 @@
 
 import Dispatch
 
-// MARK: - DispatchBlockMarker
+// MARK: - DispatchCompletionMarker
 
-// A dispatch block (which is different from a plain closure!) constitutes the
-// second half of Deferred. The `dispatch_block_notify` API defines the notifier
-// list used by `Deferred.upon(queue:body:)`.
-private struct DispatchBlockMarker: CallbacksList {
+// A Dispatch work item constitutes the second half of Deferred. The `notify`
+// family of API defines the notifier list used by `Deferred.upon(_:body:)`.
+private extension DispatchWorkItem {
 
-    let block = DispatchWorkItem {
-        fatalError("This code should never be executed")
+    convenience init() {
+        self.init { fatalError("This code should never be executed") }
     }
-    
+
     var isCompleted: Bool {
-        return block.isCancelled
+        return isCancelled
     }
-    
+
     func markCompleted() {
         // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
-        block.cancel()
+        cancel()
         // Executing the block "unblocks" it, calling all the `_notify` blocks
-        block.perform()
+        perform()
     }
 
-    func notify(upon executor: ExecutorType, body: DispatchWorkItem) {
-        if let queue = executor.underlyingQueue {
-            block.notify(queue: queue, execute: body)
-        } else {
-            block.notify(queue: Deferred<Void>.genericQueue) {
-                executor.submit(body)
-            }
-        }
-    }
 }
 
 // MARK: - Deferred
@@ -48,7 +38,7 @@ private struct DispatchBlockMarker: CallbacksList {
 public struct Deferred<Value>: FutureType, PromiseType {
 
     private let storage: MemoStore<Value>
-    private let onFilled = DispatchBlockMarker()
+    private let onFilled = DispatchWorkItem()
     
     /// Initialize an unfilled Deferred.
     public init() {
@@ -63,14 +53,6 @@ public struct Deferred<Value>: FutureType, PromiseType {
 
     // MARK: FutureType
 
-    private func upon(_ executor: ExecutorType, per flags: DispatchWorkItemFlags, execute body: @escaping(Value) -> Void) -> DispatchWorkItem {
-        let workItem = DispatchWorkItem(flags: flags.union(.assignCurrentContext)) { [storage] in
-            storage.withValue(body)
-        }
-        onFilled.notify(upon: executor, body: workItem)
-        return workItem
-    }
-
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
         return onFilled.isCompleted
@@ -84,7 +66,18 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A function that uses the determined value.
     public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
-        _ = upon(executor, per: .inheritQoS, execute: body)
+        func callBodyWithValue() {
+            storage.withValue(body)
+        }
+
+        if let queue = executor.underlyingQueue {
+            onFilled.notify(flags: [.assignCurrentContext, .inheritQoS], queue: queue, execute: callBodyWithValue)
+        } else {
+            let queue = type(of: self).genericQueue
+            onFilled.notify(flags: .assignCurrentContext, queue: queue) {
+                executor.submit(callBodyWithValue)
+            }
+        }
     }
 
     /// Waits synchronously for the value to become determined.
@@ -107,11 +100,14 @@ public struct Deferred<Value>: FutureType, PromiseType {
             return result
         }
 
-        let executor = QueueExecutor(.global(qos: .utility))
-        let handler = upon(executor, per: .enforceQoS, execute: assign)
+        let callback = DispatchWorkItem(flags: [.assignCurrentContext, .enforceQoS]) { [storage] in
+            storage.withValue(assign)
+        }
 
-        guard case .success = handler.wait(timeout: .init(time)) else {
-            handler.cancel()
+        onFilled.notify(queue: .global(), execute: callback)
+
+        guard case .success = callback.wait(timeout: .init(time)) else {
+            callback.cancel()
             return nil
         }
 

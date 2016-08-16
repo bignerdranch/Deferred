@@ -38,23 +38,6 @@ extension FutureType {
 import Dispatch
 
 extension FutureType {
-    /// Begins another asynchronous operation by passing the deferred value to
-    /// `requestNextValue` once it becomes determined.
-    ///
-    /// - parameter queue: Dispatch queue for starting the new operation from.
-    /// - parameter requestNextValue: Start a new operation with the future value.
-    /// - returns: The new deferred value returned by the `transform`.
-    /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewFuture: FutureType>(upon queue: DispatchQueue, _ requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
-        let d = Deferred<NewFuture.Value>()
-        upon(queue) {
-            requestNextValue($0).upon(queue) {
-                _ = d.fill($0)
-            }
-        }
-        return Future(d)
-    }
-
     /// Begins another asynchronous operation with the deferred value once it
     /// becomes determined.
     ///

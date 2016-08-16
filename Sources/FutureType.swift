@@ -30,6 +30,10 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
+    /// The natural executor for use with this future, either by convention or
+    /// implementation detail.
+    associatedtype PreferredExecutor: ExecutorType = DefaultExecutor
+
     /// Call some `body` closure once the value is determined.
     ///
     /// If the value is determined, the closure should be submitted to the
@@ -38,6 +42,12 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined value.
     func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void)
+
+    /// Calls some `body` closure once the value is determined.
+    ///
+    /// By default, calls `upon(_:body:)` with an `ExecutorType`. This method
+    /// serves as sugar for types with global members such as `DispatchQueue`.
+    func upon(_ executor: PreferredExecutor, body: @escaping(Value) -> Void)
 
     /// Waits synchronously for the value to become determined.
     ///
@@ -49,59 +59,24 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     func wait(_ time: Timeout) -> Value?
 }
 
-private extension DispatchQoS.QoSClass {
-
-    static func current() -> DispatchQoS.QoSClass {
-        return .init(qos_class_self())
-    }
-
-    init(_ qos: qos_class_t) {
-        switch qos {
-        case QOS_CLASS_USER_INTERACTIVE:
-            self = .userInteractive
-        case QOS_CLASS_USER_INITIATED:
-            self = .userInitiated
-        case QOS_CLASS_DEFAULT:
-            self = .`default`
-        case QOS_CLASS_UTILITY:
-            self = .utility
-        case QOS_CLASS_BACKGROUND:
-            self = .background
-        default:
-            self = .unspecified
-        }
-
-    }
-
-}
-
 extension FutureType {
     /// A generic catch-all dispatch queue for use with futures, when you just
     /// want to throw some work into the concurrent pile. As an alternative to
-    /// the `QOS_CLASS_UTILITY` global queue, work dispatched onto this queue
+    /// the `.utility` QoS global queue, work dispatched onto this queue
     /// on platforms with QoS will match the QoS of the caller, which is
     /// generally the right behavior for data flow.
     public static var genericQueue: DispatchQueue {
-        // The technique is described and used in Core Foundation:
-        // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
-        // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
-        #if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
-        return DispatchQueue.global(qos: .current())
-        #else
-        return DispatchQueue.global(attributes: .qosUtility)
-        #endif
+        return .global(qos: .current)
     }
 }
 
 extension FutureType {
-    /// Call some `body` closure once the value is determined.
+    /// Calls some `body` closure once the value is determined.
     ///
-    /// If the value is determined, the closure will be submitted to `queue`
-    /// immediately, but this call is always asynchronous.
-    ///
-    /// - seealso: `upon(_:body:)`.
-    public func upon(_ queue: DispatchQueue, body: @escaping(Value) -> Void) {
-        upon(QueueExecutor(queue), body: body)
+    /// By default, calls `upon(_:body:)` with an `ExecutorType`. This method
+    /// serves as sugar for types with global members such as `DispatchQueue`.
+    public func upon(_ preferred: PreferredExecutor, body: @escaping(Value) -> Void) {
+        upon(preferred as ExecutorType, body: body)
     }
 
     /// Call some `body` closure in the background once the value is determined.
@@ -111,7 +86,9 @@ extension FutureType {
     public func upon(_ body: @escaping(Value) -> Void) {
         upon(Self.genericQueue, body: body)
     }
+}
 
+extension FutureType where PreferredExecutor == DispatchQueue {
     /// Call some `body` closure on the main queue once the value is determined.
     ///
     /// If the value is determined, the closure will be submitted to the

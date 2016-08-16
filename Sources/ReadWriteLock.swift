@@ -65,8 +65,8 @@ public struct DispatchLock: ReadWriteLock {
     /// Create a normal instance.
     public init() {}
 
-    private func withLock<Return>(timeout: Timeout, body: () throws -> Return) rethrows -> Return? {
-        guard case .success = semaphore.wait(timeout: .init(timeout)) else { return nil }
+    private func withLock<Return>(by timeout: DispatchTime, body: () throws -> Return) rethrows -> Return? {
+        guard case .success = semaphore.wait(timeout: timeout) else { return nil }
         defer {
             semaphore.signal()
         }
@@ -78,14 +78,14 @@ public struct DispatchLock: ReadWriteLock {
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        return try withLock(timeout: .forever, body: body)!
+        return try withLock(by: .distantFuture, body: body).unsafelyUnwrapped
     }
 
     /// Attempt to call `body` with a lock.
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        return try withLock(timeout: .now, body: body)
+        return try withLock(by: .now(), body: body)
     }
 }
 

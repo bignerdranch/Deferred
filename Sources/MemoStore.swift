@@ -11,26 +11,6 @@ import Dispatch
 import AtomicSwift
 #endif
 
-// Extremely simple surface describing an async rejoin-type notifier for a
-// one-off event.
-protocol CallbacksList {
-    init()
-    
-    var isCompleted: Bool { get }
-    
-    /// Unblock the waiter list.
-    ///
-    /// - precondition: `isCompleted` is false.
-    /// - postcondition: `isCompleted` is true.
-    func markCompleted()
-    
-    /// Become notified when the list becomes unblocked.
-    ///
-    /// If `isCompleted`, an implementer should immediately submit the `body`
-    /// to `queue`.
-    func notify(upon executor: ExecutorType, body: DispatchWorkItem)
-}
-
 // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:
 //  - ObjC: "MyObject *__strong *"
 //  - Swift: "UnsafeMutablePointer<MyObject!>"

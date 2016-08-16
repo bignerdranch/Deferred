@@ -88,6 +88,10 @@
 		DB8CFEFC1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
 		DB8CFEFD1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
 		DB8CFEFE1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
+		DBCD426C1D135CD600813BEF /* QoS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCD426B1D135CD600813BEF /* QoS.swift */; };
+		DBCD426D1D135CD600813BEF /* QoS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCD426B1D135CD600813BEF /* QoS.swift */; };
+		DBCD426E1D135CD600813BEF /* QoS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCD426B1D135CD600813BEF /* QoS.swift */; };
+		DBCD426F1D135CD600813BEF /* QoS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCD426B1D135CD600813BEF /* QoS.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -150,6 +154,7 @@
 		DB8CFEF01CB047F200D095B7 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
 		DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureFlatMap.swift; sourceTree = "<group>"; };
 		DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExecutorType.swift; sourceTree = "<group>"; };
+		DBCD426B1D135CD600813BEF /* QoS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QoS.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,6 +253,7 @@
 				DB6AE03D1C237F8800D77BF1 /* LockProtected.swift */,
 				DB6AE03E1C237F8800D77BF1 /* MemoStore.swift */,
 				DB6AE03F1C237F8800D77BF1 /* PromiseType.swift */,
+				DBCD426B1D135CD600813BEF /* QoS.swift */,
 				DB6AE0401C237F8800D77BF1 /* ReadWriteLock.swift */,
 				DB6AE0411C237F8800D77BF1 /* Timeout.swift */,
 				DB6ADFD81C237DD500D77BF1 /* Info.plist */,
@@ -569,6 +575,7 @@
 				DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0571C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DBCD426D1D135CD600813BEF /* QoS.swift in Sources */,
 				DB8CFEED1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05B1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE05F1C237F8800D77BF1 /* PromiseType.swift in Sources */,
@@ -603,6 +610,7 @@
 				DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF61CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0561C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DBCD426C1D135CD600813BEF /* QoS.swift in Sources */,
 				DB8CFEEC1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05A1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE05E1C237F8800D77BF1 /* PromiseType.swift in Sources */,
@@ -637,6 +645,7 @@
 				DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0581C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DBCD426E1D135CD600813BEF /* QoS.swift in Sources */,
 				DB8CFEEE1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05C1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE0601C237F8800D77BF1 /* PromiseType.swift in Sources */,
@@ -671,6 +680,7 @@
 				DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0591C237F8800D77BF1 /* LockProtected.swift in Sources */,
+				DBCD426F1D135CD600813BEF /* QoS.swift in Sources */,
 				DB8CFEEF1CB047D100D095B7 /* FutureComposition.swift in Sources */,
 				DB6AE05D1C237F8800D77BF1 /* MemoStore.swift in Sources */,
 				DB6AE0611C237F8800D77BF1 /* PromiseType.swift in Sources */,

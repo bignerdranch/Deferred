@@ -151,7 +151,7 @@ class DeferredTests: XCTestCase {
         let d = Deferred<Int>()
         
         let expectation = self.expectation(description: "uponMainQueue block called on main queue")
-        d.uponMainQueue { value in
+        d.upon(.main) { value in
             XCTAssertTrue(Thread.isMainThread)
             XCTAssertEqual(value, 1)
             XCTAssertEqual(d.value, 1)

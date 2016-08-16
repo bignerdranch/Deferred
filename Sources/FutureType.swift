@@ -96,6 +96,7 @@ extension FutureType where PreferredExecutor == DispatchQueue {
     /// made from the main queue.
     ///
     /// - parameter body: A closure that uses the determined value.
+    @available(*, unavailable, message: "Use upon(.main) directly.")
     public func uponMainQueue(_ body: @escaping(Value) -> Void) {
         upon(.main, body: body)
     }

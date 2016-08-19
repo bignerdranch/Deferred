@@ -32,7 +32,7 @@ class IgnoringFutureTests: XCTestCase {
         let peek: ()? = future.wait(.Interval(0.5))
         XCTAssertNil(peek)
 
-        waitForExpectationsWithTimeout(1.5, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
     }
 
     func testIgnoredUponCalledWhenFilled() {
@@ -49,7 +49,7 @@ class IgnoringFutureTests: XCTestCase {
 
         d.fill(1)
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
     }
 
 }

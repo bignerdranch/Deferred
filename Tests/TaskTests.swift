@@ -101,7 +101,7 @@ class TaskTests: XCTestCase {
 
         let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
         let afterTask: Task<String> = beforeTask.flatMap { _ in
-            return Task(Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: afterExpectation.fulfill)
         }
 
         afterTask.cancel()
@@ -225,7 +225,7 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
 
         let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
         let afterTask: Task<String> = beforeTask.flatMap(upon: executor) { _ in
-            return Task(Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: afterExpectation.fulfill)
         }
 
         afterTask.cancel()
@@ -337,7 +337,7 @@ class TaskCustomQueueTests: CustomQueueTestCase {
         let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
         let afterTask = beforeTask.flatMap(upon: queue) { _ -> Task<String> in
             self.assertOnQueue()
-            return Task(Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: afterExpectation.fulfill)
         }
 
         afterTask.cancel()

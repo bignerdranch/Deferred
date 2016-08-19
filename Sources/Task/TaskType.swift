@@ -10,7 +10,7 @@
 import Deferred
 import Result
 #endif
-import Dispatch
+import Foundation
 
 /// A task is a future modelling the completion of some underlying operation,
 /// such as making a web request.
@@ -25,6 +25,11 @@ public protocol TaskType: FutureType {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value: ResultType
 
+    /// The progress of the task.
+    ///
+    /// `cancel()` will typically chain to this `progress`.
+    var progress: NSProgress { get }
+
     /// Attempt to cancel the underlying operation.
     ///
     /// An implementation should be a "best effort". There are several
@@ -35,4 +40,11 @@ public protocol TaskType: FutureType {
     ///
     /// - seealso: isFilled
     func cancel()
+}
+
+extension TaskType {
+    /// Attempt to cancel the underlying operation. This is a "best effort".
+    public func cancel() {
+        progress.cancel()
+    }
 }

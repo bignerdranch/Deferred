@@ -134,6 +134,10 @@
 		DB8CFEFC1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
 		DB8CFEFD1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
 		DB8CFEFE1CB048B200D095B7 /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */; };
+		DB915D0A1D67814400073364 /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB915D091D67814400073364 /* TaskProgress.swift */; };
+		DB915D0B1D67814400073364 /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB915D091D67814400073364 /* TaskProgress.swift */; };
+		DB915D0C1D67814400073364 /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB915D091D67814400073364 /* TaskProgress.swift */; };
+		DB915D0D1D67814400073364 /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB915D091D67814400073364 /* TaskProgress.swift */; };
 		DB9976921C2F1AAA005201CE /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB99768E1C2F1AAA005201CE /* TaskResult.swift */; };
 		DB9976931C2F1AAA005201CE /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB99768E1C2F1AAA005201CE /* TaskResult.swift */; };
 		DB9976941C2F1AAA005201CE /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB99768E1C2F1AAA005201CE /* TaskResult.swift */; };
@@ -239,6 +243,7 @@
 		DB8CFEF01CB047F200D095B7 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureMap.swift; path = Deferred/FutureMap.swift; sourceTree = "<group>"; };
 		DB8CFEF51CB047F800D095B7 /* FutureFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FutureFlatMap.swift; path = Deferred/FutureFlatMap.swift; sourceTree = "<group>"; };
 		DB8CFEFA1CB048B200D095B7 /* ExecutorType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExecutorType.swift; path = Deferred/ExecutorType.swift; sourceTree = "<group>"; };
+		DB915D091D67814400073364 /* TaskProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskProgress.swift; sourceTree = "<group>"; };
 		DB99768E1C2F1AAA005201CE /* TaskResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskResult.swift; sourceTree = "<group>"; };
 		DB9976901C2F1AAA005201CE /* ResultRecovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultRecovery.swift; sourceTree = "<group>"; };
 		DB9976911C2F1AAA005201CE /* ResultType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultType.swift; sourceTree = "<group>"; };
@@ -410,6 +415,7 @@
 				DB215F281CC16F5300A88450 /* TaskCollections.swift */,
 				DB215F531CC17B2D00A88450 /* TaskFlatMap.swift */,
 				DB215F401CC1704300A88450 /* TaskMap.swift */,
+				DB915D091D67814400073364 /* TaskProgress.swift */,
 				DB215F4E1CC1788A00A88450 /* TaskRecover.swift */,
 				DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */,
 			);
@@ -708,6 +714,7 @@
 				DB5F1A381CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0631C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB215F2F1CC16F6B00A88450 /* ResultFuture.swift in Sources */,
+				DB915D0B1D67814400073364 /* TaskProgress.swift in Sources */,
 				DB215F551CC17B2D00A88450 /* TaskFlatMap.swift in Sources */,
 				DB8CFEF71CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0571C237F8800D77BF1 /* LockProtected.swift in Sources */,
@@ -763,6 +770,7 @@
 				DB5F1A371CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0621C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB215F2E1CC16F6B00A88450 /* ResultFuture.swift in Sources */,
+				DB915D0A1D67814400073364 /* TaskProgress.swift in Sources */,
 				DB215F541CC17B2D00A88450 /* TaskFlatMap.swift in Sources */,
 				DB8CFEF61CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0561C237F8800D77BF1 /* LockProtected.swift in Sources */,
@@ -818,6 +826,7 @@
 				DB5F1A391CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0641C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB215F301CC16F6B00A88450 /* ResultFuture.swift in Sources */,
+				DB915D0C1D67814400073364 /* TaskProgress.swift in Sources */,
 				DB215F561CC17B2D00A88450 /* TaskFlatMap.swift in Sources */,
 				DB8CFEF81CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0581C237F8800D77BF1 /* LockProtected.swift in Sources */,
@@ -873,6 +882,7 @@
 				DB5F1A3A1CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
 				DB6AE0651C237F8800D77BF1 /* ReadWriteLock.swift in Sources */,
 				DB215F311CC16F6B00A88450 /* ResultFuture.swift in Sources */,
+				DB915D0D1D67814400073364 /* TaskProgress.swift in Sources */,
 				DB215F571CC17B2D00A88450 /* TaskFlatMap.swift in Sources */,
 				DB8CFEF91CB047F800D095B7 /* FutureFlatMap.swift in Sources */,
 				DB6AE0591C237F8800D77BF1 /* LockProtected.swift in Sources */,

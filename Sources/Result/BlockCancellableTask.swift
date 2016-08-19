@@ -25,7 +25,7 @@ extension Task {
     /// - parameter body: A failable closure creating and returning the
     ///   success value of the task.
     /// - seealso: dispatch_block_flags_t
-    public init(upon queue: dispatch_queue_t = Task<SuccessValue>.genericQueue, per options: dispatch_block_flags_t = [], @autoclosure(escaping) onCancel produceError: () -> ErrorType, body: () throws -> SuccessValue) {
+    public convenience init(upon queue: dispatch_queue_t = Task<SuccessValue>.genericQueue, per options: dispatch_block_flags_t = [], @autoclosure(escaping) onCancel produceError: () -> ErrorType, body: () throws -> SuccessValue) {
         let deferred = Deferred<Result>()
 
         let block = dispatch_block_create(options) {

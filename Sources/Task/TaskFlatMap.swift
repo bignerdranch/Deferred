@@ -10,22 +10,34 @@
 import Deferred
 import Result
 #endif
-import Dispatch
-
-private func commonFlatMap<OldResult: ResultType, NewTask: TaskType>(startNextTask: OldResult.Value throws -> NewTask, cancellationToken: Deferred<Void>) -> (OldResult) -> Future<NewTask.Value> {
-    return { result in
-        do {
-            let newTask = try startNextTask(result.extract())
-            cancellationToken.upon(newTask.cancel)
-            return Future(newTask)
-        } catch {
-            return Future(value: NewTask.Value(error: error))
-        }
-    }
-}
+import Foundation
 
 extension TaskType {
-    private typealias OldSuccessValue = Value.Value
+    private typealias SuccessValue = Value.Value
+    private func commonBody<NewTask: TaskType>(for startNextTask: SuccessValue throws -> NewTask) -> (NSProgress, (Value) -> Task<NewTask.Value.Value>) {
+        let progress = extendedProgress(byUnitCount: 1)
+        return (progress, { (result) in
+            do {
+                let value = try result.extract()
+
+                // We want to become the thread-local progress, but we don't
+                // want to consume units; we may not attach newTask.progress to
+                // the root progress until after the scope ends.
+                progress.becomeCurrentWithPendingUnitCount(0)
+                defer { progress.resignCurrent() }
+
+                // Attempt to create and wrap the next task. Task's own progress
+                // wrapper logic takes over at this point.
+                let newTask = try startNextTask(value)
+                return Task<NewTask.Value.Value>(newTask)
+            } catch {
+                // Failure case behaves just like map: just error passthrough.
+                progress.becomeCurrentWithPendingUnitCount(1)
+                defer { progress.resignCurrent() }
+                return Task<NewTask.Value.Value>(error: error)
+            }
+        })
+    }
 
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
@@ -37,10 +49,10 @@ extension TaskType {
     /// `startNextTask` closure. `flatMap` submits `startNextTask` to `executor`
     /// once the task completes successfully.
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: TaskType>(upon executor: ExecutorType, _ startNextTask: OldSuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
-        let cancellationToken = Deferred<Void>()
-        let mapped = flatMap(upon: executor, commonFlatMap(startNextTask, cancellationToken: cancellationToken))
-        return Task(mapped) { _ = cancellationToken.fill() }
+    public func flatMap<NewTask: TaskType>(upon executor: ExecutorType, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+        let (progress, body) = commonBody(for: startNextTask)
+        let future = flatMap(upon: executor, body)
+        return Task(future: future, progress: progress)
     }
 
     /// Begins another task by passing the result of the task to `startNextTask`
@@ -51,10 +63,10 @@ extension TaskType {
     /// asynchronously once the task completes successfully.
     /// - seealso: flatMap(upon:_:)
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: TaskType>(upon queue: dispatch_queue_t, _ startNextTask: OldSuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
-        let cancellationToken = Deferred<Void>()
-        let mapped = flatMap(upon: queue, commonFlatMap(startNextTask, cancellationToken: cancellationToken))
-        return Task(mapped) { _ = cancellationToken.fill() }
+    public func flatMap<NewTask: TaskType>(upon queue: dispatch_queue_t, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+        let (progress, body) = commonBody(for: startNextTask)
+        let future = flatMap(upon: queue, body)
+        return Task(future: future, progress: progress)
     }
 
     /// Begins another task by passing the result of the task to `startNextTask`
@@ -65,9 +77,9 @@ extension TaskType {
     /// background once the task completes successfully.
     /// - seealso: flatMap(upon:_:)
     /// - seealso: FutureType.flatMap(_:)
-    public func flatMap<NewTask: TaskType>(startNextTask: OldSuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
-        let cancellationToken = Deferred<Void>()
-        let mapped = flatMap(commonFlatMap(startNextTask, cancellationToken: cancellationToken))
-        return Task(mapped) { _ = cancellationToken.fill() }
+    public func flatMap<NewTask: TaskType>(startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+        let (progress, body) = commonBody(for: startNextTask)
+        let future = flatMap(body)
+        return Task(future: future, progress: progress)
     }
 }

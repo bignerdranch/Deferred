@@ -10,7 +10,7 @@
 import Deferred
 import Result
 #endif
-import Dispatch
+import Foundation
 
 private extension ResultType {
     func ignored() -> TaskResult<Void> {
@@ -22,17 +22,19 @@ public struct IgnoringTask<Base: FutureType where Base.Value: ResultType> {
     public typealias Result = TaskResult<Void>
 
     private let base: Base
-    private let cancellation: Cancellation
+    public let progress: NSProgress
 
-    /// Creates an event given with a `base` future and an optional
-    /// `cancellation`.
-    private init(_ base: Base, cancellation: Cancellation) {
+    /// Creates an event given with a `base` future and its `progress`.
+    private init(_ base: Base, progress: NSProgress) {
         self.base = base
-        self.cancellation = cancellation
+        self.progress = progress
     }
 }
 
-extension IgnoringTask: FutureType {
+extension IgnoringTask: TaskType {
+    /// A type that represents the result of some asynchronous event.
+    public typealias Value = Result
+
     /// Call some function once the event completes.
     ///
     /// If the event is already completed, the function will be submitted to the
@@ -54,13 +56,6 @@ extension IgnoringTask: FutureType {
     }
 }
 
-extension IgnoringTask: TaskType {
-    /// Attempt to cancel the underlying operation. This is a "best effort".
-    public func cancel() {
-        cancellation()
-    }
-}
-
 extension TaskType {
     /// Returns a task that ignores the successful completion of this task.
     ///
@@ -74,6 +69,6 @@ extension TaskType {
     ///
     /// - seealso: map(_:)
     public func ignored() -> IgnoringTask<Self> {
-        return IgnoringTask(self, cancellation: cancel)
+        return IgnoringTask(self, progress: progress)
     }
 }

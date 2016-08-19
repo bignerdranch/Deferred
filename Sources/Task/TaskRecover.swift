@@ -10,18 +10,17 @@
 import Deferred
 import Result
 #endif
-import Dispatch
-
-private func commonMapFailure<OldResult: ResultType>(body: ErrorType throws -> OldResult.Value) -> (OldResult) -> TaskResult<OldResult.Value> {
-    return { oldResult in
-        TaskResult {
-            try oldResult.withValues(ifSuccess: { $0 }, ifFailure: { try body($0) })
-        }
-    }
-}
+import Foundation
 
 extension TaskType {
     private typealias SuccessValue = Value.Value
+    private func commonBody(for transform: ErrorType throws -> SuccessValue) -> (NSProgress, (Value) -> TaskResult<SuccessValue>) {
+        return extendingTask(unitCount: 1) { (result) in
+            TaskResult {
+                try result.withValues(ifSuccess: { $0 }, ifFailure: { try transform($0) })
+            }
+        }
+    }
 
     /// Returns a `Task` containing the result of mapping `transform` over the
     /// failed task's error.
@@ -31,9 +30,10 @@ extension TaskType {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
-    public func recover(upon executor: ExecutorType, _ body: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
-        let future = map(upon: executor, commonMapFailure(body))
-        return .init(future, cancellation: cancel)
+    public func recover(upon executor: ExecutorType, _ transform: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
+        let (progress, body) = commonBody( for: transform)
+        let future = map(upon: executor, body)
+        return Task(future: future, progress: progress)
     }
 
     /// Returns a `Task` containing the result of mapping `transform` over the
@@ -44,9 +44,10 @@ extension TaskType {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
-    public func recover(upon queue: dispatch_queue_t, _ body: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
-        let future = map(upon: queue, commonMapFailure(body))
-        return .init(future, cancellation: cancel)
+    public func recover(upon queue: dispatch_queue_t, _ transform: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
+        let (progress, body) = commonBody(for: transform)
+        let future = map(upon: queue, body)
+        return Task(future: future, progress: progress)
     }
 
     /// Returns a `Task` containing the result of mapping `transform` over the
@@ -57,8 +58,9 @@ extension TaskType {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(_:)
-    public func recover(body: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
-        let future = map(commonMapFailure(body))
-        return .init(future, cancellation: cancel)
+    public func recover(transform: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
+        let (progress, body) = commonBody(for: transform)
+        let future = map(body)
+        return Task(future: future, progress: progress)
     }
 }

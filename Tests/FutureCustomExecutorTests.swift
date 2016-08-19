@@ -30,7 +30,6 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         d.fill(())
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(1)
     }
 
     func testMap() {
@@ -47,7 +46,6 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         marker.fill(())
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(2)
     }
 
     func testFlatMap() {
@@ -64,7 +62,6 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         marker.fill(())
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(3)
     }
 
 }

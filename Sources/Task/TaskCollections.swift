@@ -10,7 +10,7 @@
 import Deferred
 import Result
 #endif
-import Dispatch
+import Foundation
 
 extension CollectionType where Generator.Element: TaskType {
     /// Compose a number of tasks into a single notifier task.
@@ -23,19 +23,19 @@ extension CollectionType where Generator.Element: TaskType {
             return Task(value: ())
         }
 
-        let group = dispatch_group_create()
         let coalescingDeferred = Deferred<Task<Void>.Result>()
-        var cancellations = [Cancellation]()
-        cancellations.reserveCapacity(numericCast(underestimateCount()))
+        let progress = NSProgress(discreteWithCount: numericCast(count))
+        let group = dispatch_group_create()
 
         for task in self {
-            cancellations.append(task.cancel)
+            progress.addChild(task.progress, for: task, withPendingUnitCount: 1)
 
             dispatch_group_enter(group)
             task.upon { result in
                 result.withValues(ifSuccess: { _ in }, ifFailure: { error in
                     _ = coalescingDeferred.fill(.Failure(error))
                 })
+
                 dispatch_group_leave(group)
             }
         }
@@ -44,10 +44,6 @@ extension CollectionType where Generator.Element: TaskType {
             _ = coalescingDeferred.fill(.Success())
         }
 
-        return Task(coalescingDeferred) { _ in
-            for function in cancellations {
-                function()
-            }
-        }
+        return Task(coalescingDeferred, progress: progress)
     }
 }

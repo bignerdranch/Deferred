@@ -51,31 +51,23 @@ extension ResultType {
 
 class CustomExecutorTestCase: XCTestCase {
 
-    private struct Executor: ExecutorType {
+    private var queue: NSOperationQueue!
 
-        unowned let owner: CustomExecutorTestCase
+    override func setUp() {
+        super.setUp()
 
-        func submit(body: () -> Void) {
-            owner.submitCount.withWriteLock { (inout count: Int) in
-                count += 1
-            }
-
-            body()
-        }
-
+        queue = NSOperationQueue()
     }
 
-    private var submitCount = LockProtected<Int>(item: 0)
+    override func tearDown() {
+        super.tearDown()
+
+        XCTAssertEqual(queue.operationCount, 0, "Test torn down with in-flight operations")
+        queue = nil
+    }
+
     final var executor: ExecutorType {
-        return Executor(owner: self)
-    }
-
-    func assertExecutorCalled(times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 == times }), file: file, line: line, "Executor was not called exactly \(times) times")
-    }
-
-    func assertExecutorCalledAtLeastOnce(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 >= 1 }), file: file, line: line, "Executor was never called")
+        return queue
     }
     
 }
@@ -92,7 +84,7 @@ class CustomQueueTestCase: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        queue = dispatch_queue_create("Deferred test queue", nil)
+        queue = dispatch_queue_create("Deferred test queue", DISPATCH_QUEUE_CONCURRENT)
         specificPtr = malloc(0)
         dispatch_queue_set_specific(queue, &Constants.key, specificPtr, nil)
     }

@@ -10,29 +10,35 @@
 import Deferred
 import Result
 #endif
-import Dispatch
-
-/// A simple function type expressing the cancellation of some operation.
-public typealias Cancellation = () -> Void
+import Foundation
 
 /// A wrapper over any task.
 ///
 /// Forwards operations to an arbitrary underlying future having the same result
 /// type, optionally combined with some `cancellation`.
-public struct Task<SuccessValue> {
+public final class Task<SuccessValue>: NSObject, NSProgressReporting {
     public typealias Result = TaskResult<SuccessValue>
 
     private let future: Future<Result>
-    private let cancellation: Cancellation
+    public let progress: NSProgress
 
-    /// Creates a task given a `future` and an optional `cancellation`.
-    public init(_ future: Future<Result>, cancellation: Cancellation) {
+    /// Creates a task given a `future` and its `progress`.
+    public init(future: Future<Result>, progress: NSProgress) {
         self.future = future
-        self.cancellation = cancellation
+        self.progress = NSProgress.extendingRootIfNeeded(for: future, progress: progress)
     }
+
+    /// Create a task that will never complete.
+    public override convenience init() {
+        self.init(future: Future(), progress: NSProgress(indefinite: ()))
+    }
+
 }
 
-extension Task: FutureType {
+extension Task: TaskType {
+    /// A type that represents the result of some asynchronous operation.
+    public typealias Value = Result
+
     /// Call some function once the operation completes.
     ///
     /// If the task is complete, the function will be submitted to the
@@ -54,41 +60,45 @@ extension Task: FutureType {
     }
 }
 
-extension Task: TaskType {
-    /// Attempt to cancel the underlying operation. This is a "best effort".
-    public func cancel() {
-        cancellation()
-    }
-}
-
 extension Task {
     /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: Cancellation) {
-        self.init(Future(task: base), cancellation: cancellation)
+    public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, progress: NSProgress) {
+        self.init(future: Future(task: base), progress: progress)
     }
 
-    /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public init<Task: TaskType where Task.Value.Value == SuccessValue>(_ base: Task) {
-        self.init(Future(task: base), cancellation: base.cancel)
+    /// Creates a task given a `future` and an optional `cancellation`.
+    ///
+    /// `cancellation` will be called asynchronously, but not on any particular
+    /// queue. If you must do work on a specific queue, schedule work on it.
+    public convenience init(future: Future<Result>, cancellation: ((Void) -> Void)?) {
+        self.init(future: future, progress: NSProgress(future: future, cancellation: cancellation))
+    }
+
+    /// Create a task whose `upon(_:_:)` method uses the result of `base`.
+    ///
+    /// `cancellation` will be called asynchronously, but not on any particular
+    /// queue. If you must do work on a specific queue, schedule work on it.
+    public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: ((Void) -> Void)?) {
+        self.init(future: Future(task: base), cancellation: cancellation)
+    }
+
+    /// Create a task whose `upon(_:_:)` method uses the result of `base`.
+    public convenience init<Task: TaskType where Task.Value.Value == SuccessValue>(_ base: Task) {
+        self.init(future: Future(task: base), progress: base.progress)
     }
 
     /// Wrap an operation that has already completed with `value`.
-    public init(@autoclosure value getValue: () throws -> SuccessValue) {
-        self.init(Future(value: TaskResult(with: getValue)), cancellation: {})
+    public convenience init(@autoclosure value getValue: () throws -> SuccessValue) {
+        self.init(future: Future(value: TaskResult(with: getValue)), progress: NSProgress(noWork: ()))
     }
 
     /// Wrap an operation that has already failed with `error`.
-    public init(error: ErrorType) {
-        self.init(Future(value: TaskResult(error: error)), cancellation: {})
-    }
-
-    /// Create a task that will never complete.
-    public init() {
-        self.init(Future(), cancellation: {})
+    public convenience init(error: ErrorType) {
+        self.init(future: Future(value: TaskResult(error: error)), progress: NSProgress(noWork: ()))
     }
 
     /// Create a task having the same underlying operation as the `other` task.
-    public init(_ other: Task<SuccessValue>) {
-        self.init(other.future, cancellation: other.cancellation)
+    public convenience init(_ other: Task<SuccessValue>) {
+        self.init(future: other.future, progress: other.progress)
     }
 }

@@ -101,7 +101,7 @@ class TaskTests: XCTestCase {
 
         let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
         let afterTask: Task<String> = beforeTask.flatMap { _ in
-            return Task(Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: afterExpectation.fulfill)
         }
 
         afterTask.cancel()
@@ -180,7 +180,6 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
         d.succeed(1)
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalledAtLeastOnce()
     }
 
     func testUponFailure() {
@@ -194,7 +193,6 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
         d.fail(Error.First)
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalledAtLeastOnce()
     }
 
     func testThatThrowingMapSubstitutesWithError() {
@@ -217,7 +215,6 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(3)
     }
 
     func testThatFlatMapForwardsCancellationToSubsequentTask() {
@@ -225,13 +222,12 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
 
         let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
         let afterTask: Task<String> = beforeTask.flatMap(upon: executor) { _ in
-            return Task(Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: afterExpectation.fulfill)
         }
 
         afterTask.cancel()
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(1)
     }
 
     func testThatThrowingFlatMapSubstitutesWithError() {
@@ -248,7 +244,6 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalledAtLeastOnce()
     }
 
     func testThatRecoverMapsFailures() {
@@ -269,7 +264,6 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(1)
     }
 
 }
@@ -337,7 +331,7 @@ class TaskCustomQueueTests: CustomQueueTestCase {
         let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
         let afterTask = beforeTask.flatMap(upon: queue) { _ -> Task<String> in
             self.assertOnQueue()
-            return Task(Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: afterExpectation.fulfill)
         }
 
         afterTask.cancel()

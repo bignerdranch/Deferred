@@ -1,22 +1,19 @@
 language: objective-c
 osx_image: xcode7.3
+rvm:
+- 2.2.5
 install:
-- gem install scan --no-rdoc --no-ri --no-document --quiet
-- gem install cocoapods --no-rdoc --no-ri --no-document --quiet
-- gem install jazzy --no-rdoc --no-ri --no-document --quiet
+- bundle install --jobs=3 --retry=3
 - brew install carthage --force-bottle
 env:
   matrix:
   - SCAN_OPEN_REPORT=false
   global:
     secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=
-before_script:
-- set -o pipefail
 script:
 - scan -s Deferred
-- scan -s MobileDeferred
-- scan -s TVDeferred
-- carthage build --no-skip-current --configuration Debug
+- scan -s MobileDeferred --devices "iPhone 5s (8.4), iPhone 6s (9.3)"
+- carthage build --no-skip-current --configuration Debug --platform tvOS,watchOS
 - pod lib lint --quick
 after_success:
 - "./Configurations/publish_docs.sh"

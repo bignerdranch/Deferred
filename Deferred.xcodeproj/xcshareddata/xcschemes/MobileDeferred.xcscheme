@@ -52,6 +52,74 @@
                BlueprintName = "MobileDeferredTests"
                ReferencedContainer = "container:Deferred.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "BlockCancellationTests">
+               </Test>
+               <Test
+                  Identifier = "CustomExecutorTestCase">
+               </Test>
+               <Test
+                  Identifier = "CustomQueueTestCase">
+               </Test>
+               <Test
+                  Identifier = "DeferredTests">
+               </Test>
+               <Test
+                  Identifier = "ExistentialFutureTests">
+               </Test>
+               <Test
+                  Identifier = "FutureCustomExecutorTests">
+               </Test>
+               <Test
+                  Identifier = "IgnoringFutureTests">
+               </Test>
+               <Test
+                  Identifier = "LockProtectedTests">
+               </Test>
+               <Test
+                  Identifier = "ReadWriteLockTests">
+               </Test>
+               <Test
+                  Identifier = "ResultRecoveryTests">
+               </Test>
+               <Test
+                  Identifier = "ResultTests">
+               </Test>
+               <Test
+                  Identifier = "TaskAccumulatorTests">
+               </Test>
+               <Test
+                  Identifier = "TaskCustomExecutorTests">
+               </Test>
+               <Test
+                  Identifier = "TaskCustomQueueTests">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testThatMapPassesThroughErrors()">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testThatRecoverMapsFailures()">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testThatRecoverPassesThroughValues()">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testThatThrowingFlatMapSubstitutesWithError()">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testThatThrowingMapSubstitutesWithError()">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testUponFailure()">
+               </Test>
+               <Test
+                  Identifier = "TaskTests/testUponSuccess()">
+               </Test>
+               <Test
+                  Identifier = "VoidResultTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
@@ -86,6 +154,11 @@
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
+         <AdditionalOption
+            key = "NSZombieEnabled"
+            value = "YES"
+            isEnabled = "YES">
+         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction

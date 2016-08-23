@@ -79,26 +79,21 @@ class CustomQueueTestCase: XCTestCase {
     }
 
     private(set) var queue: dispatch_queue_t!
-    private var specificPtr: UnsafeMutablePointer<Void>!
 
     override func setUp() {
         super.setUp()
 
         queue = dispatch_queue_create("Deferred test queue", DISPATCH_QUEUE_CONCURRENT)
-        specificPtr = malloc(0)
-        dispatch_queue_set_specific(queue, &Constants.key, specificPtr, nil)
+        dispatch_queue_set_specific(queue, &Constants.key, UnsafeMutablePointer(Unmanaged.passUnretained(self).toOpaque()), nil)
     }
 
     override func tearDown() {
         queue = nil
-        free(specificPtr)
-        specificPtr = nil
-
         super.tearDown()
     }
 
     func assertOnQueue(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssertEqual(dispatch_get_specific(&Constants.key), specificPtr, file: file, line: line)
+        XCTAssertEqual(dispatch_get_specific(&Constants.key), UnsafeMutablePointer(Unmanaged.passUnretained(self).toOpaque()), file: file, line: line)
     }
     
 }

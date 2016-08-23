@@ -11,11 +11,8 @@ env:
   global:
     secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=
 script:
-- scan -s Deferred
-- scan -s MobileDeferred --devices "iPhone 5s (8.4)", "iPhone 6s (9.3)"
-- scan -s TVDeferred
-- carthage build --no-skip-current --configuration Debug
-- pod lib lint --quick
+- env NSUnbufferedIO=YES xcodebuild -scheme MobileDeferred -project ./Deferred.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 6' build test
+- env NSUnbufferedIO=YES xcodebuild -scheme MobileDeferred -project ./Deferred.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 6,OS=8.4' build test
 after_success:
 - "./Configurations/publish_docs.sh"
 notifications:

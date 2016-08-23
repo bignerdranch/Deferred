@@ -28,19 +28,22 @@ private struct KVO {
 
 private final class ProxyProgress: NSProgress {
 
-    var original: NSProgress!
+    dynamic var original: NSProgress!
 
     init(cloning original: NSProgress) {
         self.original = original
         super.init(parent: .currentProgress(), userInfo: nil)
         start()
+        print(unsafeAddressOf(self))
     }
 
     func start() {
         for keyPath in KVO.KeyPath.all {
             original.addObserver(self, forKeyPath: keyPath.rawValue, options: [.Initial, .New], context: &KVO.context)
         }
-        cancellationHandler = original.cancel
+        cancellationHandler = {
+            self.original.cancel()
+        }
         pausingHandler = original.pause
         if #available(OSX 10.11, iOS 9.0, *) {
             resumingHandler = original.resume
@@ -48,6 +51,7 @@ private final class ProxyProgress: NSProgress {
     }
 
     func invalidate() {
+        original.removeObserver(<#T##observer: NSObject##NSObject#>, forKeyPath: <#T##String#>, context: <#T##UnsafeMutablePointer<Void>#>)
         for keyPath in KVO.KeyPath.all {
             original.removeObserver(self, forKeyPath: keyPath.rawValue, context: &KVO.context)
         }
@@ -69,16 +73,17 @@ private final class ProxyProgress: NSProgress {
             guard change?[NSKeyValueChangeNewKey] as? Bool == true else { return }
             cancellationHandler = nil
             cancel()
-            cancellationHandler = original.cancel
         case (KVO.KeyPath.paused.rawValue?, &KVO.context):
             if change?[NSKeyValueChangeNewKey] as? Bool == true {
                 pausingHandler = nil
                 pause()
-                pausingHandler = original.pause
+                if #available(OSX 10.11, iOS 9.0, *) {
+                    resumingHandler = original.resume
+                }
             } else if #available(OSX 10.11, iOS 9.0, *) {
                 resumingHandler = nil
                 resume()
-                resumingHandler = original.resume
+                pausingHandler = original.pause
             }
         case (let keyPath?, &KVO.context):
             setValue(change?[NSKeyValueChangeNewKey], forKeyPath: keyPath)
@@ -100,11 +105,11 @@ private final class ProxyProgress: NSProgress {
         original.addChild(child, withPendingUnitCount: unitCount)
     }
 
-    @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
-        return [ "original.userInfo" ]
-    }
+//    @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
+//        return [ "original.userInfo" ]
+//    }
 
-    #if swift(>=2.3)
+    /*#if swift(>=2.3)
     override var userInfo: [String : AnyObject] {
         return original.userInfo
     }
@@ -116,6 +121,13 @@ private final class ProxyProgress: NSProgress {
 
     override func setUserInfoObject(object: AnyObject?, forKey key: String) {
         original.setUserInfoObject(object, forKey: key)
+    }*/
+
+    static func activate<Future: FutureType>(cloning progress: NSProgress, for future: Future) {
+        let wrapper = ProxyProgress(cloning: progress)
+        future.upon { _ in
+            wrapper.invalidate()
+        }
     }
 
 }
@@ -128,14 +140,12 @@ extension NSProgress {
     func addChild<Future: FutureType>(progress: NSProgress, for future: Future, withPendingUnitCount pendingUnitCount: Int64) {
         if #available(OSX 10.11, iOS 9.0, *) {
             addChild(progress, withPendingUnitCount: pendingUnitCount)
-        } else {
+        } else if NSProgress.currentProgress() !== self {
             becomeCurrentWithPendingUnitCount(pendingUnitCount)
             defer { resignCurrent() }
-
-            let wrapper = ProxyProgress(cloning: progress)
-            future.upon { _ in
-                wrapper.invalidate()
-            }
+            ProxyProgress.activate(cloning: progress, for: future)
+        } else {
+            ProxyProgress.activate(cloning: progress, for: future)
         }
     }
 

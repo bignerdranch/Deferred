@@ -44,8 +44,18 @@ private final class ProxyProgress: NSProgress {
             original.addObserver(self, forKeyPath: keyPath.rawValue, options: [.Initial, .New], context: &KVO.context)
         }
 
-        cancellationHandler = original.cancel
-        pausingHandler = original.pause
+        if NSProgress.currentProgress()?.cancelled == true {
+            original.cancel()
+        } else {
+            cancellationHandler = original.cancel
+        }
+
+        if NSProgress.currentProgress()?.paused == true {
+            original.pause()
+        } else {
+            pausingHandler = original.pause
+        }
+
         if #available(OSX 10.11, iOS 9.0, *) {
             resumingHandler = original.resume
         }

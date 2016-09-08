@@ -165,6 +165,89 @@ class TaskTests: XCTestCase {
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
+    func testThatCancellationIsAppliedImmediatelyWhenMapping() {
+        let beforeExpectation = expectationWithDescription("original task cancelled")
+        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>(), cancellation: beforeExpectation.fulfill)
+
+        beforeTask.cancel()
+        XCTAssert(beforeTask.progress.cancelled)
+
+        let afterTask: Task<String> = beforeTask.map(impossible)
+
+        XCTAssert(afterTask.progress.cancelled)
+
+        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+    }
+
+    func testThatTaskCreatedWithProgressReflectsThatProgress() {
+        let progress = NSProgress(parent: nil, userInfo: nil)
+        progress.totalUnitCount = 10
+        progress.setUserInfoObject(true, forKey: "Test")
+        progress.cancellable = false
+
+        let task = Task<Int>(Deferred<TaskResult<Int>>(), progress: progress)
+
+        XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0, accuracy: 0.001)
+        XCTAssertEqual(progress.userInfo["Test"] as? Bool, true)
+        XCTAssert(task.progress.cancellable)
+
+        progress.completedUnitCount = 5
+        XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
+    }
+
+    func testThatTaskCreatedUnfilledIsIndeterminate() {
+        let task = Task<Int>()
+
+        XCTAssert(task.progress.indeterminate)
+    }
+
+    func testThatTaskWrappingUnfilledIsIndeterminate() {
+        let d = Deferred<Task<Int>.Result>()
+        let task = Task(d, cancellation: {})
+
+        XCTAssertFalse(task.progress.indeterminate)
+    }
+
+    func testThatTaskWrappingFilledIsDeterminate() {
+        let d = Deferred<Task<Int>.Result>.init(value: .Success(42))
+        let task = Task(d, cancellation: {})
+
+        XCTAssertFalse(task.progress.indeterminate)
+    }
+
+    func testThatMapExtendsParentFractions() {
+        let beforeTask: Task<Int> = Task(value: 42)
+        XCTAssertEqualWithAccuracy(beforeTask.progress.fractionCompleted, 1, accuracy: 0.001)
+
+        let afterTask = beforeTask.map { $0 * 2 }
+        _ = expectationForPredicate(NSPredicate(block: {
+            abs(($0.0 as! NSProgress).fractionCompleted.distanceTo(1)) <= 0.0001
+        }), evaluatedWithObject: afterTask.progress, handler: nil)
+
+        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+    }
+
+    func testThatFlatMapExtendsParentFractions() {
+        let beforeTask: Task<Int> = Task(value: 42)
+        XCTAssertEqualWithAccuracy(beforeTask.progress.fractionCompleted, 1, accuracy: 0.001)
+
+        let afterTask = beforeTask.flatMap { (before) -> Task<Int> in
+            let d = Deferred<Task<Int>.Result>()
+            let task = Task(d, cancellation: nil)
+            afterDelay(0.5, perform: {
+                d.succeed(before * 2)
+            })
+            return task
+        }
+        XCTAssertNotEqualWithAccuracy(afterTask.progress.fractionCompleted, 1, 0.001)
+
+        _ = expectationForPredicate(NSPredicate(block: {
+            abs(($0.0 as! NSProgress).fractionCompleted.distanceTo(1)) <= 0.0001
+        }), evaluatedWithObject: afterTask.progress, handler: nil)
+
+        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+    }
+
 }
 
 class TaskCustomExecutorTests: CustomExecutorTestCase {

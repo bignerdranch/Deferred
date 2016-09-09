@@ -140,45 +140,49 @@ extension NSProgress {
 // MARK: - Convenience initializers
 
 extension NSProgress {
-    @nonobjc convenience init(discreteWithCount totalUnitCount: Int64) {
-        self.init(parent: nil, userInfo: nil)
-        self.totalUnitCount = totalUnitCount
+    // Indeterminate progress which will likely not change.
+    @nonobjc static func indefinite() -> Self {
+        let progress = self.init(parent: nil, userInfo: nil)
+        progress.totalUnitCount = -1
+        progress.cancellable = false
+        return progress
     }
 
-    @nonobjc convenience init(indefinite: ()) {
-        self.init(parent: nil, userInfo: nil)
-        totalUnitCount = -1
-        cancellable = false
+    // Progress for which no work actually needs to be done.
+    @nonobjc static func noWork() -> Self {
+        let progress = self.init(parent: nil, userInfo: nil)
+        progress.totalUnitCount = 0
+        progress.completedUnitCount = 1
+        progress.cancellable = false
+        progress.pausable = false
+        return progress
     }
 
-    @nonobjc convenience init(noWork: ()) {
-        self.init(parent: nil, userInfo: nil)
-        totalUnitCount = 0
-        completedUnitCount = 1
-        cancellable = false
-        pausable = false
-    }
+    // A simple indeterminate progress with a cancellation function.
+    @nonobjc static func wrapped<Future: FutureType where Future.Value: ResultType>(future: Future, cancellation: ((Void) -> Void)?) -> NSProgress {
+        if let task = future as? Task<Future.Value.Value> {
+            return task.progress
+        }
 
-    // A simple indeterminate progress with a completion block.
-    @nonobjc convenience init<Future: FutureType>(future: Future, cancellation: ((Void) -> Void)?) {
-        self.init(parent: nil, userInfo: nil)
-
-        totalUnitCount = future.isFilled ? 0 : -1
+        let progress = NSProgress(parent: nil, userInfo: nil)
+        progress.totalUnitCount = future.isFilled ? 0 : -1
 
         if let cancellation = cancellation {
-            cancellationHandler = cancellation
+            progress.cancellationHandler = cancellation
         } else {
-            cancellable = false
+            progress.cancellable = false
         }
 
-        future.upon { [weak self] _ in
-            self?.totalUnitCount = 1
-            self?.completedUnitCount = 1
+        future.upon { [weak progress] _ in
+            progress?.totalUnitCount = 1
+            progress?.completedUnitCount = 1
         }
+
+        return progress
     }
 }
 
-// MARK: - Task extension
+// MARK: - Task chaning
 
 /**
  Both Task<Value> and NSProgress operate compose over implicit trees, but their
@@ -190,13 +194,25 @@ extension NSProgress {
 
 private let NSProgressTaskRootLockKey = "com_bignerdranch_Deferred_taskRootLock"
 
-extension NSProgress {
+private extension NSProgress {
     /// `true` if the progress is a wrapper progress created by `Task<Value>`
-    private var isTaskRoot: Bool {
+    var isTaskRoot: Bool {
         return userInfo[NSProgressTaskRootLockKey] != nil
     }
 
-    static func extendingRoot(for progress: NSProgress) -> NSProgress {
+    /// Create a progress for the root of an implicit chain of tasks.
+    convenience init(taskRootFor progress: NSProgress, orphaned: Bool) {
+        self.init(parent: nil, userInfo: nil)
+        totalUnitCount = 1
+        setUserInfoObject(NSLock(), forKey: NSProgressTaskRootLockKey)
+        adoptChild(progress, orphaned: orphaned, pendingUnitCount: 1)
+    }
+}
+
+extension NSProgress {
+    /// Wrap or re-wrap `progress` if necessary, suitable for becoming the
+    /// progress of a Task node.
+    @nonobjc static func taskRoot(for progress: NSProgress) -> NSProgress {
         if progress.isTaskRoot || progress === NSProgress.currentProgress() {
             // Task<Value> has already taken care of this at a deeper level.
             return progress
@@ -209,17 +225,10 @@ extension NSProgress {
             return NSProgress(taskRootFor: progress, orphaned: true)
         }
     }
-
-    /// Create a progress for the root of an implicit chain of tasks.
-    @nonobjc convenience init(taskRootFor progress: NSProgress, orphaned: Bool) {
-        self.init(parent: nil, userInfo: nil)
-        totalUnitCount = 1
-        setUserInfoObject(NSLock(), forKey: NSProgressTaskRootLockKey)
-        adoptChild(progress, orphaned: orphaned, pendingUnitCount: 1)
-    }
 }
 
-extension TaskType {
+extension Task {
+    /// Extend the progress of `self` to reflect an added operation of `cost`.
     func extendedProgress(byUnitCount cost: Int64) -> NSProgress {
         if let lock = progress.userInfo[NSProgressTaskRootLockKey] as? NSLock {
             lock.lock()

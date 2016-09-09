@@ -12,9 +12,8 @@ import Result
 #endif
 import Foundation
 
-extension TaskType {
-    private typealias SuccessValue = Value.Value
-    private func commonBody<NewTask: TaskType>(for startNextTask: SuccessValue throws -> NewTask) -> (NSProgress, (Value) -> Task<NewTask.Value.Value>) {
+extension Task {
+    private func commonBody<NewTask: FutureType where NewTask.Value: ResultType>(for startNextTask: SuccessValue throws -> NewTask) -> (NSProgress, (Result) -> Task<NewTask.Value.Value>) {
         let progress = extendedProgress(byUnitCount: 1)
         return (progress, { (result) in
             do {
@@ -49,10 +48,10 @@ extension TaskType {
     /// `startNextTask` closure. `flatMap` submits `startNextTask` to `executor`
     /// once the task completes successfully.
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: TaskType>(upon executor: ExecutorType, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+    public func flatMap<NewTask: FutureType where NewTask.Value: ResultType>(upon executor: ExecutorType, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
         let (progress, body) = commonBody(for: startNextTask)
         let future = flatMap(upon: executor, body)
-        return Task(future: future, progress: progress)
+        return Task<NewTask.Value.Value>(future: future, progress: progress)
     }
 
     /// Begins another task by passing the result of the task to `startNextTask`
@@ -63,10 +62,10 @@ extension TaskType {
     /// asynchronously once the task completes successfully.
     /// - seealso: flatMap(upon:_:)
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: TaskType>(upon queue: dispatch_queue_t, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+    public func flatMap<NewTask: FutureType where NewTask.Value: ResultType>(upon queue: dispatch_queue_t, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
         let (progress, body) = commonBody(for: startNextTask)
         let future = flatMap(upon: queue, body)
-        return Task(future: future, progress: progress)
+        return Task<NewTask.Value.Value>(future: future, progress: progress)
     }
 
     /// Begins another task by passing the result of the task to `startNextTask`
@@ -77,9 +76,9 @@ extension TaskType {
     /// background once the task completes successfully.
     /// - seealso: flatMap(upon:_:)
     /// - seealso: FutureType.flatMap(_:)
-    public func flatMap<NewTask: TaskType>(startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+    public func flatMap<NewTask: FutureType where NewTask.Value: ResultType>(startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
         let (progress, body) = commonBody(for: startNextTask)
         let future = flatMap(body)
-        return Task(future: future, progress: progress)
+        return Task<NewTask.Value.Value>(future: future, progress: progress)
     }
 }

@@ -165,10 +165,6 @@
 		DBBDCF3C1D61314A00C595E8 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */; };
 		DBBDCF3D1D61314A00C595E8 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */; };
 		DBBDCF3E1D61314A00C595E8 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */; };
-		DBDAC8C71CA9D4F80087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
-		DBDAC8C81CA9D4F80087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
-		DBDAC8C91CA9D4F80087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
-		DBDAC8EE1CAA10A00087EA91 /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -252,7 +248,6 @@
 		DB9976AA1C2F2E6E005201CE /* TaskResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskResultTests.swift; sourceTree = "<group>"; };
 		DB9976AB1C2F2E6E005201CE /* VoidResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoidResultTests.swift; sourceTree = "<group>"; };
 		DBBDCF3B1D61314A00C595E8 /* TaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
-		DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -417,7 +412,6 @@
 				DB215F401CC1704300A88450 /* TaskMap.swift */,
 				DB915D091D67814400073364 /* TaskProgress.swift */,
 				DB215F4E1CC1788A00A88450 /* TaskRecover.swift */,
-				DBDAC8C61CA9D4F80087EA91 /* TaskType.swift */,
 			);
 			path = Task;
 			sourceTree = "<group>";
@@ -708,7 +702,6 @@
 				DB4C05141CC1A2B400D03269 /* TaskAccumulator.swift in Sources */,
 				DB6AE0531C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB8CFEFC1CB048B200D095B7 /* ExecutorType.swift in Sources */,
-				DBDAC8C81CA9D4F80087EA91 /* TaskType.swift in Sources */,
 				DB215F2A1CC16F5300A88450 /* TaskCollections.swift in Sources */,
 				DB6AE0431C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB5F1A381CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
@@ -764,7 +757,6 @@
 				DB4C05131CC1A2B400D03269 /* TaskAccumulator.swift in Sources */,
 				DB6AE0521C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB8CFEFB1CB048B200D095B7 /* ExecutorType.swift in Sources */,
-				DBDAC8C71CA9D4F80087EA91 /* TaskType.swift in Sources */,
 				DB215F291CC16F5300A88450 /* TaskCollections.swift in Sources */,
 				DB6AE0421C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB5F1A371CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
@@ -820,7 +812,6 @@
 				DB4C05151CC1A2B400D03269 /* TaskAccumulator.swift in Sources */,
 				DB6AE0541C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB8CFEFD1CB048B200D095B7 /* ExecutorType.swift in Sources */,
-				DBDAC8C91CA9D4F80087EA91 /* TaskType.swift in Sources */,
 				DB215F2B1CC16F5300A88450 /* TaskCollections.swift in Sources */,
 				DB6AE0441C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB5F1A391CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,
@@ -876,7 +867,6 @@
 				DB4C05161CC1A2B400D03269 /* TaskAccumulator.swift in Sources */,
 				DB6AE0551C237F8800D77BF1 /* IgnoringFuture.swift in Sources */,
 				DB8CFEFE1CB048B200D095B7 /* ExecutorType.swift in Sources */,
-				DBDAC8EE1CAA10A00087EA91 /* TaskType.swift in Sources */,
 				DB215F2C1CC16F5300A88450 /* TaskCollections.swift in Sources */,
 				DB6AE0451C237F8800D77BF1 /* Deferred.swift in Sources */,
 				DB5F1A3A1CBAD61500B5BE9E /* ExistentialTask.swift in Sources */,

@@ -12,7 +12,8 @@ import Result
 #endif
 import Foundation
 
-extension CollectionType where Generator.Element: TaskType {
+
+extension CollectionType where Generator.Element: FutureType, Generator.Element.Value: ResultType {
     /// Compose a number of tasks into a single notifier task.
     ///
     /// If any of the contained tasks fail, the returned task will be determined
@@ -24,13 +25,13 @@ extension CollectionType where Generator.Element: TaskType {
         }
 
         let coalescingDeferred = Deferred<Task<Void>.Result>()
-        let progress = NSProgress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = numericCast(count)
-
+        let outerProgress = NSProgress(parent: nil, userInfo: nil)
+        outerProgress.totalUnitCount = numericCast(count)
         let group = dispatch_group_create()
 
         for task in self {
-            progress.adoptChild(task.progress, orphaned: true, pendingUnitCount: 1)
+            let innerProgress = NSProgress.wrapped(task, cancellation: nil)
+            outerProgress.adoptChild(innerProgress, orphaned: true, pendingUnitCount: 1)
 
             dispatch_group_enter(group)
             task.upon { result in
@@ -46,6 +47,6 @@ extension CollectionType where Generator.Element: TaskType {
             _ = coalescingDeferred.fill(.Success())
         }
 
-        return Task(coalescingDeferred, progress: progress)
+        return Task(coalescingDeferred, progress: outerProgress)
     }
 }

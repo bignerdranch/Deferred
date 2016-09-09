@@ -12,9 +12,8 @@ import Result
 #endif
 import Foundation
 
-extension TaskType {
-    private typealias SuccessValue = Value.Value
-    private func commonBody<NewSuccessValue>(for transform: Value.Value throws -> NewSuccessValue) -> (NSProgress, (Value) -> TaskResult<NewSuccessValue>) {
+extension Task {
+    private func commonBody<NewSuccessValue>(for transform: Value.Value throws -> NewSuccessValue) -> (NSProgress, (Result) -> TaskResult<NewSuccessValue>) {
         let progress = extendedProgress(byUnitCount: 1)
         return (progress, { (result) in
             progress.becomeCurrentWithPendingUnitCount(1)
@@ -37,7 +36,7 @@ extension TaskType {
     public func map<NewSuccessValue>(upon executor: ExecutorType, _ transform: SuccessValue throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(upon: executor, body)
-        return Task(future: future, progress: progress)
+        return Task<NewSuccessValue>(future: future, progress: progress)
     }
 
     /// Returns a `Task` containing the result of mapping `transform` over the
@@ -51,7 +50,7 @@ extension TaskType {
     public func map<NewSuccessValue>(upon queue: dispatch_queue_t, _ transform: SuccessValue throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(upon: queue, body)
-        return Task(future: future, progress: progress)
+        return Task<NewSuccessValue>(future: future, progress: progress)
     }
 
     /// Returns a `Task` containing the result of mapping `transform` over the
@@ -65,6 +64,6 @@ extension TaskType {
     public func map<NewSuccessValue>(transform: SuccessValue throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(body)
-        return Task(future: future, progress: progress)
+        return Task<NewSuccessValue>(future: future, progress: progress)
     }
 }

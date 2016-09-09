@@ -12,9 +12,8 @@ import Result
 #endif
 import Foundation
 
-extension TaskType {
-    private typealias SuccessValue = Value.Value
-    private func commonBody(for transform: ErrorType throws -> SuccessValue) -> (NSProgress, (Value) -> TaskResult<SuccessValue>) {
+extension Task {
+    private func commonBody(for transform: ErrorType throws -> SuccessValue) -> (NSProgress, (Result) -> TaskResult<SuccessValue>) {
         let progress = extendedProgress(byUnitCount: 1)
         return (progress, { (result) in
             progress.becomeCurrentWithPendingUnitCount(1)

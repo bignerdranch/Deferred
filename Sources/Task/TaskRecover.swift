@@ -30,6 +30,9 @@ extension Task {
     ///
     /// `recover` submits the `transform` to the `executor` once the task fails.
     ///
+    /// Recovering from a failed task appends a unit of progress to the root
+    /// task. A root task is the earliest, or parent-most, task in a tree.
+    ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
@@ -44,6 +47,9 @@ extension Task {
     ///
     /// `recover` executes the `transform` asynchronously once the task fails.
     ///
+    /// Recovering from a failed task appends a unit of progress to the root
+    /// task. A root task is the earliest, or parent-most, task in a tree.
+    ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
@@ -57,6 +63,9 @@ extension Task {
     /// failed task's error.
     ///
     /// `recover` executes the `transform` in the background once the task fails.
+    ///
+    /// Recovering from a failed task appends a unit of progress to the root
+    /// task. A root task is the earliest, or parent-most, task in a tree.
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///

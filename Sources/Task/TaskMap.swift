@@ -26,9 +26,12 @@ extension Task {
     }
 
     /// Returns a `Task` containing the result of mapping `transform` over the
-    /// task's success value.
+    /// successful task's value.
     ///
     /// The `transform` is submitted to the `executor` once the task completes.
+    ///
+    /// Mapping a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
@@ -44,6 +47,9 @@ extension Task {
     ///
     /// The `transform` is submitted to the `executor` once the task completes.
     ///
+    /// Mapping a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
+    ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
@@ -57,6 +63,9 @@ extension Task {
     /// task's success value
     ///
     /// The `transform` is submitted to the `executor` once the task completes.
+    ///
+    /// Mapping a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///

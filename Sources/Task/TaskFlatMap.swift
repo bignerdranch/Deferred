@@ -41,6 +41,9 @@ extension Task {
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
     ///
+    /// Chaining a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
+    ///
     /// Cancelling the resulting task will attempt to cancel both the recieving
     /// task and the created task.
     ///
@@ -57,6 +60,9 @@ extension Task {
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
     ///
+    /// Chaining a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
+    ///
     /// - note: It is important to keep in mind the thread safety of the
     /// `startNextTask` closure. `flatMap` executes `startNextTask`
     /// asynchronously once the task completes successfully.
@@ -70,6 +76,9 @@ extension Task {
 
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
+    ///
+    /// Chaining a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
     ///
     /// - note: It is important to keep in mind the thread safety of the
     /// `startNextTask` closure. `flatMap` executes `startNextTask` in the

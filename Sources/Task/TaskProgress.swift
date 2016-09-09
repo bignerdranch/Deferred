@@ -26,6 +26,8 @@ private struct KVO {
     }
 }
 
+/// A progress object whose attributes reflect that of an external progress
+/// tree.
 private final class ProxyProgress: NSProgress {
     let original: NSProgress
 
@@ -117,7 +119,7 @@ extension NSProgress {
     /// an external progress tree.
     ///
     /// Send `isOrphaned: false` if the iOS 9 behavior cannot be trusted (i.e.,
-    /// `progress` is not guaranteed to have no parent).
+    /// `progress` is not understood to have no parent).
     @nonobjc func adoptChild(progress: NSProgress, orphaned canAdopt: Bool, pendingUnitCount: Int64) {
         if #available(OSX 10.11, iOS 9.0, *), canAdopt {
             addChild(progress, withPendingUnitCount: pendingUnitCount)
@@ -140,7 +142,7 @@ extension NSProgress {
 // MARK: - Convenience initializers
 
 extension NSProgress {
-    // Indeterminate progress which will likely not change.
+    /// Indeterminate progress which will likely not change.
     @nonobjc static func indefinite() -> Self {
         let progress = self.init(parent: nil, userInfo: nil)
         progress.totalUnitCount = -1
@@ -148,7 +150,7 @@ extension NSProgress {
         return progress
     }
 
-    // Progress for which no work actually needs to be done.
+    /// Progress for which no work actually needs to be done.
     @nonobjc static func noWork() -> Self {
         let progress = self.init(parent: nil, userInfo: nil)
         progress.totalUnitCount = 0
@@ -158,7 +160,7 @@ extension NSProgress {
         return progress
     }
 
-    // A simple indeterminate progress with a cancellation function.
+    /// A simple indeterminate progress with a cancellation function.
     @nonobjc static func wrapped<Future: FutureType where Future.Value: ResultType>(future: Future, cancellation: ((Void) -> Void)?) -> NSProgress {
         if let task = future as? Task<Future.Value.Value> {
             return task.progress
@@ -182,7 +184,7 @@ extension NSProgress {
     }
 }
 
-// MARK: - Task chaning
+// MARK: - Task chaining
 
 /**
  Both Task<Value> and NSProgress operate compose over implicit trees, but their
@@ -229,6 +231,9 @@ extension NSProgress {
 
 extension Task {
     /// Extend the progress of `self` to reflect an added operation of `cost`.
+    ///
+    /// Incrementing the total unit count is not atomic; we take a lock so as
+    /// to not interfere with simultaneous mapping operations.
     func extendedProgress(byUnitCount cost: Int64) -> NSProgress {
         if let lock = progress.userInfo[NSProgressTaskRootLockKey] as? NSLock {
             lock.lock()

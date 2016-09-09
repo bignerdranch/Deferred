@@ -24,13 +24,30 @@ private extension XCTestCase {
         } while true
     }
 
+    @nonobjc var anyUnfinishedTask: (Deferred<Task<Int>.Result>, Task<Int>) {
+        let d = Deferred<Task<Int>.Result>()
+        return (d, Task(d))
+    }
+
+    @nonobjc var anyFinishedTask: Task<Int> { return Task(value: 42) }
+
+    @nonobjc var anyFailedTask: Task<Int> { return Task(error: Error.First) }
+
+    @nonobjc func contrivedNextTask(for result: Int) -> Task<Int> {
+        let d = Deferred<Task<Int>.Result>()
+        let task = Task(d, cancellation: nil)
+        afterDelay(0.5, perform: {
+            d.succeed(result * 2)
+        })
+        return task
+    }
+
 }
 
 class TaskTests: XCTestCase {
 
     func testUponSuccess() {
-        let d = Deferred<Task<Int>.Result>()
-        let task = Task(d, cancellation: {})
+        let (d, task) = anyUnfinishedTask
         let expectation = expectationWithDescription("upon is called")
 
         task.uponSuccess { _ in expectation.fulfill() }
@@ -42,8 +59,7 @@ class TaskTests: XCTestCase {
     }
 
     func testUponFailure() {
-        let d = Deferred<Task<Int>.Result>()
-        let task = Task(d, cancellation: {})
+        let (d, task) = anyUnfinishedTask
         let expectation = expectationWithDescription("upon is called")
 
         task.uponSuccess(impossible)
@@ -55,111 +71,75 @@ class TaskTests: XCTestCase {
     }
 
     func testThatMapPassesThroughErrors() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(error: Error.First)
+        let expectation = expectationWithDescription("mapped filled with same error")
+        let task: Task<String> = anyFailedTask.map(impossible)
 
-        let afterExpectation = expectationWithDescription("mapped filled with same error")
-        let afterTask: Task<String> = beforeTask.map(impossible)
-
-        beforeTask.upon {
+        task.upon {
             XCTAssertEqual($0.error as? Error, .First)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
-            XCTAssertEqual($0.error as? Error, .First)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatThrowingMapSubstitutesWithError() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(value: -1)
-
-        let afterExpectation = expectationWithDescription("mapped filled with error")
-        let afterTask: Task<String> = beforeTask.map { _ in
+        let expectation = expectationWithDescription("mapped filled with error")
+        let task: Task<String> = anyFinishedTask.map { _ in
             throw Error.Second
         }
 
-        beforeTask.upon {
-            XCTAssertEqual($0.value, -1)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
+        task.upon {
             XCTAssertEqual($0.error as? Error, .Second)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatFlatMapForwardsCancellationToSubsequentTask() {
-        let beforeTask = Task<Int>(value: 1)
-
-        let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
-        let afterTask: Task<String> = beforeTask.flatMap { _ in
-            return Task(future: Future(), cancellation: afterExpectation.fulfill)
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let task: Task<String> = anyFinishedTask.flatMap { _ in
+            return Task(future: Future(), cancellation: expectation.fulfill)
         }
 
-        afterTask.cancel()
+        task.cancel()
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatThrowingFlatMapSubstitutesWithError() {
-        let beforeTask = Task<Int>(value: 1)
-
-        let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
-        let afterTask: Task<String> = beforeTask.flatMap { _ -> Task<String> in
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let task: Task<String> = anyFinishedTask.flatMap { _ -> Task<String> in
             throw Error.Second
         }
 
-        afterTask.uponFailure {
+        task.uponFailure {
             XCTAssertEqual($0 as? Error, .Second)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatRecoverPassesThroughValues() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(value: 1)
+        let expectation = expectationWithDescription("mapped filled with same error")
+        let task: Task<Int> = anyFinishedTask.recover(impossible)
 
-        let afterExpectation = expectationWithDescription("mapped filled with same error")
-        let afterTask: Task<Int> = beforeTask.recover(impossible)
-
-        beforeTask.upon {
-            XCTAssertEqual($0.value, 1)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
+        task.upon {
             XCTAssertNil($0.error)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatRecoverMapsFailures() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(error: Error.First)
+        let expectation = expectationWithDescription("mapped filled with same error")
+        let task: Task<Int> = anyFailedTask.recover { _ in 42 }
 
-        let afterExpectation = expectationWithDescription("mapped filled with same error")
-        let afterTask: Task<Int> = beforeTask.recover { _ in 42 }
-
-        beforeTask.upon {
-            XCTAssertEqual($0.error as? Error, .First)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
+        task.upon {
             XCTAssertEqual($0.value, 42)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
@@ -195,6 +175,14 @@ class TaskTests: XCTestCase {
         XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
     }
 
+    func testTaskCreatedUnfilledIs100PercentCompleted() {
+        XCTAssertEqual(anyUnfinishedTask.1.progress.fractionCompleted, 0)
+    }
+
+    func testTaskCreatedFilledIs100PercentCompleted() {
+        XCTAssertEqual(anyFinishedTask.progress.fractionCompleted, 1)
+    }
+
     func testThatTaskCreatedUnfilledIsIndeterminate() {
         let task = Task<Int>()
 
@@ -209,42 +197,23 @@ class TaskTests: XCTestCase {
     }
 
     func testThatTaskWrappingFilledIsDeterminate() {
-        let d = Deferred<Task<Int>.Result>.init(value: .Success(42))
-        let task = Task(d, cancellation: {})
+        let d = Deferred<Task<Int>.Result>(value: .Success(42))
+        let task = Task(d)
 
         XCTAssertFalse(task.progress.indeterminate)
     }
 
-    func testThatMapExtendsParentFractions() {
-        let beforeTask: Task<Int> = Task(value: 42)
-        XCTAssertEqualWithAccuracy(beforeTask.progress.fractionCompleted, 1, accuracy: 0.001)
-
-        let afterTask = beforeTask.map { $0 * 2 }
-        _ = expectationForPredicate(NSPredicate(block: {
-            abs(($0.0 as! NSProgress).fractionCompleted.distanceTo(1)) <= 0.0001
-        }), evaluatedWithObject: afterTask.progress, handler: nil)
-
+    func testThatMapIncrementsParentProgressFraction() {
+        let task = anyFinishedTask.map { $0 * 2 }
+        _ = expectationForPredicate(NSPredicate(format: "fractionCompleted == 1"), evaluatedWithObject: task.progress, handler: nil)
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
-    func testThatFlatMapExtendsParentFractions() {
-        let beforeTask: Task<Int> = Task(value: 42)
-        XCTAssertEqualWithAccuracy(beforeTask.progress.fractionCompleted, 1, accuracy: 0.001)
+    func testThatFlatMapIncrementsParentProgressFraction() {
+        let task = anyFinishedTask.flatMap(contrivedNextTask)
+        XCTAssertNotEqual(task.progress.fractionCompleted, 1)
 
-        let afterTask = beforeTask.flatMap { (before) -> Task<Int> in
-            let d = Deferred<Task<Int>.Result>()
-            let task = Task(d, cancellation: nil)
-            afterDelay(0.5, perform: {
-                d.succeed(before * 2)
-            })
-            return task
-        }
-        XCTAssertNotEqualWithAccuracy(afterTask.progress.fractionCompleted, 1, 0.001)
-
-        _ = expectationForPredicate(NSPredicate(block: {
-            abs(($0.0 as! NSProgress).fractionCompleted.distanceTo(1)) <= 0.0001
-        }), evaluatedWithObject: afterTask.progress, handler: nil)
-
+        _ = expectationForPredicate(NSPredicate(format: "fractionCompleted == 1"), evaluatedWithObject: task.progress, handler: nil)
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
@@ -253,8 +222,7 @@ class TaskTests: XCTestCase {
 class TaskCustomExecutorTests: CustomExecutorTestCase {
 
     func testUponSuccess() {
-        let d = Deferred<Task<Int>.Result>()
-        let task = Task(d, cancellation: {})
+        let (d, task) = anyUnfinishedTask
         let expectation = expectationWithDescription("upon is called")
 
         task.uponSuccess(executor) { _ in expectation.fulfill() }
@@ -267,8 +235,7 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
     }
 
     func testUponFailure() {
-        let d = Deferred<Task<Int>.Result>()
-        let task = Task(d, cancellation: {})
+        let (d, task) = anyUnfinishedTask
         let expectation = expectationWithDescription("upon is called")
 
         task.uponSuccess(executor, body: impossible)
@@ -281,53 +248,41 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
     }
 
     func testThatThrowingMapSubstitutesWithError() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(value: -1)
-
-        let afterExpectation = expectationWithDescription("mapped filled with error")
-        let afterTask: Task<String> = beforeTask.map(upon: executor) { _ in
+        let expectation = expectationWithDescription("mapped filled with error")
+        let task: Task<String> = anyFinishedTask.map(upon: executor) { _ in
             throw Error.Second
         }
 
-        beforeTask.upon(executor) {
-            XCTAssertEqual($0.value, -1)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon(executor) {
+        task.upon(executor) {
             XCTAssertEqual($0.error as? Error, .Second)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
-        assertExecutorCalled(3)
+        assertExecutorCalled(2)
     }
 
     func testThatFlatMapForwardsCancellationToSubsequentTask() {
-        let beforeTask = Task<Int>(value: 1)
-
-        let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
-        let afterTask: Task<String> = beforeTask.flatMap(upon: executor) { _ in
-            return Task(future: Future(), cancellation: afterExpectation.fulfill)
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let task: Task<String> = anyFinishedTask.flatMap(upon: executor) { _ in
+            return Task(future: Future(), cancellation: expectation.fulfill)
         }
 
-        afterTask.cancel()
+        task.cancel()
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
         assertExecutorCalled(1)
     }
 
     func testThatThrowingFlatMapSubstitutesWithError() {
-        let beforeTask = Task<Int>(value: 1)
-
-        let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
-        let afterTask = beforeTask.flatMap(upon: executor) { _ -> Task<String> in
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let task = anyFinishedTask.flatMap(upon: executor) { _ -> Task<String> in
             throw Error.Second
         }
 
-        afterTask.uponFailure {
+        task.uponFailure {
             XCTAssertEqual($0 as? Error, .Second)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
@@ -335,20 +290,12 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
     }
 
     func testThatRecoverMapsFailures() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(error: Error.First)
+        let expectation = expectationWithDescription("mapped filled with same error")
+        let task: Task<Int> = anyFailedTask.recover(upon: executor) { _ in 42 }
 
-        let afterExpectation = expectationWithDescription("mapped filled with same error")
-        let afterTask: Task<Int> = beforeTask.recover(upon: executor) { _ in 42 }
-
-        beforeTask.upon {
-            XCTAssertEqual($0.error as? Error, .First)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
+        task.upon {
             XCTAssertEqual($0.value, 42)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
@@ -360,8 +307,7 @@ class TaskCustomExecutorTests: CustomExecutorTestCase {
 class TaskCustomQueueTests: CustomQueueTestCase {
 
     func testUponSuccess() {
-        let d = Deferred<Task<Int>.Result>()
-        let task = Task(d, cancellation: {})
+        let (d, task) = anyUnfinishedTask
         let expectation = expectationWithDescription("upon is called")
 
         task.uponSuccess(queue) { _ in
@@ -376,8 +322,7 @@ class TaskCustomQueueTests: CustomQueueTestCase {
     }
 
     func testUponFailure() {
-        let d = Deferred<Task<Int>.Result>()
-        let task = Task(d, cancellation: {})
+        let (d, task) = anyUnfinishedTask
         let expectation = expectationWithDescription("upon is called")
 
         task.uponSuccess(queue, body: impossible)
@@ -392,76 +337,56 @@ class TaskCustomQueueTests: CustomQueueTestCase {
     }
 
     func testThatThrowingMapSubstitutesWithError() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(value: -1)
-
-        let afterExpectation = expectationWithDescription("mapped filled with error")
-        let afterTask: Task<String> = beforeTask.map(upon: queue) { _ in
+        let expectation = expectationWithDescription("mapped filled with error")
+        let task: Task<String> = anyFinishedTask.map(upon: queue) { _ in
             self.assertOnQueue()
             throw Error.Second
         }
 
-        beforeTask.upon {
-            XCTAssertEqual($0.value, -1)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
+        task.upon {
             XCTAssertEqual($0.error as? Error, .Second)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatFlatMapForwardsCancellationToSubsequentTask() {
-        let beforeTask = Task<Int>(value: 1)
-
-        let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
-        let afterTask = beforeTask.flatMap(upon: queue) { _ -> Task<String> in
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let task = anyFinishedTask.flatMap(upon: queue) { _ -> Task<String> in
             self.assertOnQueue()
-            return Task(future: Future(), cancellation: afterExpectation.fulfill)
+            return Task(future: Future(), cancellation: expectation.fulfill)
         }
 
-        afterTask.cancel()
+        task.cancel()
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatThrowingFlatMapSubstitutesWithError() {
-        let beforeTask = Task<Int>(value: 1)
-
-        let afterExpectation = expectationWithDescription("flatMapped task is cancelled")
-        let afterTask = beforeTask.flatMap(upon: queue) { _ -> Task<String> in
+        let expectation = expectationWithDescription("flatMapped task is cancelled")
+        let task = anyFinishedTask.flatMap(upon: queue) { _ -> Task<String> in
             throw Error.Second
         }
 
-        afterTask.uponFailure {
+        task.uponFailure {
             XCTAssertEqual($0 as? Error, .Second)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)
     }
 
     func testThatRecoverMapsFailures() {
-        let beforeExpectation = expectationWithDescription("original task filled")
-        let beforeTask: Task<Int> = Task(error: Error.First)
-
-        let afterExpectation = expectationWithDescription("mapped filled with same error")
-        let afterTask: Task<Int> = beforeTask.recover(upon: queue) { _ in
+        let expectation = expectationWithDescription("mapped filled with same error")
+        let task: Task<Int> = anyFailedTask.recover(upon: queue) { _ in
             self.assertOnQueue()
             return 42
         }
 
-        beforeTask.upon {
-            XCTAssertEqual($0.error as? Error, .First)
-            beforeExpectation.fulfill()
-        }
-
-        afterTask.upon {
+        task.upon {
             XCTAssertEqual($0.value, 42)
-            afterExpectation.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(TestTimeout, handler: nil)

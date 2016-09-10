@@ -33,7 +33,7 @@ class DeferredTests: XCTestCase {
         let peek = deferred.wait(.Interval(0.5))
         XCTAssertNil(peek)
 
-        waitForExpectationsWithTimeout(1.5, handler: nil)
+        waitForExpectationsWithTimeout(3, handler: nil)
     }
 
     func testPeek() {

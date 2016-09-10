@@ -92,7 +92,7 @@ struct QueueExecutor: ExecutorType {
 extension NSOperationQueue: ExecutorType {
 
     /// Wraps the `body` closure in an operation and enqueues it.
-    public func submit(body: () -> Void) {
+    @nonobjc public func submit(body: () -> Void) {
         addOperationWithBlock(body)
     }
 
@@ -109,7 +109,7 @@ extension CFRunLoop: ExecutorType {
     /// in the default mode.
     ///
     /// - seealso: kCFRunLoopDefaultMode
-    public func submit(body: () -> Void) {
+    @nonobjc public func submit(body: () -> Void) {
         CFRunLoopPerformBlock(self, kCFRunLoopDefaultMode, body)
         CFRunLoopWakeUp(self)
     }
@@ -127,7 +127,7 @@ extension NSRunLoop: ExecutorType {
     /// in the default mode.
     ///
     /// - seealso: NSDefaultRunLoopMode
-    public func submit(body: () -> Void) {
+    @nonobjc public func submit(body: () -> Void) {
         getCFRunLoop().submit(body)
     }
 

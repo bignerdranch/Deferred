@@ -10,29 +10,35 @@
 import Deferred
 import Result
 #endif
-import Dispatch
-
-/// A simple function type expressing the cancellation of some operation.
-public typealias Cancellation = () -> Void
+import Foundation
 
 /// A wrapper over any task.
 ///
 /// Forwards operations to an arbitrary underlying future having the same result
 /// type, optionally combined with some `cancellation`.
-public struct Task<SuccessValue> {
+public final class Task<SuccessValue>: NSObject, NSProgressReporting {
     public typealias Result = TaskResult<SuccessValue>
 
     private let future: Future<Result>
-    private let cancellation: Cancellation
+    public let progress: NSProgress
 
-    /// Creates a task given a `future` and an optional `cancellation`.
-    public init(_ future: Future<Result>, cancellation: Cancellation) {
+    /// Creates a task given a `future` and its `progress`.
+    public init(future: Future<Result>, progress: NSProgress) {
         self.future = future
-        self.cancellation = cancellation
+        self.progress = .taskRoot(for: progress)
+    }
+
+    /// Create a task that will never complete.
+    public override init() {
+        self.future = Future()
+        self.progress = .indefinite()
     }
 }
 
 extension Task: FutureType {
+    /// A type that represents the result of some asynchronous operation.
+    public typealias Value = Result
+
     /// Call some function once the operation completes.
     ///
     /// If the task is complete, the function will be submitted to the
@@ -54,41 +60,62 @@ extension Task: FutureType {
     }
 }
 
-extension Task: TaskType {
-    /// Attempt to cancel the underlying operation. This is a "best effort".
+extension Task {
+    /// Attempt to cancel the underlying operation.
+    ///
+    /// An implementation should be a "best effort". There are several
+    /// situations in which cancellation may not happen:
+    /// * The operation has already completed.
+    /// * The operation has entered an uncancelable state.
+    /// * The underlying task is not cancellable.
+    ///
+    /// - seealso: isFilled
     public func cancel() {
-        cancellation()
+        progress.cancel()
     }
 }
 
 extension Task {
     /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: Cancellation) {
-        self.init(Future(task: base), cancellation: cancellation)
+    public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, progress: NSProgress) {
+        self.init(future: Future(task: base), progress: progress)
     }
 
-    /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public init<Task: TaskType where Task.Value.Value == SuccessValue>(_ base: Task) {
-        self.init(Future(task: base), cancellation: base.cancel)
+    /// Creates a task given a `future` and an optional `cancellation`.
+    ///
+    /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
+    /// but not on any specific queue. If you must do work on a specific queue,
+    /// schedule work on it.
+    public convenience init(future base: Future<Result>, cancellation: ((Void) -> Void)? = nil) {
+        let progress = NSProgress.wrapped(base, cancellation: cancellation)
+        self.init(future: base, progress: progress)
+    }
+
+    /// Create a task whose `upon(_:_:)` method uses the result of `base`.
+    ///
+    /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
+    /// but not on any specific queue. If you must do work on a specific queue,
+    /// schedule work on it.
+    public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: ((Void) -> Void)? = nil) {
+        let progress = NSProgress.wrapped(base, cancellation: cancellation)
+        self.init(future: Future(task: base), progress: progress)
     }
 
     /// Wrap an operation that has already completed with `value`.
-    public init(@autoclosure value getValue: () throws -> SuccessValue) {
-        self.init(Future(value: TaskResult(with: getValue)), cancellation: {})
+    public convenience init(@autoclosure value getValue: () throws -> SuccessValue) {
+        self.init(future: Future(value: TaskResult(with: getValue)), progress: .noWork())
     }
 
     /// Wrap an operation that has already failed with `error`.
-    public init(error: ErrorType) {
-        self.init(Future(value: TaskResult(error: error)), cancellation: {})
-    }
-
-    /// Create a task that will never complete.
-    public init() {
-        self.init(Future(), cancellation: {})
+    public convenience init(error: ErrorType) {
+        self.init(future: Future(value: TaskResult(error: error)), progress: .noWork())
     }
 
     /// Create a task having the same underlying operation as the `other` task.
-    public init(_ other: Task<SuccessValue>) {
-        self.init(other.future, cancellation: other.cancellation)
+    public convenience init(_ other: Task<SuccessValue>) {
+        self.init(future: other.future, progress: other.progress)
     }
 }
+
+@available(*, deprecated, message="Use Task or FutureType instead. It will be removed in Deferred 3")
+public protocol TaskType: FutureType {}

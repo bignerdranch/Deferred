@@ -1,5 +1,6 @@
 language: objective-c
 osx_image: xcode8
+cache: bundler
 install:
 - bundle install --jobs=3 --retry=3
 env:

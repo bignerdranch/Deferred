@@ -15,6 +15,7 @@ extension PromiseType where Value: ResultType {
     /// Completes the task with a successful `value`, or a thrown error.
     ///
     /// - seealso: `fill(_:)`
+    @discardableResult
     public func succeed(_ value: @autoclosure() throws -> Value.Value) -> Bool {
         return fill(Value(value: value))
     }
@@ -22,6 +23,7 @@ extension PromiseType where Value: ResultType {
     /// Completes the task with a failed `error`.
     ///
     /// - seealso: `fill(_:)`
+    @discardableResult
     public func fail(_ error: Error) -> Bool {
         return fill(Value(error: error))
     }
@@ -30,6 +32,7 @@ extension PromiseType where Value: ResultType {
     ///
     /// - seealso: `fill(_:)`
     /// - seealso: `ResultType.init(with:)`
+    @discardableResult
     public func fill(with body: () throws -> Value.Value) -> Bool {
         return fill(Value(with: body))
     }

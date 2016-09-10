@@ -15,17 +15,13 @@ import Deferred
 @testable import Deferred
 #endif
 
-private var oneSecondTimeout: DispatchTime {
-    return DispatchTime.now() + Double(Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC)
-}
-
 class BlockCancellationTests: XCTestCase {
-    fileprivate var queue: DispatchQueue!
+    private var queue: DispatchQueue!
 
     override func setUp() {
         super.setUp()
 
-        queue = DispatchQueue(label: "BlockCancellationTestsQueue", attributes: [])
+        queue = DispatchQueue(label: "BlockCancellationTestsQueue")
     }
 
     override func tearDown() {
@@ -40,11 +36,11 @@ class BlockCancellationTests: XCTestCase {
 
         let task = Task<Int>(upon: queue, onCancel: Error.first) {
             startSemaphore.signal()
-            _ = finishSemaphore.wait(timeout: oneSecondTimeout)
+            finishSemaphore.waitShort()
             return 1
         }
 
-        _ = startSemaphore.wait(timeout: oneSecondTimeout)
+        startSemaphore.waitShort()
         task.cancel()
         finishSemaphore.signal()
 
@@ -56,9 +52,7 @@ class BlockCancellationTests: XCTestCase {
         let semaphore = DispatchSemaphore(value: 0)
 
         // send a block into queue to keep it blocked while we submit our real test task
-        queue.async {
-            _ = semaphore.wait(timeout: oneSecondTimeout)
-        }
+        queue.async(execute: semaphore.waitShort)
 
         let task = Task<Int>(upon: queue, onCancel: Error.second) { 1 }
 
@@ -66,7 +60,7 @@ class BlockCancellationTests: XCTestCase {
 
         let result = waitForTaskToComplete(task)
         semaphore.signal()
-        XCTAssertEqual(result.error as? Error, Error.second)
+        XCTAssertEqual(result.error as? Error, .second)
     }
 
 }

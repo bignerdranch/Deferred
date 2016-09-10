@@ -16,8 +16,6 @@ func timeIntervalSleep(_ duration: TimeInterval) {
     usleep(useconds_t(duration * TimeInterval(USEC_PER_SEC)))
 }
 
-private let testTimeout = 10.0
-
 class PerfTestThread: Thread {
     let iters: Int
     var lock: ReadWriteLock
@@ -68,7 +66,7 @@ class ReadWriteLockTests: XCTestCase {
         allLocks = [dispatchLock, spinLock, casSpinLock, pthreadLock]
         locksAllowingConcurrentReads = [casSpinLock, pthreadLock]
 
-        queue = DispatchQueue(label: "ReadWriteLockTests", attributes: DispatchQueue.Attributes.concurrent)
+        queue = DispatchQueue(label: "ReadWriteLockTests", attributes: .concurrent)
     }
     
     override func tearDown() {
@@ -100,7 +98,7 @@ class ReadWriteLockTests: XCTestCase {
 
             // and make sure all 32 complete in < 3 second. If the readers
             // did not run concurrently, they would take >= 3.2 seconds
-            waitForExpectations(timeout: testTimeout, handler: nil)
+            waitForExpectationsShort()
         }
     }
 
@@ -122,7 +120,7 @@ class ReadWriteLockTests: XCTestCase {
                     }
                 }
             }
-            waitForExpectations(timeout: testTimeout, handler: nil)
+            waitForExpectationsShort()
         }
     }
 
@@ -162,7 +160,7 @@ class ReadWriteLockTests: XCTestCase {
                 startReader(i)
             }
             
-            waitForExpectations(timeout: testTimeout, handler: nil)
+            waitForExpectationsShort()
         }
     }
 

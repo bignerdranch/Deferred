@@ -9,15 +9,6 @@
 import XCTest
 import Deferred
 
-// Should this be promoted to an initializer on Future?
-private func delay<Value>( _ value: @autoclosure @escaping (Void) -> Value, by interval: TimeInterval) -> Future<Value> {
-    let d = Deferred<Value>()
-    afterDelay(interval, upon: Deferred<Value>.genericQueue) {
-        d.fill(value())
-    }
-    return Future(d)
-}
-
 class FutureCustomExecutorTests: CustomExecutorTestCase {
     func testUpon() {
         let d = Deferred<Void>()
@@ -29,7 +20,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         d.fill(())
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
         assertExecutorCalled(1)
     }
 
@@ -46,14 +37,23 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         marker.fill(())
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
         assertExecutorCalled(2)
+    }
+
+    // Should this be promoted to an initializer on Future?
+    private func delay<Value>(_ value: @autoclosure @escaping(Void) -> Value) -> Future<Value> {
+        let d = Deferred<Value>()
+        afterDelay {
+            d.fill(value())
+        }
+        return Future(d)
     }
 
     func testFlatMap() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let flattened = marker.flatMap(upon: executor) { _ in delay(testValue, by: 0.2) }
+        let flattened = marker.flatMap(upon: executor) { _ in self.delay(testValue) }
 
         let expect = expectation(description: "upon block called when deferred is filled")
         flattened.upon(executor) {
@@ -63,7 +63,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         marker.fill(())
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
         assertExecutorCalled(3)
     }
 

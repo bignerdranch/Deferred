@@ -9,8 +9,6 @@
 import XCTest
 import Deferred
 
-private let testTimeout = 15.0
-
 class LockProtectedTests: XCTestCase {
     var protected: LockProtected<(Date?, [Int])>!
     var queue: DispatchQueue!
@@ -19,7 +17,7 @@ class LockProtectedTests: XCTestCase {
         super.setUp()
 
         protected = LockProtected(item: (nil, []))
-        queue = DispatchQueue(label: "LockProtectedTests", attributes: DispatchQueue.Attributes.concurrent)
+        queue = DispatchQueue(label: "LockProtectedTests", attributes: .concurrent)
     }
     
     override func tearDown() {
@@ -36,7 +34,7 @@ class LockProtectedTests: XCTestCase {
                 self.protected.withReadLock { (date,items) -> () in
                     if items.count == 0 && date == nil {
                         // OK - we're before the writer has added items
-                    } else if items.count == 5 && date! == lastWriterDate! {
+                    } else if items.count == 5 && date == lastWriterDate {
                         // OK - we're after the writer has added items
                     } else {
                         XCTFail("invalid count (\(items.count)) or date (\(date))")
@@ -65,7 +63,7 @@ class LockProtectedTests: XCTestCase {
             startReader(i)
         }
 
-        waitForExpectations(timeout: testTimeout, handler: nil)
+        waitForExpectationsShort()
     }
 
 }

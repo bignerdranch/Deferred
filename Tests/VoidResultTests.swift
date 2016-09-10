@@ -16,10 +16,10 @@ import Deferred
 
 class VoidResultTests: XCTestCase {
 
-    fileprivate typealias Result = TaskResult<Void>
+    private typealias Result = TaskResult<Void>
 
-    fileprivate let aSuccessResult = Result.success(())
-    fileprivate let aFailureResult = Result.failure(Error.first)
+    private let aSuccessResult = Result.success(())
+    private let aFailureResult = Result.failure(Error.first)
 
     func testDescriptionSuccess() {
         XCTAssertEqual(String(describing: aSuccessResult), "()")

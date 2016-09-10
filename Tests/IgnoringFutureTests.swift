@@ -24,15 +24,15 @@ class IgnoringFutureTests: XCTestCase {
         future = deferred.ignored()
 
         let expect = expectation(description: "value blocks while unfilled")
-        afterDelay(1, upon: .global()) {
+        afterDelay(upon: .global()) {
             deferred.fill(42)
             expect.fulfill()
         }
 
-        let peek: ()? = future.wait(.interval(0.5))
+        let peek: ()? = future.waitShort()
         XCTAssertNil(peek)
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations()
     }
 
     func testIgnoredUponCalledWhenFilled() {
@@ -49,7 +49,7 @@ class IgnoringFutureTests: XCTestCase {
 
         d.fill(1)
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations()
     }
 
 }

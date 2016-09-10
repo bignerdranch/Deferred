@@ -17,8 +17,8 @@ import Deferred
 
 class TaskAccumulatorTests: XCTestCase {
 
-    fileprivate let queue = DispatchQueue(label: "TaskAccumulatorTests", attributes: DispatchQueue.Attributes.concurrent)
-    fileprivate var accumulator: TaskAccumulator!
+    private let queue = DispatchQueue(label: "TaskAccumulatorTests", attributes: .concurrent)
+    private var accumulator: TaskAccumulator!
 
     override func setUp() {
         super.setUp()
@@ -39,7 +39,7 @@ class TaskAccumulatorTests: XCTestCase {
             tasks.append(task)
             accumulator.accumulate(task)
 
-            afterDelay(0.1, upon: queue) {
+            afterDelay {
                 // success/failure should be ignored by TaskAccumulator, so try both!
                 if i % 2 == 0 {
                     deferred.fill(.success(()))
@@ -58,6 +58,6 @@ class TaskAccumulatorTests: XCTestCase {
             expectation?.fulfill()
         }
 
-        waitForExpectations(timeout: 4, handler: nil)
+        waitForExpectations()
     }
 }

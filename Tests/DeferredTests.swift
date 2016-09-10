@@ -31,15 +31,15 @@ class DeferredTests: XCTestCase {
         let deferred = Deferred<Int>()
 
         let expect = expectation(description: "value blocks while unfilled")
-        afterDelay(1, upon: .global()) {
+        afterDelay(upon: .global()) {
             deferred.fill(42)
             expect.fulfill()
         }
 
-        let peek = deferred.wait(.interval(0.5))
+        let peek = deferred.waitShort()
         XCTAssertNil(peek)
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations()
     }
 
     func testPeek() {
@@ -61,10 +61,8 @@ class DeferredTests: XCTestCase {
         DispatchQueue.global().async {
             XCTAssertNil(unfilled.wait(.interval(2)))
         }
-        afterDelay(0.1) {
-            expect.fulfill()
-        }
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        afterDelay(execute: expect.fulfill)
+        waitForExpectations()
     }
 
     func testValueUnblocksWhenUnfilledIsFilled() {
@@ -74,10 +72,10 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(d.value, 3)
             expect.fulfill()
         }
-        afterDelay(0.1) {
+        afterDelay {
             d.fill(3)
         }
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     func testFill() {
@@ -103,7 +101,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
         d.fill(1)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectationsShort()
     }
 
     func testUponWithFilled() {
@@ -117,7 +115,7 @@ class DeferredTests: XCTestCase {
             }
         }
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     func testUponNotCalledWhileUnfilled() {
@@ -128,11 +126,11 @@ class DeferredTests: XCTestCase {
         }
 
         let expect = expectation(description: "upon blocks not called while deferred is unfilled")
-        afterDelay(0.1) {
+        afterDelay {
             expect.fulfill()
         }
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     func testUponCalledWhenFilled() {
@@ -149,7 +147,7 @@ class DeferredTests: XCTestCase {
 
         d.fill(1)
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
     
     func testUponMainQueueCalledWhenFilled() {
@@ -164,7 +162,7 @@ class DeferredTests: XCTestCase {
         }
         
         d.fill(1)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectationsShort()
     }
 
     func testConcurrentUpon() {
@@ -184,7 +182,7 @@ class DeferredTests: XCTestCase {
         queue.async { d.fill(1) }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     func testAnd() {
@@ -207,7 +205,7 @@ class DeferredTests: XCTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     func testJoinedValues() {
@@ -226,18 +224,18 @@ class DeferredTests: XCTestCase {
             d[i].fill(i)
         }
 
-        afterDelay(0.1) {
+        afterDelay {
             XCTAssertFalse(w.isFilled) // unfilled because d[0] is still unfilled
             d[0].fill(0)
 
-            afterDelay(0.1) {
+            self.afterDelay {
                 XCTAssertTrue(w.value == [Int](0 ..< d.count))
                 innerExpectation.fulfill()
             }
             outerExpectation.fulfill()
         }
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     func testJoinedValuesEmptyCollection() {
@@ -254,12 +252,12 @@ class DeferredTests: XCTestCase {
         let outerExpectation = expectation(description: "any is filled")
         let innerExpectation = expectation(description: "any is not changed")
 
-        afterDelay(0.1) {
+        afterDelay {
             XCTAssertEqual(w.value, 3)
 
             d[4].fill(4)
 
-            afterDelay(0.1) {
+            self.afterDelay {
                 XCTAssertEqual(w.value, 3)
                 innerExpectation.fulfill()
             }
@@ -267,7 +265,7 @@ class DeferredTests: XCTestCase {
             outerExpectation.fulfill()
         }
 
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
     }
 
     /// Deferred values behave as values: All copies reflect the same value.
@@ -294,7 +292,7 @@ class DeferredTests: XCTestCase {
         let oneOfTheDeferreds = allDeferreds[numericCast(randomIndex)]
         oneOfTheDeferreds.fill(anyValue)
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectationsShort()
     }
     
     func testDeferredOptionalBehavesCorrectly() {
@@ -314,7 +312,7 @@ class DeferredTests: XCTestCase {
             afterExpectation.fulfill()
         }
         
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectationsShort()
     }
     
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
@@ -354,7 +352,7 @@ class DeferredTests: XCTestCase {
 
         d.fill(42)
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectationsShort()
         XCTAssertNotNil(uponQos)
         XCTAssertEqual(uponQos, expectedQos)
     }
@@ -389,7 +387,7 @@ class DeferredTests: XCTestCase {
         XCTAssertNotNil(deferred.peek())
         XCTAssertTrue(deferred.isFilled)
         XCTAssertNotNil(deferred.wait(.now))
-        XCTAssertNotNil(deferred.wait(.interval(0.1)))  // pass
+        XCTAssertNotNil(deferred.waitShort())  // pass
     }
 
 }

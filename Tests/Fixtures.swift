@@ -12,17 +12,10 @@ import XCTest
 import Result
 #endif
 
-let TestTimeout: TimeInterval = 15
-
 enum Error: Swift.Error {
     case first
     case second
     case third
-}
-
-func afterDelay(_ delay: TimeInterval, upon queue: DispatchQueue = DispatchQueue.main, perform body: @escaping () -> Void) {
-    let delay = DispatchTime.now() + Double(Int64(delay * TimeInterval(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-    queue.asyncAfter(deadline: delay, execute: body)
 }
 
 extension XCTestCase {
@@ -33,9 +26,27 @@ extension XCTestCase {
             result = $0
             expectation?.fulfill()
         }
-        waitForExpectations(timeout: TestTimeout, handler: nil)
+        waitForExpectations()
 
         return result!
+    }
+
+    func waitForExpectations() {
+        waitForExpectations(timeout: 10, handler: nil)
+    }
+
+    func waitForExpectationsShort() {
+        waitForExpectations(timeout: 2, handler: nil)
+    }
+
+    func afterDelay(upon queue: DispatchQueue = .main, execute body: @escaping() -> ()) {
+        queue.asyncAfter(deadline: .now() + 0.1, execute: body)
+    }
+}
+
+extension FutureType {
+    func waitShort() -> Value? {
+        return wait(.interval(0.05))
     }
 }
 
@@ -83,30 +94,26 @@ class CustomExecutorTestCase: XCTestCase {
 class CustomQueueTestCase: XCTestCase {
 
     private struct Constants {
-        static let key = DispatchSpecificKey<UnsafeMutableRawPointer!>()
+        static let key = DispatchSpecificKey<Unmanaged<CustomQueueTestCase>>()
     }
 
     private(set) var queue: DispatchQueue!
-    fileprivate var specificPtr: UnsafeMutableRawPointer!
 
     override func setUp() {
         super.setUp()
 
-        queue = DispatchQueue(label: "Deferred test queue", attributes: [])
-        specificPtr = malloc(0)
-        queue.setSpecific(key: Constants.key, value: specificPtr)
+        queue = DispatchQueue(label: "Deferred test queue")
+        queue.setSpecific(key: Constants.key, value: Unmanaged.passUnretained(self))
     }
 
     override func tearDown() {
         queue = nil
-        free(specificPtr)
-        specificPtr = nil
 
         super.tearDown()
     }
 
     func assertOnQueue(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssertEqual(DispatchQueue.getSpecific(key: Constants.key), specificPtr, file: file, line: line)
+        XCTAssertEqual(DispatchQueue.getSpecific(key: Constants.key)?.toOpaque(), Unmanaged.passUnretained(self).toOpaque(), file: file, line: line)
     }
     
 }

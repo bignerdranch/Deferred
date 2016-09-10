@@ -30,15 +30,15 @@ class ExistentialFutureTests: XCTestCase {
         anyFuture = Future(deferred)
 
         let expect = expectation(description: "value blocks while unfilled")
-        afterDelay(1, upon: .global()) {
+        afterDelay(upon: .global()) {
             deferred.fill(42)
             expect.fulfill()
         }
 
-        let peek = anyFuture.wait(.interval(0.5))
+        let peek = anyFuture.waitShort()
         XCTAssertNil(peek)
 
-        waitForExpectations(timeout: 3, handler: nil)
+        waitForExpectations()
     }
 
     func testFilledAnyFutureUpon() {
@@ -81,7 +81,7 @@ class ExistentialFutureTests: XCTestCase {
         XCTAssertNotNil(anyFuture.peek())
         XCTAssertTrue(anyFuture.isFilled)
         XCTAssertNotNil(anyFuture.wait(.now))
-        XCTAssertNotNil(anyFuture.wait(.interval(0.1)))  // pass
+        XCTAssertNotNil(anyFuture.waitShort())  // pass
     }
 
 }

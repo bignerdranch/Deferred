@@ -125,6 +125,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     ///
     /// - parameter value: The resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
+    @discardableResult
     public func fill(_ value: Value) -> Bool {
         let wasFilled = storage.fill(value)
         if wasFilled {

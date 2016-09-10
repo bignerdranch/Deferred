@@ -16,10 +16,10 @@ import Deferred
 
 class ResultTests: XCTestCase {
 
-    typealias Result = TaskResult<Int>
+    private typealias Result = TaskResult<Int>
 
-    fileprivate let aSuccessResult = Result.success(42)
-    fileprivate let aFailureResult = Result.failure(Error.first)
+    private let aSuccessResult = Result.success(42)
+    private let aFailureResult = Result.failure(Error.first)
 
     func testDescriptionSuccess() {
         XCTAssertEqual(String(describing: aSuccessResult), String(42))
@@ -56,7 +56,7 @@ class ResultTests: XCTestCase {
     }
 
     func testFlatCoalesceSuccess() {
-        let x = aSuccessResult ?? .success(84)
+        let x = aSuccessResult ?? Result.success(84)
         XCTAssertEqual(x.value, 42)
         XCTAssertNil(x.error)
     }

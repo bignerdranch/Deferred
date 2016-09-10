@@ -1,5 +1,5 @@
 //
-//  NSProgress.swift
+//  TaskProgress.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/19/16.
@@ -7,6 +7,10 @@
 //
 
 import Foundation
+#if SWIFT_PACKAGE
+import Result
+import Deferred
+#endif
 
 // MARK: - Backports
 
@@ -159,9 +163,9 @@ extension Progress {
         if let task = future as? Task<Future.Value.Value> {
             return task.progress
         }
-
+        
         let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = future.isFilled ? 0 : -1
+        progress.totalUnitCount = future.wait(.now) != nil ? 0 : -1
 
         if let cancellation = cancellation {
             progress.cancellationHandler = cancellation

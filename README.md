@@ -427,7 +427,7 @@ There are a few different options to install Deferred.
 Add the following to your Cartfile:
 
 ```
-github "bignerdranch/Deferred" ~> 2.0
+github "bignerdranch/Deferred" "2.2.0-rc.1"
 ```
 
 Then run `carthage update`.
@@ -444,7 +444,7 @@ for up to date installation instructions.
 Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
 
 ```ruby
-pod 'BNRDeferred', '~> 2.0'
+pod 'BNRDeferred', '~> 2.2'
 ```
 
 You will also need to make sure you're opting into using frameworks:

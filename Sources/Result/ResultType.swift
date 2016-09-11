@@ -12,30 +12,30 @@ public protocol ResultType: CustomStringConvertible, CustomDebugStringConvertibl
     associatedtype Value
 
     /// Derive a result from a failable function.
-    init(@noescape with body: () throws -> Value)
+    init(with body: () throws -> Value)
 
     /// Creates a failed result with `error`.
-    init(error: ErrorType)
+    init(error: Error)
 
     /// Case analysis.
     ///
     /// Returns the value from the `failure` closure if `self` represents a
     /// failure, or from the `success` closure if `self` represents a success.
-    func withValues<Return>(@noescape ifSuccess success: Value throws -> Return, @noescape ifFailure failure: ErrorType throws -> Return) rethrows -> Return
+    func withValues<Return>(ifSuccess success: (Value) throws -> Return, ifFailure failure: (Error) throws -> Return) rethrows -> Return
 }
 
 extension ResultType {
     /// A textual representation of `self`.
     public var description: String {
-        return withValues(ifSuccess: { String($0) }, ifFailure: { String($0) })
+        return withValues(ifSuccess: { String(describing: $0) }, ifFailure: { String(describing: $0) })
     }
 
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
         return withValues(ifSuccess: {
-            "Success(\(String(reflecting: $0)))"
+            "success(\(String(reflecting: $0)))"
         }, ifFailure: {
-            "Failure(\(String(reflecting: $0)))"
+            "failure(\(String(reflecting: $0)))"
         })
     }
 }

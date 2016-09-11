@@ -28,7 +28,7 @@ public final class LockProtected<T> {
     /// Give read access to the item within `body`.
     /// - parameter body: A function that reads from the contained item.
     /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: T throws -> Return) rethrows -> Return {
+    public func withReadLock<Return>(_ body: (T) throws -> Return) rethrows -> Return {
         return try lock.withReadLock {
             try body(self.item)
         }
@@ -37,13 +37,13 @@ public final class LockProtected<T> {
     /// Give write access to the item within the given function.
     /// - parameter body: A function that writes to the contained item, and returns some value.
     /// - returns: The value returned from the given function.
-    public func withWriteLock<Return>(@noescape body: (inout T) throws -> Return) rethrows -> Return {
+    public func withWriteLock<Return>(_ body: (inout T) throws -> Return) rethrows -> Return {
         return try lock.withWriteLock {
             try body(&self.item)
         }
     }
 
-    private var synchronizedValue: T? {
+    fileprivate var synchronizedValue: T? {
         return lock.withAttemptedReadLock { self.item }
     }
 }
@@ -55,16 +55,16 @@ extension LockProtected: CustomDebugStringConvertible, CustomReflectable {
         if let value = synchronizedValue {
             return "LockProtected(\(String(reflecting: value)))"
         } else {
-            return "\(self.dynamicType) (lock contended)"
+            return "\(type(of: self)) (lock contended)"
         }
     }
 
     /// Returns the `Mirror` for `self`.
-    public func customMirror() -> Mirror {
+    public var customMirror: Mirror {
         if let value = synchronizedValue {
-            return Mirror(self, children: [ "item": value ], displayStyle: .Optional)
+            return Mirror(self, children: [ "item": value ], displayStyle: .optional)
         } else {
-            return Mirror(self, children: [ "lockContended": true ], displayStyle: .Tuple)
+            return Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
         }
     }
 

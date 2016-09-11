@@ -24,16 +24,16 @@ class DeferredTests: XCTestCase {
     func testWaitWithTimeout() {
         let deferred = Deferred<Int>()
 
-        let expect = expectationWithDescription("value blocks while unfilled")
-        afterDelay(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        let expect = expectation(description: "value blocks while unfilled")
+        afterDelay(1, upon: .global()) {
             deferred.fill(42)
             expect.fulfill()
         }
 
-        let peek = deferred.wait(.Interval(0.5))
+        let peek = deferred.wait(.interval(0.5))
         XCTAssertNil(peek)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
     func testPeek() {
@@ -51,28 +51,28 @@ class DeferredTests: XCTestCase {
     func testValueBlocksWhileUnfilled() {
         let unfilled = Deferred<Int>()
 
-        let expect = expectationWithDescription("value blocks while unfilled")
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        let expect = expectation(description: "value blocks while unfilled")
+        DispatchQueue.global().async {
             _ = unfilled.value
             XCTFail("value did not block")
         }
         afterDelay(0.1) {
             expect.fulfill()
         }
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testValueUnblocksWhenUnfilledIsFilled() {
         let d = Deferred<Int>()
-        let expect = expectationWithDescription("value blocks until filled")
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        let expect = expectation(description: "value blocks until filled")
+        DispatchQueue.global().async {
             XCTAssertEqual(d.value, 3)
             expect.fulfill()
         }
         afterDelay(0.1) {
             d.fill(3)
         }
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testFill() {
@@ -92,27 +92,27 @@ class DeferredTests: XCTestCase {
         let d = Deferred<Int>()
         XCTAssertFalse(d.isFilled)
 
-        let expect = expectationWithDescription("isFilled is true when filled")
+        let expect = expectation(description: "isFilled is true when filled")
         d.upon { _ in
             XCTAssertTrue(d.isFilled)
             expect.fulfill()
         }
         d.fill(1)
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testUponWithFilled() {
         let d = Deferred(value: 1)
 
         for _ in 0 ..< 10 {
-            let expect = expectationWithDescription("upon blocks called with correct value")
+            let expect = expectation(description: "upon blocks called with correct value")
             d.upon { value in
                 XCTAssertEqual(value, 1)
                 expect.fulfill()
             }
         }
 
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testUponNotCalledWhileUnfilled() {
@@ -122,19 +122,19 @@ class DeferredTests: XCTestCase {
             XCTFail("unexpected upon block call")
         }
 
-        let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")
+        let expect = expectation(description: "upon blocks not called while deferred is unfilled")
         afterDelay(0.1) {
             expect.fulfill()
         }
 
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testUponCalledWhenFilled() {
         let d = Deferred<Int>()
 
         for _ in 0 ..< 10 {
-            let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")
+            let expect = expectation(description: "upon blocks not called while deferred is unfilled")
             d.upon { value in
                 XCTAssertEqual(value, 1)
                 XCTAssertEqual(d.value, value)
@@ -144,42 +144,42 @@ class DeferredTests: XCTestCase {
 
         d.fill(1)
 
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
     
     func testUponMainQueueCalledWhenFilled() {
         let d = Deferred<Int>()
         
-        let expectation = expectationWithDescription("uponMainQueue block called on main queue")
+        let expectation = self.expectation(description: "uponMainQueue block called on main queue")
         d.uponMainQueue { value in
-            XCTAssertTrue(NSThread.isMainThread())
+            XCTAssertTrue(Thread.isMainThread)
             XCTAssertEqual(value, 1)
             XCTAssertEqual(d.value, 1)
             expectation.fulfill()
         }
         
         d.fill(1)
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testConcurrentUpon() {
         let d = Deferred<Int>()
-        let queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+        let queue = DispatchQueue.global()
 
         // upon with an unfilled deferred appends to an internal array (protected by a write lock)
         // spin up a bunch of these in parallel...
         for i in 0 ..< 32 {
-            let expectUponCalled = expectationWithDescription("upon block \(i)")
-            dispatch_async(queue) {
+            let expectUponCalled = expectation(description: "upon block \(i)")
+            queue.async {
                 d.upon { _ in expectUponCalled.fulfill() }
             }
         }
 
         // ...then fill it (also in parallel)
-        dispatch_async(queue) { d.fill(1) }
+        queue.async { d.fill(1) }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testAnd() {
@@ -193,7 +193,7 @@ class DeferredTests: XCTestCase {
         XCTAssertFalse(both.isFilled)
         d2.fill("foo")
 
-        let expectation = expectationWithDescription("paired deferred should be filled")
+        let expectation = self.expectation(description: "paired deferred should be filled")
         both.upon { _ in
             XCTAssert(d1.isFilled)
             XCTAssert(d2.isFilled)
@@ -202,7 +202,7 @@ class DeferredTests: XCTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testJoinedValues() {
@@ -213,8 +213,8 @@ class DeferredTests: XCTestCase {
         }
 
         let w = d.joinedValues
-        let outerExpectation = expectationWithDescription("all results filled in")
-        let innerExpectation = expectationWithDescription("paired deferred should be filled")
+        let outerExpectation = expectation(description: "all results filled in")
+        let innerExpectation = expectation(description: "paired deferred should be filled")
 
         // skip first
         for i in 1 ..< d.count {
@@ -232,7 +232,7 @@ class DeferredTests: XCTestCase {
             outerExpectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     func testJoinedValuesEmptyCollection() {
@@ -246,8 +246,8 @@ class DeferredTests: XCTestCase {
 
         d[3].fill(3)
 
-        let outerExpectation = expectationWithDescription("any is filled")
-        let innerExpectation = expectationWithDescription("any is not changed")
+        let outerExpectation = expectation(description: "any is filled")
+        let innerExpectation = expectation(description: "any is not changed")
 
         afterDelay(0.1) {
             XCTAssertEqual(w.value, 3)
@@ -262,7 +262,7 @@ class DeferredTests: XCTestCase {
             outerExpectation.fulfill()
         }
 
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
     }
 
     /// Deferred values behave as values: All copies reflect the same value.
@@ -275,9 +275,9 @@ class DeferredTests: XCTestCase {
         let allDeferreds = [parent, child1, child2]
 
         let anyValue = 42
-        let expectedValues = [Int](count: allDeferreds.count, repeatedValue: anyValue)
+        let expectedValues = [Int](repeating: anyValue, count: allDeferreds.count)
 
-        let allShouldBeFulfilled = expectationWithDescription("filling any copy fulfills all")
+        let allShouldBeFulfilled = expectation(description: "filling any copy fulfills all")
         allDeferreds.joinedValues.upon {
             [weak allShouldBeFulfilled] allValues in
             allShouldBeFulfilled?.fulfill()
@@ -289,27 +289,27 @@ class DeferredTests: XCTestCase {
         let oneOfTheDeferreds = allDeferreds[numericCast(randomIndex)]
         oneOfTheDeferreds.fill(anyValue)
 
-        waitForExpectationsWithTimeout(0.5, handler: nil)
+        waitForExpectations(timeout: 0.5, handler: nil)
     }
     
     func testDeferredOptionalBehavesCorrectly() {
-        let d = Deferred<Optional<Int>>(value: .None)
+        let d = Deferred<Optional<Int>>(value: .none)
 
-        let beforeExpectation = expectationWithDescription("already filled with nil optional")
+        let beforeExpectation = expectation(description: "already filled with nil optional")
         d.upon {
-            XCTAssert($0 == .None)
+            XCTAssert($0 == .none)
             beforeExpectation.fulfill()
         }
 
         d.fill(42, assertIfFilled: false)
 
-        let afterExpectation = expectationWithDescription("stays filled with same optional")
+        let afterExpectation = expectation(description: "stays filled with same optional")
         d.upon {
-            XCTAssert($0 == .None)
+            XCTAssert($0 == .none)
             afterExpectation.fulfill()
         }
         
-        waitForExpectationsWithTimeout(0.5, handler: nil)
+        waitForExpectations(timeout: 0.5, handler: nil)
     }
     
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
@@ -338,36 +338,41 @@ class DeferredTests: XCTestCase {
     func testThatMainThreadPostsUponWithUserInitiatedQoSClass() {
         let d = Deferred<Int>()
 
-        var qos = QOS_CLASS_UNSPECIFIED
-        let expectation = expectationWithDescription("deferred is filled in")
+        let expectedQos = DispatchQoS.QoSClass(rawValue: qos_class_main())
+        var uponQos: DispatchQoS.QoSClass?
+        let expectation = self.expectation(description: "deferred upon blocks get called")
 
         d.upon { [weak expectation] _ in
-            qos = qos_class_self()
+            uponQos = DispatchQoS.QoSClass(rawValue: qos_class_self())
             expectation?.fulfill()
         }
 
         d.fill(42)
 
-        waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssert((qos.rawValue & qos_class_main().rawValue) != 0)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertNotNil(uponQos)
+        XCTAssertEqual(uponQos, expectedQos)
     }
 
     func testThatLowerQoSPostsUponWithSameQoSClass() {
-        let d = Deferred<Int>()
-        let q = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+        let expectedQos = DispatchQoS.QoSClass.utility
 
-        var qos = QOS_CLASS_UNSPECIFIED
-        let expectation = expectationWithDescription("deferred is filled in")
+        let d = Deferred<Int>()
+        let q = DispatchQueue.global(qos: expectedQos)
+
+        var uponQos: DispatchQoS.QoSClass?
+        let expectation = self.expectation(description: "deferred upon blocks get called")
 
         d.upon(q) { [weak expectation] _ in
-            qos = qos_class_self()
+            uponQos = DispatchQoS.QoSClass(rawValue: qos_class_self())
             expectation?.fulfill()
         }
 
         d.fill(42)
 
-        waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssert((qos.rawValue & QOS_CLASS_UTILITY.rawValue) != 0)
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertNotNil(uponQos)
+        XCTAssertEqual(uponQos, expectedQos)
     }
 
     #endif // end QoS tests that require a real device
@@ -378,8 +383,8 @@ class DeferredTests: XCTestCase {
         deferred.fill(42)
         XCTAssertNotNil(deferred.peek())
         XCTAssertTrue(deferred.isFilled)
-        XCTAssertNotNil(deferred.wait(.Now))
-        XCTAssertNotNil(deferred.wait(.Interval(0.1)))  // pass
+        XCTAssertNotNil(deferred.wait(.now))
+        XCTAssertNotNil(deferred.wait(.interval(0.1)))  // pass
     }
 
 }

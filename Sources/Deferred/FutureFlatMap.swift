@@ -24,7 +24,7 @@ extension FutureType {
     /// - parameter executor: Context to execute the transformation on.
     /// - parameter requestNextValue: Start a new operation with the future value.
     /// - returns: The new deferred value returned by the `transform`.
-    public func flatMap<NewFuture: FutureType>(upon executor: ExecutorType, _ requestNextValue: Value -> NewFuture) -> Future<NewFuture.Value> {
+    public func flatMap<NewFuture: FutureType>(upon executor: ExecutorType, _ requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
         let d = Deferred<NewFuture.Value>()
         upon(executor) {
             requestNextValue($0).upon(executor) {
@@ -45,7 +45,7 @@ extension FutureType {
     /// - parameter requestNextValue: Start a new operation with the future value.
     /// - returns: The new deferred value returned by the `transform`.
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewFuture: FutureType>(upon queue: dispatch_queue_t, _ requestNextValue: Value -> NewFuture) -> Future<NewFuture.Value> {
+    public func flatMap<NewFuture: FutureType>(upon queue: DispatchQueue, _ requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
         let d = Deferred<NewFuture.Value>()
         upon(queue) {
             requestNextValue($0).upon(queue) {
@@ -65,7 +65,7 @@ extension FutureType {
     /// - returns: The new deferred value returned by the `transform`.
     /// - seealso: qos_class_t
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewFuture: FutureType>(requestNextValue: Value -> NewFuture) -> Future<NewFuture.Value> {
+    public func flatMap<NewFuture: FutureType>(_ requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
         if let value = peek() {
             return Future(requestNextValue(value))
         }

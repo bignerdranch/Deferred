@@ -23,7 +23,7 @@ public protocol ReadWriteLock {
     ///
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
-    func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return
+    func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return
 
     /// Attempt to call `body` with a reading lock.
     ///
@@ -32,7 +32,7 @@ public protocol ReadWriteLock {
     ///
     /// - returns: The value returned from the given function, or `nil`.
     /// - seealso: withReadLock(_:)
-    func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return?
+    func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return?
 
     /// Call `body` with a writing lock.
     ///
@@ -41,7 +41,7 @@ public protocol ReadWriteLock {
     ///
     /// - parameter body: A function that writes a value while locked, then returns some value.
     /// - returns: The value returned from the given function.
-    func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return
+    func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return
 }
 
 extension ReadWriteLock {
@@ -49,7 +49,7 @@ extension ReadWriteLock {
     ///
     /// - parameter body: A function that writes a value while locked, then returns some value.
     /// - returns: The value returned from the given function.
-    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withReadLock(body)
     }
 }
@@ -60,15 +60,15 @@ extension ReadWriteLock {
 /// The semaphore lock performs comparably to a spinlock under little lock
 /// contention, and comparably to a platform lock under contention.
 public struct DispatchLock: ReadWriteLock {
-    private let semaphore = dispatch_semaphore_create(1)
+    private let semaphore = DispatchSemaphore(value: 1)
 
     /// Create a normal instance.
     public init() {}
 
-    private func withLock<Return>(timeout timeout: Timeout, @noescape body: () throws -> Return) rethrows -> Return? {
-        guard dispatch_semaphore_wait(semaphore, timeout.rawValue) == 0 else { return nil }
+    private func withLock<Return>(timeout: Timeout, body: () throws -> Return) rethrows -> Return? {
+        guard case .success = semaphore.wait(timeout: timeout.rawValue) else { return nil }
         defer {
-            dispatch_semaphore_signal(semaphore)
+            semaphore.signal()
         }
         return try body()
 
@@ -77,15 +77,15 @@ public struct DispatchLock: ReadWriteLock {
     /// Call `body` with a lock.
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
-        return try withLock(timeout: .Forever, body: body)!
+    public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
+        return try withLock(timeout: .forever, body: body)!
     }
 
     /// Attempt to call `body` with a lock.
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
-    public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
-        return try withLock(timeout: .Now, body: body)
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
+        return try withLock(timeout: .now, body: body)
     }
 }
 
@@ -102,7 +102,7 @@ public final class SpinLock: ReadWriteLock {
     /// Call `body` with a lock.
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         OSSpinLockLock(&lock)
         defer {
             OSSpinLockUnlock(&lock)
@@ -113,7 +113,7 @@ public final class SpinLock: ReadWriteLock {
     /// Attempt to call `body` with a lock.
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
-    public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard OSSpinLockTry(&lock) else { return nil }
         defer {
             OSSpinLockUnlock(&lock)
@@ -144,7 +144,7 @@ public final class CASSpinLock: ReadWriteLock {
     ///
     /// - parameter body: A function that writes a value while locked, then returns some value.
     /// - returns: The value returned from the given function.
-    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         // spin until we acquire write lock
         repeat {
             // wait for any active writer to release the lock
@@ -181,7 +181,7 @@ public final class CASSpinLock: ReadWriteLock {
     ///
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         // spin until we acquire read lock
         repeat {
             // wait for active writer to release the lock
@@ -213,7 +213,7 @@ public final class CASSpinLock: ReadWriteLock {
     ///
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
-    public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         // active writer
         guard (state & Constants.WriterMask) == 0 else { return nil }
 
@@ -251,7 +251,7 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     ///
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
-    public func withReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_rdlock(&lock)
         defer {
             pthread_rwlock_unlock(&lock)
@@ -265,7 +265,7 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     ///
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
-    public func withAttemptedReadLock<Return>(@noescape body: () throws -> Return) rethrows -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
         defer {
             pthread_rwlock_unlock(&lock)
@@ -279,7 +279,7 @@ public final class PThreadReadWriteLock: ReadWriteLock {
     ///
     /// - parameter body: A function that writes a value while locked, then returns some value.
     /// - returns: The value returned from the given function.
-    public func withWriteLock<Return>(@noescape body: () throws -> Return) rethrows -> Return {
+    public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_wrlock(&lock)
         defer {
             pthread_rwlock_unlock(&lock)

@@ -1,22 +1,29 @@
 language: objective-c
-osx_image: xcode7.3
-rvm:
-- 2.2.5
+osx_image: xcode8
 install:
 - bundle install --jobs=3 --retry=3
-- brew install carthage --force-bottle
 env:
-  matrix:
-  - SCAN_OPEN_REPORT=false
   global:
-    secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=
+    - NSUnbufferedIO=YES
+    - secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=
+  matrix:
+    - PLATFORM=macOS SDK=macosx DESTINATION='platform=macOS' ACTION=test  
+    - PLATFORM=iOS SDK=iphonesimulator DESTINATION='platform=iOS Simulator,name=iPhone 6s,OS=10.0' ACTION=test
+    - PLATFORM=tvOS SDK=appletvsimulator DESTINATION='platform=tvOS Simulator,name=Apple TV 1080p' ACTION=build
+    - PLATFORM=watchOS SDK=watchsimulator DESTINATION='platform=watchOS Simulator,name=Apple Watch - 42mm' ACTION=build
+    - ACTION=other
+before_script:
+- set -o pipefail
 script:
-- scan -s Deferred
-- scan -s MobileDeferred --devices "iPhone 5s (8.4), iPhone 6s (9.3)"
-- carthage build --no-skip-current --configuration Debug --platform tvOS,watchOS
-- pod lib lint --quick
+- if [ $ACTION != "other" ]; then
+    set -o pipefail && xcodebuild -scheme Deferred -destination "$DESTINATION" $ACTION | xcpretty -c;
+  else
+    bundle exec pod lib lint --quick;
+  fi
 after_success:
-- "./Configurations/publish_docs.sh"
+- if [ $ACTION == "other" ]; then
+    ./Configurations/publish_docs.sh;
+  fi
 notifications:
   slack:
     secure: B1vBvRCVa/IJZKtuRGLastyhSZQwP5coR3+/JOrBMXWE+5733MI0u6i462FVKfNfpPkSGS7t1/PXBknX/dF5auzAGsUyKZOuvyUfPe/Sd+kMOaIPw7M8fGONml0jQT0H/OgayZY3wcrlNm42yYFwzQdGd3HBfZIDkM2Ui5P/kn8=

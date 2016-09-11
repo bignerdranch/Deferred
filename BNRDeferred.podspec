@@ -1,7 +1,5 @@
 Pod::Spec.new do |s|
-
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-
   s.name         = "BNRDeferred"
   s.version      = "2.2.0"
   s.summary      = "Work with values that haven't been determined yet."
@@ -15,19 +13,15 @@ Pod::Spec.new do |s|
 
   s.homepage     = "https://github.com/bignerdranch/Deferred"
 
-
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.license      = "MIT"
 
-
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-
   s.authors             = {"John Gallagher" => "jgallagher@bignerdranch.com",
                            "Zachary Waldowski" => "zachary@bignerdranch.com",
                            "Brian Hardy" => "brian@bignerdranch.com"}
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-
   s.ios.deployment_target     = "8.0"
   s.osx.deployment_target     = "10.10"
   s.watchos.deployment_target = "2.0"
@@ -36,15 +30,15 @@ Pod::Spec.new do |s|
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "#{s.version}" }
 
-
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-
-  s.source_files  = "Sources"
+  s.source_files  = "Sources/**/*.{swift,h}"
+  s.preserve_path = "Sources/**/*.modulemap"
   s.header_dir    = "Deferred"
   s.module_name   = "Deferred"
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.requires_arc = true
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0' }
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0',
+                            'SWIFT_INCLUDE_PATHS': '$(PODS_ROOT)/BNRDeferred/Sources' }
 
 end

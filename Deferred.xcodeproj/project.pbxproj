@@ -19,7 +19,6 @@
 		DB524CD81D85204B00DDF16D /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9A1D85200C00DDF16D /* FutureType.swift */; };
 		DB524CD91D85204B00DDF16D /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */; };
 		DB524CDA1D85204B00DDF16D /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9C1D85200C00DDF16D /* LockProtected.swift */; };
-		DB524CDB1D85204B00DDF16D /* MemoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9D1D85200C00DDF16D /* MemoStore.swift */; };
 		DB524CDC1D85204B00DDF16D /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9E1D85200C00DDF16D /* PromiseType.swift */; };
 		DB524CDD1D85204B00DDF16D /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */; };
 		DB524CDE1D85204B00DDF16D /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA01D85200C00DDF16D /* Timeout.swift */; };
@@ -80,7 +79,6 @@
 		DB524C9A1D85200C00DDF16D /* FutureType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureType.swift; sourceTree = "<group>"; };
 		DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoringFuture.swift; sourceTree = "<group>"; };
 		DB524C9C1D85200C00DDF16D /* LockProtected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
-		DB524C9D1D85200C00DDF16D /* MemoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoStore.swift; sourceTree = "<group>"; };
 		DB524C9E1D85200C00DDF16D /* PromiseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
 		DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
 		DB524CA01D85200C00DDF16D /* Timeout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
@@ -114,6 +112,7 @@
 		DB524CBF1D85200C00DDF16D /* TaskResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskResultTests.swift; sourceTree = "<group>"; };
 		DB524CC01D85200C00DDF16D /* TaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
 		DB524CC11D85200C00DDF16D /* VoidResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoidResultTests.swift; sourceTree = "<group>"; };
+		DB524CFD1D85489500DDF16D /* Atomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Atomics.h; path = include/Atomics.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +168,7 @@
 		DB524C911D85200C00DDF16D /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				DB524CFA1D85489500DDF16D /* Atomics */,
 				DB524C921D85200C00DDF16D /* Deferred */,
 				DB524CA11D85200C00DDF16D /* Deferred.h */,
 				DB524CA21D85200C00DDF16D /* Info.plist */,
@@ -191,7 +191,6 @@
 				DB524C9A1D85200C00DDF16D /* FutureType.swift */,
 				DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */,
 				DB524C9C1D85200C00DDF16D /* LockProtected.swift */,
-				DB524C9D1D85200C00DDF16D /* MemoStore.swift */,
 				DB524C9E1D85200C00DDF16D /* PromiseType.swift */,
 				DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */,
 				DB524CA01D85200C00DDF16D /* Timeout.swift */,
@@ -246,6 +245,14 @@
 				DB524CBA1D85200C00DDF16D /* Info.plist */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		DB524CFA1D85489500DDF16D /* Atomics */ = {
+			isa = PBXGroup;
+			children = (
+				DB524CFD1D85489500DDF16D /* Atomics.h */,
+			);
+			path = Atomics;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -387,7 +394,6 @@
 				DB524CE21D85205400DDF16D /* BlockCancellableTask.swift in Sources */,
 				DB524CD91D85204B00DDF16D /* IgnoringFuture.swift in Sources */,
 				DB524CE91D85205400DDF16D /* TaskFlatMap.swift in Sources */,
-				DB524CDB1D85204B00DDF16D /* MemoStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

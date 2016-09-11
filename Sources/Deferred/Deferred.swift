@@ -7,13 +7,14 @@
 //
 
 import Dispatch
+import Atomics
 
 // MARK: - DispatchBlockMarker
 
 // A dispatch block (which is different from a plain closure!) constitutes the
 // second half of Deferred. The `dispatch_block_notify` API defines the notifier
 // list used by `Deferred.upon(queue:body:)`.
-private struct DispatchBlockMarker: CallbacksList {
+private struct DispatchBlockMarker {
     let block = DispatchWorkItem {
         fatalError("This code should never be executed")
     }
@@ -46,17 +47,17 @@ private struct DispatchBlockMarker: CallbacksList {
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value>: FutureType, PromiseType {
 
-    private let storage: MemoStore<Value>
+    private let storage: DeferredStorage<Value>
     private let onFilled = DispatchBlockMarker()
-    
+
     /// Initialize an unfilled Deferred.
     public init() {
-        storage = MemoStore.create(with: nil)
+        storage = DeferredStorage.create(with: nil)
     }
     
     /// Initialize a Deferred filled with the given value.
     public init(value: Value) {
-        storage = MemoStore.create(with: value)
+        storage = DeferredStorage.create(with: value)
         onFilled.markCompleted()
     }
 
@@ -133,4 +134,74 @@ public struct Deferred<Value>: FutureType, PromiseType {
         }
         return wasFilled
     }
+}
+
+// Heap storage that is initialized with a value once-and-only-once, atomically.
+final private class DeferredStorage<Value> {
+
+    // Using `ManagedBufferPointer` has advantages over a custom class:
+    //  - The buffer has a stable pointer when locked to a single element.
+    //  - Better `holdsUniqueReference` support allows for future optimization.
+    private typealias BufferPointer =
+        ManagedBufferPointer<Void, AnyObject?>
+    private typealias Storage = DeferredStorage<Value>
+
+    static func create(with value: Value?) -> DeferredStorage<Value> {
+        let pointer = BufferPointer(bufferClass: self, minimumCapacity: 1) { _ in }
+        pointer.withUnsafeMutablePointerToElements { (boxPtr) in
+            boxPtr.initialize(to: value.map { $0 as AnyObject })
+        }
+        return unsafeDowncast(pointer.buffer, to: self)
+    }
+
+    deinit {
+        buffer.withUnsafeMutablePointers { (pointerToHeader, pointerToElements) -> Void in
+            pointerToElements.deinitialize()
+            pointerToHeader.deinitialize()
+        }
+    }
+
+    private var buffer: BufferPointer {
+        return BufferPointer(unsafeBufferObject: self)
+    }
+
+    func withValue(_ body: (Value) -> Void) {
+        buffer.withUnsafeMutablePointerToElements { target in
+            guard let ptr = target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1, {
+                $0.pointee.load(order: .relaxed)
+            }), let unboxed = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? Value else { return }
+
+            body(unboxed)
+        }
+    }
+
+    // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:
+    //  - ObjC: "MyObject *__strong *"
+    //  - Swift: "UnsafeMutablePointer<MyObject!>"
+    // If the assignment is made, the new value is retained by its owning pointer.
+    // If the assignment is not made, the new value is not retained.
+    func fill(_ value: Value) -> Bool {
+        let newPtr = Unmanaged.passRetained(value as AnyObject).toOpaque()
+
+        let wonRace = buffer.withUnsafeMutablePointerToElements { target in
+            target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1) {
+                $0.pointee.compareAndSwap(from: nil, to: newPtr, success: .sequentiallyConsistent, failure: .sequentiallyConsistent)
+            }
+        }
+
+        if !wonRace {
+            Unmanaged<AnyObject>.fromOpaque(newPtr).release()
+        }
+
+        return wonRace
+    }
+
+    var isFilled: Bool {
+        return buffer.withUnsafeMutablePointerToElements { target in
+            target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1, {
+                $0.pointee.load(order: .relaxed)
+            }) != nil
+        }
+    }
+
 }

@@ -17,7 +17,7 @@ before_script:
 - set -o pipefail
 script:
 - if [ $ACTION != "other" ]; then
-    set -o pipefail && xcodebuild -scheme Deferred -destination "$DESTINATION" $ACTION | xcpretty -c;
+    xcodebuild -scheme Deferred -destination "$DESTINATION" $ACTION | xcpretty -c;
   else
     bundle exec pod lib lint --quick;
   fi

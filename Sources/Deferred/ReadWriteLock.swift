@@ -7,9 +7,7 @@
 //
 
 import Dispatch
-#if SWIFT_PACKAGE
-import AtomicSwift
-#endif
+import Atomics
 
 /// A type that mutually excludes execution of code such that only one unit of
 /// code is running at any given time. An implementing type may choose to have
@@ -89,12 +87,20 @@ public struct DispatchLock: ReadWriteLock {
     }
 }
 
-/// A spin lock provided by Darwin, the low-level system under iOS and OS X.
+/// An unfair lock provided by the platform.
 ///
-/// A spin lock polls to check the state of the lock, which is much faster
-/// when there isn't contention but rapidly slows down otherwise.
+/// A spin lock conceptually polls to check the state of the lock, which is much
+/// faster when there isn't contention expected. No attempts at fairness or lock
+/// ordering are made.
+///
+/// In iOS 10.0, macOS 12.0, tvOS 1.0, watchOS 3.0, or better, the
+/// implementation does not actually spin on contention.
+///
+/// On prior versions of Darwin, or any platform that eagerly suspends threads
+/// for QoS, this may cause unexpected priority inversion, and should be used
+/// with care.
 public final class SpinLock: ReadWriteLock {
-    private var lock = OS_SPINLOCK_INIT
+    private var lock = UnsafeSpinLock()
 
     /// Allocate a normal spinlock.
     public init() {}
@@ -103,9 +109,9 @@ public final class SpinLock: ReadWriteLock {
     /// - parameter body: A function that reads a value while locked.
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        OSSpinLockLock(&lock)
+        lock.lock()
         defer {
-            OSSpinLockUnlock(&lock)
+            lock.unlock()
         }
         return try body()
     }
@@ -114,16 +120,22 @@ public final class SpinLock: ReadWriteLock {
     /// - returns: The value returned from `body`, or `nil` if already locked.
     /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        guard OSSpinLockTry(&lock) else { return nil }
+        guard lock.tryLock() else { return nil }
         defer {
-            OSSpinLockUnlock(&lock)
+            lock.unlock()
         }
         return try body()
     }
 }
 
-/// A custom spin-lock with readers-writer semantics. The spin lock will poll
-/// to check the state of the lock, allowing many readers at the same time.
+/// A custom spin-lock with readers-writer semantics.
+///
+/// A spin lock will poll to check the state of the lock, which is much faster
+/// when there isn't contention expected. In addition, this lock attempts to
+/// allow many readers at the same time.
+///
+/// On Darwin, or any platform that eagerly suspends threads for QoS, this may
+/// cause unexpected priority inversion, and should be used with care.
 public final class CASSpinLock: ReadWriteLock {
     // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
     // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
@@ -133,7 +145,7 @@ public final class CASSpinLock: ReadWriteLock {
         static var WriterOffset: Int32 { return Int32(bitPattern: 0x00100000) }
     }
 
-    private var state = Int32.allZeros
+    private var state = UnsafeAtomicInt32()
 
     /// Allocate the spinlock.
     public init() {}
@@ -148,15 +160,15 @@ public final class CASSpinLock: ReadWriteLock {
         // spin until we acquire write lock
         repeat {
             // wait for any active writer to release the lock
-            while (state & Constants.WriterMask) != 0 {
-                _OSAtomicSpin()
+            while (state.load(order: .relaxed) & Constants.WriterMask) != 0 {
+                UnsafeAtomicInt32.spin()
             }
 
             // increment the writer count
-            if (OSAtomicAdd32Barrier(Constants.WriterOffset, &state) & Constants.WriterMask) == Constants.WriterOffset {
+            if (state.add(Constants.WriterOffset, order: .acquire) & Constants.WriterMask) == Constants.WriterOffset {
                 // wait until there are no more readers
-                while (state & Constants.ReaderMask) != 0 {
-                    _OSAtomicSpin()
+                while (state.load(order: .relaxed) & Constants.ReaderMask) != 0 {
+                    UnsafeAtomicInt32.spin()
                 }
 
                 // write lock acquired
@@ -164,12 +176,12 @@ public final class CASSpinLock: ReadWriteLock {
             }
 
             // there's another writer active; try again
-            OSAtomicAdd32Barrier(-Constants.WriterOffset, &state)
+            state.subtract(Constants.WriterOffset, order: .release)
         } while true
         
         defer {
             // decrement writers, potentially unblock readers
-            OSAtomicAdd32Barrier(-Constants.WriterOffset, &state)
+            state.subtract(Constants.WriterOffset, order: .release)
         }
 
         return try body()
@@ -185,23 +197,23 @@ public final class CASSpinLock: ReadWriteLock {
         // spin until we acquire read lock
         repeat {
             // wait for active writer to release the lock
-            while (state & Constants.WriterMask) != 0 {
-                _OSAtomicSpin()
+            while (state.load(order: .relaxed) & Constants.WriterMask) != 0 {
+                UnsafeAtomicInt32.spin()
             }
 
             // increment the reader count
-            if (OSAtomicIncrement32Barrier(&state) & Constants.WriterMask) == 0 {
+            if (state.add(1, order: .acquire) & Constants.WriterMask) == 0 {
                 // read lock required
                 break
             }
 
             // a writer became active while locking; try again
-            OSAtomicDecrement32Barrier(&state)
+            state.subtract(1, order: .release)
         } while true
         
         defer {
             // decrement readers, potentially unblock writers
-            OSAtomicDecrement32Barrier(&state)
+            state.subtract(1, order: .release)
         }
 
         return try body()
@@ -215,14 +227,17 @@ public final class CASSpinLock: ReadWriteLock {
     /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         // active writer
-        guard (state & Constants.WriterMask) == 0 else { return nil }
+        guard (state.load(order: .relaxed) & Constants.WriterMask) == 0 else { return nil }
 
         // increment the reader count
-        guard (OSAtomicIncrement32Barrier(&state) & Constants.WriterMask) == 0 else { return nil }
+        guard (state.add(1, order: .acquire) & Constants.WriterMask) == 0 else {
+            state.subtract(1, order: .release)
+            return nil
+        }
 
         defer {
             // decrement readers, potentially unblock writers
-            OSAtomicDecrement32Barrier(&state)
+            state.subtract(1, order: .release)
         }
 
         return try body()

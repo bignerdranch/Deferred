@@ -39,7 +39,7 @@ head: |
   <link rel="shortcut icon" type="image/x-icon" href="//www.bignerdranch.com/favicon.png">
 hide_documentation_coverage: true
 module: Deferred
-module_version: "2.0.0"
+module_version: "2.2.0-rc.1"
 # podspec: BNRDeferred.podspec
 root_url: "http://bignerdranch.github.io/Deferred/"
 swift_version: 2.2

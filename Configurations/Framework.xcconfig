@@ -35,3 +35,6 @@ PRODUCT_NAME = Deferred
 
 // Signing
 DEVELOPMENT_TEAM = 439592V3LM
+
+// Swift Compiler - Search Paths
+SWIFT_INCLUDE_PATHS = $(inherited) $(SRCROOT)/Sources

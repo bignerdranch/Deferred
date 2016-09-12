@@ -9,71 +9,28 @@
 import Dispatch
 import Atomics
 
-// MARK: - DispatchBlockMarker
-
-// A dispatch block (which is different from a plain closure!) constitutes the
-// second half of Deferred. The `dispatch_block_notify` API defines the notifier
-// list used by `Deferred.upon(queue:body:)`.
-private struct DispatchBlockMarker {
-    let block = DispatchWorkItem {
-        fatalError("This code should never be executed")
-    }
-    
-    var isCompleted: Bool {
-        return block.isCancelled
-    }
-    
-    func markCompleted() {
-        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
-        block.cancel()
-        // Executing the block "unblocks" it, calling all the `_notify` blocks
-        block.perform()
-    }
-
-    func notify(upon executor: ExecutorType, body: DispatchWorkItem) {
-        if let queue = executor.underlyingQueue {
-            block.notify(queue: queue, execute: body)
-        } else {
-            block.notify(queue: Deferred<Void>.genericQueue) {
-                executor.submit(body)
-            }
-        }
-    }
-}
-
-// MARK: - Deferred
-
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public struct Deferred<Value>: FutureType, PromiseType {
 
     private let storage: DeferredStorage<Value>
-    private let onFilled = DispatchBlockMarker()
 
     /// Initialize an unfilled Deferred.
     public init() {
-        storage = DeferredStorage.create(with: nil)
+        storage = .create(with: nil)
+        storage.group.enter()
     }
     
     /// Initialize a Deferred filled with the given value.
     public init(value: Value) {
-        storage = DeferredStorage.create(with: value)
-        onFilled.markCompleted()
+        storage = .create(with: value)
     }
 
     // MARK: FutureType
 
-    private func upon(_ executor: ExecutorType, per flags: DispatchWorkItemFlags, execute body: @escaping(Value) -> Void) -> DispatchWorkItem {
-        let workItem = DispatchWorkItem(flags: flags.union(.assignCurrentContext)) { [storage] in
-            storage.withValue(body)
-        }
-        onFilled.notify(upon: executor, body: workItem)
-        return workItem
-    }
-
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
-        return onFilled.isCompleted
+        return storage.isFilled
     }
 
     /// Call some `body` closure once the value is determined.
@@ -84,7 +41,19 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A function that uses the determined value.
     public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
-        _ = upon(executor, per: .inheritQoS, execute: body)
+        func callBodyWithValue() {
+            guard let value = storage.value else { return }
+            body(value)
+        }
+
+        if let queue = executor.underlyingQueue {
+            storage.group.notify(flags: [.assignCurrentContext, .inheritQoS], queue: queue, execute: callBodyWithValue)
+        } else {
+            let queue = type(of: self).genericQueue
+            storage.group.notify(flags: .assignCurrentContext, queue: queue) {
+                executor.submit(callBodyWithValue)
+            }
+        }
     }
 
     /// Waits synchronously for the value to become determined.
@@ -95,27 +64,11 @@ public struct Deferred<Value>: FutureType, PromiseType {
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
     public func wait(_ time: Timeout) -> Value? {
-        var result: Value?
-        func assign(_ value: Value) {
-            result = value
-        }
-
-        // FutureType can't generally do this; `isFilled` is normally
-        // implemented in terms of wait() normally.
-        if isFilled {
-            storage.withValue(assign)
-            return result
-        }
-
-        let executor = QueueExecutor(.global(qos: .utility))
-        let handler = upon(executor, per: .enforceQoS, execute: assign)
-
-        guard case .success = handler.wait(timeout: time.rawValue) else {
-            handler.cancel()
+        guard case .success = storage.group.wait(timeout: time.rawValue) else {
             return nil
         }
 
-        return result
+        return storage.value
     }
 
     // MARK: PromiseType
@@ -130,7 +83,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     public func fill(_ value: Value) -> Bool {
         let wasFilled = storage.fill(value)
         if wasFilled {
-            onFilled.markCompleted()
+            storage.group.leave()
         }
         return wasFilled
     }
@@ -143,11 +96,14 @@ final private class DeferredStorage<Value> {
     //  - The buffer has a stable pointer when locked to a single element.
     //  - Better `holdsUniqueReference` support allows for future optimization.
     private typealias BufferPointer =
-        ManagedBufferPointer<Void, AnyObject?>
+        ManagedBufferPointer<DispatchGroup, AnyObject?>
     private typealias Storage = DeferredStorage<Value>
 
-    static func create(with value: Value?) -> DeferredStorage<Value> {
-        let pointer = BufferPointer(bufferClass: self, minimumCapacity: 1) { _ in }
+    static func create(with value: Value?) -> Storage {
+        let pointer = BufferPointer(bufferClass: self, minimumCapacity: 1) { _ in
+            return DispatchGroup()
+        }
+
         pointer.withUnsafeMutablePointerToElements { (boxPtr) in
             boxPtr.initialize(to: value.map { $0 as AnyObject })
         }
@@ -155,6 +111,10 @@ final private class DeferredStorage<Value> {
     }
 
     deinit {
+        if !isFilled {
+            group.leave()
+        }
+
         buffer.withUnsafeMutablePointers { (pointerToHeader, pointerToElements) -> Void in
             pointerToElements.deinitialize()
             pointerToHeader.deinitialize()
@@ -165,14 +125,16 @@ final private class DeferredStorage<Value> {
         return BufferPointer(unsafeBufferObject: self)
     }
 
-    func withValue(_ body: (Value) -> Void) {
-        buffer.withUnsafeMutablePointerToElements { target in
-            guard let ptr = target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1, {
-                $0.pointee.load(order: .relaxed)
-            }), let unboxed = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? Value else { return }
-
-            body(unboxed)
+    private func withAtomicPointerToValue<Return>(_ body: (inout UnsafeAtomicRawPointer) throws -> Return) rethrows -> Return {
+        return try buffer.withUnsafeMutablePointerToElements { target in
+            try target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1) { atomicTarget in
+                try body(&atomicTarget.pointee)
+            }
         }
+    }
+
+    var group: DispatchGroup {
+        return buffer.header
     }
 
     // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:
@@ -183,10 +145,8 @@ final private class DeferredStorage<Value> {
     func fill(_ value: Value) -> Bool {
         let newPtr = Unmanaged.passRetained(value as AnyObject).toOpaque()
 
-        let wonRace = buffer.withUnsafeMutablePointerToElements { target in
-            target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1) {
-                $0.pointee.compareAndSwap(from: nil, to: newPtr, success: .sequentiallyConsistent, failure: .sequentiallyConsistent)
-            }
+        let wonRace = withAtomicPointerToValue {
+            $0.compareAndSwap(from: nil, to: newPtr, order: .acquireRelease)
         }
 
         if !wonRace {
@@ -197,11 +157,17 @@ final private class DeferredStorage<Value> {
     }
 
     var isFilled: Bool {
-        return buffer.withUnsafeMutablePointerToElements { target in
-            target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1, {
-                $0.pointee.load(order: .relaxed)
-            }) != nil
+        return withAtomicPointerToValue {
+            $0.load(order: .relaxed) != nil
         }
+    }
+
+    var value: Value? {
+        guard let ptr = withAtomicPointerToValue({
+            $0.load(order: .relaxed)
+        }) else { return nil }
+
+        return (Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value)
     }
 
 }

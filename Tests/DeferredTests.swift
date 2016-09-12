@@ -53,8 +53,7 @@ class DeferredTests: XCTestCase {
 
         let expect = expectationWithDescription("value blocks while unfilled")
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            _ = unfilled.value
-            XCTFail("value did not block")
+            XCTAssertNil(unfilled.wait(.Interval(2)))
         }
         afterDelay(0.1) {
             expect.fulfill()

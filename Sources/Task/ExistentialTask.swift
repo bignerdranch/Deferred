@@ -101,8 +101,8 @@ extension Task {
     }
 
     /// Wrap an operation that has already completed with `value`.
-    public convenience init(success getValue: @autoclosure() throws -> SuccessValue) {
-        self.init(future: Future(value: TaskResult(with: getValue)), progress: .noWork())
+    public convenience init(success value: @autoclosure() throws -> SuccessValue) {
+        self.init(future: Future(value: TaskResult(with: value)), progress: .noWork())
     }
 
     /// Wrap an operation that has already failed with `error`.
@@ -115,6 +115,3 @@ extension Task {
         self.init(future: other.future, progress: other.progress)
     }
 }
-
-@available(*, deprecated, message: "Use Task or FutureProtocol instead. It will be removed in Deferred 3")
-public protocol TaskType: FutureProtocol {}

@@ -1,5 +1,5 @@
 //
-//  BlockCancellableTask.swift
+//  TaskWorkItem.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 7/14/15.
@@ -16,14 +16,13 @@ extension Task {
     /// Creates a Task around a unit of work `body` called on a `queue`.
     ///
     /// - parameter queue: A dispatch queue to perform the work on.
-    /// - parameter options: Options controlling how `body` is executed upon
+    /// - parameter flags: Options controlling how `body` is executed upon
     ///   `queue` with respect to system resource contention.
     /// - parameter produceError: On cancel, this value is used to preemptively
     ///   complete the Task.
     /// - parameter body: A failable closure creating and returning the
     ///   success value of the task.
-    /// - seealso: dispatch_block_flags_t
-    public convenience init(upon queue: DispatchQueue = .any(), per flags: DispatchWorkItemFlags = [], onCancel produceError: @autoclosure @escaping() -> Error, body: @escaping() throws -> SuccessValue) {
+    public convenience init(upon queue: DispatchQueue = .any(), flags: DispatchWorkItemFlags = [], onCancel produceError: @autoclosure @escaping() -> Error, execute body: @escaping() throws -> SuccessValue) {
         let deferred = Deferred<Result>()
 
         let block = DispatchWorkItem(flags: flags) {

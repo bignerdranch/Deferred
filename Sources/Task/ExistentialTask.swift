@@ -76,7 +76,7 @@ extension Task {
 
 extension Task {
     /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress) where Task.Value: ResultType, Task.Value.Value == SuccessValue {
+    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
     }
 
@@ -95,19 +95,19 @@ extension Task {
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
-    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: ResultType, Task.Value.Value == SuccessValue {
+    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: Future(task: base), progress: progress)
     }
 
     /// Wrap an operation that has already completed with `value`.
-    public convenience init(value getValue: @autoclosure() throws -> SuccessValue) {
+    public convenience init(success getValue: @autoclosure() throws -> SuccessValue) {
         self.init(future: Future(value: TaskResult(with: getValue)), progress: .noWork())
     }
 
     /// Wrap an operation that has already failed with `error`.
-    public convenience init(error: Error) {
-        self.init(future: Future(value: TaskResult(error: error)), progress: .noWork())
+    public convenience init(failure error: Error) {
+        self.init(future: Future(value: TaskResult(failure: error)), progress: .noWork())
     }
 
     /// Create a task having the same underlying operation as the `other` task.

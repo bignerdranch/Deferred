@@ -1,5 +1,5 @@
 //
-//  ResultType.swift
+//  Either.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/9/15.
@@ -8,34 +8,33 @@
 
 /// A type that can exclusively represent either some result value of a
 /// successful computation or a failure with an error.
-public protocol ResultType: CustomStringConvertible, CustomDebugStringConvertible {
-    associatedtype Value
+public protocol Either: CustomStringConvertible, CustomDebugStringConvertible {
+    associatedtype Left = Error
+    associatedtype Right
 
     /// Derive a result from a failable function.
-    init(with body: () throws -> Value)
+    init(with body: () throws -> Right)
 
     /// Creates a failed result with `error`.
-    init(error: Error)
+    init(failure: Left)
 
     /// Case analysis.
     ///
     /// Returns the value from the `failure` closure if `self` represents a
     /// failure, or from the `success` closure if `self` represents a success.
-    func withValues<Return>(ifSuccess success: (Value) throws -> Return, ifFailure failure: (Error) throws -> Return) rethrows -> Return
+    func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return
 }
 
-extension ResultType {
-    /// A textual representation of `self`.
+extension Either {
     public var description: String {
-        return withValues(ifSuccess: { String(describing: $0) }, ifFailure: { String(describing: $0) })
+        return withValues(ifLeft: { String(describing: $0) }, ifRight: { String(describing: $0) })
     }
 
-    /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
-        return withValues(ifSuccess: {
-            "success(\(String(reflecting: $0)))"
-        }, ifFailure: {
+        return withValues(ifLeft: {
             "failure(\(String(reflecting: $0)))"
+        }, ifRight: {
+            "success(\(String(reflecting: $0)))"
         })
     }
 }

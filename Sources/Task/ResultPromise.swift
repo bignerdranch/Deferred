@@ -11,20 +11,20 @@ import Deferred
 import Result
 #endif
 
-extension PromiseProtocol where Value: ResultType {
+extension PromiseProtocol where Value: Either {
     /// Completes the task with a successful `value`, or a thrown error.
     ///
     /// - seealso: `fill(_:)`
     @discardableResult
-    public func succeed(_ value: @autoclosure() throws -> Value.Value) -> Bool {
-        return fill(with: Value(value: value))
+    public func succeed(with value: @autoclosure() throws -> Value.Right) -> Bool {
+        return fill(with: Value(with: value))
     }
 
     /// Completes the task with a failed `error`.
     ///
     /// - seealso: `fill(_:)`
     @discardableResult
-    public func fail(_ error: Error) -> Bool {
-        return fill(with: Value(error: error))
+    public func fail(with error: Value.Left) -> Bool {
+        return fill(with: Value(failure: error))
     }
 }

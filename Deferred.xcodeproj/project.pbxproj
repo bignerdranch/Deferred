@@ -21,8 +21,8 @@
 		DB524CDA1D85204B00DDF16D /* Protected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9C1D85200C00DDF16D /* Protected.swift */; };
 		DB524CDC1D85204B00DDF16D /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9E1D85200C00DDF16D /* Promise.swift */; };
 		DB524CDD1D85204B00DDF16D /* Locking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9F1D85200C00DDF16D /* Locking.swift */; };
-		DB524CDF1D85205200DDF16D /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
-		DB524CE01D85205200DDF16D /* ResultType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* ResultType.swift */; };
+		DB524CDF1D85205200DDF16D /* EitherRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* EitherRecovery.swift */; };
+		DB524CE01D85205200DDF16D /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* Either.swift */; };
 		DB524CE11D85205200DDF16D /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
 		DB524CE21D85205400DDF16D /* BlockCancellableTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA81D85200C00DDF16D /* BlockCancellableTask.swift */; };
 		DB524CE31D85205400DDF16D /* ExistentialTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA91D85200C00DDF16D /* ExistentialTask.swift */; };
@@ -82,8 +82,8 @@
 		DB524C9F1D85200C00DDF16D /* Locking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locking.swift; sourceTree = "<group>"; };
 		DB524CA11D85200C00DDF16D /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB524CA21D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB524CA41D85200C00DDF16D /* ResultRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRecovery.swift; sourceTree = "<group>"; };
-		DB524CA51D85200C00DDF16D /* ResultType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultType.swift; sourceTree = "<group>"; };
+		DB524CA41D85200C00DDF16D /* EitherRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherRecovery.swift; sourceTree = "<group>"; };
+		DB524CA51D85200C00DDF16D /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		DB524CA61D85200C00DDF16D /* TaskResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskResult.swift; sourceTree = "<group>"; };
 		DB524CA81D85200C00DDF16D /* BlockCancellableTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockCancellableTask.swift; sourceTree = "<group>"; };
 		DB524CA91D85200C00DDF16D /* ExistentialTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExistentialTask.swift; sourceTree = "<group>"; };
@@ -198,8 +198,8 @@
 		DB524CA31D85200C00DDF16D /* Result */ = {
 			isa = PBXGroup;
 			children = (
-				DB524CA41D85200C00DDF16D /* ResultRecovery.swift */,
-				DB524CA51D85200C00DDF16D /* ResultType.swift */,
+				DB524CA51D85200C00DDF16D /* Either.swift */,
+				DB524CA41D85200C00DDF16D /* EitherRecovery.swift */,
 				DB524CA61D85200C00DDF16D /* TaskResult.swift */,
 			);
 			path = Result;
@@ -376,13 +376,13 @@
 				DB524CE31D85205400DDF16D /* ExistentialTask.swift in Sources */,
 				DB524CE11D85205200DDF16D /* TaskResult.swift in Sources */,
 				DB524CE51D85205400DDF16D /* ResultFuture.swift in Sources */,
-				DB524CDF1D85205200DDF16D /* ResultRecovery.swift in Sources */,
+				DB524CDF1D85205200DDF16D /* EitherRecovery.swift in Sources */,
 				DB524CD31D85204B00DDF16D /* ExistentialFuture.swift in Sources */,
 				DB524CD11D85204B00DDF16D /* Deferred.swift in Sources */,
 				DB524CD61D85204B00DDF16D /* FutureAndThen.swift in Sources */,
 				DB524CDA1D85204B00DDF16D /* Protected.swift in Sources */,
 				DB524CE71D85205400DDF16D /* TaskAccumulator.swift in Sources */,
-				DB524CE01D85205200DDF16D /* ResultType.swift in Sources */,
+				DB524CE01D85205200DDF16D /* Either.swift in Sources */,
 				DB524CE81D85205400DDF16D /* TaskCollections.swift in Sources */,
 				DB524CEC1D85205400DDF16D /* TaskRecover.swift in Sources */,
 				DB524CD51D85204B00DDF16D /* FutureComposition.swift in Sources */,

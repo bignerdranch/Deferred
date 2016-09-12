@@ -99,11 +99,6 @@ void bnr_atomic_int32_store(volatile bnr_atomic_int32_t *_Nonnull target, int32_
     __c11_atomic_store(&target->value, desired, order);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.exchange(self:with:order:))
-int32_t bnr_atomic_int32_exchange(volatile bnr_atomic_int32_t *_Nonnull target, int32_t desired, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_exchange(&target->value, desired, order);
-}
-
 OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.compareAndSwap(self:from:to:success:failure:))
 bool bnr_atomic_int32_compare_and_swap(volatile bnr_atomic_int32_t *_Nonnull target, int32_t expected, int32_t desired, bnr_atomic_memory_order_t success, bnr_atomic_memory_order_t failure) {
     return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, success, failure);
@@ -129,19 +124,9 @@ void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_Nonnull target, 
     return __c11_atomic_load(&target->value, order);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.store(self:_:order:))
-void bnr_atomic_ptr_store(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable desired, bnr_atomic_memory_order_t order) {
-    __c11_atomic_store(&target->value, desired, order);
-}
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.exchange(self:with:order:))
-void *_Nullable bnr_atomic_ptr_exchange(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable desired, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_exchange(&target->value, desired, order);
-}
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.compareAndSwap(self:from:to:success:failure:))
-bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable expected, void *_Nullable desired, bnr_atomic_memory_order_t success, bnr_atomic_memory_order_t failure) {
-    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, success, failure);
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.compareAndSwap(self:from:to:order:))
+bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable expected, void *_Nullable desired, bnr_atomic_memory_order_t order) {
+    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, order, __ATOMIC_RELAXED);
 }
 
 OS_ASSUME_NONNULL_END

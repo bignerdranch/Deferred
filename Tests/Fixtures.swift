@@ -22,7 +22,7 @@ extension XCTestCase {
     func waitForTaskToComplete<T>(_ task: Task<T>) -> TaskResult<T> {
         let expectation = self.expectation(description: "task completed")
         var result: TaskResult<T>?
-        task.uponMainQueue { [weak expectation] in
+        task.upon(.main) { [weak expectation] in
             result = $0
             expectation?.fulfill()
         }

@@ -21,6 +21,12 @@ class DeferredTests: XCTestCase {
         super.tearDown()
     }
 
+    func testDestroyedWithoutBeingFilled() {
+        autoreleasepool {
+            _ = Deferred<Int>()
+        }
+    }
+
     func testWaitWithTimeout() {
         let deferred = Deferred<Int>()
 

@@ -70,17 +70,6 @@ extension FutureType where PreferredExecutor == DispatchQueue {
     public func upon(_ body: @escaping(Value) -> Void) {
         upon(.any(), body: body)
     }
-
-    /// Call some `body` closure on the main queue once the value is determined.
-    ///
-    /// If the value is determined, the closure will be submitted to the
-    /// main queue. It will always execute asynchronously, even if this call is
-    /// made from the main queue.
-    ///
-    /// - parameter body: A closure that uses the determined value.
-    public func uponMainQueue(_ body: @escaping(Value) -> Void) {
-        upon(.main, body: body)
-    }
 }
 
 extension FutureType {

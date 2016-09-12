@@ -16,14 +16,14 @@ import Foundation
 ///
 /// Forwards operations to an arbitrary underlying future having the same result
 /// type, optionally combined with some `cancellation`.
-public final class Task<SuccessValue>: NSObject, NSProgressReporting {
+public final class Task<SuccessValue>: NSObject, ProgressReporting {
     public typealias Result = TaskResult<SuccessValue>
 
-    private let future: Future<Result>
-    public let progress: NSProgress
+    fileprivate let future: Future<Result>
+    public let progress: Progress
 
     /// Creates a task given a `future` and its `progress`.
-    public init(future: Future<Result>, progress: NSProgress) {
+    public init(future: Future<Result>, progress: Progress) {
         self.future = future
         self.progress = .taskRoot(for: progress)
     }
@@ -46,7 +46,7 @@ extension Task: FutureType {
     ///
     /// - parameter queue: A dispatch queue for executing the given function on.
     /// - parameter body: A function that uses the determined value.
-    public func upon(executor: ExecutorType, body: Result -> ()) {
+    public func upon(_ executor: ExecutorType, body: @escaping(Result) -> ()) {
         future.upon(executor, body: body)
     }
 
@@ -55,7 +55,7 @@ extension Task: FutureType {
     /// If the task is complete, the call returns immediately with the value.
     ///
     /// - returns: The task's result, if filled within `timeout`, or `nil`.
-    public func wait(timeout: Timeout) -> Result? {
+    public func wait(_ timeout: Timeout) -> Result? {
         return future.wait(timeout)
     }
 }
@@ -77,7 +77,7 @@ extension Task {
 
 extension Task {
     /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, progress: NSProgress) {
+    public convenience init<Task: FutureType>(_ base: Task, progress: Progress) where Task.Value: ResultType, Task.Value.Value == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
     }
 
@@ -87,7 +87,7 @@ extension Task {
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
     public convenience init(future base: Future<Result>, cancellation: ((Void) -> Void)? = nil) {
-        let progress = NSProgress.wrapped(base, cancellation: cancellation)
+        let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: base, progress: progress)
     }
 
@@ -96,18 +96,18 @@ extension Task {
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
-    public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: ((Void) -> Void)? = nil) {
-        let progress = NSProgress.wrapped(base, cancellation: cancellation)
+    public convenience init<Task: FutureType>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: ResultType, Task.Value.Value == SuccessValue {
+        let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: Future(task: base), progress: progress)
     }
 
     /// Wrap an operation that has already completed with `value`.
-    public convenience init(@autoclosure value getValue: () throws -> SuccessValue) {
+    public convenience init(value getValue: @autoclosure() throws -> SuccessValue) {
         self.init(future: Future(value: TaskResult(with: getValue)), progress: .noWork())
     }
 
     /// Wrap an operation that has already failed with `error`.
-    public convenience init(error: ErrorType) {
+    public convenience init(error: Error) {
         self.init(future: Future(value: TaskResult(error: error)), progress: .noWork())
     }
 
@@ -117,5 +117,5 @@ extension Task {
     }
 }
 
-@available(*, deprecated, message="Use Task or FutureType instead. It will be removed in Deferred 3")
+@available(*, deprecated, message: "Use Task or FutureType instead. It will be removed in Deferred 3")
 public protocol TaskType: FutureType {}

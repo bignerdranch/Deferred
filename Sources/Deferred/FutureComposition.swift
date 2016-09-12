@@ -11,7 +11,7 @@ extension FutureType {
     /// given future become determined.
     ///
     /// - seealso: SequenceType.joinedValues
-    public func and<OtherFuture: FutureType>(other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
+    public func and<OtherFuture: FutureType>(_ other: OtherFuture) -> Future<(Value, OtherFuture.Value)> {
         return flatMap { t in other.map { u in (t, u) } }
     }
 
@@ -19,7 +19,7 @@ extension FutureType {
     /// futures become determined.
     ///
     /// - seealso: SequenceType.joinedValues
-    public func and<Other1: FutureType, Other2: FutureType>(one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
+    public func and<Other1: FutureType, Other2: FutureType>(_ one: Other1, _ two: Other2) -> Future<(Value, Other1.Value, Other2.Value)> {
         return flatMap { t in
             one.flatMap { u in
                 two.map { v in (t, u, v) }
@@ -31,7 +31,7 @@ extension FutureType {
     /// futures become determined.
     ///
     /// - seealso: SequenceType.joinedValues
-    public func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
+    public func and<Other1: FutureType, Other2: FutureType, Other3: FutureType>(_ one: Other1, _ two: Other2, _ three: Other3) -> Future<(Value, Other1.Value, Other2.Value, Other3.Value)> {
         return flatMap { t in
             one.flatMap { u in
                 two.flatMap { v in

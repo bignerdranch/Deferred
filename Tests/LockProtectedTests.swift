@@ -12,14 +12,14 @@ import Deferred
 private let testTimeout = 15.0
 
 class LockProtectedTests: XCTestCase {
-    var protected: LockProtected<(NSDate?,[Int])>!
-    var queue: dispatch_queue_t!
+    var protected: LockProtected<(Date?, [Int])>!
+    var queue: DispatchQueue!
 
     override func setUp() {
         super.setUp()
 
         protected = LockProtected(item: (nil, []))
-        queue = dispatch_queue_create("LockProtectedTests", DISPATCH_QUEUE_CONCURRENT)
+        queue = DispatchQueue(label: "LockProtectedTests", attributes: DispatchQueue.Attributes.concurrent)
     }
     
     override func tearDown() {
@@ -28,15 +28,15 @@ class LockProtectedTests: XCTestCase {
     }
 
     func testConcurrentReadingWriting() {
-        var lastWriterDate: NSDate?
+        var lastWriterDate: Date?
 
         let startReader: (Int) -> () = { i in
-            let expectation = self.expectationWithDescription("reader \(i)")
-            dispatch_async(self.queue) {
+            let expectation = self.expectation(description: "reader \(i)")
+            self.queue.async {
                 self.protected.withReadLock { (date,items) -> () in
                     if items.count == 0 && date == nil {
                         // OK - we're before the writer has added items
-                    } else if items.count == 5 && date! === lastWriterDate! {
+                    } else if items.count == 5 && date! == lastWriterDate! {
                         // OK - we're after the writer has added items
                     } else {
                         XCTFail("invalid count (\(items.count)) or date (\(date))")
@@ -49,11 +49,11 @@ class LockProtectedTests: XCTestCase {
         for i in 0 ..< 64 {
             startReader(i)
         }
-        let expectation = self.expectationWithDescription("writer")
-        dispatch_async(self.queue) {
+        let expectation = self.expectation(description: "writer")
+        self.queue.async {
             self.protected.withWriteLock { dateItemsTuple -> () in
                 for i in 0 ..< 5 {
-                    dateItemsTuple.0 = NSDate()
+                    dateItemsTuple.0 = Date()
                     dateItemsTuple.1.append(i)
                     timeIntervalSleep(0.1)
                 }
@@ -65,7 +65,7 @@ class LockProtectedTests: XCTestCase {
             startReader(i)
         }
 
-        waitForExpectationsWithTimeout(testTimeout, handler: nil)
+        waitForExpectations(timeout: testTimeout, handler: nil)
     }
 
 }

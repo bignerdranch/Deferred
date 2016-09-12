@@ -18,25 +18,25 @@ class ResultTests: XCTestCase {
 
     typealias Result = TaskResult<Int>
 
-    private let aSuccessResult = Result.Success(42)
-    private let aFailureResult = Result.Failure(Error.First)
+    fileprivate let aSuccessResult = Result.success(42)
+    fileprivate let aFailureResult = Result.failure(Error.first)
 
     func testDescriptionSuccess() {
-        XCTAssertEqual(String(aSuccessResult), String(42))
+        XCTAssertEqual(String(describing: aSuccessResult), String(42))
     }
 
     func testDescriptionFailure() {
-        XCTAssertEqual(String(aFailureResult), "First")
+        XCTAssertEqual(String(describing: aFailureResult), "first")
     }
 
     func testDebugDescriptionSuccess() {
-        XCTAssertEqual(String(reflecting: aSuccessResult), "Success(\(String(reflecting: 42)))")
+        XCTAssertEqual(String(reflecting: aSuccessResult), "success(\(String(reflecting: 42)))")
     }
 
     func testDebugDescriptionFailure() {
         let debugDescription1 = String(reflecting: aFailureResult)
-        XCTAssert(debugDescription1.hasPrefix("Failure("))
-        XCTAssert(debugDescription1.hasSuffix("Error.First)"))
+        XCTAssert(debugDescription1.hasPrefix("failure("))
+        XCTAssert(debugDescription1.hasSuffix("Error.first)"))
     }
 
     func testSuccessExtract() {
@@ -56,7 +56,7 @@ class ResultTests: XCTestCase {
     }
 
     func testFlatCoalesceSuccess() {
-        let x = aSuccessResult ?? Result.Success(84)
+        let x = aSuccessResult ?? .success(84)
         XCTAssertEqual(x.value, 42)
         XCTAssertNil(x.error)
     }

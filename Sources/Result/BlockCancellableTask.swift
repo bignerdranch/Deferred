@@ -12,8 +12,6 @@ import Result
 #endif
 import Dispatch
 
-extension dispatch_block_flags_t: OptionSetType {}
-
 extension Task {
     /// Creates a Task around a unit of work `body` called on a `queue`.
     ///
@@ -25,23 +23,23 @@ extension Task {
     /// - parameter body: A failable closure creating and returning the
     ///   success value of the task.
     /// - seealso: dispatch_block_flags_t
-    public convenience init(upon queue: dispatch_queue_t = Task<SuccessValue>.genericQueue, per options: dispatch_block_flags_t = [], @autoclosure(escaping) onCancel produceError: () -> ErrorType, body: () throws -> SuccessValue) {
+    public convenience init(upon queue: DispatchQueue = Task<SuccessValue>.genericQueue, per flags: DispatchWorkItemFlags = [], onCancel produceError: @autoclosure @escaping() -> Error, body: @escaping() throws -> SuccessValue) {
         let deferred = Deferred<Result>()
 
-        let block = dispatch_block_create(options) {
+        let block = DispatchWorkItem(flags: flags) {
             deferred.fill(Result(with: body))
         }
 
         defer {
-            dispatch_async(queue, block)
+            queue.async(execute: block)
         }
 
-        dispatch_block_notify(block, queue) {
-            _ = deferred.fill(.Failure(produceError()))
+        block.notify(queue: queue) {
+            _ = deferred.fill(.failure(produceError()))
         }
 
         self.init(deferred) {
-            dispatch_block_cancel(block)
+            block.cancel()
         }
     }
 }

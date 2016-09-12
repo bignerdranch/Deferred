@@ -45,4 +45,4 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = -
 CODE_SIGN_IDENTITY[sdk=iphoneos*] = iPhone Developer
 CODE_SIGN_IDENTITY[sdk=appletvos*] = iPhone Developer
 
-SWIFT_VERSION = 2.3
+SWIFT_VERSION = 3.0

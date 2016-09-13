@@ -59,7 +59,7 @@ class DeferredTests: XCTestCase {
 
         let expect = expectation(description: "value blocks while unfilled")
         DispatchQueue.global().async {
-            XCTAssertNil(unfilled.wait(.interval(2)))
+            XCTAssertNil(unfilled.wait(until: .now() + 2))
         }
         afterDelay(execute: expect.fulfill)
         waitForExpectations()
@@ -153,8 +153,8 @@ class DeferredTests: XCTestCase {
     func testUponMainQueueCalledWhenFilled() {
         let d = Deferred<Int>()
         
-        let expectation = self.expectation(description: "uponMainQueue block called on main queue")
-        d.uponMainQueue { value in
+        let expectation = self.expectation(description: "upon block called on main queue")
+        d.upon(.main) { value in
             XCTAssertTrue(Thread.isMainThread)
             XCTAssertEqual(value, 1)
             XCTAssertEqual(d.value, 1)
@@ -386,7 +386,7 @@ class DeferredTests: XCTestCase {
         deferred.fill(42)
         XCTAssertNotNil(deferred.peek())
         XCTAssertTrue(deferred.isFilled)
-        XCTAssertNotNil(deferred.wait(.now))
+        XCTAssertNotNil(deferred.wait(until: .now()))
         XCTAssertNotNil(deferred.waitShort())  // pass
     }
 

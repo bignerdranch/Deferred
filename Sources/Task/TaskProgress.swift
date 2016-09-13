@@ -165,7 +165,7 @@ extension Progress {
         }
         
         let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = future.wait(.now) != nil ? 0 : -1
+        progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
 
         if let cancellation = cancellation {
             progress.cancellationHandler = cancellation
@@ -173,7 +173,8 @@ extension Progress {
             progress.isCancellable = false
         }
 
-        future.upon { [weak progress] _ in
+        let queue = DispatchQueue.global(qos: .background)
+        future.upon(queue) { [weak progress] _ in
             progress?.totalUnitCount = 1
             progress?.completedUnitCount = 1
         }

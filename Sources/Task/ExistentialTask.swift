@@ -39,6 +39,8 @@ extension Task: FutureType {
     /// A type that represents the result of some asynchronous operation.
     public typealias Value = Result
 
+    public typealias PreferredExecutor = Future<Result>.PreferredExecutor
+
     /// Call some function once the operation completes.
     ///
     /// If the task is complete, the function will be submitted to the
@@ -50,13 +52,17 @@ extension Task: FutureType {
         future.upon(executor, body: body)
     }
 
+    public func upon(_ queue: PreferredExecutor, body: @escaping(Result) -> ()) {
+        future.upon(queue, body: body)
+    }
+
     /// Waits synchronously for the operation to complete.
     ///
     /// If the task is complete, the call returns immediately with the value.
     ///
     /// - returns: The task's result, if filled within `timeout`, or `nil`.
-    public func wait(_ timeout: Timeout) -> Result? {
-        return future.wait(timeout)
+    public func wait(until timeout: DispatchTime) -> Result? {
+        return future.wait(until: timeout)
     }
 }
 

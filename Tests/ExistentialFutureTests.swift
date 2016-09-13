@@ -21,7 +21,7 @@ class ExistentialFutureTests: XCTestCase {
 
     func testFilledAnyFutureWaitAlwaysReturns() {
         anyFuture = Future(value: 42)
-        let peek = anyFuture.wait(.forever)
+        let peek = anyFuture.wait(until: .distantFuture)
         XCTAssertNotNil(peek)
     }
 
@@ -80,7 +80,7 @@ class ExistentialFutureTests: XCTestCase {
         deferred.fill(42)
         XCTAssertNotNil(anyFuture.peek())
         XCTAssertTrue(anyFuture.isFilled)
-        XCTAssertNotNil(anyFuture.wait(.now))
+        XCTAssertNotNil(anyFuture.wait(until: .now()))
         XCTAssertNotNil(anyFuture.waitShort())  // pass
     }
 

@@ -24,6 +24,12 @@ private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
         self.transform = transform
     }
 
+    func upon(_ executor: Base.PreferredExecutor, body: @escaping(NewValue) -> Void) {
+        return base.upon(executor) { [transform] in
+            body(transform($0))
+        }
+    }
+
     /// Call some function `body` once the value becomes determined.
     ///
     /// If the value is determined, the function will be submitted to the
@@ -39,8 +45,8 @@ private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
 
     /// Waits synchronously, for a maximum `time`, for the calculated value to
     /// become determined; otherwise, returns `nil`.
-    func wait(_ time: Timeout) -> NewValue? {
-        return base.wait(time).map(transform)
+    func wait(until time: DispatchTime) -> NewValue? {
+        return base.wait(until: time).map(transform)
     }
     
 }

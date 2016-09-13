@@ -27,13 +27,14 @@ extension Collection where Iterator.Element: FutureType, Iterator.Element.Value:
         let outerProgress = Progress(parent: nil, userInfo: nil)
         outerProgress.totalUnitCount = numericCast(count)
         let group = DispatchGroup()
+        let queue = DispatchQueue.global(qos: .utility)
 
         for task in self {
             let innerProgress = Progress.wrapped(task, cancellation: nil)
             outerProgress.adoptChild(innerProgress, orphaned: true, pendingUnitCount: 1)
 
             group.enter()
-            task.upon { result in
+            task.upon(queue) { result in
                 result.withValues(ifSuccess: { _ in }, ifFailure: { error in
                     _ = coalescingDeferred.fill(.failure(error))
                 })
@@ -42,7 +43,7 @@ extension Collection where Iterator.Element: FutureType, Iterator.Element.Value:
             }
         }
 
-        group.notify(queue: Task<Void>.genericQueue) {
+        group.notify(queue: queue) {
             _ = coalescingDeferred.fill(.success())
         }
 

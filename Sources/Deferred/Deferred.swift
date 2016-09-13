@@ -68,23 +68,22 @@ public final class Deferred<Value>: FutureType, PromiseType {
         }
     }
 
-    /// Call some `body` closure once the value is determined.
-    ///
-    /// If the value is determined, the function will be submitted to
-    /// to the `executor` immediately.
-    ///
-    /// - parameter executor: A context for handling the `body` on fill.
-    /// - parameter body: A function that uses the determined value.
+    public func upon(_ queue: DispatchQueue, body: @escaping (Value) -> Void) {
+        notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue) { (getValue) in
+            body(getValue())
+        }
+    }
+
     public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
         if let queue = executor.underlyingQueue {
-            notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue) { (getValue) in
+            return upon(queue, body: body)
+        } else if let queue = executor as? DispatchQueue {
+            return upon(queue, body: body)
+        }
+
+        notify(flags: .assignCurrentContext, upon: .any()) { (getValue) in
+            executor.submit {
                 body(getValue())
-            }
-        } else {
-            notify(flags: .assignCurrentContext, upon: type(of: self).genericQueue) { (getValue) in
-                executor.submit {
-                    body(getValue())
-                }
             }
         }
     }
@@ -96,8 +95,8 @@ public final class Deferred<Value>: FutureType, PromiseType {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(_ time: Timeout) -> Value? {
-        guard case .success = group.wait(timeout: time.rawValue),
+    public func wait(until time: DispatchTime) -> Value? {
+        guard case .success = group.wait(timeout: time),
             let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return nil }
 
         return (Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value)

@@ -6,6 +6,8 @@
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
+import Dispatch
+
 /*
 The types in this file provide an implementation of type erasure for `FutureType`.
 The techniques were derived from experimenting with `AnySequence` and `Mirror`
@@ -15,12 +17,16 @@ in a playground, the following post, and the Swift standard library:
 */
 
 // Abstract class that fake-conforms to `FutureType` for use by `Future`.
-private class FutureBox<Value>: FutureType {
-    func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
+private class FutureBox<Value> {
+    func upon(_: ExecutorType, body _: @escaping(Value) -> Void) {
         fatalError()
     }
 
-    func wait(_ time: Timeout) -> Value? {
+    func upon(_: DispatchQueue, body _: @escaping(Value) -> Void) {
+        fatalError()
+    }
+
+    func wait(until _: DispatchTime) -> Value? {
         fatalError()
     }
 }
@@ -32,12 +38,16 @@ private final class ForwardedTo<Future: FutureType>: FutureBox<Future.Value> {
         self.base = base
     }
 
+    override func upon(_ executor: DispatchQueue, body: @escaping(Future.Value) -> Void) {
+        return base.upon(executor, body: body)
+    }
+
     override func upon(_ executor: ExecutorType, body: @escaping(Future.Value) -> Void) {
         return base.upon(executor, body: body)
     }
 
-    override func wait(_ time: Timeout) -> Future.Value? {
-        return base.wait(time)
+    override func wait(until time: DispatchTime) -> Future.Value? {
+        return base.wait(until: time)
     }
 }
 
@@ -48,13 +58,19 @@ private final class Always<Value>: FutureBox<Value> {
         self.value = value
     }
 
+    override func upon(_ queue: DispatchQueue, body: @escaping(Value) -> Void) {
+        queue.async { [value] in
+            body(value)
+        }
+    }
+
     override func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
         executor.submit { [value] in
             body(value)
         }
     }
 
-    override func wait(_ time: Timeout) -> Value? {
+    override func wait(until _: DispatchTime) -> Value? {
         return value
     }
 }
@@ -63,9 +79,11 @@ private final class Always<Value>: FutureBox<Value> {
 private final class Never<Value>: FutureBox<Value> {
     override init() {}
 
-    override func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {}
+    override func upon(_: DispatchQueue, body _: @escaping(Value) -> Void) {}
 
-    override func wait(_ time: Timeout) -> Value? {
+    override func upon(_: ExecutorType, body _: @escaping(Value) -> Void) {}
+
+    override func wait(until _: DispatchTime) -> Value? {
         return nil
     }
 }
@@ -110,6 +128,15 @@ public struct Future<Value>: FutureType {
     ///
     /// If the value is determined, the closure will be submitted to the
     /// `executor` immediately.
+    public func upon(_ executor: DispatchQueue, body: @escaping(Value) -> Void) {
+        return box.upon(executor, body: body)
+    }
+
+    /// Call some `body` closure once the underlying future's value is
+    /// determined.
+    ///
+    /// If the value is determined, the closure will be submitted to the
+    /// `executor` immediately.
     public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
         return box.upon(executor, body: body)
     }
@@ -118,7 +145,7 @@ public struct Future<Value>: FutureType {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(_ time: Timeout) -> Value? {
-        return box.wait(time)
+    public func wait(until time: DispatchTime) -> Value? {
+        return box.wait(until: time)
     }
 }

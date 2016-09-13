@@ -61,7 +61,6 @@ extension ResultType {
 }
 
 class CustomExecutorTestCase: XCTestCase {
-
     private struct Executor: ExecutorType {
 
         unowned let owner: CustomExecutorTestCase
@@ -85,35 +84,7 @@ class CustomExecutorTestCase: XCTestCase {
         XCTAssert(submitCount.withReadLock({ $0 == times }), "Executor was not called exactly \(times) times")
     }
 
-    func assertExecutorCalledAtLeastOnce(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 >= 1 }), "Executor was never called", file: file, line: line)
+    func assertExecutorCalled(atLeast times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 >= times }), "Executor was never called", file: file, line: line)
     }
-    
-}
-
-class CustomQueueTestCase: XCTestCase {
-
-    private struct Constants {
-        static let key = DispatchSpecificKey<Unmanaged<CustomQueueTestCase>>()
-    }
-
-    private(set) var queue: DispatchQueue!
-
-    override func setUp() {
-        super.setUp()
-
-        queue = DispatchQueue(label: "Deferred test queue")
-        queue.setSpecific(key: Constants.key, value: Unmanaged.passUnretained(self))
-    }
-
-    override func tearDown() {
-        queue = nil
-
-        super.tearDown()
-    }
-
-    func assertOnQueue(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssertEqual(DispatchQueue.getSpecific(key: Constants.key)?.toOpaque(), Unmanaged.passUnretained(self).toOpaque(), file: file, line: line)
-    }
-    
 }

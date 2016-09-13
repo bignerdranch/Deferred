@@ -42,9 +42,9 @@ class TaskAccumulatorTests: XCTestCase {
             afterDelay {
                 // success/failure should be ignored by TaskAccumulator, so try both!
                 if i % 2 == 0 {
-                    deferred.fill(.success(()))
+                    deferred.fill(with: .success(()))
                 } else {
-                    deferred.fill(.failure(Error.first))
+                    deferred.fill(with: .failure(Error.first))
                 }
             }
         }

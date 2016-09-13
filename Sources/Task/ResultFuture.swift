@@ -12,7 +12,7 @@ import Result
 #endif
 import Dispatch
 
-private extension FutureType where Value: ResultType {
+private extension FutureProtocol where Value: ResultType {
     func commonSuccessBody(_ body: @escaping(Value.Value) -> Void) -> (Value) -> Void {
         return { result in
             result.withValues(ifSuccess: body, ifFailure: { _ in () })
@@ -26,14 +26,14 @@ private extension FutureType where Value: ResultType {
     }
 }
 
-extension FutureType where Value: ResultType {
+extension FutureProtocol where Value: ResultType {
     /// Call some `body` closure if the future successfully resolves a value.
     ///
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined success value.
     /// - seealso: upon(_:body:)
-    public func uponSuccess(_ executor: ExecutorType, _ body: @escaping(Value.Value) -> Void) {
-        upon(executor, body: commonSuccessBody(body))
+    public func uponSuccess(_ executor: Executor, execute body: @escaping(Value.Value) -> Void) {
+        upon(executor, execute: commonSuccessBody(body))
     }
 
     /// Call some `body` closure if the future produces an error.
@@ -41,40 +41,40 @@ extension FutureType where Value: ResultType {
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined failure value.
     /// - seealso: upon(_:body:)
-    public func uponFailure(_ executor: ExecutorType, _ body: @escaping(Error) -> Void) {
-        upon(executor, body: commonFailureBody(body))
+    public func uponFailure(_ executor: Executor, execute body: @escaping(Error) -> Void) {
+        upon(executor, execute: commonFailureBody(body))
     }
 
     /// Call some `body` closure if the future successfully resolves a value.
     ///
     /// - seealso: `uponSuccess(_:body:)`.
     /// - seealso: `upon(_:body:)`.
-    public func uponSuccess(_ executor: PreferredExecutor, _ body: @escaping(Value.Value) -> Void) {
-        upon(executor, body: commonSuccessBody(body))
+    public func uponSuccess(_ executor: PreferredExecutor, execute body: @escaping(Value.Value) -> Void) {
+        upon(executor, execute: commonSuccessBody(body))
     }
 
     /// Call some `body` closure if the future produces an error.
     ///
     /// - seealso: `uponFailure(_:body:)`.
     /// - seealso: `upon(_:body:)`.
-    public func uponFailure(_ executor: PreferredExecutor, _ body: @escaping(Error) -> Void) {
-        upon(executor, body: commonFailureBody(body))
+    public func uponFailure(_ executor: PreferredExecutor, execute body: @escaping(Error) -> Void) {
+        upon(executor, execute: commonFailureBody(body))
     }
 }
 
-extension FutureType where Value: ResultType, PreferredExecutor == DispatchQueue {
+extension FutureProtocol where Value: ResultType, PreferredExecutor == DispatchQueue {
     /// Call some `body` in the background if the future successfully resolves
     /// a value.
     ///
     /// - seealso: `uponSuccess(_:body:)`.
-    public func uponSuccess(_ body: @escaping(Value.Value) -> Void) {
-        upon(.any(), body: commonSuccessBody(body))
+    public func uponSuccess(execute body: @escaping(Value.Value) -> Void) {
+        upon(.any(), execute: commonSuccessBody(body))
     }
 
     /// Call some `body` in the background if the future produces an error.
     ///
     /// - seealso: `uponFailure(_:body:)`.
-    public func uponFailure(_ body: @escaping(Error) -> Void) {
-        upon(.any(), body: commonFailureBody(body))
+    public func uponFailure(execute body: @escaping(Error) -> Void) {
+        upon(.any(), execute: commonFailureBody(body))
     }
 }

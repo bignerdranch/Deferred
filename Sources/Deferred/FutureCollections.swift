@@ -8,28 +8,22 @@
 
 import Dispatch
 
-extension Sequence where Iterator.Element: FutureType {
-    /// Choose the future that is determined first from a collection of futures.
-    ///
-    /// - returns: A deferred value that is determined with the first of the
-    ///   given futures to be determined.
-    public var earliestFilled: Future<Iterator.Element.Value> {
+extension Sequence where Iterator.Element: FutureProtocol {
+    /// Chooses the future that is determined first from `self`.
+    public func firstFilled() -> Future<Iterator.Element.Value> {
         let combined = Deferred<Iterator.Element.Value>()
         for future in self {
             future.upon(DispatchQueue.global(qos: .utility)) {
-                combined.fill($0)
+                combined.fill(with: $0)
             }
         }
         return Future(combined)
     }
 }
 
-extension Collection where Iterator.Element: FutureType {
-    /// Compose a number of futures into a single deferred array.
-    ///
-    /// - returns: A deferred array that is determined once all the given values
-    ///   are determined, in the same order.
-    public var joinedValues: Future<[Iterator.Element.Value]> {
+extension Collection where Iterator.Element: FutureProtocol {
+    /// Composes a number of futures into a single deferred array.
+    public func allFilled() -> Future<[Iterator.Element.Value]> {
         if isEmpty {
             return Future(value: [])
         }
@@ -47,7 +41,7 @@ extension Collection where Iterator.Element: FutureType {
         }
 
         group.notify(queue: queue) {
-            combined.fill(array.map {
+            combined.fill(with: array.map {
                 $0.value
             })
         }

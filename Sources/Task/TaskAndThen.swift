@@ -1,5 +1,5 @@
 //
-//  TaskFlatMap.swift
+//  TaskAndThen.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 10/27/15.
@@ -23,12 +23,12 @@ extension Task {
     /// task and the created task.
     ///
     /// - note: It is important to keep in mind the thread safety of the
-    /// `startNextTask` closure. `flatMap` submits `startNextTask` to `executor`
+    /// `startNextTask` closure. `andThen` submits `startNextTask` to `executor`
     /// once the task completes successfully.
-    /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: FutureType>(upon executor: ExecutorType, _ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
+    /// - seealso: FutureProtocol.andThen(upon:start:)
+    public func andThen<NewTask: FutureProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
         let progress = extendedProgress(byUnitCount: 1)
-        let future: Future<TaskResult<NewTask.Value.Value>> = flatMap(upon: executor) { (result) -> Task<NewTask.Value.Value> in
+        let future: Future<TaskResult<NewTask.Value.Value>> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Value> in
             do {
                 let value = try result.extract()
 

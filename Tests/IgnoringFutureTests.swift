@@ -25,7 +25,7 @@ class IgnoringFutureTests: XCTestCase {
 
         let expect = expectation(description: "value blocks while unfilled")
         afterDelay(upon: .global()) {
-            deferred.fill(42)
+            deferred.fill(with: 42)
             expect.fulfill()
         }
 
@@ -47,7 +47,7 @@ class IgnoringFutureTests: XCTestCase {
             }
         }
 
-        d.fill(1)
+        d.fill(with: 1)
 
         waitForExpectations()
     }

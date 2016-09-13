@@ -1,5 +1,5 @@
 //
-//  LockProtectedTests.swift
+//  ProtectedTests.swift
 //  Deferred
 //
 //  Created by John Gallagher on 7/19/14.
@@ -9,15 +9,15 @@
 import XCTest
 import Deferred
 
-class LockProtectedTests: XCTestCase {
-    var protected: LockProtected<(Date?, [Int])>!
+class ProtectedTests: XCTestCase {
+    var protected: Protected<(Date?, [Int])>!
     var queue: DispatchQueue!
 
     override func setUp() {
         super.setUp()
 
-        protected = LockProtected(item: (nil, []))
-        queue = DispatchQueue(label: "LockProtectedTests", attributes: .concurrent)
+        protected = Protected(initialValue: (nil, []))
+        queue = DispatchQueue(label: "ProtectedTests", attributes: .concurrent)
     }
     
     override func tearDown() {

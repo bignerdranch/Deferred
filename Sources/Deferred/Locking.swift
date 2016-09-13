@@ -1,9 +1,9 @@
 //
-//  ReadWriteLock.swift
-//  ReadWriteLock
+//  Locking.swift
+//  Deferred
 //
 //  Created by John Gallagher on 7/17/14.
-//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
@@ -13,7 +13,7 @@ import Atomics
 /// code is running at any given time. An implementing type may choose to have
 /// readers-writer semantics, such that many readers can read at once, or lock
 /// around all reads and writes the same way.
-public protocol ReadWriteLock {
+public protocol Locking {
     /// Call `body` with a reading lock.
     ///
     /// If the implementing type models a readers-writer lock, this function may
@@ -42,7 +42,7 @@ public protocol ReadWriteLock {
     func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return
 }
 
-extension ReadWriteLock {
+extension Locking {
     /// Call `body` with a lock.
     ///
     /// - parameter body: A function that writes a value while locked, then returns some value.
@@ -57,7 +57,7 @@ extension ReadWriteLock {
 ///
 /// The semaphore lock performs comparably to a spinlock under little lock
 /// contention, and comparably to a platform lock under contention.
-public struct DispatchLock: ReadWriteLock {
+public struct DispatchLock: Locking {
     private let semaphore = DispatchSemaphore(value: 1)
 
     /// Create a normal instance.
@@ -99,7 +99,7 @@ public struct DispatchLock: ReadWriteLock {
 /// On prior versions of Darwin, or any platform that eagerly suspends threads
 /// for QoS, this may cause unexpected priority inversion, and should be used
 /// with care.
-public final class SpinLock: ReadWriteLock {
+public final class SpinLock: Locking {
     private var lock = UnsafeSpinLock()
 
     /// Allocate a normal spinlock.
@@ -136,7 +136,7 @@ public final class SpinLock: ReadWriteLock {
 ///
 /// On Darwin, or any platform that eagerly suspends threads for QoS, this may
 /// cause unexpected priority inversion, and should be used with care.
-public final class CASSpinLock: ReadWriteLock {
+public final class CASSpinLock: Locking {
     // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
     // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
     private enum Constants {
@@ -178,7 +178,7 @@ public final class CASSpinLock: ReadWriteLock {
             // there's another writer active; try again
             state.subtract(Constants.WriterOffset, order: .release)
         } while true
-        
+
         defer {
             // decrement writers, potentially unblock readers
             state.subtract(Constants.WriterOffset, order: .release)
@@ -210,7 +210,7 @@ public final class CASSpinLock: ReadWriteLock {
             // a writer became active while locking; try again
             state.subtract(1, order: .release)
         } while true
-        
+
         defer {
             // decrement readers, potentially unblock writers
             state.subtract(1, order: .release)
@@ -246,7 +246,7 @@ public final class CASSpinLock: ReadWriteLock {
 
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads
-public final class PThreadReadWriteLock: ReadWriteLock {
+public final class PThreadReadWriteLock: Locking {
     private var lock = pthread_rwlock_t()
 
     /// Create the standard platform lock.

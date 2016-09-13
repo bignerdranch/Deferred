@@ -44,7 +44,7 @@ extension XCTestCase {
     }
 }
 
-extension FutureType {
+extension FutureProtocol {
     func waitShort() -> Value? {
         return wait(until: .now() + 0.05)
     }
@@ -61,7 +61,7 @@ extension ResultType {
 }
 
 class CustomExecutorTestCase: XCTestCase {
-    private struct Executor: ExecutorType {
+    private struct CountingExecutor: Executor {
 
         unowned let owner: CustomExecutorTestCase
 
@@ -75,9 +75,9 @@ class CustomExecutorTestCase: XCTestCase {
 
     }
 
-    private var submitCount = LockProtected<Int>(item: 0)
-    final var executor: ExecutorType {
-        return Executor(owner: self)
+    private var submitCount = Protected(initialValue: 0)
+    final var executor: Executor {
+        return CountingExecutor(owner: self)
     }
 
     func assertExecutorCalled(_ times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {

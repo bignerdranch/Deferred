@@ -9,20 +9,20 @@
 import Dispatch
 
 /*
-The types in this file provide an implementation of type erasure for `FutureType`.
+The types in this file provide an implementation of type erasure for `FutureProtocol`.
 The techniques were derived from experimenting with `AnySequence` and `Mirror`
 in a playground, the following post, and the Swift standard library:
  - https://realm.io/news/type-erased-wrappers-in-swift/
  - https://github.com/apple/swift/blob/master/stdlib/public/core/ExistentialCollection.swift.gyb
 */
 
-// Abstract class that fake-conforms to `FutureType` for use by `Future`.
+// Abstract class that fake-conforms to `FutureProtocol` for use by `Future`.
 private class FutureBox<Value> {
-    func upon(_: ExecutorType, body _: @escaping(Value) -> Void) {
+    func upon(_: Executor, execute _: @escaping(Value) -> Void) {
         fatalError()
     }
 
-    func upon(_: DispatchQueue, body _: @escaping(Value) -> Void) {
+    func upon(_: DispatchQueue, execute _: @escaping(Value) -> Void) {
         fatalError()
     }
 
@@ -31,19 +31,19 @@ private class FutureBox<Value> {
     }
 }
 
-// Concrete future wrapper given an instance of a `FutureType`.
-private final class ForwardedTo<Future: FutureType>: FutureBox<Future.Value> {
+// Concrete future wrapper given an instance of a `FutureProtocol`.
+private final class ForwardedTo<Future: FutureProtocol>: FutureBox<Future.Value> {
     let base: Future
     init(base: Future) {
         self.base = base
     }
 
-    override func upon(_ executor: DispatchQueue, body: @escaping(Future.Value) -> Void) {
-        return base.upon(executor, body: body)
+    override func upon(_ executor: DispatchQueue, execute body: @escaping(Future.Value) -> Void) {
+        return base.upon(executor, execute: body)
     }
 
-    override func upon(_ executor: ExecutorType, body: @escaping(Future.Value) -> Void) {
-        return base.upon(executor, body: body)
+    override func upon(_ executor: Executor, execute body: @escaping(Future.Value) -> Void) {
+        return base.upon(executor, execute: body)
     }
 
     override func wait(until time: DispatchTime) -> Future.Value? {
@@ -58,13 +58,13 @@ private final class Always<Value>: FutureBox<Value> {
         self.value = value
     }
 
-    override func upon(_ queue: DispatchQueue, body: @escaping(Value) -> Void) {
+    override func upon(_ queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         queue.async { [value] in
             body(value)
         }
     }
 
-    override func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
+    override func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
         executor.submit { [value] in
             body(value)
         }
@@ -79,9 +79,9 @@ private final class Always<Value>: FutureBox<Value> {
 private final class Never<Value>: FutureBox<Value> {
     override init() {}
 
-    override func upon(_: DispatchQueue, body _: @escaping(Value) -> Void) {}
+    override func upon(_: DispatchQueue, execute _: @escaping(Value) -> Void) {}
 
-    override func upon(_: ExecutorType, body _: @escaping(Value) -> Void) {}
+    override func upon(_: Executor, execute _: @escaping(Value) -> Void) {}
 
     override func wait(until _: DispatchTime) -> Value? {
         return nil
@@ -91,20 +91,20 @@ private final class Never<Value>: FutureBox<Value> {
 /// A type-erased wrapper over any future.
 ///
 /// Forwards operations to an arbitrary underlying future having the same
-/// `Value` type, hiding the specifics of the underlying `FutureType`.
+/// `Value` type, hiding the specifics of the underlying `FutureProtocol`.
 ///
 /// Authors can use this type to:
 ///
-/// - Prevent clients from coupling to the specific kind of `FutureType` your
+/// - Prevent clients from coupling to the specific kind of `FutureProtocol` your
 ///   implementation is currently using.
-/// - Publicly expose only the `FutureType` aspect of a deferred value,
+/// - Publicly expose only the `FutureProtocol` aspect of a deferred value,
 ///   ensuring that only your implementation can fill the deferred value
-///   using the `PromiseType` aspect.
-public struct Future<Value>: FutureType {
+///   using the `PromiseProtocol` aspect.
+public struct Future<Value>: FutureProtocol {
     private let box: FutureBox<Value>
 
     /// Create a future whose `upon(_:body:)` method forwards to `base`.
-    public init<Future: FutureType>(_ base: Future) where Future.Value == Value {
+    public init<Future: FutureProtocol>(_ base: Future) where Future.Value == Value {
         self.box = ForwardedTo(base: base)
     }
 
@@ -128,8 +128,8 @@ public struct Future<Value>: FutureType {
     ///
     /// If the value is determined, the closure will be submitted to the
     /// `executor` immediately.
-    public func upon(_ executor: DispatchQueue, body: @escaping(Value) -> Void) {
-        return box.upon(executor, body: body)
+    public func upon(_ queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
+        return box.upon(queue, execute: body)
     }
 
     /// Call some `body` closure once the underlying future's value is
@@ -137,8 +137,8 @@ public struct Future<Value>: FutureType {
     ///
     /// If the value is determined, the closure will be submitted to the
     /// `executor` immediately.
-    public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
-        return box.upon(executor, body: body)
+    public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
+        return box.upon(executor, execute: body)
     }
 
     /// Waits synchronously for the underlying future to become determined.

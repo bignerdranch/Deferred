@@ -27,7 +27,7 @@ extension Task {
         let deferred = Deferred<Result>()
 
         let block = DispatchWorkItem(flags: flags) {
-            deferred.fill(Result(with: body))
+            deferred.fill(with: Result(with: body))
         }
 
         defer {
@@ -35,7 +35,7 @@ extension Task {
         }
 
         block.notify(queue: queue) {
-            _ = deferred.fill(.failure(produceError()))
+            _ = deferred.fill(with: .failure(produceError()))
         }
 
         self.init(deferred) {

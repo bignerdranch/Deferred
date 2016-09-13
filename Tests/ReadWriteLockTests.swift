@@ -1,6 +1,6 @@
 //
-//  ReadWriteLockTests.swift
-//  ReadWriteLockTests
+//  LockingTests.swift
+//  LockingTests
 //
 //  Created by John Gallagher on 7/19/14.
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
@@ -16,10 +16,10 @@ func timeIntervalSleep(_ duration: TimeInterval) {
 
 class PerfTestThread: Thread {
     let iters: Int
-    var lock: ReadWriteLock
+    var lock: Locking
     let joinLock = NSConditionLock(condition: 0)
 
-    init(lock: ReadWriteLock, iters: Int) {
+    init(lock: Locking, iters: Int) {
         self.lock = lock
         self.iters = iters
         super.init()
@@ -44,14 +44,14 @@ class PerfTestThread: Thread {
     }
 }
 
-class ReadWriteLockTests: XCTestCase {
+class LockingTests: XCTestCase {
     var dispatchLock: DispatchLock!
     var spinLock: SpinLock!
     var casSpinLock: CASSpinLock!
     var pthreadLock: PThreadReadWriteLock!
     var queue: DispatchQueue!
-    var allLocks: [ReadWriteLock]!
-    var locksAllowingConcurrentReads: [ReadWriteLock]!
+    var allLocks: [Locking]!
+    var locksAllowingConcurrentReads: [Locking]!
 
     override func setUp() {
         super.setUp()
@@ -64,7 +64,7 @@ class ReadWriteLockTests: XCTestCase {
         allLocks = [dispatchLock, spinLock, casSpinLock, pthreadLock]
         locksAllowingConcurrentReads = [casSpinLock, pthreadLock]
 
-        queue = DispatchQueue(label: "ReadWriteLockTests", attributes: .concurrent)
+        queue = DispatchQueue(label: "LockingTests", attributes: .concurrent)
     }
     
     override func tearDown() {
@@ -162,7 +162,7 @@ class ReadWriteLockTests: XCTestCase {
         }
     }
 
-    func measureReadLockSingleThread(_ lock: ReadWriteLock, iters: Int) {
+    func measureReadLockSingleThread(_ lock: Locking, iters: Int) {
         let doNothing: () -> () = {}
         self.measure {
             for _ in 0 ..< iters {
@@ -171,7 +171,7 @@ class ReadWriteLockTests: XCTestCase {
         }
     }
 
-    func measureWriteLockSingleThread(_ lock: ReadWriteLock, iters: Int) {
+    func measureWriteLockSingleThread(_ lock: Locking, iters: Int) {
         let doNothing: () -> () = {}
         self.measure {
             for _ in 0 ..< iters {
@@ -180,7 +180,7 @@ class ReadWriteLockTests: XCTestCase {
         }
     }
 
-    func measureLock90PercentReadsNThreads(_ lock: ReadWriteLock, iters: Int, nthreads: Int) {
+    func measureLock90PercentReadsNThreads(_ lock: Locking, iters: Int, nthreads: Int) {
         self.measure {
             var threads: [PerfTestThread] = []
             for _ in 0 ..< nthreads {
@@ -215,10 +215,10 @@ class ReadWriteLockTests: XCTestCase {
         measureWriteLockSingleThread(casSpinLock, iters: 250_000)
     }
 
-    func testSingleThreadPerformancePThreadLockRead() {
+    func testSingleThreadPerformancePThreadReadWriteLockRead() {
         measureReadLockSingleThread(pthreadLock, iters: 250_000)
     }
-    func testSingleThreadPerformancePThreadLockWrite() {
+    func testSingleThreadPerformancePThreadReadWriteLockWrite() {
         measureWriteLockSingleThread(pthreadLock, iters: 250_000)
     }
 
@@ -231,7 +231,7 @@ class ReadWriteLockTests: XCTestCase {
     func test90PercentReads4ThreadsCASSpinLock() {
         measureLock90PercentReadsNThreads(casSpinLock, iters: 5_000, nthreads: 4)
     }
-    func test90PercentReads4ThreadsPThreadLock() {
+    func test90PercentReads4ThreadsPThreadReadWriteLock() {
         measureLock90PercentReadsNThreads(pthreadLock, iters: 5_000, nthreads: 4)
     }
 

@@ -16,7 +16,7 @@ extension Sequence where Iterator.Element: FutureType {
     public var earliestFilled: Future<Iterator.Element.Value> {
         let combined = Deferred<Iterator.Element.Value>()
         for future in self {
-            future.upon {
+            future.upon(DispatchQueue.global(qos: .utility)) {
                 combined.fill($0)
             }
         }
@@ -37,15 +37,16 @@ extension Collection where Iterator.Element: FutureType {
         let array = Array(self)
         let combined = Deferred<[Iterator.Element.Value]>()
         let group = DispatchGroup()
+        let queue = DispatchQueue.global(qos: .utility)
 
         for deferred in array {
             group.enter()
-            deferred.upon { _ in
+            deferred.upon(queue) { _ in
                 group.leave()
             }
         }
 
-        group.notify(queue: Iterator.Element.genericQueue) {
+        group.notify(queue: queue) {
             combined.fill(array.map {
                 $0.value
             })

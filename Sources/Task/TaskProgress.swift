@@ -173,7 +173,8 @@ extension Progress {
             progress.isCancellable = false
         }
 
-        future.upon { [weak progress] _ in
+        let queue = DispatchQueue.global(qos: .background)
+        future.upon(queue) { [weak progress] _ in
             progress?.totalUnitCount = 1
             progress?.completedUnitCount = 1
         }

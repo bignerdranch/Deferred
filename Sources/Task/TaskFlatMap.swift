@@ -13,9 +13,22 @@ import Result
 import Foundation
 
 extension Task {
-    private func commonBody<NewTask: FutureType>(for startNextTask: @escaping(SuccessValue) throws -> NewTask) -> (Progress, (Result) -> Task<NewTask.Value.Value>) where NewTask.Value: ResultType {
+    /// Begins another task by passing the result of the task to `startNextTask`
+    /// once it completes successfully.
+    ///
+    /// Chaining a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
+    ///
+    /// Cancelling the resulting task will attempt to cancel both the recieving
+    /// task and the created task.
+    ///
+    /// - note: It is important to keep in mind the thread safety of the
+    /// `startNextTask` closure. `flatMap` submits `startNextTask` to `executor`
+    /// once the task completes successfully.
+    /// - seealso: FutureType.flatMap(upon:_:)
+    public func flatMap<NewTask: FutureType>(upon executor: ExecutorType, _ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
         let progress = extendedProgress(byUnitCount: 1)
-        return (progress, { (result) in
+        let future: Future<TaskResult<NewTask.Value.Value>> = flatMap(upon: executor) { (result) -> Task<NewTask.Value.Value> in
             do {
                 let value = try result.extract()
 
@@ -35,59 +48,8 @@ extension Task {
                 defer { progress.resignCurrent() }
                 return Task<NewTask.Value.Value>(error: error)
             }
-        })
-    }
+        }
 
-    /// Begins another task by passing the result of the task to `startNextTask`
-    /// once it completes successfully.
-    ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
-    ///
-    /// Cancelling the resulting task will attempt to cancel both the recieving
-    /// task and the created task.
-    ///
-    /// - note: It is important to keep in mind the thread safety of the
-    /// `startNextTask` closure. `flatMap` submits `startNextTask` to `executor`
-    /// once the task completes successfully.
-    /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: FutureType>(upon executor: ExecutorType, _ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
-        let (progress, body) = commonBody(for: startNextTask)
-        let future = flatMap(upon: executor, body)
-        return Task<NewTask.Value.Value>(future: future, progress: progress)
-    }
-
-    /// Begins another task by passing the result of the task to `startNextTask`
-    /// once it completes successfully.
-    ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
-    ///
-    /// - note: It is important to keep in mind the thread safety of the
-    /// `startNextTask` closure. `flatMap` executes `startNextTask`
-    /// asynchronously once the task completes successfully.
-    /// - seealso: flatMap(upon:_:)
-    /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: FutureType>(upon queue: DispatchQueue, _ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value>  where NewTask.Value: ResultType {
-        let (progress, body) = commonBody(for: startNextTask)
-        let future = flatMap(upon: queue, body)
-        return Task<NewTask.Value.Value>(future: future, progress: progress)
-    }
-
-    /// Begins another task by passing the result of the task to `startNextTask`
-    /// once it completes successfully.
-    ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
-    ///
-    /// - note: It is important to keep in mind the thread safety of the
-    /// `startNextTask` closure. `flatMap` executes `startNextTask` in the
-    /// background once the task completes successfully.
-    /// - seealso: flatMap(upon:_:)
-    /// - seealso: FutureType.flatMap(_:)
-    public func flatMap<NewTask: FutureType>(_ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
-        let (progress, body) = commonBody(for: startNextTask)
-        let future = flatMap(body)
         return Task<NewTask.Value.Value>(future: future, progress: progress)
     }
 }

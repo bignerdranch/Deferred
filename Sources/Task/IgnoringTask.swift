@@ -24,6 +24,12 @@ private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
         self.transform = transform
     }
 
+    func upon(_ executor: Base.PreferredExecutor, body: @escaping(NewValue) -> Void) {
+        return base.upon(executor) { [transform] in
+            body(transform($0))
+        }
+    }
+
     /// Call some function `body` once the value becomes determined.
     ///
     /// If the value is determined, the function will be submitted to the

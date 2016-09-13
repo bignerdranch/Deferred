@@ -12,19 +12,21 @@ import Result
 #endif
 import Dispatch
 
-extension FutureType where Value: ResultType {
-    private func commonSuccessBody(_ body: @escaping(Value.Value) -> Void) -> (Value) -> Void {
+private extension FutureType where Value: ResultType {
+    func commonSuccessBody(_ body: @escaping(Value.Value) -> Void) -> (Value) -> Void {
         return { result in
             result.withValues(ifSuccess: body, ifFailure: { _ in () })
         }
     }
 
-    private func commonFailureBody(_ body: @escaping(Error) -> Void) -> (Value) -> Void {
+    func commonFailureBody(_ body: @escaping(Error) -> Void) -> (Value) -> Void {
         return { result in
             result.withValues(ifSuccess: { _ in () }, ifFailure: body)
         }
     }
+}
 
+extension FutureType where Value: ResultType {
     /// Call some `body` closure if the future successfully resolves a value.
     ///
     /// - parameter executor: A context for handling the `body` on fill.
@@ -47,30 +49,32 @@ extension FutureType where Value: ResultType {
     ///
     /// - seealso: `uponSuccess(_:body:)`.
     /// - seealso: `upon(_:body:)`.
-    public func uponSuccess(_ queue: DispatchQueue, _ body: @escaping(Value.Value) -> Void) {
-        upon(queue, body: commonSuccessBody(body))
+    public func uponSuccess(_ executor: PreferredExecutor, _ body: @escaping(Value.Value) -> Void) {
+        upon(executor, body: commonSuccessBody(body))
     }
 
     /// Call some `body` closure if the future produces an error.
     ///
     /// - seealso: `uponFailure(_:body:)`.
     /// - seealso: `upon(_:body:)`.
-    public func uponFailure(_ queue: DispatchQueue, _ body: @escaping(Error) -> Void) {
-        upon(queue, body: commonFailureBody(body))
+    public func uponFailure(_ executor: PreferredExecutor, _ body: @escaping(Error) -> Void) {
+        upon(executor, body: commonFailureBody(body))
     }
+}
 
+extension FutureType where Value: ResultType, PreferredExecutor == DispatchQueue {
     /// Call some `body` in the background if the future successfully resolves
     /// a value.
     ///
     /// - seealso: `uponSuccess(_:body:)`.
     public func uponSuccess(_ body: @escaping(Value.Value) -> Void) {
-        upon(Self.genericQueue, body: commonSuccessBody(body))
+        upon(.any(), body: commonSuccessBody(body))
     }
 
     /// Call some `body` in the background if the future produces an error.
     ///
     /// - seealso: `uponFailure(_:body:)`.
     public func uponFailure(_ body: @escaping(Error) -> Void) {
-        upon(Self.genericQueue, body: commonFailureBody(body))
+        upon(.any(), body: commonFailureBody(body))
     }
 }

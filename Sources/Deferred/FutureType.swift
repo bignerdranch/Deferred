@@ -30,13 +30,20 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
+    /// The natural executor for use with this future, either by convention or
+    /// implementation detail.
+    associatedtype PreferredExecutor: ExecutorType = DefaultExecutor
+
+    /// Calls some `body` closure once the value is determined.
+    ///
+    /// By default, calls `upon(_:body:)` with an `ExecutorType`. This method
+    /// serves as sugar for types with global members such as `DispatchQueue`.
+    func upon(_ executor: PreferredExecutor, body: @escaping(Value) -> Void)
+
     /// Call some `body` closure once the value is determined.
     ///
     /// If the value is determined, the closure should be submitted to the
     /// `executor` immediately.
-    ///
-    /// - parameter executor: A context for handling the `body` on fill.
-    /// - parameter body: A closure that uses the determined value.
     func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void)
 
     /// Waits synchronously for the value to become determined.
@@ -50,41 +57,18 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
 }
 
 extension FutureType {
-    /// A generic catch-all dispatch queue for use with futures, when you just
-    /// want to throw some work into the concurrent pile. As an alternative to
-    /// the `QOS_CLASS_UTILITY` global queue, work dispatched onto this queue
-    /// on platforms with QoS will match the QoS of the caller, which is
-    /// generally the right behavior for data flow.
-    public static var genericQueue: DispatchQueue {
-        // The technique is described and used in Core Foundation:
-        // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
-        // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
-        #if os(OSX) || os(iOS) || os(watchOS) || os(tvOS)
-        let qosClass = DispatchQoS.QoSClass(rawValue: qos_class_self()) ?? .utility
-        return .global(qos: qosClass)
-        #else
-        return .global(qos: .utility)
-        #endif
+    public func upon(_ executor: PreferredExecutor, body: @escaping(Value) -> Void) {
+        upon(executor as ExecutorType, body: body)
     }
 }
 
-extension FutureType {
-    /// Call some `body` closure once the value is determined.
-    ///
-    /// If the value is determined, the closure will be submitted to `queue`
-    /// immediately, but this call is always asynchronous.
-    ///
-    /// - seealso: `upon(_:body:)`.
-    public func upon(_ queue: DispatchQueue, body: @escaping(Value) -> Void) {
-        upon(QueueExecutor(queue), body: body)
-    }
-
+extension FutureType where PreferredExecutor == DispatchQueue {
     /// Call some `body` closure in the background once the value is determined.
     ///
     /// If the value is determined, the closure will be enqueued immediately,
     /// but this call is always asynchronous.
     public func upon(_ body: @escaping(Value) -> Void) {
-        upon(Self.genericQueue, body: body)
+        upon(.any(), body: body)
     }
 
     /// Call some `body` closure on the main queue once the value is determined.

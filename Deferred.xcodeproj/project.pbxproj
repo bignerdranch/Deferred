@@ -10,17 +10,17 @@
 		DB524C7B1D851E3800DDF16D /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB524C711D851E3800DDF16D /* Deferred.framework */; };
 		DB524CC21D85202C00DDF16D /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB524CD11D85204B00DDF16D /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C931D85200C00DDF16D /* Deferred.swift */; };
-		DB524CD21D85204B00DDF16D /* ExecutorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C941D85200C00DDF16D /* ExecutorType.swift */; };
+		DB524CD21D85204B00DDF16D /* Executor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C941D85200C00DDF16D /* Executor.swift */; };
 		DB524CD31D85204B00DDF16D /* ExistentialFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C951D85200C00DDF16D /* ExistentialFuture.swift */; };
 		DB524CD41D85204B00DDF16D /* FutureCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C961D85200C00DDF16D /* FutureCollections.swift */; };
 		DB524CD51D85204B00DDF16D /* FutureComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C971D85200C00DDF16D /* FutureComposition.swift */; };
-		DB524CD61D85204B00DDF16D /* FutureFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C981D85200C00DDF16D /* FutureFlatMap.swift */; };
+		DB524CD61D85204B00DDF16D /* FutureAndThen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C981D85200C00DDF16D /* FutureAndThen.swift */; };
 		DB524CD71D85204B00DDF16D /* FutureMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C991D85200C00DDF16D /* FutureMap.swift */; };
-		DB524CD81D85204B00DDF16D /* FutureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9A1D85200C00DDF16D /* FutureType.swift */; };
+		DB524CD81D85204B00DDF16D /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9A1D85200C00DDF16D /* Future.swift */; };
 		DB524CD91D85204B00DDF16D /* IgnoringFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */; };
-		DB524CDA1D85204B00DDF16D /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9C1D85200C00DDF16D /* LockProtected.swift */; };
-		DB524CDC1D85204B00DDF16D /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9E1D85200C00DDF16D /* PromiseType.swift */; };
-		DB524CDD1D85204B00DDF16D /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */; };
+		DB524CDA1D85204B00DDF16D /* Protected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9C1D85200C00DDF16D /* Protected.swift */; };
+		DB524CDC1D85204B00DDF16D /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9E1D85200C00DDF16D /* Promise.swift */; };
+		DB524CDD1D85204B00DDF16D /* Locking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9F1D85200C00DDF16D /* Locking.swift */; };
 		DB524CDF1D85205200DDF16D /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
 		DB524CE01D85205200DDF16D /* ResultType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* ResultType.swift */; };
 		DB524CE11D85205200DDF16D /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
@@ -31,7 +31,7 @@
 		DB524CE61D85205400DDF16D /* ResultPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAC1D85200C00DDF16D /* ResultPromise.swift */; };
 		DB524CE71D85205400DDF16D /* TaskAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAD1D85200C00DDF16D /* TaskAccumulator.swift */; };
 		DB524CE81D85205400DDF16D /* TaskCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAE1D85200C00DDF16D /* TaskCollections.swift */; };
-		DB524CE91D85205400DDF16D /* TaskFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAF1D85200C00DDF16D /* TaskFlatMap.swift */; };
+		DB524CE91D85205400DDF16D /* TaskAndThen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAF1D85200C00DDF16D /* TaskAndThen.swift */; };
 		DB524CEA1D85205400DDF16D /* TaskMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB01D85200C00DDF16D /* TaskMap.swift */; };
 		DB524CEB1D85205400DDF16D /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB11D85200C00DDF16D /* TaskProgress.swift */; };
 		DB524CEC1D85205400DDF16D /* TaskRecover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB21D85200C00DDF16D /* TaskRecover.swift */; };
@@ -69,17 +69,17 @@
 		DB524C8F1D851FD900DDF16D /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		DB524C901D851FD900DDF16D /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		DB524C931D85200C00DDF16D /* Deferred.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deferred.swift; sourceTree = "<group>"; };
-		DB524C941D85200C00DDF16D /* ExecutorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutorType.swift; sourceTree = "<group>"; };
+		DB524C941D85200C00DDF16D /* Executor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Executor.swift; sourceTree = "<group>"; };
 		DB524C951D85200C00DDF16D /* ExistentialFuture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExistentialFuture.swift; sourceTree = "<group>"; };
 		DB524C961D85200C00DDF16D /* FutureCollections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureCollections.swift; sourceTree = "<group>"; };
 		DB524C971D85200C00DDF16D /* FutureComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureComposition.swift; sourceTree = "<group>"; };
-		DB524C981D85200C00DDF16D /* FutureFlatMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureFlatMap.swift; sourceTree = "<group>"; };
+		DB524C981D85200C00DDF16D /* FutureAndThen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureAndThen.swift; sourceTree = "<group>"; };
 		DB524C991D85200C00DDF16D /* FutureMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
-		DB524C9A1D85200C00DDF16D /* FutureType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureType.swift; sourceTree = "<group>"; };
+		DB524C9A1D85200C00DDF16D /* Future.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoringFuture.swift; sourceTree = "<group>"; };
-		DB524C9C1D85200C00DDF16D /* LockProtected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
-		DB524C9E1D85200C00DDF16D /* PromiseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
-		DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
+		DB524C9C1D85200C00DDF16D /* Protected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protected.swift; sourceTree = "<group>"; };
+		DB524C9E1D85200C00DDF16D /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
+		DB524C9F1D85200C00DDF16D /* Locking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locking.swift; sourceTree = "<group>"; };
 		DB524CA11D85200C00DDF16D /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB524CA21D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DB524CA41D85200C00DDF16D /* ResultRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRecovery.swift; sourceTree = "<group>"; };
@@ -92,7 +92,7 @@
 		DB524CAC1D85200C00DDF16D /* ResultPromise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultPromise.swift; sourceTree = "<group>"; };
 		DB524CAD1D85200C00DDF16D /* TaskAccumulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAccumulator.swift; sourceTree = "<group>"; };
 		DB524CAE1D85200C00DDF16D /* TaskCollections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCollections.swift; sourceTree = "<group>"; };
-		DB524CAF1D85200C00DDF16D /* TaskFlatMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskFlatMap.swift; sourceTree = "<group>"; };
+		DB524CAF1D85200C00DDF16D /* TaskAndThen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAndThen.swift; sourceTree = "<group>"; };
 		DB524CB01D85200C00DDF16D /* TaskMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMap.swift; sourceTree = "<group>"; };
 		DB524CB11D85200C00DDF16D /* TaskProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskProgress.swift; sourceTree = "<group>"; };
 		DB524CB21D85200C00DDF16D /* TaskRecover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRecover.swift; sourceTree = "<group>"; };
@@ -180,17 +180,17 @@
 			isa = PBXGroup;
 			children = (
 				DB524C931D85200C00DDF16D /* Deferred.swift */,
-				DB524C941D85200C00DDF16D /* ExecutorType.swift */,
+				DB524C941D85200C00DDF16D /* Executor.swift */,
 				DB524C951D85200C00DDF16D /* ExistentialFuture.swift */,
+				DB524C9A1D85200C00DDF16D /* Future.swift */,
 				DB524C961D85200C00DDF16D /* FutureCollections.swift */,
 				DB524C971D85200C00DDF16D /* FutureComposition.swift */,
-				DB524C981D85200C00DDF16D /* FutureFlatMap.swift */,
+				DB524C981D85200C00DDF16D /* FutureAndThen.swift */,
 				DB524C991D85200C00DDF16D /* FutureMap.swift */,
-				DB524C9A1D85200C00DDF16D /* FutureType.swift */,
 				DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */,
-				DB524C9C1D85200C00DDF16D /* LockProtected.swift */,
-				DB524C9E1D85200C00DDF16D /* PromiseType.swift */,
-				DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */,
+				DB524C9F1D85200C00DDF16D /* Locking.swift */,
+				DB524C9E1D85200C00DDF16D /* Promise.swift */,
+				DB524C9C1D85200C00DDF16D /* Protected.swift */,
 			);
 			path = Deferred;
 			sourceTree = "<group>";
@@ -215,7 +215,7 @@
 				DB524CAC1D85200C00DDF16D /* ResultPromise.swift */,
 				DB524CAD1D85200C00DDF16D /* TaskAccumulator.swift */,
 				DB524CAE1D85200C00DDF16D /* TaskCollections.swift */,
-				DB524CAF1D85200C00DDF16D /* TaskFlatMap.swift */,
+				DB524CAF1D85200C00DDF16D /* TaskAndThen.swift */,
 				DB524CB01D85200C00DDF16D /* TaskMap.swift */,
 				DB524CB11D85200C00DDF16D /* TaskProgress.swift */,
 				DB524CB21D85200C00DDF16D /* TaskRecover.swift */,
@@ -364,12 +364,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB524CD81D85204B00DDF16D /* FutureType.swift in Sources */,
-				DB524CDC1D85204B00DDF16D /* PromiseType.swift in Sources */,
+				DB524CD81D85204B00DDF16D /* Future.swift in Sources */,
+				DB524CDC1D85204B00DDF16D /* Promise.swift in Sources */,
 				DB524CD41D85204B00DDF16D /* FutureCollections.swift in Sources */,
-				DB524CD21D85204B00DDF16D /* ExecutorType.swift in Sources */,
+				DB524CD21D85204B00DDF16D /* Executor.swift in Sources */,
 				DB524CE41D85205400DDF16D /* IgnoringTask.swift in Sources */,
-				DB524CDD1D85204B00DDF16D /* ReadWriteLock.swift in Sources */,
+				DB524CDD1D85204B00DDF16D /* Locking.swift in Sources */,
 				DB524CEB1D85205400DDF16D /* TaskProgress.swift in Sources */,
 				DB524CEA1D85205400DDF16D /* TaskMap.swift in Sources */,
 				DB524CD71D85204B00DDF16D /* FutureMap.swift in Sources */,
@@ -379,8 +379,8 @@
 				DB524CDF1D85205200DDF16D /* ResultRecovery.swift in Sources */,
 				DB524CD31D85204B00DDF16D /* ExistentialFuture.swift in Sources */,
 				DB524CD11D85204B00DDF16D /* Deferred.swift in Sources */,
-				DB524CD61D85204B00DDF16D /* FutureFlatMap.swift in Sources */,
-				DB524CDA1D85204B00DDF16D /* LockProtected.swift in Sources */,
+				DB524CD61D85204B00DDF16D /* FutureAndThen.swift in Sources */,
+				DB524CDA1D85204B00DDF16D /* Protected.swift in Sources */,
 				DB524CE71D85205400DDF16D /* TaskAccumulator.swift in Sources */,
 				DB524CE01D85205200DDF16D /* ResultType.swift in Sources */,
 				DB524CE81D85205400DDF16D /* TaskCollections.swift in Sources */,
@@ -389,7 +389,7 @@
 				DB524CE61D85205400DDF16D /* ResultPromise.swift in Sources */,
 				DB524CE21D85205400DDF16D /* BlockCancellableTask.swift in Sources */,
 				DB524CD91D85204B00DDF16D /* IgnoringFuture.swift in Sources */,
-				DB524CE91D85205400DDF16D /* TaskFlatMap.swift in Sources */,
+				DB524CE91D85205400DDF16D /* TaskAndThen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

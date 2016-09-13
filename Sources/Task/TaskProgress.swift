@@ -159,7 +159,7 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    @nonobjc static func wrapped<Future: FutureType>(_ future: Future, cancellation: ((Void) -> Void)?) -> Progress where Future.Value: ResultType {
+    @nonobjc static func wrapped<Future: FutureProtocol>(_ future: Future, cancellation: ((Void) -> Void)?) -> Progress where Future.Value: ResultType {
         if let task = future as? Task<Future.Value.Value> {
             return task.progress
         }

@@ -18,7 +18,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
             expect.fulfill()
         }
 
-        d.fill(())
+        d.fill(with: ())
 
         waitForExpectations()
         assertExecutorCalled(1)
@@ -35,7 +35,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
             expect.fulfill()
         }
 
-        marker.fill(())
+        marker.fill(with: ())
 
         waitForExpectations()
         assertExecutorCalled(2)
@@ -45,15 +45,15 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     private func delay<Value>(_ value: @autoclosure @escaping(Void) -> Value) -> Future<Value> {
         let d = Deferred<Value>()
         afterDelay {
-            d.fill(value())
+            d.fill(with: value())
         }
         return Future(d)
     }
 
-    func testFlatMap() {
+    func testAndThen() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let flattened = marker.flatMap(upon: executor) { _ in self.delay(testValue) }
+        let flattened = marker.andThen(upon: executor) { _ in self.delay(testValue) }
 
         let expect = expectation(description: "upon block called when deferred is filled")
         flattened.upon(executor) {
@@ -61,7 +61,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
             expect.fulfill()
         }
 
-        marker.fill(())
+        marker.fill(with: ())
 
         waitForExpectations()
         assertExecutorCalled(3)

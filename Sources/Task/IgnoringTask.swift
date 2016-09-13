@@ -12,10 +12,10 @@ import Result
 #endif
 import Foundation
 
-/// A `FutureType` whose determined element is that of a `Base` future passed
+/// A `FutureProtocol` whose determined element is that of a `Base` future passed
 /// through a transform function returning `NewValue`. This value is computed
 /// each time it is read through a call to `upon(queue:body:)`.
-private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
+private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
 
     let base: Base
     let transform: (Base.Value) -> NewValue
@@ -24,20 +24,13 @@ private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
         self.transform = transform
     }
 
-    func upon(_ executor: Base.PreferredExecutor, body: @escaping(NewValue) -> Void) {
+    func upon(_ executor: Base.PreferredExecutor, execute body: @escaping(NewValue) -> Void) {
         return base.upon(executor) { [transform] in
             body(transform($0))
         }
     }
 
-    /// Call some function `body` once the value becomes determined.
-    ///
-    /// If the value is determined, the function will be submitted to the
-    /// queue immediately. An upon call is always executed asynchronously.
-    ///
-    /// - parameter queue: A dispatch queue to execute the function `body` on.
-    /// - parameter body: A function that uses the delayed value.
-    func upon(_ executor: ExecutorType, body: @escaping(NewValue) -> Void) {
+    func upon(_ executor: Executor, execute body: @escaping(NewValue) -> Void) {
         return base.upon(executor) { [transform] in
             body(transform($0))
         }
@@ -53,7 +46,7 @@ private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
 
 extension Future where Value: ResultType {
     /// Create a future having the same underlying task as `other`.
-    public init<Other: FutureType>(task other: Other) where Other.Value: ResultType, Other.Value.Value == Value.Value {
+    public init<Other: FutureProtocol>(task other: Other) where Other.Value: ResultType, Other.Value.Value == Value.Value {
         self.init(LazyMapFuture(other) {
             Value(with: $0.extract)
         })

@@ -31,14 +31,14 @@ extension Task {
             guard case .success = semaphore.wait(timeout: .now()) else { return }
             defer { semaphore.signal() }
 
-            deferred.fill(Result(with: body))
+            deferred.fill(with: Result(with: body))
         }
 
         self.init(deferred) {
             guard case .success = semaphore.wait(timeout: .now()) else { return }
             defer { semaphore.signal() }
 
-            _ = deferred.fill(.failure(produceError()))
+            _ = deferred.fill(with: .failure(produceError()))
         }
     }
 }

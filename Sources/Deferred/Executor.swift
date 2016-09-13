@@ -1,5 +1,5 @@
 //
-//  ExecutorType.swift
+//  Executor.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 3/29/16.
@@ -13,7 +13,7 @@ import Foundation
 /// or atomicity.
 ///
 /// Throughout the Deferred module, `upon` methods (or parameters to methods
-/// built around `upon`, such as `map`) are overloaded to take an `ExecutorType`
+/// built around `upon`, such as `map`) are overloaded to take an `Executor`
 /// as well as the standard `dispatch_queue_t`.
 ///
 /// A custom executor is a customization point into the asynchronous semantics
@@ -24,7 +24,7 @@ import Foundation
 /// that objects be accessed on other threads with the `performBlock(_:)` method
 /// of a managed object context. We may want to connect that to Deferred:
 ///
-///     extension NSManagedObjectContext: ExecutorType {
+///     extension NSManagedObjectContext: Executor {
 ///
 ///          func submit(body: () -> Void) {
 ///              performBlock(body)
@@ -40,7 +40,7 @@ import Foundation
 ///         Person(JSON: JSON, inContext: context)
 ///     }
 ///
-public protocol ExecutorType {
+public protocol Executor {
 
     /// Execute the `body` closure.
     func submit(_ body: @escaping() -> Void)
@@ -56,7 +56,7 @@ public protocol ExecutorType {
 
 public typealias DefaultExecutor = DispatchQueue
 
-extension ExecutorType {
+extension Executor {
 
     /// By default, executes the contents of the work item as a closure.
     public func submit(_ workItem: DispatchWorkItem) {
@@ -73,7 +73,7 @@ extension ExecutorType {
 /// Dispatch queues invoke function bodies submitted to them serially in FIFO
 /// order. A queue will only invoke one-at-a-time, but independent queues may
 /// each invoke concurrently with respect to each other.
-extension DispatchQueue: ExecutorType {
+extension DispatchQueue: Executor {
     /// A generic catch-all dispatch queue, for when you just want to throw some
     /// work onto the concurrent pile. As an alternative to the `.utility` QoS
     /// global queue, work dispatched onto this queue on platforms with support
@@ -107,10 +107,10 @@ extension DispatchQueue: ExecutorType {
 /// An operation queue manages a number of operation objects, making high
 /// level features like cancellation and dependencies simple.
 ///
-/// As an `ExecutorType`, `upon` closures are enqueued as non-cancellable
+/// As an `Executor`, `upon` closures are enqueued as non-cancellable
 /// operations. This is ideal for regulating the call relative to other
 /// operations in the queue.
-extension OperationQueue: ExecutorType {
+extension OperationQueue: Executor {
 
     /// Wraps the `body` closure in an operation and enqueues it.
     @nonobjc public func submit(_ body: @escaping() -> Void) {
@@ -122,9 +122,9 @@ extension OperationQueue: ExecutorType {
 /// A run loop processes events on a thread, and is a fundamental construct in
 /// Cocoa applications.
 ///
-/// As an `ExecutorType`, submitted functions are invoked on the next iteration
+/// As an `Executor`, submitted functions are invoked on the next iteration
 /// of the run loop.
-extension CFRunLoop: ExecutorType {
+extension CFRunLoop: Executor {
 
     /// Enqueues the `body` closure to be executed as the runloop cycles
     /// in the default mode.
@@ -140,9 +140,9 @@ extension CFRunLoop: ExecutorType {
 /// A run loop processes events on a thread, and is a fundamental construct in
 /// Cocoa applications.
 ///
-/// As an `ExecutorType`, submitted functions are invoked on the next iteration
+/// As an `Executor`, submitted functions are invoked on the next iteration
 /// of the run loop.
-extension RunLoop: ExecutorType {
+extension RunLoop: Executor {
 
     /// Enqueues the `body` closure to be executed as the runloop cycles
     /// in the default mode.

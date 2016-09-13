@@ -26,7 +26,7 @@ private class FutureBox<Value> {
         fatalError()
     }
 
-    func wait(_: Timeout) -> Value? {
+    func wait(until _: DispatchTime) -> Value? {
         fatalError()
     }
 }
@@ -46,8 +46,8 @@ private final class ForwardedTo<Future: FutureType>: FutureBox<Future.Value> {
         return base.upon(executor, body: body)
     }
 
-    override func wait(_ time: Timeout) -> Future.Value? {
-        return base.wait(time)
+    override func wait(until time: DispatchTime) -> Future.Value? {
+        return base.wait(until: time)
     }
 }
 
@@ -70,7 +70,7 @@ private final class Always<Value>: FutureBox<Value> {
         }
     }
 
-    override func wait(_ time: Timeout) -> Value? {
+    override func wait(until _: DispatchTime) -> Value? {
         return value
     }
 }
@@ -83,7 +83,7 @@ private final class Never<Value>: FutureBox<Value> {
 
     override func upon(_: ExecutorType, body _: @escaping(Value) -> Void) {}
 
-    override func wait(_: Timeout) -> Value? {
+    override func wait(until _: DispatchTime) -> Value? {
         return nil
     }
 }
@@ -145,7 +145,7 @@ public struct Future<Value>: FutureType {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(_ time: Timeout) -> Value? {
-        return box.wait(time)
+    public func wait(until time: DispatchTime) -> Value? {
+        return box.wait(until: time)
     }
 }

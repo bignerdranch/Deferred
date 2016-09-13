@@ -46,7 +46,7 @@ extension XCTestCase {
 
 extension FutureType {
     func waitShort() -> Value? {
-        return wait(.interval(0.05))
+        return wait(until: .now() + 0.05)
     }
 }
 

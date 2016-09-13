@@ -40,8 +40,8 @@ public struct IgnoringFuture<Base: FutureType>: FutureType {
     ///
     /// - parameter time: A length of time to wait for event to complete.
     /// - returns: Nothing, if filled within the timeout, or `nil`.
-    public func wait(_ time: Timeout) -> ()? {
-        return base.wait(time).map { _ in }
+    public func wait(until time: DispatchTime) -> ()? {
+        return base.wait(until: time).map { _ in }
     }
 }
 

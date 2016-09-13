@@ -61,8 +61,8 @@ extension Task: FutureType {
     /// If the task is complete, the call returns immediately with the value.
     ///
     /// - returns: The task's result, if filled within `timeout`, or `nil`.
-    public func wait(_ timeout: Timeout) -> Result? {
-        return future.wait(timeout)
+    public func wait(until timeout: DispatchTime) -> Result? {
+        return future.wait(until: timeout)
     }
 }
 

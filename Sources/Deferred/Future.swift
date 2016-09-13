@@ -100,8 +100,6 @@ extension FutureProtocol {
 }
 
 extension FutureProtocol {
-
-    /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
         var ret = "\(Self.self)"
         if Value.self == Void.self && isFilled {
@@ -114,7 +112,6 @@ extension FutureProtocol {
         return ret
     }
 
-    /// Return the `Mirror` for `self`.
     public var customMirror: Mirror {
         if Value.self != Void.self, let value = peek() {
             return Mirror(self, children: [ "value": value ], displayStyle: .optional)
@@ -122,5 +119,4 @@ extension FutureProtocol {
             return Mirror(self, children: [ "isFilled": isFilled ], displayStyle: .tuple)
         }
     }
-
 }

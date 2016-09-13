@@ -14,7 +14,7 @@ import Result
 extension PromiseProtocol where Value: Either {
     /// Completes the task with a successful `value`, or a thrown error.
     ///
-    /// - seealso: `fill(_:)`
+    /// - seealso: fill(with:)
     @discardableResult
     public func succeed(with value: @autoclosure() throws -> Value.Right) -> Bool {
         return fill(with: Value(with: value))
@@ -22,7 +22,7 @@ extension PromiseProtocol where Value: Either {
 
     /// Completes the task with a failed `error`.
     ///
-    /// - seealso: `fill(_:)`
+    /// - seealso: fill(with:)
     @discardableResult
     public func fail(with error: Value.Left) -> Bool {
         return fill(with: Value(failure: error))

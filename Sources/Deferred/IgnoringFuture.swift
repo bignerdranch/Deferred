@@ -55,7 +55,7 @@ extension FutureProtocol {
     ///
     /// But behaves more efficiently.
     ///
-    /// - seealso: map(upon:_:)
+    /// - seealso: map(upon:transform:)
     public func ignored() -> IgnoringFuture<Self> {
         return IgnoringFuture(self)
     }

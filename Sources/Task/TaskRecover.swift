@@ -24,7 +24,7 @@ extension Task {
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
-    /// - seealso: FutureProtocol.map(upon:_:)
+    /// - seealso: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         let progress = extendedProgress(byUnitCount: 1)
         let future: Future<TaskResult<SuccessValue>> = map(upon: executor) { (result) in

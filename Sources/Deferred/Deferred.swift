@@ -33,7 +33,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         group.enter()
     }
     
-    /// Creates a Deferred filled with `value`.
+    /// Creates an instance resolved with `value`.
     public init(filledWith value: Value) {
         storage.withUnsafeMutablePointerToElements { (pointerToElement) in
             pointerToElement.initialize(to: value as AnyObject)
@@ -60,13 +60,6 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     // MARK: FutureProtocol
 
-    /// Check whether or not the receiver is filled.
-    public var isFilled: Bool {
-        return storage.withAtomicPointerToElement {
-            $0.load(order: .relaxed) != nil
-        }
-    }
-
     public func upon(_ queue: DispatchQueue, execute body: @escaping (Value) -> Void) {
         notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue) { (getValue) in
             body(getValue())
@@ -87,13 +80,6 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         }
     }
 
-    /// Waits synchronously for the value to become determined.
-    ///
-    /// If the value is already determined, the call returns immediately with
-    /// the value.
-    ///
-    /// - parameter time: A length of time to wait for the value to be determined.
-    /// - returns: The determined value, if filled within the timeout, or `nil`.
     public func wait(until time: DispatchTime) -> Value? {
         guard case .success = group.wait(timeout: time),
             let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return nil }
@@ -102,13 +88,13 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     }
 
     // MARK: PromiseProtocol
+
+    public var isFilled: Bool {
+        return storage.withAtomicPointerToElement {
+            $0.load(order: .relaxed) != nil
+        }
+    }
     
-    /// Determines the deferred value with a given result.
-    ///
-    /// Filling a deferred value should usually be attempted only once.
-    ///
-    /// - parameter value: The resolved value for the instance.
-    /// - returns: Whether the promise was fulfilled with `value`.
     @discardableResult
     public func fill(with value: Value) -> Bool {
         let newPtr = Unmanaged.passRetained(value as AnyObject).toOpaque()

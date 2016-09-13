@@ -12,7 +12,7 @@ public final class Protected<T> {
     private var lock: Locking
     private var value: T
 
-    /// Creates the protected `value` and a type implementing a `lock`.
+    /// Creates a protected `value` with a type implementing a `lock`.
     public init(initialValue value: T, lock: Locking = CASSpinLock()) {
         self.value = value
         self.lock = lock
@@ -42,8 +42,6 @@ public final class Protected<T> {
 }
 
 extension Protected: CustomDebugStringConvertible, CustomReflectable {
-
-    /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
         if let value = synchronizedValue {
             return "Protected(\(String(reflecting: value)))"
@@ -52,7 +50,6 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable {
         }
     }
 
-    /// Returns the `Mirror` for `self`.
     public var customMirror: Mirror {
         if let value = synchronizedValue {
             return Mirror(self, children: [ "item": value ], displayStyle: .optional)
@@ -60,5 +57,4 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable {
             return Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
         }
     }
-
 }

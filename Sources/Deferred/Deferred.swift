@@ -95,8 +95,8 @@ public final class Deferred<Value>: FutureType, PromiseType {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(_ time: Timeout) -> Value? {
-        guard case .success = group.wait(timeout: time.rawValue),
+    public func wait(until time: DispatchTime) -> Value? {
+        guard case .success = group.wait(timeout: time),
             let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return nil }
 
         return (Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value)

@@ -21,7 +21,6 @@
 		DB524CDA1D85204B00DDF16D /* LockProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9C1D85200C00DDF16D /* LockProtected.swift */; };
 		DB524CDC1D85204B00DDF16D /* PromiseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9E1D85200C00DDF16D /* PromiseType.swift */; };
 		DB524CDD1D85204B00DDF16D /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */; };
-		DB524CDE1D85204B00DDF16D /* Timeout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA01D85200C00DDF16D /* Timeout.swift */; };
 		DB524CDF1D85205200DDF16D /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
 		DB524CE01D85205200DDF16D /* ResultType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* ResultType.swift */; };
 		DB524CE11D85205200DDF16D /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
@@ -81,7 +80,6 @@
 		DB524C9C1D85200C00DDF16D /* LockProtected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockProtected.swift; sourceTree = "<group>"; };
 		DB524C9E1D85200C00DDF16D /* PromiseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseType.swift; sourceTree = "<group>"; };
 		DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
-		DB524CA01D85200C00DDF16D /* Timeout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeout.swift; sourceTree = "<group>"; };
 		DB524CA11D85200C00DDF16D /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB524CA21D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DB524CA41D85200C00DDF16D /* ResultRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRecovery.swift; sourceTree = "<group>"; };
@@ -193,7 +191,6 @@
 				DB524C9C1D85200C00DDF16D /* LockProtected.swift */,
 				DB524C9E1D85200C00DDF16D /* PromiseType.swift */,
 				DB524C9F1D85200C00DDF16D /* ReadWriteLock.swift */,
-				DB524CA01D85200C00DDF16D /* Timeout.swift */,
 			);
 			path = Deferred;
 			sourceTree = "<group>";
@@ -368,7 +365,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB524CD81D85204B00DDF16D /* FutureType.swift in Sources */,
-				DB524CDE1D85204B00DDF16D /* Timeout.swift in Sources */,
 				DB524CDC1D85204B00DDF16D /* PromiseType.swift in Sources */,
 				DB524CD41D85204B00DDF16D /* FutureCollections.swift in Sources */,
 				DB524CD21D85204B00DDF16D /* ExecutorType.swift in Sources */,

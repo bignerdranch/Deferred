@@ -22,13 +22,17 @@ import Dispatch
 public struct TaskAccumulator {
     private let group = DispatchGroup()
 
+    private var queue: DispatchQueue {
+        return .global(qos: .utility)
+    }
+
     /// Accumulate another task into the list of tasks that fold into the
     /// next `allCompleted()` task.
     ///
     /// This method is thread-safe.
     public func accumulate<Task: FutureType>(_ task: Task) where Task.Value: ResultType {
         group.enter()
-        task.upon { [group = group] _ in
+        task.upon(queue) { [group = group] _ in
             group.leave()
         }
     }
@@ -40,7 +44,7 @@ public struct TaskAccumulator {
     /// if this method is being called at the same time as `accumulate(_:)`.
     public func allCompleted() -> Future<Void> {
         let deferred = Deferred<Void>()
-        group.notify(queue: Deferred<Void>.genericQueue) {
+        group.notify(queue: queue) {
             deferred.fill()
         }
         return Future(deferred)

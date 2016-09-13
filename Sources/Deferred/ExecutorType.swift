@@ -54,6 +54,8 @@ public protocol ExecutorType {
 
 }
 
+public typealias DefaultExecutor = DispatchQueue
+
 extension ExecutorType {
 
     /// By default, executes the contents of the work item as a closure.
@@ -68,27 +70,38 @@ extension ExecutorType {
     
 }
 
-// A `ExecutorType` wrapper for a `dispatch_queue_t`.
-//
-// In Swift 2.2, dispatch queues are protocol objects, and cannot be made to
-// conform to other protocols. If this changes in the future, and
-// `dispatch_queue_t` can be made to conform to `ExecutorType` directly, the
-// overloads referenced above can be removed.
-struct QueueExecutor: ExecutorType {
-
-    private let queue: DispatchQueue
-    init(_ queue: DispatchQueue) {
-        self.queue = queue
+/// Dispatch queues invoke function bodies submitted to them serially in FIFO
+/// order. A queue will only invoke one-at-a-time, but independent queues may
+/// each invoke concurrently with respect to each other.
+extension DispatchQueue: ExecutorType {
+    /// A generic catch-all dispatch queue, for when you just want to throw some
+    /// work onto the concurrent pile. As an alternative to the `.utility` QoS
+    /// global queue, work dispatched onto this queue on platforms with support
+    /// for QoS will match the QoS of the caller.
+    public static func any() -> DispatchQueue {
+        // The technique is described and used in Core Foundation:
+        // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
+        // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
+        let qosClass: DispatchQoS.QoSClass
+        #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+            qosClass = DispatchQoS.QoSClass(rawValue: qos_class_self()) ?? .utility
+        #else
+            qosClass = .utility
+        #endif
+        return .global(qos: qosClass)
     }
 
-    func submit(_ body: @escaping() -> Void) {
-        queue.async(execute: body)
+    public func submit(_ body: @escaping() -> Void) {
+        async(execute: body)
     }
 
-    var underlyingQueue: DispatchQueue? {
-        return queue
+    public func submit(_ workItem: DispatchWorkItem) {
+        async(execute: workItem)
     }
 
+    public var underlyingQueue: DispatchQueue? {
+        return self
+    }
 }
 
 /// An operation queue manages a number of operation objects, making high

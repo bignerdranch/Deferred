@@ -6,6 +6,8 @@
 //  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
+import Dispatch
+
 /// A wrapped future that discards the result of the future. The wrapped
 /// future is determined when the underlying future is determined, but it
 /// is always determined with the empty tuple. In this way, it models the
@@ -24,10 +26,10 @@ public struct IgnoringFuture<Base: FutureType>: FutureType {
         self.base = base
     }
 
-    /// Call some `body` closure once the event completes.
-    ///
-    /// If the event is already completed, the closure will be submitted to the
-    /// `executor` immediately.
+    public func upon(_ executor: Base.PreferredExecutor, body: @escaping() -> Void) {
+        base.upon(executor) { _ in body() }
+    }
+
     public func upon(_ executor: ExecutorType, body: @escaping() -> Void) {
         base.upon(executor) { _ in body() }
     }

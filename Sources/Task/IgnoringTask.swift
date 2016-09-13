@@ -45,8 +45,8 @@ private struct LazyMapFuture<Base: FutureType, NewValue>: FutureType {
 
     /// Waits synchronously, for a maximum `time`, for the calculated value to
     /// become determined; otherwise, returns `nil`.
-    func wait(_ time: Timeout) -> NewValue? {
-        return base.wait(time).map(transform)
+    func wait(until time: DispatchTime) -> NewValue? {
+        return base.wait(until: time).map(transform)
     }
     
 }

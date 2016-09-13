@@ -165,7 +165,7 @@ extension Progress {
         }
 
         let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = future.wait(.now) != nil ? 0 : -1
+        progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
 
         if let cancellation = cancellation {
             progress.cancellationHandler = cancellation

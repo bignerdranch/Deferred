@@ -52,7 +52,7 @@ class TaskAccumulatorTests: XCTestCase {
         let expectation = self.expectation(description: "allCompleteTask finished")
         accumulator.allCompleted().upon(queue) { [weak expectation] _ in
             for task in tasks {
-                XCTAssertNotNil(task.wait(.forever))
+                XCTAssertNotNil(task.wait(until: .distantFuture))
             }
 
             expectation?.fulfill()

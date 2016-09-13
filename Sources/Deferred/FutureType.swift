@@ -51,9 +51,9 @@ public protocol FutureType: CustomDebugStringConvertible, CustomReflectable {
     /// If the value is already determined, the call returns immediately with
     /// the value.
     ///
-    /// - parameter time: A length of time to wait for the value to be determined.
+    /// - parameter time: A deadline for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    func wait(_ time: Timeout) -> Value?
+    func wait(until time: DispatchTime) -> Value?
 }
 
 extension FutureType {
@@ -77,7 +77,7 @@ extension FutureType {
     ///
     /// - returns: The determined value, if already filled, or `nil`.
     public func peek() -> Value? {
-        return wait(.now)
+        return wait(until: .now())
     }
 
     /// Waits for the value to become determined, then returns it.
@@ -90,12 +90,12 @@ extension FutureType {
     ///
     /// - returns: The determined value.
     var value: Value {
-        return wait(.forever)!
+        return wait(until: .distantFuture).unsafelyUnwrapped
     }
 
     /// Check whether or not the receiver is filled.
     var isFilled: Bool {
-        return wait(.now) != nil
+        return wait(until: .now()) != nil
     }
 }
 

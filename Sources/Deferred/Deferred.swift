@@ -11,7 +11,7 @@ import Atomics
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
-public final class Deferred<Value>: FutureType, PromiseType {
+public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     // Using `ManagedBuffer` has advantages:
     //  - The buffer has a stable pointer when locked to a single element.
@@ -25,7 +25,6 @@ public final class Deferred<Value>: FutureType, PromiseType {
     // A semaphore that keeps efficiently keeps track of a callbacks list.
     private let group = DispatchGroup()
 
-    /// Initialize an unfilled Deferred.
     public init() {
         storage.withUnsafeMutablePointerToElements { (pointerToElement) in
             pointerToElement.initialize(to: nil)
@@ -34,8 +33,8 @@ public final class Deferred<Value>: FutureType, PromiseType {
         group.enter()
     }
     
-    /// Initialize a Deferred filled with the given value.
-    public init(value: Value) {
+    /// Creates a Deferred filled with `value`.
+    public init(filledWith value: Value) {
         storage.withUnsafeMutablePointerToElements { (pointerToElement) in
             pointerToElement.initialize(to: value as AnyObject)
         }
@@ -59,7 +58,7 @@ public final class Deferred<Value>: FutureType, PromiseType {
         }
     }
 
-    // MARK: FutureType
+    // MARK: FutureProtocol
 
     /// Check whether or not the receiver is filled.
     public var isFilled: Bool {
@@ -68,17 +67,17 @@ public final class Deferred<Value>: FutureType, PromiseType {
         }
     }
 
-    public func upon(_ queue: DispatchQueue, body: @escaping (Value) -> Void) {
+    public func upon(_ queue: DispatchQueue, execute body: @escaping (Value) -> Void) {
         notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue) { (getValue) in
             body(getValue())
         }
     }
 
-    public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
+    public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
         if let queue = executor.underlyingQueue {
-            return upon(queue, body: body)
+            return upon(queue, execute: body)
         } else if let queue = executor as? DispatchQueue {
-            return upon(queue, body: body)
+            return upon(queue, execute: body)
         }
 
         notify(flags: .assignCurrentContext, upon: .any()) { (getValue) in
@@ -102,7 +101,7 @@ public final class Deferred<Value>: FutureType, PromiseType {
         return (Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value)
     }
 
-    // MARK: PromiseType
+    // MARK: PromiseProtocol
     
     /// Determines the deferred value with a given result.
     ///
@@ -111,7 +110,7 @@ public final class Deferred<Value>: FutureType, PromiseType {
     /// - parameter value: The resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
     @discardableResult
-    public func fill(_ value: Value) -> Bool {
+    public func fill(with value: Value) -> Bool {
         let newPtr = Unmanaged.passRetained(value as AnyObject).toOpaque()
 
         let wonRace = storage.withAtomicPointerToElement {

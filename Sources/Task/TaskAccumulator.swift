@@ -30,7 +30,7 @@ public struct TaskAccumulator {
     /// next `allCompleted()` task.
     ///
     /// This method is thread-safe.
-    public func accumulate<Task: FutureType>(_ task: Task) where Task.Value: ResultType {
+    public func accumulate<Task: FutureProtocol>(_ task: Task) where Task.Value: ResultType {
         group.enter()
         task.upon(queue) { [group = group] _ in
             group.leave()
@@ -45,7 +45,7 @@ public struct TaskAccumulator {
     public func allCompleted() -> Future<Void> {
         let deferred = Deferred<Void>()
         group.notify(queue: queue) {
-            deferred.fill()
+            deferred.fill(with: ())
         }
         return Future(deferred)
     }

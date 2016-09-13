@@ -12,7 +12,7 @@ import Result
 #endif
 import Foundation
 
-extension Collection where Iterator.Element: FutureType, Iterator.Element.Value: ResultType {
+extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: ResultType {
     /// Compose a number of tasks into a single notifier task.
     ///
     /// If any of the contained tasks fail, the returned task will be determined
@@ -36,7 +36,7 @@ extension Collection where Iterator.Element: FutureType, Iterator.Element.Value:
             group.enter()
             task.upon(queue) { result in
                 result.withValues(ifSuccess: { _ in }, ifFailure: { error in
-                    _ = coalescingDeferred.fill(.failure(error))
+                    _ = coalescingDeferred.fill(with: .failure(error))
                 })
 
                 group.leave()
@@ -44,7 +44,7 @@ extension Collection where Iterator.Element: FutureType, Iterator.Element.Value:
         }
 
         group.notify(queue: queue) {
-            _ = coalescingDeferred.fill(.success())
+            _ = coalescingDeferred.fill(with: .success())
         }
 
         return Task(coalescingDeferred, progress: outerProgress)

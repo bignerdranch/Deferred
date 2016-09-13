@@ -1,27 +1,20 @@
 //
-//  LockProtected.swift
-//  ReadWriteLock
+//  Protected.swift
+//  Locking
 //
 //  Created by John Gallagher on 7/17/14.
 //  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
 //
 
-/// A `LockProtected` holds onto a value of type T, but only allows access to it
-/// from within a locking statement. This prevents accidental unsafe access when
-/// thread safety is desired.
-public final class LockProtected<T> {
-    private var lock: ReadWriteLock
-    private var item: T
+/// A protected value only allows access from within a locking statement. This
+/// prevents accidental unsafe access when thread safety is desired.
+public final class Protected<T> {
+    private var lock: Locking
+    private var value: T
 
-    /// Create the protected value with an initial item and a default lock.
-    public convenience init(item: T) {
-        self.init(item: item, lock: CASSpinLock())
-    }
-
-    /// Create the protected value with an initial item and a type implementing
-    /// a lock.
-    public init(item: T, lock: ReadWriteLock) {
-        self.item = item
+    /// Creates the protected `value` and a type implementing a `lock`.
+    public init(initialValue value: T, lock: Locking = CASSpinLock()) {
+        self.value = value
         self.lock = lock
     }
 
@@ -30,7 +23,7 @@ public final class LockProtected<T> {
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: (T) throws -> Return) rethrows -> Return {
         return try lock.withReadLock {
-            try body(self.item)
+            try body(value)
         }
     }
 
@@ -39,21 +32,21 @@ public final class LockProtected<T> {
     /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: (inout T) throws -> Return) rethrows -> Return {
         return try lock.withWriteLock {
-            try body(&self.item)
+            try body(&value)
         }
     }
 
     fileprivate var synchronizedValue: T? {
-        return lock.withAttemptedReadLock { self.item }
+        return lock.withAttemptedReadLock { value }
     }
 }
 
-extension LockProtected: CustomDebugStringConvertible, CustomReflectable {
+extension Protected: CustomDebugStringConvertible, CustomReflectable {
 
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
         if let value = synchronizedValue {
-            return "LockProtected(\(String(reflecting: value)))"
+            return "Protected(\(String(reflecting: value)))"
         } else {
             return "\(type(of: self)) (lock contended)"
         }

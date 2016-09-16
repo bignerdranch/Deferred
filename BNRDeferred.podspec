@@ -32,12 +32,13 @@ Pod::Spec.new do |s|
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source_files  = "Sources/**/*.{swift,h}"
+  s.preserve_path = "Sources/**/*.modulemap"
   s.header_dir    = "Deferred"
   s.module_name   = "Deferred"
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.requires_arc = true
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0',
-                            'SWIFT_INCLUDE_PATHS': '$(SRCROOT)/Deferred/Sources' }
+                            'SWIFT_INCLUDE_PATHS': '$(PODS_ROOT)/BNRDeferred/Sources' }
 
 end

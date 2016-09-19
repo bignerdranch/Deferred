@@ -1,9 +1,9 @@
 //
-//  ReadWriteLock.swift
-//  ReadWriteLock
+//  Locking.swift
+//  Deferred
 //
 //  Created by John Gallagher on 7/17/14.
-//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
@@ -13,7 +13,7 @@ import Atomics
 /// code is running at any given time. An implementing type may choose to have
 /// readers-writer semantics, such that many readers can read at once, or lock
 /// around all reads and writes the same way.
-public protocol ReadWriteLock {
+public protocol Locking {
     /// Call `body` with a reading lock.
     ///
     /// If the implementing type models a readers-writer lock, this function may
@@ -42,11 +42,7 @@ public protocol ReadWriteLock {
     func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return
 }
 
-extension ReadWriteLock {
-    /// Call `body` with a lock.
-    ///
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
+extension Locking {
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withReadLock(body)
     }
@@ -57,10 +53,10 @@ extension ReadWriteLock {
 ///
 /// The semaphore lock performs comparably to a spinlock under little lock
 /// contention, and comparably to a platform lock under contention.
-public struct DispatchLock: ReadWriteLock {
+public struct DispatchLock: Locking {
     private let semaphore = DispatchSemaphore(value: 1)
 
-    /// Create a normal instance.
+    /// Creates a normal semaphore.
     public init() {}
 
     private func withLock<Return>(before time: DispatchTime, body: () throws -> Return) rethrows -> Return? {
@@ -72,16 +68,10 @@ public struct DispatchLock: ReadWriteLock {
 
     }
 
-    /// Call `body` with a lock.
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withLock(before: .distantFuture, body: body)!
     }
 
-    /// Attempt to call `body` with a lock.
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         return try withLock(before: .now(), body: body)
     }
@@ -99,15 +89,12 @@ public struct DispatchLock: ReadWriteLock {
 /// On prior versions of Darwin, or any platform that eagerly suspends threads
 /// for QoS, this may cause unexpected priority inversion, and should be used
 /// with care.
-public final class SpinLock: ReadWriteLock {
+public final class SpinLock: Locking {
     private var lock = UnsafeSpinLock()
 
-    /// Allocate a normal spinlock.
+    /// Creates a normal spinlock.
     public init() {}
 
-    /// Call `body` with a lock.
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         lock.lock()
         defer {
@@ -116,9 +103,6 @@ public final class SpinLock: ReadWriteLock {
         return try body()
     }
 
-    /// Attempt to call `body` with a lock.
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard lock.tryLock() else { return nil }
         defer {
@@ -136,7 +120,7 @@ public final class SpinLock: ReadWriteLock {
 ///
 /// On Darwin, or any platform that eagerly suspends threads for QoS, this may
 /// cause unexpected priority inversion, and should be used with care.
-public final class CASSpinLock: ReadWriteLock {
+public final class CASSpinLock: Locking {
     // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
     // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
     private enum Constants {
@@ -147,15 +131,9 @@ public final class CASSpinLock: ReadWriteLock {
 
     private var state = UnsafeAtomicInt32()
 
-    /// Allocate the spinlock.
+    /// Creates a normal spinlock.
     public init() {}
 
-    /// Call `body` with a writing lock.
-    ///
-    /// The given function is guaranteed to be called exclusively.
-    ///
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         // spin until we acquire write lock
         repeat {
@@ -187,12 +165,6 @@ public final class CASSpinLock: ReadWriteLock {
         return try body()
     }
 
-    /// Call `body` with a reading lock.
-    ///
-    /// The given function may be called concurrently with reads on other threads.
-    ///
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         // spin until we acquire read lock
         repeat {
@@ -219,12 +191,6 @@ public final class CASSpinLock: ReadWriteLock {
         return try body()
     }
 
-    /// Attempt to call `body` with a lock.
-    ///
-    /// `body` may be called concurrently with reads on other threads.
-    ///
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         // active writer
         guard (state.load(order: .relaxed) & Constants.WriterMask) == 0 else { return nil }
@@ -246,7 +212,7 @@ public final class CASSpinLock: ReadWriteLock {
 
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads
-public final class PThreadReadWriteLock: ReadWriteLock {
+public final class PThreadReadWriteLock: Locking {
     private var lock = pthread_rwlock_t()
 
     /// Create the standard platform lock.
@@ -260,12 +226,6 @@ public final class PThreadReadWriteLock: ReadWriteLock {
         assert(status == 0)
     }
 
-    /// Call `body` with a reading lock.
-    ///
-    /// The given function may be called concurrently with reads on other threads.
-    ///
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_rdlock(&lock)
         defer {
@@ -274,12 +234,6 @@ public final class PThreadReadWriteLock: ReadWriteLock {
         return try body()
     }
 
-    /// Attempt to call `body` with a lock.
-    ///
-    /// `body` may be called concurrently with reads on other threads.
-    ///
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
         defer {
@@ -288,12 +242,6 @@ public final class PThreadReadWriteLock: ReadWriteLock {
         return try body()
     }
 
-    /// Call `body` with a writing lock.
-    ///
-    /// The given function is guaranteed to be called exclusively.
-    ///
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_wrlock(&lock)
         defer {
@@ -301,5 +249,4 @@ public final class PThreadReadWriteLock: ReadWriteLock {
         }
         return try body()
     }
-
 }

@@ -44,7 +44,7 @@ extension XCTestCase {
     }
 }
 
-extension FutureType {
+extension FutureProtocol {
     func waitShort() -> Value? {
         return wait(until: .now() + 0.05)
     }
@@ -56,18 +56,18 @@ extension DispatchSemaphore {
     }
 }
 
-extension ResultType {
-    var value: Value? {
-        return withValues(ifSuccess: { $0 }, ifFailure: { _ in nil })
+extension Either {
+    var value: Right? {
+        return withValues(ifLeft: { _ in nil }, ifRight: { $0 })
     }
 
-    var error: Swift.Error? {
-        return withValues(ifSuccess: { _ in nil }, ifFailure: { $0 })
+    var error: Left? {
+        return withValues(ifLeft: { $0 }, ifRight: { _ in nil })
     }
 }
 
 class CustomExecutorTestCase: XCTestCase {
-    private struct Executor: ExecutorType {
+    private struct CountingExecutor: Executor {
 
         unowned let owner: CustomExecutorTestCase
 
@@ -81,9 +81,9 @@ class CustomExecutorTestCase: XCTestCase {
 
     }
 
-    private var submitCount = LockProtected<Int>(item: 0)
-    final var executor: ExecutorType {
-        return Executor(owner: self)
+    private var submitCount = Protected(initialValue: 0)
+    final var executor: Executor {
+        return CountingExecutor(owner: self)
     }
 
     func assertExecutorCalled(_ times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {

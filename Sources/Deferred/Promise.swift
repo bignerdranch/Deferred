@@ -1,5 +1,5 @@
 //
-//  PromiseType.swift
+//  Promise.swift
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/29/15.
@@ -16,28 +16,26 @@
 /// However, certain use cases inherently race (such as cancellation), and any
 /// attempts to check for programmer error should be active by default.
 ///
-public protocol PromiseType {
+public protocol PromiseProtocol {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
     
-    /// Create the promise in a default, unfilled state
+    /// Creates an instance in a default, unfilled state.
     init()
 
     /// Check whether or not the receiver is filled.
     var isFilled: Bool { get }
 
-    /// Determines the deferred value with a given result.
+    /// Determines the promise with `value`.
     ///
-    /// Filling a deferred value should usually be attempted only once. An
-    /// implementing type may choose to enforce this.
+    /// Filling a deferred value should usually be attempted only once.
     ///
-    /// - parameter value: A resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
     @discardableResult
-    func fill(_ value: Value) -> Bool
+    func fill(with value: Value) -> Bool
 }
 
-extension PromiseType {
+extension PromiseProtocol {
     /// Determines the deferred `value`.
     ///
     /// Filling a deferred value should usually be attempted only once. A
@@ -55,7 +53,7 @@ extension PromiseType {
     ///   not possible.
     @_transparent
     public func mustFill(with value: Value) {
-        if !fill(value) {
+        if !fill(with: value) {
             preconditionFailure("Cannot fill an already-filled \(type(of: self))")
         }
     }

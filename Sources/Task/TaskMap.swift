@@ -23,8 +23,8 @@ extension Task {
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
-    /// - seealso: FutureType.map(upon:_:)
-    public func map<NewSuccessValue>(upon executor: ExecutorType, _ transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+    /// - seealso: FutureProtocol.map(upon:transform:)
+    public func map<NewSuccessValue>(upon executor: Executor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let progress = extendedProgress(byUnitCount: 1)
         let future: Future<TaskResult<NewSuccessValue>> = map(upon: executor) { (result) in
             progress.becomeCurrent(withPendingUnitCount: 1)

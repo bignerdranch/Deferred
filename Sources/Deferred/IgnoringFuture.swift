@@ -18,7 +18,7 @@ import Dispatch
 ///     myFuture.map { _ in }
 ///
 /// But may behave more efficiently.
-public struct IgnoringFuture<Base: FutureType>: FutureType {
+public struct IgnoringFuture<Base: FutureProtocol>: FutureProtocol {
     private let base: Base
     
     /// Creates a future that ignores the result of `base`.
@@ -26,11 +26,11 @@ public struct IgnoringFuture<Base: FutureType>: FutureType {
         self.base = base
     }
 
-    public func upon(_ executor: Base.PreferredExecutor, body: @escaping() -> Void) {
+    public func upon(_ executor: Base.PreferredExecutor, execute body: @escaping() -> Void) {
         base.upon(executor) { _ in body() }
     }
 
-    public func upon(_ executor: ExecutorType, body: @escaping() -> Void) {
+    public func upon(_ executor: Executor, execute body: @escaping() -> Void) {
         base.upon(executor) { _ in body() }
     }
     
@@ -45,7 +45,7 @@ public struct IgnoringFuture<Base: FutureType>: FutureType {
     }
 }
 
-extension FutureType {
+extension FutureProtocol {
 
     /// Returns a future that ignores the result of this future.
     ///
@@ -55,7 +55,7 @@ extension FutureType {
     ///
     /// But behaves more efficiently.
     ///
-    /// - seealso: map(upon:_:)
+    /// - seealso: map(upon:transform:)
     public func ignored() -> IgnoringFuture<Self> {
         return IgnoringFuture(self)
     }

@@ -35,32 +35,18 @@ public final class Task<SuccessValue>: NSObject, ProgressReporting {
     }
 }
 
-extension Task: FutureType {
-    /// A type that represents the result of some asynchronous operation.
+extension Task: FutureProtocol {
     public typealias Value = Result
-
     public typealias PreferredExecutor = Future<Result>.PreferredExecutor
 
-    /// Call some function once the operation completes.
-    ///
-    /// If the task is complete, the function will be submitted to the
-    /// queue immediately. An `upon` call is always executed asynchronously.
-    ///
-    /// - parameter queue: A dispatch queue for executing the given function on.
-    /// - parameter body: A function that uses the determined value.
-    public func upon(_ executor: ExecutorType, body: @escaping(Result) -> ()) {
-        future.upon(executor, body: body)
+    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> ()) {
+        future.upon(queue, execute: body)
     }
 
-    public func upon(_ queue: PreferredExecutor, body: @escaping(Result) -> ()) {
-        future.upon(queue, body: body)
+    public func upon(_ executor: Executor, execute body: @escaping(Result) -> ()) {
+        future.upon(executor, execute: body)
     }
 
-    /// Waits synchronously for the operation to complete.
-    ///
-    /// If the task is complete, the call returns immediately with the value.
-    ///
-    /// - returns: The task's result, if filled within `timeout`, or `nil`.
     public func wait(until timeout: DispatchTime) -> Result? {
         return future.wait(until: timeout)
     }
@@ -82,8 +68,8 @@ extension Task {
 }
 
 extension Task {
-    /// Create a task whose `upon(_:body:)` method uses the result of `base`.
-    public convenience init<Task: FutureType>(_ base: Task, progress: Progress) where Task.Value: ResultType, Task.Value.Value == SuccessValue {
+    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
+    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
     }
 
@@ -97,31 +83,28 @@ extension Task {
         self.init(future: base, progress: progress)
     }
 
-    /// Create a task whose `upon(_:_:)` method uses the result of `base`.
+    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
     ///
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
-    public convenience init<Task: FutureType>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: ResultType, Task.Value.Value == SuccessValue {
+    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: Future(task: base), progress: progress)
     }
 
-    /// Wrap an operation that has already completed with `value`.
-    public convenience init(value getValue: @autoclosure() throws -> SuccessValue) {
-        self.init(future: Future(value: TaskResult(with: getValue)), progress: .noWork())
+    /// Creates an operation that has already completed with `value`.
+    public convenience init(success value: @autoclosure() throws -> SuccessValue) {
+        self.init(future: Future(value: TaskResult(with: value)), progress: .noWork())
     }
 
-    /// Wrap an operation that has already failed with `error`.
-    public convenience init(error: Error) {
-        self.init(future: Future(value: TaskResult(error: error)), progress: .noWork())
+    /// Creates an operation that has already failed with `error`.
+    public convenience init(failure error: Error) {
+        self.init(future: Future(value: TaskResult(failure: error)), progress: .noWork())
     }
 
-    /// Create a task having the same underlying operation as the `other` task.
+    /// Creates a task having the same underlying operation as the `other` task.
     public convenience init(_ other: Task<SuccessValue>) {
         self.init(future: other.future, progress: other.progress)
     }
 }
-
-@available(*, deprecated, message: "Use Task or FutureType instead. It will be removed in Deferred 3")
-public protocol TaskType: FutureType {}

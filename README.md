@@ -4,18 +4,20 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 ### Vital Statistics
 
-|                                                                                               |
-|-----------------------------------------------------------------------------------------------|
-|[![Swift 2.3 supported](https://img.shields.io/badge/swift-2.3-EF5138.svg?)][Swift]            |
-|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT License]         |
-|![iOS, OS X, tvOS, and watchOS](https://img.shields.io/cocoapods/p/BNRDeferred.svg)            |
-|[!["BNRDeferred" on CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods] |
-|[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)][Carthage]|
+|                                                                                     |
+|-------------------------------------------------------------------------------------|
+|[![Swift 3.0 required](https://img.shields.io/badge/swift-3.0-EF5138.svg?)][Swift]   |
+|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]       |
+|![iOS, OS X, tvOS, and watchOS](https://img.shields.io/cocoapods/p/BNRDeferred.svg)  |
+|[![CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods]        |
+|[![Carthage](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)][Carthage] |
+|[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred/swift-3_0.svg)][CI]|
 
 [Swift]: https://swift.org
-[MIT License]: https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt
+[MIT]: https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt
 [CocoaPods]: https://cocoapods.org/pods/BNRDeferred
 [Carthage]: https://github.com/Carthage/Carthage
+[CI]: http://travis-ci.org/bignerdranch/Deferred
 
 ## Table of Contents
 
@@ -53,13 +55,13 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 A `Deferred<Value>` is a value that might be unknown now but is expected to resolve to a definite `Value` at some time in the future. It is resolved by being "filled" with a `Value`.
 
-A `Deferred<Value>` represents a `Value`. If you just want to work with the eventual `Value`, use `upon`. If you want to produce an `OtherValue` future from a `Deferred<Value>`, check out `map` and `flatMap`.
+A `Deferred<Value>` represents a `Value`. If you just want to work with the eventual `Value`, use `upon`. If you want to produce an `OtherValue` future from a `Deferred<Value>`, check out `map(upon:transform:)` and `andThen(upon:start:)`.
 
-You can wait for an array of values to resolve with `CollectionType.joinedValues`, or just take the first one to resolve with `SequenceType.earliestFilled`. (`joinedValues ` for just a handful of futures is so common, there's a few versions `FutureType.and` to save you the trouble of putting them in an array.)
+You can wait for an array of values to resolve with `Collection.allFilled()`, or just take the first one to resolve with `Sequence.firstFilled()`. (`allFilled` for just a handful of futures is so common, there's a few variations of `and` to save you the trouble of putting them in an array.)
 
 #### Gotcha: No Double-Stuffed `Deferred`s
 
-It's a no-op to `fill` an already-`fill`ed `Deferred`. Use `fill(_:assertIfFilled:)` if you want to treat this as an error.
+It's a no-op to `fill(with:)` an already-`fill`ed `Deferred`. Use `mustFill(with:)` if you want to treat this state as an error.
 
 ## Why Deferred?
 
@@ -92,7 +94,7 @@ Deferred enables this comfortable linear flow for async programming:
 
 ```swift
 let friends = fetchFriends(forUser: jimbob)
-friends.upon { friends in
+friends.upon(.main) { friends in
     let names = friends.map { $0.name }
     dataSource.array = names
     tableView.reloadData()
@@ -120,16 +122,16 @@ This gets really messy with callbacks. But with `Deferred`, it's just:
 
 ```swift
 // Let's use type annotations to make it easier to see what's going on here.
-let friends: Deferred<[Friend]> = fetchFriends(forUser: jimbob)
-let names: Future<[Name]> = friends.flatMap { (friends: [Friend]) -> Future<[Name]> in
+let friends: Deferred<[Friend]> = fetchFriends(for: jimbob)
+let names: Future<[Name]> = friends.andThen(upon: .global()) { (friends: [Friend]) -> Future<[Name]> in
     // fork: get an array of not-yet-determined names
     let names: [Deferred<Name>] = friends.map { AsynchronousCall(.Name, friend: $0) }
 
-    // join: get a not-yet-determined array of now-determined names
-    return names.joinedValues
+    // get a not-yet-determined array of now-determined names
+    return names.allFilled()
 }
 
-names.upon { (names: [Name]) in
+names.upon(.main) { (names: [Name]) in
     // names has been determined - use it!
     dataSource.array = names
     tableView.reloadData()
@@ -147,12 +149,12 @@ func performOperation() -> Deferred<Int> {
     let deferred = Deferred<Int>()
 
     // 2. Kick off asynchronous code that will eventually…
-    let queue = /* … */
-    dispatch_async(queue) {
-        let result = compute_result()
+    let queue: DispatchQueue = /* … */
+    queue.async {
+        let result = computeResult()
 
         // 3. … fill the deferred in with its value
-        deferred.fill(result)
+        deferred.fill(with: result)
     }
 
     // 4. Return the (currently still unfilled) deferred
@@ -164,9 +166,9 @@ func performOperation() -> Deferred<Int> {
 
 <a name="upon"></a>
 
-You can use the `upon(_:body:)` method to run a closure once the `Deferred` has been filled. `upon(_:body:)` can be called multiple times, and the closures will be called in the order they were supplied to `upon(_:body:)`.
+You can use the `upon(_:execute:)` method to run a function once the `Deferred` has been filled. `upon(_:execute:)` can be called multiple times, and the closures will be called in the order they were supplied to `upon(_:execute:)`.
 
-By default, `upon(_:)` will run the closures on a background concurrent GCD queue. You can change this by passing a different queue when by using the full `upon(_:body:)` method to specify a queue for the closure.
+By default, `upon(_:)` will run the closures on a background concurrent GCD queue. You can change this by passing a different queue when using the full `upon(_:execute:)` method to specify a queue for the closure.
 
 ```swift
 let deferredResult = performOperation()
@@ -192,32 +194,28 @@ if let result = deferredResult.peek() {
 
 ### Blocking on Fulfillment
 
-Use the `wait(_:)` method to wait for a `Deferred` to be filled, and return the value.
-
-The `wait(_:)` method supports a few timeout values, including an arbitrary number of seconds.
+Use the `wait(until:)` method to wait for a `Deferred` to be filled, and return the value.
 
 ```swift
-// WARNING: Blocks the calling thread!
-let result: Int = performOperation().wait(.Forever)!
+// warning: Blocks the calling thread!
+let result: Int = performOperation().wait(until: .distantFuture)!
 ```
 
 ### Sequencing Deferreds
 
-Monadic `map` and `flatMap` are available to chain `Deferred` results. For example, suppose you have a method that asynchronously reads a string, and you want to call `Int.init(_:)` on that string:
+Monadic `map(upon:transform:)` and `andThen(upon:start:)` are available to chain `Deferred` results. For example, suppose you have a method that asynchronously reads a string, and you want to call `Int.init(_:)` on that string:
 
 ```swift
 // Producer
 func readString() -> Deferred<String> {
     let deferredResult = Deferred<String>()
-    // dispatch_async something to fill deferredResult…
+    // call something async to fill deferredResult…
     return deferredResult
 }
 
 // Consumer
-let deferredInt: Future<Int?> = readString().map { Int($0) }
+let deferredInt: Future<Int?> = readString().map(upon: .any()) { Int($0) }
 ```
-
-`map(upon:_:)` and `flatMap(upon:_:)`, like `upon(_:body:)`, execute on a concurrent background thread by default (once the instance has been filled). The `upon` peramater is if you want to specify the GCD queue as the consumer.
 
 ### Combining Deferreds
 
@@ -231,9 +229,9 @@ let d1: Deferred<Int> = /* … */
 let d2: Deferred<String> = /* … */
 let dBoth: Future<(Int, String)> = d1.and(d2)
 
-// MARK: joinedValues
+// MARK: allFilled
 
-// `joinedValues` creates a new future that is filled once all inputs are available.
+// `allFilled` creates a new future that is filled once all inputs are available.
 // All of the input Deferreds must contain the same type.
 var deferreds: [Deferred<Int>] = []
 for i in 0 ..< 10 {
@@ -241,14 +239,14 @@ for i in 0 ..< 10 {
 }
 
 // Once all 10 input deferreds are filled, the item at index `i` in the array passed to `upon` will contain the result of `deferreds[i]`.
-let allDeferreds: Future<[Int]> = deferreds.joinedValues
+let allDeferreds: Future<[Int]> = deferreds.allFilled
 
-// MARK: earliestFilled
+// MARK: firstFilled
 
-// `earliestFilled` creates a new future that is filled once any one of its inputs is available.
+// `firstFilled ` creates a new future that is filled once any one of its inputs is available.
 // If multiple inputs become available simultaneously, no guarantee is made about which will be selected.
 // Once any one of the 10 inputs is filled, `anyDeferred` will be filled with that value.
-let anyDeferred: Future<Int> = deferreds.earliestFilled
+let anyDeferred: Future<Int> = deferreds. firstFilled()
 ```
 
 ### Cancellation
@@ -273,7 +271,7 @@ This closure is responsible for aborting the operation if needed.
 Now, if someone defaults the `Deferred<Value>` to some `Value`,
 the `upon` closure will run and cancel the in-flight operation.
 
-Let's look at cancelling our `fetchFriends(forUser:)` request:
+Let's look at cancelling our `fetchFriends(for:)` request:
 
 ```swift
 // MARK: - Client
@@ -283,26 +281,26 @@ extension FriendsViewController {
     private var friends: Deferred<Value>?
 
     func refreshFriends() {
-        let friends = fetchFriends(forUser: jimbob)
-        friends.upon { friends in
+        let friends = fetchFriends(for: jimbob)
+        friends.upon(.main) { friends in
             let names = friends.map { $0.name }
             dataSource.array = names
             tableView.reloadData()
         }
 
-        /* Stash the `Deferred<Value>` for defaulting later. */
+        // Stash the `Deferred<Value>` for defaulting later.
         self.friends = friends
     }
 
     func cancelFriends() {
-        friends?.fill([])
+        friends?.fill(with: [])
     }
 
 }
 
 // MARK: - Producer
 
-func fetchFriends(forUser user: User) -> Deferred<[Friend]> {
+func fetchFriends(for user: User) -> Deferred<[Friend]> {
     let deferredFriends = Deferred<[Friend]>()
     let session: NSURLSession = /* … */
     let request: NSURLRequest = /* … */
@@ -336,22 +334,22 @@ It sometimes just doesn't make *sense* to be able to `fill` something; if you ha
 
 You may have noticed that anybody can call `upon` on a `Deferred` type; this is fundamental. But the same is true of `fill`, and this may be a liability as different pieces of code interact with each other. How can we make it **read-only**?
 
-For this reason, Deferred is split into `FutureType` and `PromiseType`, both protocols the `Deferred` type conforms to. You can think of these as the "reading" and "writing" sides of a deferred value; a future can only be `upon`ed, and a promise can only be `fill`ed.
+For this reason, Deferred is split into `FutureProtocol` and `PromiseProtocol`, both protocols the `Deferred` type conforms to. You can think of these as the "reading" and "writing" sides of a deferred value; a future can only be `upon`ed, and a promise can only be `fill`ed.
 
-Deferred also provides the `Future` type, a wrapper for anything that's a `FutureType` much like the Swift standard library's `Any` types. You can use it protectively to make a `Deferred` read-only. Reconsider the example from above:
+Deferred also provides the `Future` type, a wrapper for anything that's a `PromiseProtocol` much like the Swift `Any` types. You can use it protectively to make a `Deferred` read-only. Reconsider the example from above:
 
 ```swift
 extension FriendsViewController {
 
     // `FriendsViewController` is the only of the `Deferred` in its
-    // `PromiseType` role, and can use it as it pleases.
+    // `Promise` role, and can use it as it pleases.
     private var friends: Deferred<Value>?
 
     // Now this method can vend a `Future` and not worry about the
     // rules of accessing its private `Deferred`.
     func refreshFriends() -> Future<[Friend]> {
-        let friends = fetchFriends(forUser: jimbob)
-        friends.upon { friends in
+        let friends = fetchFriends(for: jimbob)
+        friends.upon(.main) { friends in
             let names = friends.map { $0.name }
             dataSource.array = names
             tableView.reloadData()
@@ -364,7 +362,7 @@ extension FriendsViewController {
     }
 
     func cancelFriends() {
-        friends?.fill([])
+        friends?.fill(with: [])
     }
 
 }
@@ -378,7 +376,7 @@ extension FriendsStore {
     // dependency, injected later on
     var context: NSManagedObjectContext?
 
-    func getLocalFriends(forUser user: User) -> Future<[Friend]> {
+    func getLocalFriends(for user: User) -> Future<[Friend]> {
         guard let context = context else {
             // a future can be created with an immediate value, allowing the benefits
             // of Deferred's design even if values are available already (consider a
@@ -398,7 +396,7 @@ extension FriendsStore {
 
 As a codebase or team using Deferred gets larger, it may become important to reduce repetition and noise.
 
-Deferred's abstractions can be extended using protocols. [`FutureType`](http://bignerdranch.github.io/Deferred/Protocols/FutureType.html) gives you all the power of the `Deferred` type on anything you build.
+Deferred's abstractions can be extended using protocols. [`FutureProtocol`](http://bignerdranch.github.io/Deferred/Protocols/FutureProtocol.html) gives you all the power of the `Deferred` type on anything you build.
 
 An example algorithm, included in Deferred, is the `IgnoringFuture`. Simply call `ignored()` to create a future that gets "filled" with `Void`:
 
@@ -410,7 +408,7 @@ func whenFriendsAreLoaded() -> IgnoringFuture<Void> {
 
 This method erases the `Value` of the `Deferred` without the boilerplate of creating a new `Deferred<Void>` and having to wait on an `upon`.
 
-The [`ExecutorType`](http://bignerdranch.github.io/Deferred/Protocols/ExecutorType.html) protocol allows changing the behavior of an `upon` call, and any derived algorithm such as `map` or `flatMap`. If your app isn't using a `dispatch_queue_t` directly, this allows you to adapt other asynchronous mechanisms like `NSManagedObjectContext.performBlock(_:)` fors Deferred.
+The [`Executor`](http://bignerdranch.github.io/Deferred/Protocols/Executor.html) protocol allows changing the behavior of an `upon` call, and any derived algorithm such as `map` or `andThen`. If your app isn't using a `DispatchQueue` directly, this allows you to adapt other asynchronous mechanisms like `NSManagedObjectContext.performBlock(_:)` for Deferred.
 
 ## Getting Started
 
@@ -427,7 +425,7 @@ There are a few different options to install Deferred.
 Add the following to your Cartfile:
 
 ```
-github "bignerdranch/Deferred" "2.2.0-rc.1"
+github "bignerdranch/Deferred" "3.0-beta.1"
 ```
 
 Then run `carthage update`.
@@ -444,7 +442,7 @@ for up to date installation instructions.
 Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
 
 ```ruby
-pod 'BNRDeferred', '~> 2.2'
+pod 'BNRDeferred', '~> 3.0'
 ```
 
 You will also need to make sure you're opting into using frameworks:
@@ -457,7 +455,7 @@ Then run `pod install`.
 
 ### Swift Package Manager
 
-We include provisional support for [Swift Package Manager](https://swift.org/package-manager/) on the 2.x toolchain.
+We include support for [Swift Package Manager](https://swift.org/package-manager/) on 3.x toolchains.
 
 Add us to your `Package.swift`:
 
@@ -467,7 +465,7 @@ import PackageDescription
 let package = Package(
     name: "My Extremely Nerdy App",
     dependencies: [
-        .Package(url: "https://github.com/bignerdranch/Deferred.git", majorVersion: 2),
+        .Package(url: "https://github.com/bignerdranch/Deferred.git", majorVersion: 3),
     ]
 )
 ```

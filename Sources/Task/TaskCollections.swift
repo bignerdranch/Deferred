@@ -12,15 +12,15 @@ import Result
 #endif
 import Foundation
 
-extension Collection where Iterator.Element: FutureType, Iterator.Element.Value: ResultType {
+extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: Either, Iterator.Element.Value.Left == Error {
     /// Compose a number of tasks into a single notifier task.
     ///
     /// If any of the contained tasks fail, the returned task will be determined
     /// with that failure. Otherwise, once all operations succeed, the returned
     /// task will be determined a success.
-    public var joinedTasks: Task<Void> {
+    public func allSucceeded() -> Task<Void> {
         if isEmpty {
-            return Task(value: ())
+            return Task(success: ())
         }
 
         let coalescingDeferred = Deferred<Task<Void>.Result>()
@@ -35,16 +35,16 @@ extension Collection where Iterator.Element: FutureType, Iterator.Element.Value:
 
             group.enter()
             task.upon(queue) { result in
-                result.withValues(ifSuccess: { _ in }, ifFailure: { error in
-                    _ = coalescingDeferred.fill(.failure(error))
-                })
+                result.withValues(ifLeft: { (error) in
+                    _ = coalescingDeferred.fill(with: .failure(error))
+                }, ifRight: { _ in })
 
                 group.leave()
             }
         }
 
         group.notify(queue: queue) {
-            _ = coalescingDeferred.fill(.success())
+            _ = coalescingDeferred.fill(with: .success())
         }
 
         return Task(coalescingDeferred, progress: outerProgress)

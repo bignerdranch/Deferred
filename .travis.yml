@@ -25,6 +25,9 @@ after_success:
 - if [ $ACTION == "other" ]; then
     ./Configurations/publish_docs.sh;
   fi
+- sleep 5
+after_failure:
+- cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log
 notifications:
   slack:
     secure: B1vBvRCVa/IJZKtuRGLastyhSZQwP5coR3+/JOrBMXWE+5733MI0u6i462FVKfNfpPkSGS7t1/PXBknX/dF5auzAGsUyKZOuvyUfPe/Sd+kMOaIPw7M8fGONml0jQT0H/OgayZY3wcrlNm42yYFwzQdGd3HBfZIDkM2Ui5P/kn8=

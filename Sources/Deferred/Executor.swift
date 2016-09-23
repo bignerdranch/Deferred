@@ -6,6 +6,8 @@
 //  Copyright © 2014-2016 Big Nerd Ranch. All rights reserved.
 //
 
+import Dispatch
+import CoreFoundation
 import Foundation
 
 /// An executor calls closures submitted to it in first-in, first-out order,
@@ -121,7 +123,11 @@ extension OperationQueue: Executor {
 /// of the run loop.
 extension CFRunLoop: Executor {
     @nonobjc public func submit(_ body: @escaping() -> Void) {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         CFRunLoopPerformBlock(self, CFRunLoopMode.defaultMode.rawValue, body)
+        #else
+        CFRunLoopPerformBlock(self, kCFRunLoopDefaultMode, body)
+        #endif
         CFRunLoopWakeUp(self)
     }
 }

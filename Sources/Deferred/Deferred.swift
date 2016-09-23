@@ -36,7 +36,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     /// Creates an instance resolved with `value`.
     public init(filledWith value: Value) {
         storage.withUnsafeMutablePointerToElements { (pointerToElement) in
-            pointerToElement.initialize(to: value as AnyObject)
+            pointerToElement.initialize(to: Storage.box(value))
         }
     }
 
@@ -53,7 +53,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
             guard let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return }
 
             body {
-                Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value
+                Storage.unbox(from: ptr)
             }
         }
     }
@@ -84,7 +84,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         guard case .success = group.wait(timeout: time),
             let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return nil }
 
-        return (Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value)
+        return Storage.unbox(from: ptr)
     }
 
     // MARK: PromiseProtocol
@@ -97,34 +97,79 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     
     @discardableResult
     public func fill(with value: Value) -> Bool {
-        let newPtr = Unmanaged.passRetained(value as AnyObject).toOpaque()
+        let box = Storage.box(value)
+        let boxPtr = Unmanaged.passRetained(box).toOpaque()
 
         let wonRace = storage.withAtomicPointerToElement {
-            $0.compareAndSwap(from: nil, to: newPtr, order: .acquireRelease)
+            $0.compareAndSwap(from: nil, to: boxPtr, order: .acquireRelease)
         }
 
         if wonRace {
             group.leave()
         } else {
-            Unmanaged<AnyObject>.fromOpaque(newPtr).release()
+            Unmanaged<AnyObject>.fromOpaque(boxPtr).release()
         }
 
         return wonRace
     }
 }
 
-private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
+
+
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+    private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
+
+        deinit {
+            _ = withUnsafeMutablePointerToElements { (pointerToElements) in
+                pointerToElements.deinitialize()
+            }
+        }
+
+        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
+            return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value
+        }
+
+        static func box(_ value: Value) -> AnyObject {
+            return value as AnyObject
+        }
+
+    }
+#else
+    // In order to assign the value of a scalar in a Deferred using atomics, we must
+    // box it up into something word-sized. See `atomicInitialize` above.
+    private final class Box<T> {
+        let contents: T
+
+        init(_ contents: T) {
+            self.contents = contents
+        }
+    }
+
+    private final class DeferredStorage<Value>: ManagedBuffer<Void, Box<Value>?> {
+
+        deinit {
+            _ = withUnsafeMutablePointerToElements { (pointerToElements) in
+                pointerToElements.deinitialize()
+            }
+        }
+
+        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
+            return Unmanaged<Box<Value>>.fromOpaque(ptr).takeUnretainedValue().contents
+        }
+
+        static func box(_ value: Value) -> Box<Value> {
+            return Box(value)
+        }
+
+    }
+#endif
+
+extension DeferredStorage {
 
     typealias _Self = DeferredStorage<Value>
 
     static func create() -> _Self {
         return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: _Self.self)
-    }
-
-    deinit {
-        _ = withUnsafeMutablePointerToElements { (pointerToElements) in
-            pointerToElements.deinitialize()
-        }
     }
 
     func withAtomicPointerToElement<Return>(_ body: (inout UnsafeAtomicRawPointer) throws -> Return) rethrows -> Return {

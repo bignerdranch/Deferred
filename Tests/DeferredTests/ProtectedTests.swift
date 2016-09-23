@@ -7,12 +7,22 @@
 //
 
 import XCTest
+import Dispatch
+import struct Foundation.Date
+
 import Deferred
 #if SWIFT_PACKAGE
 @testable import TestSupport
 #endif
 
 class ProtectedTests: XCTestCase {
+
+    static var allTests : [(String, (ProtectedTests) -> () throws -> Void)] {
+        return [
+            ("testConcurrentReadingWriting", testConcurrentReadingWriting)
+        ]
+    }
+
     var protected: Protected<(Date?, [Int])>!
     var queue: DispatchQueue!
 

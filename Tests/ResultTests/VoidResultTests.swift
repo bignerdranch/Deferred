@@ -17,6 +17,16 @@ import Deferred
 
 class VoidResultTests: XCTestCase {
 
+    static var allTests : [(String, (VoidResultTests) -> () throws -> Void)] {
+        return [
+            ("testDescriptionSuccess", testDescriptionSuccess),
+            ("testDescriptionFailure", testDescriptionFailure),
+            ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
+            ("testDebugDescriptionFailure", testDebugDescriptionFailure),
+            ("testExtract", testExtract),
+        ]
+    }
+
     private typealias Result = TaskResult<Void>
 
     private let aSuccessResult = Result.success(())
@@ -37,7 +47,7 @@ class VoidResultTests: XCTestCase {
     func testDebugDescriptionFailure() {
         let debugDescription = String(reflecting: aFailureResult)
         XCTAssert(debugDescription.hasPrefix("failure("))
-        XCTAssert(debugDescription.hasSuffix("TestError.first)"))
+        XCTAssert(debugDescription.hasSuffix("Error.first)"))
     }
 
     func testExtract() {

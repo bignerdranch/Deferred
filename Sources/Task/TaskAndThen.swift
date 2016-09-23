@@ -10,7 +10,8 @@
 import Deferred
 import Result
 #endif
-import Foundation
+
+import Dispatch
 
 extension Task {
     /// Begins another task by passing the result of the task to `startNextTask`
@@ -27,29 +28,50 @@ extension Task {
     /// once the task completes successfully.
     /// - seealso: FutureProtocol.andThen(upon:start:)
     public func andThen<NewTask: FutureProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Right> where NewTask.Value: Either, NewTask.Value.Left == Error {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = extendedProgress(byUnitCount: 1)
+        #else
+        let cancellationToken = Deferred<Void>()
+        #endif
+
         let future: Future<TaskResult<NewTask.Value.Right>> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Right> in
             do {
                 let value = try result.extract()
 
+                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
                 // We want to become the thread-local progress, but we don't
                 // want to consume units; we may not attach newTask.progress to
                 // the root progress until after the scope ends.
                 progress.becomeCurrent(withPendingUnitCount: 0)
                 defer { progress.resignCurrent() }
+                #endif
 
                 // Attempt to create and wrap the next task. Task's own progress
                 // wrapper logic takes over at this point.
                 let newTask = try startNextTask(value)
+                #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+                if let task = newTask as? Task<NewTask.Value.Right> {
+                    cancellationToken.upon(DispatchQueue.any(), execute: task.cancel)
+                }
+                #endif
                 return Task<NewTask.Value.Right>(newTask)
             } catch {
+                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
                 // Failure case behaves just like map: just error passthrough.
                 progress.becomeCurrent(withPendingUnitCount: 1)
                 defer { progress.resignCurrent() }
+                #endif
+
                 return Task<NewTask.Value.Right>(failure: error)
             }
         }
 
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task<NewTask.Value.Right>(future: future, progress: progress)
+        #else
+        return Task<NewTask.Value.Right>(future: future) {
+            cancellationToken.fill(with: ())
+        }
+        #endif
     }
 }

@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import class Foundation.RunLoop
+
 #if SWIFT_PACKAGE
 import Result
 import Deferred
@@ -46,6 +48,37 @@ private extension XCTestCase {
 }
 
 class TaskTests: CustomExecutorTestCase {
+
+    static var allTests : [(String, (TaskTests) -> () throws -> Void)] {
+        let universalTests: [(String, (TaskTests) -> () throws -> Void)] = [
+            ("testUponSuccess", testUponSuccess),
+            ("testUponFailure", testUponFailure),
+            ("testThatThrowingMapSubstitutesWithError", testThatThrowingMapSubstitutesWithError),
+            ("testThatAndThenForwardsCancellationToSubsequentTask", testThatAndThenForwardsCancellationToSubsequentTask),
+            ("testThatThrowingAndThenSubstitutesWithError", testThatThrowingAndThenSubstitutesWithError),
+            ("testThatRecoverMapsFailures", testThatRecoverMapsFailures),
+            ("testThatMapPassesThroughErrors", testThatMapPassesThroughErrors),
+            ("testThatRecoverPassesThroughValues", testThatRecoverPassesThroughValues),
+        ]
+
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let appleTests: [(String, (TaskTests) -> () throws -> Void)] = [
+            ("testThatCancellationIsAppliedImmediatelyWhenMapping", testThatCancellationIsAppliedImmediatelyWhenMapping),
+            ("testThatTaskCreatedWithProgressReflectsThatProgress", testThatTaskCreatedWithProgressReflectsThatProgress),
+            ("testTaskCreatedUnfilledIs100PercentCompleted", testTaskCreatedUnfilledIs100PercentCompleted),
+            ("testTaskCreatedFilledIs100PercentCompleted", testTaskCreatedFilledIs100PercentCompleted),
+            ("testThatTaskCreatedUnfilledIsIndeterminate", testThatTaskCreatedUnfilledIsIndeterminate),
+            ("testThatTaskWrappingUnfilledIsIndeterminate", testThatTaskWrappingUnfilledIsIndeterminate),
+            ("testThatTaskWrappingFilledIsDeterminate", testThatTaskWrappingFilledIsDeterminate),
+            ("testThatMapIncrementsParentProgressFraction", testThatMapIncrementsParentProgressFraction),
+            ("testThatAndThenIncrementsParentProgressFraction", testThatAndThenIncrementsParentProgressFraction)
+        ]
+
+            return universalTests + appleTests
+        #else
+            return universalTests
+        #endif
+    }
 
     func testUponSuccess() {
         let (d, task) = anyUnfinishedTask
@@ -91,7 +124,9 @@ class TaskTests: CustomExecutorTestCase {
     func testThatAndThenForwardsCancellationToSubsequentTask() {
         let expectation = self.expectation(description: "flatMapped task is cancelled")
         let task: Task<String> = anyFinishedTask.andThen(upon: executor) { _ in
-            return Task(future: Future(), cancellation: expectation.fulfill)
+            return Task(future: Future()) {
+                expectation.fulfill()
+            }
         }
 
         task.cancel()
@@ -154,9 +189,12 @@ class TaskTests: CustomExecutorTestCase {
         assertExecutorCalled(1)
     }
 
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     func testThatCancellationIsAppliedImmediatelyWhenMapping() {
         let beforeExpectation = expectation(description: "original task cancelled")
-        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>(), cancellation: beforeExpectation.fulfill)
+        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>()) {
+            beforeExpectation.fulfill()
+        }
 
         beforeTask.cancel()
         XCTAssert(beforeTask.progress.isCancelled)
@@ -231,5 +269,6 @@ class TaskTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
     }
+    #endif
 
 }

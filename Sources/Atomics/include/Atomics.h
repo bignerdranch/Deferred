@@ -9,18 +9,36 @@
 #ifndef __BNR_DEFERRED_ATOMIC_SHIMS__
 #define __BNR_DEFERRED_ATOMIC_SHIMS__
 
+#if defined(__APPLE__)
 #include <os/lock.h>
-#include <stdlib.h>
+#else
+#include <stdint.h>
+#include <stdbool.h>
+#include <os/linux_base.h>
+#endif // !__APPLE__
+
+#if !defined(OS_INLINE)
+#if __GNUC__
+#define OS_INLINE static __inline__
+#else
+#define OS_INLINE
+#endif // !__GNUC__
+#endif // !OS_INLINE
+
+#if !defined(OS_ALWAYS_INLINE)
+#if __GNUC__
+#define OS_ALWAYS_INLINE __attribute__((__always_inline__))
+#else
+#define OS_ALWAYS_INLINE
+#endif // !__GNUC__
+#endif // !OS_ALWAYS_INLINE
 
 // We should be using OS_ENUM, but Swift looks for particular macro patterns.
 #if !defined(SWIFT_ENUM)
-#if __has_feature(objc_fixed_enum)
-#if !defined(SWIFT_ENUM_EXTRA)
-#define SWIFT_ENUM_EXTRA
-#endif
-#define SWIFT_ENUM(_name, _type, ...) enum _name : _type _name; enum SWIFT_ENUM_EXTRA _name : _type
+#if __has_extension(cxx_strong_enums) || __has_feature(objc_fixed_enum)
+#define SWIFT_ENUM(_name, _type, ...) enum : _type { __VA_ARGS__ } _name##_t
 #else
-#define SWIFT_ENUM(_name, _type, ...) _type _name; enum
+#define SWIFT_ENUM(_name, _type, ...) enum { __VA_ARGS__ } _name##_t
 #endif
 #endif
 
@@ -38,50 +56,58 @@ void bnr_atomic_spin(void) {
 }
 
 OS_SWIFT_NAME(AtomicMemoryOrder)
-typedef SWIFT_ENUM(bnr_atomic_memory_order_t, int32_t) {
-    bnr_atomic_memory_order_relaxed = __ATOMIC_RELAXED,
-    bnr_atomic_memory_order_consume = __ATOMIC_CONSUME,
-    bnr_atomic_memory_order_acquire = __ATOMIC_ACQUIRE,
-    bnr_atomic_memory_order_release = __ATOMIC_RELEASE,
+typedef SWIFT_ENUM(bnr_atomic_memory_order, int32_t,
+    bnr_atomic_memory_order_relaxed OS_SWIFT_NAME(relaxed) = __ATOMIC_RELAXED,
+    bnr_atomic_memory_order_consume OS_SWIFT_NAME(consume) = __ATOMIC_CONSUME,
+    bnr_atomic_memory_order_acquire OS_SWIFT_NAME(acquire) = __ATOMIC_ACQUIRE,
+    bnr_atomic_memory_order_release OS_SWIFT_NAME(release) = __ATOMIC_RELEASE,
     bnr_atomic_memory_order_acq_rel OS_SWIFT_NAME(acquireRelease) = __ATOMIC_ACQ_REL,
     bnr_atomic_memory_order_seq_cst OS_SWIFT_NAME(sequentiallyConsistent) = __ATOMIC_SEQ_CST
-};
+);
 
 OS_SWIFT_NAME(UnsafeSpinLock)
 typedef struct {
     union {
         _Atomic(_Bool) legacy;
+#if defined(__APPLE__)
         os_unfair_lock modern;
+#endif
     } impl;
 } bnr_spinlock_t;
 
 OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeSpinLock.tryLock(self:))
 bool bnr_spinlock_trylock(bnr_spinlock_t *_Nonnull address) {
+#if defined(__APPLE__)
     if (os_unfair_lock_trylock != NULL) {
         return os_unfair_lock_trylock(&address->impl.modern);
-    } else {
-        return !__c11_atomic_exchange(&address->impl.legacy, 1, __ATOMIC_ACQUIRE);
     }
+#endif
+
+    return !__c11_atomic_exchange(&address->impl.legacy, 1, __ATOMIC_ACQUIRE);
 }
 
 OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeSpinLock.lock(self:))
 void bnr_spinlock_lock(bnr_spinlock_t *_Nonnull address) {
+#if defined(__APPLE__)
     if (os_unfair_lock_lock != NULL) {
         return os_unfair_lock_lock(&address->impl.modern);
-    } else {
-        while (!OS_EXPECT(bnr_spinlock_trylock(address), true)) {
-            bnr_atomic_spin();
-        }
+    }
+#endif
+
+    while (!OS_EXPECT(bnr_spinlock_trylock(address), true)) {
+        bnr_atomic_spin();
     }
 }
 
 OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeSpinLock.unlock(self:))
 void bnr_spinlock_unlock(bnr_spinlock_t *_Nonnull address) {
+#if defined(__APPLE__)
     if (os_unfair_lock_unlock != NULL) {
         return os_unfair_lock_unlock(&address->impl.modern);
-    } else {
-        __c11_atomic_store(&address->impl.legacy, 0, __ATOMIC_RELEASE);
     }
+#endif
+
+    __c11_atomic_store(&address->impl.legacy, 0, __ATOMIC_RELEASE);
 }
 
 OS_SWIFT_NAME(UnsafeAtomicInt32)

@@ -10,7 +10,12 @@
 import Deferred
 import Result
 #endif
-import Foundation
+
+import Dispatch
+
+// TODO: XPLAT
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+import class Foundation.Progress
 
 extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: Either, Iterator.Element.Value.Left == Error {
     /// Compose a number of tasks into a single notifier task.
@@ -50,3 +55,4 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         return Task(coalescingDeferred, progress: outerProgress)
     }
 }
+#endif

@@ -17,6 +17,13 @@ import Deferred
 
 class ResultRecoveryTests: XCTestCase {
 
+    static var allTests : [(String, (ResultRecoveryTests) -> () throws -> Void)] {
+        return [
+            ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
+            ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures),
+        ]
+    }
+
     private typealias Result = TaskResult<String>
 
     private func tryIsSuccess(_ text: String?) throws -> String {

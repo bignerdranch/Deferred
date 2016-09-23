@@ -17,6 +17,21 @@ import Deferred
 
 class TaskResultTests: XCTestCase {
 
+    static var allTests : [(String, (TaskResultTests) -> () throws -> Void)] {
+        return [
+            ("testDescriptionSuccess", testDescriptionSuccess),
+            ("testDescriptionFailure", testDescriptionFailure),
+            ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
+            ("testDebugDescriptionFailure", testDebugDescriptionFailure),
+            ("testSuccessExtract", testSuccessExtract),
+            ("testFailureExtract", testFailureExtract),
+            ("testCoalesceSuccessValue", testCoalesceSuccessValue),
+            ("testCoalesceFailureValue", testCoalesceFailureValue),
+            ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
+            ("testFlatCoalesceFailure", testFlatCoalesceFailure)
+        ]
+    }
+
     private typealias Result = TaskResult<Int>
 
     private let aSuccessResult = Result.success(42)
@@ -37,7 +52,7 @@ class TaskResultTests: XCTestCase {
     func testDebugDescriptionFailure() {
         let debugDescription1 = String(reflecting: aFailureResult)
         XCTAssert(debugDescription1.hasPrefix("failure("))
-        XCTAssert(debugDescription1.hasSuffix("TestError.first)"))
+        XCTAssert(debugDescription1.hasSuffix("Error.first)"))
     }
 
     func testSuccessExtract() {

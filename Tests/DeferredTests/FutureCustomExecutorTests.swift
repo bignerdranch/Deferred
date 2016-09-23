@@ -13,6 +13,15 @@ import XCTest
 #endif
 
 class FutureCustomExecutorTests: CustomExecutorTestCase {
+
+    static var allTests : [(String, (FutureCustomExecutorTests) -> () throws -> Void)] {
+        return [
+            ("testUpon", testUpon),
+            ("testMap", testMap),
+            ("testAndThen", testAndThen),
+        ]
+    }
+
     func testUpon() {
         let d = Deferred<Void>()
 

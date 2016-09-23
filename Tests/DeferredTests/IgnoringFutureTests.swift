@@ -1,9 +1,9 @@
 //
 //  IgnoringFutureTests.swift
-//  Deferred
+//  DeferredTests
 //
 //  Created by Zachary Waldowski on 9/3/15.
-//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest

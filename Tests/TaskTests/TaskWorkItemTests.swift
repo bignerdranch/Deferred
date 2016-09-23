@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/15/15.
-//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest

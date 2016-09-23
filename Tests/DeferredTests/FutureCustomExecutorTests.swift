@@ -1,6 +1,6 @@
 //
 //  FutureCustomExecutorTests.swift
-//  Deferred
+//  DeferredTests
 //
 //  Created by Zachary Waldowski on 4/10/16.
 //  Copyright © 2016 Big Nerd Ranch. All rights reserved.

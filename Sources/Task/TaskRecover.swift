@@ -26,16 +26,25 @@ extension Task {
     ///
     /// - seealso: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = extendedProgress(byUnitCount: 1)
+        #endif
+
         let future: Future<TaskResult<SuccessValue>> = map(upon: executor) { (result) in
-            progress.becomeCurrent(withPendingUnitCount: 1)
+            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+            self.progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
+            #endif
 
             return TaskResult {
                 try result.withValues(ifLeft: { try substitution($0) }, ifRight: { $0 })
             }
         }
 
-        return Task(future: future, progress: progress)
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        return Task<SuccessValue>(future: future, progress: progress)
+        #else
+        return Task<SuccessValue>(future: future, cancellation: cancellation)
+        #endif
     }
 }

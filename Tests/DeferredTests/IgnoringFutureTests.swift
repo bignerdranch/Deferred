@@ -14,6 +14,13 @@ import XCTest
 
 class IgnoringFutureTests: XCTestCase {
 
+    static var allTests : [(String, (IgnoringFutureTests) -> () throws -> Void)] {
+        return [
+            ("testWaitWithTimeout", testWaitWithTimeout),
+            ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled),
+        ]
+    }
+
     var future: IgnoringFuture<Deferred<Int>>!
 
     override func tearDown() {

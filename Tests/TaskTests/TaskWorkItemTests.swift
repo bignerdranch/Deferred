@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import Dispatch
+
 #if SWIFT_PACKAGE
 import Result
 import Deferred
@@ -17,6 +19,13 @@ import Deferred
 #endif
 
 class TaskWorkItemTests: XCTestCase {
+    static var allTests : [(String, (TaskWorkItemTests) -> () throws -> Void)] {
+        return [
+            ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
+            ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError),
+        ]
+    }
+
     private var queue: DispatchQueue!
 
     override func setUp() {

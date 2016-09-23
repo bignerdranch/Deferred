@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import Dispatch
+
 #if SWIFT_PACKAGE
 import Result
 import Deferred
@@ -17,6 +19,12 @@ import Deferred
 #endif
 
 class TaskGroupTests: XCTestCase {
+
+    static var allTests : [(String, (TaskGroupTests) -> () throws -> Void)] {
+        return [
+            ("testThatAllCompleteTaskWaitsForAllAccumulatedTasks", testThatAllCompleteTaskWaitsForAllAccumulatedTasks),
+        ]
+    }
 
     private let queue = DispatchQueue(label: "TaskGroupTests", attributes: .concurrent)
     private var accumulator: TaskGroup!

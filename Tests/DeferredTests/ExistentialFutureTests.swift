@@ -14,6 +14,16 @@ import XCTest
 
 class ExistentialFutureTests: XCTestCase {
 
+    static var allTests : [(String, (ExistentialFutureTests) -> () throws -> Void)] {
+        return [
+            ("testFilledAnyFutureWaitAlwaysReturns", testFilledAnyFutureWaitAlwaysReturns),
+            ("testAnyWaitWithTimeout", testAnyWaitWithTimeout),
+            ("testFilledAnyFutureUpon", testFilledAnyFutureUpon),
+            ("testUnfilledAnyUponCalledWhenFilled", testUnfilledAnyUponCalledWhenFilled),
+            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition),
+        ]
+    }
+
     var anyFuture: Future<Int>!
 
     override func tearDown() {

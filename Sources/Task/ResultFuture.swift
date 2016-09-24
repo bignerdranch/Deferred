@@ -32,7 +32,7 @@ extension FutureProtocol where Value: Either {
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined success value.
     /// - seealso: upon(_:body:)
-    public func uponSuccess(_ executor: Executor, execute body: @escaping(Value.Right) -> Void) {
+    public func uponSuccess(on executor: Executor, execute body: @escaping(Value.Right) -> Void) {
         upon(executor, execute: commonSuccessBody(body))
     }
 
@@ -41,7 +41,7 @@ extension FutureProtocol where Value: Either {
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined failure value.
     /// - seealso: upon(_:body:)
-    public func uponFailure(_ executor: Executor, execute body: @escaping(Value.Left) -> Void) {
+    public func uponFailure(on executor: Executor, execute body: @escaping(Value.Left) -> Void) {
         upon(executor, execute: commonFailureBody(body))
     }
 
@@ -49,7 +49,7 @@ extension FutureProtocol where Value: Either {
     ///
     /// - seealso: `uponSuccess(_:body:)`.
     /// - seealso: `upon(_:body:)`.
-    public func uponSuccess(_ executor: PreferredExecutor, execute body: @escaping(Value.Right) -> Void) {
+    public func uponSuccess(on executor: PreferredExecutor, execute body: @escaping(Value.Right) -> Void) {
         upon(executor, execute: commonSuccessBody(body))
     }
 
@@ -57,7 +57,7 @@ extension FutureProtocol where Value: Either {
     ///
     /// - seealso: `uponFailure(_:body:)`.
     /// - seealso: `upon(_:body:)`.
-    public func uponFailure(_ executor: PreferredExecutor, execute body: @escaping(Value.Left) -> Void) {
+    public func uponFailure(on executor: PreferredExecutor, execute body: @escaping(Value.Left) -> Void) {
         upon(executor, execute: commonFailureBody(body))
     }
 }

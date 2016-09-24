@@ -18,7 +18,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
     /// If any of the contained tasks fail, the returned task will be determined
     /// with that failure. Otherwise, once all operations succeed, the returned
     /// task will be determined a success.
-    public var joinedTasks: Task<Void> {
+    public func allSucceeded() -> Task<Void> {
         if isEmpty {
             return Task(success: ())
         }

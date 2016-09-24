@@ -1,5 +1,5 @@
 //
-//  TaskAccumulatorTests.swift
+//  TaskGroupTests.swift
 //  DeferredTests
 //
 //  Created by John Gallagher on 8/18/15.
@@ -15,14 +15,14 @@ import Deferred
 @testable import Deferred
 #endif
 
-class TaskAccumulatorTests: XCTestCase {
+class TaskGroupTests: XCTestCase {
 
-    private let queue = DispatchQueue(label: "TaskAccumulatorTests", attributes: .concurrent)
-    private var accumulator: TaskAccumulator!
+    private let queue = DispatchQueue(label: "TaskGroupTests", attributes: .concurrent)
+    private var accumulator: TaskGroup!
 
     override func setUp() {
         super.setUp()
-        accumulator = TaskAccumulator()
+        accumulator = TaskGroup()
     }
 
     override func tearDown() {
@@ -37,10 +37,10 @@ class TaskAccumulatorTests: XCTestCase {
             let deferred = Deferred<TaskResult<Void>>()
             let task = Task<Void>(deferred, cancellation: { _ in })
             tasks.append(task)
-            accumulator.accumulate(task)
+            accumulator.include(task)
 
             afterDelay {
-                // success/failure should be ignored by TaskAccumulator, so try both!
+                // success/failure should be ignored by TaskGroup, so try both!
                 if i % 2 == 0 {
                     deferred.fill(with: .success(()))
                 } else {
@@ -50,7 +50,7 @@ class TaskAccumulatorTests: XCTestCase {
         }
 
         let expectation = self.expectation(description: "allCompleteTask finished")
-        accumulator.allCompleted().upon(queue) { [weak expectation] _ in
+        accumulator.completed().upon(queue) { [weak expectation] _ in
             for task in tasks {
                 XCTAssertNotNil(task.wait(until: .distantFuture))
             }

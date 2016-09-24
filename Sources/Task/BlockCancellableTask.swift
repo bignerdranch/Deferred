@@ -31,7 +31,7 @@ extension Task {
             guard case .success = semaphore.wait(timeout: .now()) else { return }
             defer { semaphore.signal() }
 
-            deferred.fill(with: Result(with: body))
+            deferred.fill(with: Result(from: body))
         }
 
         self.init(deferred) {

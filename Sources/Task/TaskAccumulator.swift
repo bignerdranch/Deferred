@@ -30,7 +30,7 @@ public struct TaskAccumulator {
     /// next `allCompleted()` task.
     ///
     /// This method is thread-safe.
-    public func accumulate<Task: FutureProtocol>(_ task: Task) where Task.Value: ResultType {
+    public func accumulate<Task: FutureProtocol>(_ task: Task) where Task.Value: Either {
         group.enter()
         task.upon(queue) { [group = group] _ in
             group.leave()

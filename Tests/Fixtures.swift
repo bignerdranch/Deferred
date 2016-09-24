@@ -50,13 +50,13 @@ extension FutureProtocol {
     }
 }
 
-extension ResultType {
-    var value: Value? {
-        return withValues(ifSuccess: { $0 }, ifFailure: { _ in nil })
+extension Either {
+    var value: Right? {
+        return withValues(ifLeft: { _ in nil }, ifRight: { $0 })
     }
 
-    var error: Swift.Error? {
-        return withValues(ifSuccess: { _ in nil }, ifFailure: { $0 })
+    var error: Left? {
+        return withValues(ifLeft: { $0 }, ifRight: { _ in nil })
     }
 }
 

@@ -27,14 +27,12 @@ extension Task {
         let deferred = Deferred<Result>()
         let semaphore = DispatchSemaphore(value: 1)
 
-        let block = DispatchWorkItem(flags: flags) {
+        queue.async(flags: flags) {
             guard case .success = semaphore.wait(timeout: .now()) else { return }
             defer { semaphore.signal() }
 
             deferred.fill(Result(with: body))
         }
-
-        queue.async(execute: block)
 
         self.init(deferred) {
             guard case .success = semaphore.wait(timeout: .now()) else { return }

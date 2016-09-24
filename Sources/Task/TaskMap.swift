@@ -13,10 +13,10 @@ import Result
 import Foundation
 
 extension Task {
-    private func commonBody<NewSuccessValue>(for transform: Value.Value throws -> NewSuccessValue) -> (NSProgress, (Result) -> TaskResult<NewSuccessValue>) {
+    private func commonBody<NewSuccessValue>(for transform: @escaping(Value.Value) throws -> NewSuccessValue) -> (Progress, (Result) -> TaskResult<NewSuccessValue>) {
         let progress = extendedProgress(byUnitCount: 1)
         return (progress, { (result) in
-            progress.becomeCurrentWithPendingUnitCount(1)
+            progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
 
             return TaskResult {
@@ -36,7 +36,7 @@ extension Task {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
-    public func map<NewSuccessValue>(upon executor: ExecutorType, _ transform: SuccessValue throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+    public func map<NewSuccessValue>(upon executor: ExecutorType, _ transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(upon: executor, body)
         return Task<NewSuccessValue>(future: future, progress: progress)
@@ -53,7 +53,7 @@ extension Task {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
-    public func map<NewSuccessValue>(upon queue: dispatch_queue_t, _ transform: SuccessValue throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+    public func map<NewSuccessValue>(upon queue: DispatchQueue, _ transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(upon: queue, body)
         return Task<NewSuccessValue>(future: future, progress: progress)
@@ -70,7 +70,7 @@ extension Task {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(_:)
-    public func map<NewSuccessValue>(transform: SuccessValue throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+    public func map<NewSuccessValue>(_ transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(body)
         return Task<NewSuccessValue>(future: future, progress: progress)

@@ -15,17 +15,17 @@ import Deferred
 @testable import Deferred
 #endif
 
-private var oneSecondTimeout: dispatch_time_t {
-    return dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC))
+private var oneSecondTimeout: DispatchTime {
+    return DispatchTime.now() + Double(Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC)
 }
 
 class BlockCancellationTests: XCTestCase {
-    private var queue: dispatch_queue_t!
+    fileprivate var queue: DispatchQueue!
 
     override func setUp() {
         super.setUp()
 
-        queue = dispatch_queue_create("BlockCancellationTestsQueue", DISPATCH_QUEUE_SERIAL)
+        queue = DispatchQueue(label: "BlockCancellationTestsQueue", attributes: [])
     }
 
     override func tearDown() {
@@ -35,38 +35,38 @@ class BlockCancellationTests: XCTestCase {
     }
 
     func testThatCancellingATaskAfterItStartsRunningIsANoop() {
-        let startSemaphore = dispatch_semaphore_create(0)
-        let finishSemaphore = dispatch_semaphore_create(0)
+        let startSemaphore = DispatchSemaphore(value: 0)
+        let finishSemaphore = DispatchSemaphore(value: 0)
 
-        let task = Task<Int>(upon: queue, onCancel: Error.First) {
-            dispatch_semaphore_signal(startSemaphore)
-            dispatch_semaphore_wait(finishSemaphore, oneSecondTimeout)
+        let task = Task<Int>(upon: queue, onCancel: Error.first) {
+            startSemaphore.signal()
+            _ = finishSemaphore.wait(timeout: oneSecondTimeout)
             return 1
         }
 
-        dispatch_semaphore_wait(startSemaphore, oneSecondTimeout)
+        _ = startSemaphore.wait(timeout: oneSecondTimeout)
         task.cancel()
-        dispatch_semaphore_signal(finishSemaphore)
+        finishSemaphore.signal()
 
         let result = waitForTaskToComplete(task)
         XCTAssertEqual(try! result.extract(), 1)
     }
 
     func testThatCancellingBeforeATaskStartsProducesTheCancellationError() {
-        let semaphore = dispatch_semaphore_create(0)
+        let semaphore = DispatchSemaphore(value: 0)
 
         // send a block into queue to keep it blocked while we submit our real test task
-        dispatch_async(queue) {
-            dispatch_semaphore_wait(semaphore, oneSecondTimeout)
+        queue.async {
+            _ = semaphore.wait(timeout: oneSecondTimeout)
         }
 
-        let task = Task<Int>(upon: queue, onCancel: Error.Second) { 1 }
+        let task = Task<Int>(upon: queue, onCancel: Error.second) { 1 }
 
         task.cancel()
 
         let result = waitForTaskToComplete(task)
-        dispatch_semaphore_signal(semaphore)
-        XCTAssertEqual(result.error as? Error, Error.Second)
+        semaphore.signal()
+        XCTAssertEqual(result.error as? Error, Error.second)
     }
 
 }

@@ -13,10 +13,10 @@ import Result
 import Foundation
 
 extension Task {
-    private func commonBody(for transform: ErrorType throws -> SuccessValue) -> (NSProgress, (Result) -> TaskResult<SuccessValue>) {
+    private func commonBody(for transform: @escaping(Error) throws -> SuccessValue) -> (Progress, (Result) -> TaskResult<SuccessValue>) {
         let progress = extendedProgress(byUnitCount: 1)
         return (progress, { (result) in
-            progress.becomeCurrentWithPendingUnitCount(1)
+            progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
 
             return TaskResult {
@@ -36,7 +36,7 @@ extension Task {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
-    public func recover(upon executor: ExecutorType, _ transform: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
+    public func recover(upon executor: ExecutorType, _ transform: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         let (progress, body) = commonBody( for: transform)
         let future = map(upon: executor, body)
         return Task(future: future, progress: progress)
@@ -53,7 +53,7 @@ extension Task {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(upon:_:)
-    public func recover(upon queue: dispatch_queue_t, _ transform: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
+    public func recover(upon queue: DispatchQueue, _ transform: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(upon: queue, body)
         return Task(future: future, progress: progress)
@@ -70,7 +70,7 @@ extension Task {
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
     /// - seealso: FutureType.map(_:)
-    public func recover(transform: ErrorType throws -> SuccessValue) -> Task<SuccessValue> {
+    public func recover(_ transform: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         let (progress, body) = commonBody(for: transform)
         let future = map(body)
         return Task(future: future, progress: progress)

@@ -7,40 +7,54 @@
 //
 
 import XCTest
-@testable import Deferred
+import Deferred
 #if SWIFT_PACKAGE
 import Result
+import Task
 #endif
 
-enum Error: Swift.Error {
+import Dispatch
+import typealias Foundation.TimeInterval
+
+enum TestError: Error {
     case first
     case second
     case third
 }
 
 extension XCTestCase {
-    func waitForTaskToComplete<T>(_ task: Task<T>) -> TaskResult<T> {
+    func waitForTaskToComplete<T>(_ task: Task<T>, file: StaticString = #file, line: UInt = #line) -> TaskResult<T> {
         let expectation = self.expectation(description: "task completed")
         var result: TaskResult<T>?
         task.upon(.main) { [weak expectation] in
             result = $0
             expectation?.fulfill()
         }
-        waitForExpectations()
+        waitForExpectations(file: file, line: line)
 
         return result!
     }
 
-    func waitForExpectations() {
-        waitForExpectations(timeout: 10, handler: nil)
+    func waitForExpectations(file: StaticString = #file, line: UInt = #line) {
+        let timeout: TimeInterval = 10
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
+            waitForExpectations(timeout: timeout, handler: nil)
+        #else
+            waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
+        #endif
     }
 
-    func waitForExpectationsShort() {
-        waitForExpectations(timeout: 2, handler: nil)
+    func waitForExpectationsShort(file: StaticString = #file, line: UInt = #line) {
+        let timeout: TimeInterval = 3
+        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
+            waitForExpectations(timeout: timeout, handler: nil)
+        #else
+            waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
+        #endif
     }
 
     func afterDelay(upon queue: DispatchQueue = .main, execute body: @escaping() -> ()) {
-        queue.asyncAfter(deadline: .now() + 0.1, execute: body)
+        queue.asyncAfter(deadline: .now() + 0.15, execute: body)
     }
 }
 

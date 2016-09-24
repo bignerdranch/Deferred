@@ -6,11 +6,13 @@
 //  Copyright © 2016 Big Nerd Ranch. All rights reserved.
 //
 
-import Foundation
 #if SWIFT_PACKAGE
 import Result
 import Deferred
 #endif
+
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+import Foundation
 
 // MARK: - Backports
 
@@ -250,3 +252,5 @@ extension Task {
         }
     }
 }
+
+#endif

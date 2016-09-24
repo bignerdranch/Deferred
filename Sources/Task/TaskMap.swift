@@ -10,7 +10,6 @@
 import Deferred
 import Result
 #endif
-import Foundation
 
 extension Task {
     /// Returns a `Task` containing the result of mapping `transform` over the
@@ -25,16 +24,25 @@ extension Task {
     ///
     /// - seealso: FutureProtocol.map(upon:transform:)
     public func map<NewSuccessValue>(upon executor: Executor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = extendedProgress(byUnitCount: 1)
+        #endif
+
         let future: Future<TaskResult<NewSuccessValue>> = map(upon: executor) { (result) in
-            progress.becomeCurrent(withPendingUnitCount: 1)
+            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+            self.progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
+            #endif
 
             return TaskResult {
                 try transform(result.extract())
             }
         }
 
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task<NewSuccessValue>(future: future, progress: progress)
+        #else
+        return Task<NewSuccessValue>(future: future, cancellation: cancellation)
+        #endif
     }
 }

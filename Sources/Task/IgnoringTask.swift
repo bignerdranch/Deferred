@@ -10,7 +10,8 @@
 import Deferred
 import Result
 #endif
-import Foundation
+
+import Dispatch
 
 /// A `FutureProtocol` whose determined element is that of a `Base` future passed
 /// through a transform function returning `NewValue`. This value is computed
@@ -66,6 +67,10 @@ extension Task {
             result.withValues(ifLeft: TaskResult.failure, ifRight: { _ in TaskResult.success() })
         })
 
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task<Void>(future: future, progress: progress)
+#else
+        return Task<Void>(future: future, cancellation: cancel)
+#endif
     }
 }

@@ -1,5 +1,5 @@
 //
-//  BlockCancellationTests.swift
+//  TaskWorkItemTests.swift
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/15/15.
@@ -7,15 +7,25 @@
 //
 
 import XCTest
+import Dispatch
+
 #if SWIFT_PACKAGE
 import Result
 import Deferred
 @testable import Task
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
 
-class BlockCancellationTests: XCTestCase {
+class TaskWorkItemTests: XCTestCase {
+    static var allTests : [(String, (TaskWorkItemTests) -> () throws -> Void)] {
+        return [
+            ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
+            ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError),
+        ]
+    }
+
     private var queue: DispatchQueue!
 
     override func setUp() {
@@ -34,7 +44,7 @@ class BlockCancellationTests: XCTestCase {
         let startSemaphore = DispatchSemaphore(value: 0)
         let finishSemaphore = DispatchSemaphore(value: 0)
 
-        let task = Task<Int>(upon: queue, onCancel: Error.first) {
+        let task = Task<Int>(upon: queue, onCancel: TestError.first) {
             startSemaphore.signal()
             XCTAssertEqual(finishSemaphore.wait(timeout: .distantFuture), .success)
             return 1
@@ -56,13 +66,13 @@ class BlockCancellationTests: XCTestCase {
             _ = semaphore.wait(timeout: .distantFuture)
         }
 
-        let task = Task<Int>(upon: queue, onCancel: Error.second) { 1 }
+        let task = Task<Int>(upon: queue, onCancel: TestError.second) { 1 }
 
         task.cancel()
 
         let result = waitForTaskToComplete(task)
         semaphore.signal()
-        XCTAssertEqual(result.error as? Error, .second)
+        XCTAssertEqual(result.error as? TestError, .second)
     }
 
 }

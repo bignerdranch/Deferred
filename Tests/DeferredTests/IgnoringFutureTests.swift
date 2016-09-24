@@ -8,8 +8,18 @@
 
 import XCTest
 @testable import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 class IgnoringFutureTests: XCTestCase {
+
+    static var allTests : [(String, (IgnoringFutureTests) -> () throws -> Void)] {
+        return [
+            ("testWaitWithTimeout", testWaitWithTimeout),
+            ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled),
+        ]
+    }
 
     var future: IgnoringFuture<Deferred<Int>>!
 

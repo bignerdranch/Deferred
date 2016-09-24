@@ -8,21 +8,72 @@
 
 import XCTest
 @testable import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
+
+import Dispatch
+#if os(Linux)
+    import Glibc
+#endif
 
 class DeferredTests: XCTestCase {
-    
+
+    static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
+        let universalTests: [(String, (DeferredTests) -> () throws -> Void)] = [
+            ("testDestroyedWithoutBeingFilled", testDestroyedWithoutBeingFilled),
+            ("testWaitWithTimeout", testWaitWithTimeout),
+            ("testPeek", testPeek),
+            ("testValueOnFilled", testValueOnFilled),
+            ("testValueBlocksWhileUnfilled", testValueBlocksWhileUnfilled),
+            ("testValueUnblocksWhenUnfilledIsFilled", testValueUnblocksWhenUnfilledIsFilled),
+            ("testFill", testFill),
+            ("testFillMultipleTimes", testFillMultipleTimes),
+            ("testIsFilled", testIsFilled),
+            ("testUponWithFilled", testUponWithFilled),
+            ("testUponNotCalledWhileUnfilled", testUponNotCalledWhileUnfilled),
+            ("testUponCalledWhenFilled", testUponCalledWhenFilled),
+            ("testUponMainQueueCalledWhenFilled", testUponMainQueueCalledWhenFilled),
+            ("testConcurrentUpon", testConcurrentUpon),
+            ("testAnd", testAnd),
+            ("testAllFilled", testAllFilled),
+            ("testAllFilledEmptyCollection", testAllFilledEmptyCollection),
+            ("testFirstFilled", testFirstFilled),
+            ("testAllCopiesOfADeferredValueRepresentTheSameDeferredValue", testAllCopiesOfADeferredValueRepresentTheSameDeferredValue),
+            ("testDeferredOptionalBehavesCorrectly", testDeferredOptionalBehavesCorrectly),
+            ("testIsFilledCanBeCalledMultipleTimesNotFilled", testIsFilledCanBeCalledMultipleTimesNotFilled),
+            ("testIsFilledCanBeCalledMultipleTimesWhenFilled", testIsFilledCanBeCalledMultipleTimesWhenFilled),
+            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition)
+        ]
+
+        #if os(OSX)
+        || (os(iOS) && !(arch(i386) || arch(x86_64)))
+        || (os(watchOS) && !(arch(i386) || arch(x86_64)))
+        || (os(tvOS) && !arch(x86_64))
+            let appleTests: [(String, (DeferredTests) -> () throws -> Void)] = [
+                ("testAllCopiesOfADeferredValueRepresentTheSameDeferredValue", testAllCopiesOfADeferredValueRepresentTheSameDeferredValue),
+                ("testThatMainThreadPostsUponWithUserInitiatedQoSClass", testThatMainThreadPostsUponWithUserInitiatedQoSClass),
+                ("testThatLowerQoSPostsUponWithSameQoSClass", testThatLowerQoSPostsUponWithSameQoSClass)
+            ]
+
+            return universalTests + appleTests
+        #else
+            return universalTests
+        #endif
+    }
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
 
     func testDestroyedWithoutBeingFilled() {
-        autoreleasepool {
+        do {
             _ = Deferred<Int>()
         }
     }
@@ -61,7 +112,7 @@ class DeferredTests: XCTestCase {
         DispatchQueue.global().async {
             XCTAssertNil(unfilled.wait(until: .now() + 2))
         }
-        afterDelay(execute: expect.fulfill)
+        afterDelay { expect.fulfill() }
         waitForExpectations()
     }
 
@@ -149,18 +200,22 @@ class DeferredTests: XCTestCase {
 
         waitForExpectations()
     }
-    
+
     func testUponMainQueueCalledWhenFilled() {
         let d = Deferred<Int>()
-        
+
         let expectation = self.expectation(description: "upon block called on main queue")
         d.upon(.main) { value in
+            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             XCTAssertTrue(Thread.isMainThread)
+            #else
+            dispatchPrecondition(condition: .onQueue(.main))
+            #endif
             XCTAssertEqual(value, 1)
             XCTAssertEqual(d.value, 1)
             expectation.fulfill()
         }
-        
+
         d.fill(with: 1)
         waitForExpectationsShort()
     }
@@ -288,13 +343,17 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(allValues, expectedValues, "all deferreds are the same value")
         }
 
-        let randomIndex = arc4random_uniform(numericCast(allDeferreds.count))
+        #if os(Linux)
+        let randomIndex = Int(random() % allDeferreds.count)
+        #else // arc4random_uniform is also available on BSD and Bionic
+        let randomIndex = Int(arc4random_uniform(numericCast(allDeferreds.count)))
+        #endif
         let oneOfTheDeferreds = allDeferreds[numericCast(randomIndex)]
         oneOfTheDeferreds.fill(with: anyValue)
 
         waitForExpectationsShort()
     }
-    
+
     func testDeferredOptionalBehavesCorrectly() {
         let d = Deferred<Optional<Int>>(filledWith: .none)
 
@@ -311,10 +370,10 @@ class DeferredTests: XCTestCase {
             XCTAssert($0 == .none)
             afterExpectation.fulfill()
         }
-        
+
         waitForExpectationsShort()
     }
-    
+
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
         let d = Deferred<Int>()
         XCTAssertFalse(d.isFilled)

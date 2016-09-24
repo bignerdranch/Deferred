@@ -11,12 +11,29 @@ env:
   global:
   - NSUnbufferedIO=YES
   matrix:
-  - JOB=Test-macOS DESTINATION='platform=macOS' ACTION=test
+  - JOB=Test-macOS ACTION=test
 matrix:
   include:
   - env: JOB=Test-iOS DEVICE='iPhone 6s (10.0)' PLATFORM='iOS Simulator' ACTION=test
   - env: JOB=Build-tvOS DESTINATION='platform=tvOS Simulator,name=Apple TV 1080p' ACTION=build
   - env: JOB=Build-watchOS DESTINATION='platform=watchOS Simulator,name=Apple Watch - 42mm' ACTION=build
+  - os: linux
+    dist: trusty
+    sudo: required
+    addons:
+      apt:
+        packages:
+        - clang-3.8
+        - libicu-dev
+    env: JOB=Test-Linux COMPILER=clang-3.8
+    before_install:
+    - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
+    install:
+    - wget https://swift.org/builds/swift-3.0-release/ubuntu1404/swift-3.0-RELEASE/swift-3.0-RELEASE-ubuntu14.04.tar.gz
+    - tar xzf swift-3.0-RELEASE-ubuntu14.04.tar.gz
+    - export PATH=swift-3.0-RELEASE-ubuntu14.04/usr/bin:$PATH
+    script:
+    - swift test
   - env: JOB=Misc
     script:
     - bundle exec pod lib lint --quick
@@ -30,6 +47,8 @@ before_script:
 script:
 - if [[ $DESTINATION ]]; then
     xcodebuild $ACTION -scheme Deferred -destination "$DESTINATION" | xcpretty -c;
+  else
+    swift test;
   fi
 after_success:
 - if [[ "$JOB" == "Misc" ]]; then
@@ -38,4 +57,6 @@ after_success:
     sleep 5;
   fi
 after_failure:
-- cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log;
+  fi

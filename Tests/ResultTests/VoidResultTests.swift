@@ -10,16 +10,27 @@ import XCTest
 #if SWIFT_PACKAGE
 import Deferred
 @testable import Result
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
 
 class VoidResultTests: XCTestCase {
 
+    static var allTests : [(String, (VoidResultTests) -> () throws -> Void)] {
+        return [
+            ("testDescriptionSuccess", testDescriptionSuccess),
+            ("testDescriptionFailure", testDescriptionFailure),
+            ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
+            ("testDebugDescriptionFailure", testDebugDescriptionFailure),
+            ("testExtract", testExtract),
+        ]
+    }
+
     private typealias Result = TaskResult<Void>
 
     private let aSuccessResult = Result.success(())
-    private let aFailureResult = Result.failure(Error.first)
+    private let aFailureResult = Result.failure(TestError.first)
 
     func testDescriptionSuccess() {
         XCTAssertEqual(String(describing: aSuccessResult), "()")

@@ -7,9 +7,21 @@
 //
 
 import XCTest
-import Deferred
+@testable import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 class FutureCustomExecutorTests: CustomExecutorTestCase {
+
+    static var allTests : [(String, (FutureCustomExecutorTests) -> () throws -> Void)] {
+        return [
+            ("testUpon", testUpon),
+            ("testMap", testMap),
+            ("testAndThen", testAndThen),
+        ]
+    }
+
     func testUpon() {
         let d = Deferred<Void>()
 

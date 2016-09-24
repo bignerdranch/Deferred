@@ -7,10 +7,13 @@
 //
 
 import XCTest
+import class Foundation.RunLoop
+
 #if SWIFT_PACKAGE
 import Result
 import Deferred
 @testable import Task
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
@@ -31,7 +34,7 @@ private extension XCTestCase {
 
     @nonobjc var anyFinishedTask: Task<Int> { return Task(success: 42) }
 
-    @nonobjc var anyFailedTask: Task<Int> { return Task(failure: Error.first) }
+    @nonobjc var anyFailedTask: Task<Int> { return Task(failure: TestError.first) }
 
     @nonobjc func contrivedNextTask(for result: Int) -> Task<Int> {
         let d = Deferred<Task<Int>.Result>()
@@ -45,6 +48,37 @@ private extension XCTestCase {
 }
 
 class TaskTests: CustomExecutorTestCase {
+
+    static var allTests : [(String, (TaskTests) -> () throws -> Void)] {
+        let universalTests: [(String, (TaskTests) -> () throws -> Void)] = [
+            ("testUponSuccess", testUponSuccess),
+            ("testUponFailure", testUponFailure),
+            ("testThatThrowingMapSubstitutesWithError", testThatThrowingMapSubstitutesWithError),
+            ("testThatAndThenForwardsCancellationToSubsequentTask", testThatAndThenForwardsCancellationToSubsequentTask),
+            ("testThatThrowingAndThenSubstitutesWithError", testThatThrowingAndThenSubstitutesWithError),
+            ("testThatRecoverMapsFailures", testThatRecoverMapsFailures),
+            ("testThatMapPassesThroughErrors", testThatMapPassesThroughErrors),
+            ("testThatRecoverPassesThroughValues", testThatRecoverPassesThroughValues),
+        ]
+
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let appleTests: [(String, (TaskTests) -> () throws -> Void)] = [
+            ("testThatCancellationIsAppliedImmediatelyWhenMapping", testThatCancellationIsAppliedImmediatelyWhenMapping),
+            ("testThatTaskCreatedWithProgressReflectsThatProgress", testThatTaskCreatedWithProgressReflectsThatProgress),
+            ("testTaskCreatedUnfilledIs100PercentCompleted", testTaskCreatedUnfilledIs100PercentCompleted),
+            ("testTaskCreatedFilledIs100PercentCompleted", testTaskCreatedFilledIs100PercentCompleted),
+            ("testThatTaskCreatedUnfilledIsIndeterminate", testThatTaskCreatedUnfilledIsIndeterminate),
+            ("testThatTaskWrappingUnfilledIsIndeterminate", testThatTaskWrappingUnfilledIsIndeterminate),
+            ("testThatTaskWrappingFilledIsDeterminate", testThatTaskWrappingFilledIsDeterminate),
+            ("testThatMapIncrementsParentProgressFraction", testThatMapIncrementsParentProgressFraction),
+            ("testThatAndThenIncrementsParentProgressFraction", testThatAndThenIncrementsParentProgressFraction)
+        ]
+
+            return universalTests + appleTests
+        #else
+            return universalTests
+        #endif
+    }
 
     func testUponSuccess() {
         let (d, task) = anyUnfinishedTask
@@ -66,7 +100,7 @@ class TaskTests: CustomExecutorTestCase {
         task.uponSuccess(on: executor, execute: impossible)
         task.uponFailure(on: executor) { _ in expectation.fulfill() }
 
-        d.fail(with: Error.first)
+        d.fail(with: TestError.first)
 
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
@@ -75,11 +109,11 @@ class TaskTests: CustomExecutorTestCase {
     func testThatThrowingMapSubstitutesWithError() {
         let expectation = self.expectation(description: "mapped filled with error")
         let task: Task<String> = anyFinishedTask.map(upon: executor) { _ in
-            throw Error.second
+            throw TestError.second
         }
 
         task.upon(executor) {
-            XCTAssertEqual($0.error as? Error, .second)
+            XCTAssertEqual($0.error as? TestError, .second)
             expectation.fulfill()
         }
 
@@ -90,7 +124,9 @@ class TaskTests: CustomExecutorTestCase {
     func testThatAndThenForwardsCancellationToSubsequentTask() {
         let expectation = self.expectation(description: "flatMapped task is cancelled")
         let task: Task<String> = anyFinishedTask.andThen(upon: executor) { _ in
-            return Task(future: Future(), cancellation: expectation.fulfill)
+            return Task(future: Future()) {
+                expectation.fulfill()
+            }
         }
 
         task.cancel()
@@ -102,11 +138,11 @@ class TaskTests: CustomExecutorTestCase {
     func testThatThrowingAndThenSubstitutesWithError() {
         let expectation = self.expectation(description: "flatMapped task is cancelled")
         let task = anyFinishedTask.andThen(upon: executor) { _ -> Task<String> in
-            throw Error.second
+            throw TestError.second
         }
 
         task.uponFailure {
-            XCTAssertEqual($0 as? Error, .second)
+            XCTAssertEqual($0 as? TestError, .second)
             expectation.fulfill()
         }
 
@@ -122,7 +158,7 @@ class TaskTests: CustomExecutorTestCase {
             XCTAssertEqual($0.value, 42)
             expectation.fulfill()
         }
-        
+
         waitForExpectations()
         assertExecutorCalled(1)
     }
@@ -132,7 +168,7 @@ class TaskTests: CustomExecutorTestCase {
         let task: Task<String> = anyFailedTask.map(upon: executor, transform: impossible)
 
         task.upon {
-            XCTAssertEqual($0.error as? Error, .first)
+            XCTAssertEqual($0.error as? TestError, .first)
             expectation.fulfill()
         }
 
@@ -153,9 +189,12 @@ class TaskTests: CustomExecutorTestCase {
         assertExecutorCalled(1)
     }
 
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     func testThatCancellationIsAppliedImmediatelyWhenMapping() {
         let beforeExpectation = expectation(description: "original task cancelled")
-        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>(), cancellation: beforeExpectation.fulfill)
+        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>()) {
+            beforeExpectation.fulfill()
+        }
 
         beforeTask.cancel()
         XCTAssert(beforeTask.progress.isCancelled)
@@ -230,5 +269,6 @@ class TaskTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
     }
+    #endif
 
 }

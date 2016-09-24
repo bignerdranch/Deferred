@@ -7,9 +7,22 @@
 //
 
 import XCTest
+import Dispatch
+import struct Foundation.Date
+
 import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 class ProtectedTests: XCTestCase {
+
+    static var allTests : [(String, (ProtectedTests) -> () throws -> Void)] {
+        return [
+            ("testConcurrentReadingWriting", testConcurrentReadingWriting)
+        ]
+    }
+
     var protected: Protected<(Date?, [Int])>!
     var queue: DispatchQueue!
 
@@ -19,7 +32,7 @@ class ProtectedTests: XCTestCase {
         protected = Protected(initialValue: (nil, []))
         queue = DispatchQueue(label: "ProtectedTests", attributes: .concurrent)
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()

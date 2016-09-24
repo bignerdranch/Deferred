@@ -7,44 +7,50 @@
 //
 
 import XCTest
+import Dispatch
+import typealias Foundation.TimeInterval
+
 import Deferred
 import Atomics
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 func timeIntervalSleep(_ duration: TimeInterval) {
-    usleep(useconds_t(duration * TimeInterval(USEC_PER_SEC)))
-}
-
-class PerfTestThread: Thread {
-    let iters: Int
-    var lock: Locking
-    let joinLock = NSConditionLock(condition: 0)
-
-    init(lock: Locking, iters: Int) {
-        self.lock = lock
-        self.iters = iters
-        super.init()
-    }
-
-    override func main() {
-        joinLock.lock()
-        let doNothing: () -> () = {}
-        for i in 0 ..< iters {
-            if (i % 10) == 0 {
-                lock.withWriteLock(doNothing)
-            } else {
-                lock.withReadLock(doNothing)
-            }
-        }
-        joinLock.unlock(withCondition: 1)
-    }
-
-    func join() {
-        joinLock.lock(whenCondition: 1)
-        joinLock.unlock()
-    }
+    usleep(useconds_t(duration * TimeInterval(1_000_000)))
 }
 
 class LockingTests: XCTestCase {
+
+    static var allTests : [(String, (LockingTests) -> () throws -> Void)] {
+        let universalTests: [(String, (LockingTests) -> () throws -> Void)] = [
+            ("testMultipleConcurrentReaders", testMultipleConcurrentReaders),
+            ("testMultipleConcurrentWriters", testMultipleConcurrentWriters),
+            ("testSimultaneousReadersAndWriters", testSimultaneousReadersAndWriters),
+            ("testSingleThreadPerformanceGCDLockRead", testSingleThreadPerformanceGCDLockRead),
+            ("testSingleThreadPerformanceGCDLockWrite", testSingleThreadPerformanceGCDLockWrite),
+            ("testSingleThreadPerformanceSpinLockRead", testSingleThreadPerformanceSpinLockRead),
+            ("testSingleThreadPerformanceSpinLockWrite", testSingleThreadPerformanceSpinLockWrite),
+            ("testSingleThreadPerformanceCASSpinLockRead", testSingleThreadPerformanceCASSpinLockRead),
+            ("testSingleThreadPerformanceCASSpinLockWrite", testSingleThreadPerformanceCASSpinLockWrite),
+            ("testSingleThreadPerformancePThreadReadWriteLockRead", testSingleThreadPerformancePThreadReadWriteLockRead),
+            ("testSingleThreadPerformancePThreadReadWriteLockWrite", testSingleThreadPerformancePThreadReadWriteLockWrite),
+        ]
+
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let appleTests: [(String, (LockingTests) -> () throws -> Void)] = [
+            ("test90PercentReads4ThreadsGCDLock", test90PercentReads4ThreadsGCDLock),
+            ("test90PercentReads4ThreadsSpinLock", test90PercentReads4ThreadsSpinLock),
+            ("test90PercentReads4ThreadsCASSpinLock", test90PercentReads4ThreadsCASSpinLock),
+            ("test90PercentReads4ThreadsPThreadReadWriteLock", test90PercentReads4ThreadsPThreadReadWriteLock),
+        ]
+
+            return universalTests + appleTests
+        #else
+            return universalTests
+        #endif
+    }
+
     var dispatchLock: DispatchLock!
     var spinLock: SpinLock!
     var casSpinLock: CASSpinLock!
@@ -66,7 +72,7 @@ class LockingTests: XCTestCase {
 
         queue = DispatchQueue(label: "LockingTests", attributes: .concurrent)
     }
-    
+
     override func tearDown() {
         queue = nil
 
@@ -124,7 +130,7 @@ class LockingTests: XCTestCase {
 
     func testSimultaneousReadersAndWriters() {
         for lock in allLocks {
-            var x: Int32 = 0
+            var x = UnsafeAtomicInt32()
 
             let startReader: (Int) -> () = { i in
                 let expectation = self.expectation(description: "reader \(i)")
@@ -132,7 +138,8 @@ class LockingTests: XCTestCase {
                     lock.withReadLock {
                         // make sure we get the value of x either before or after
                         // the writer runs, never a partway-through value
-                        XCTAssertTrue(x == 0 || x == 5)
+                        let result = x.load(order: .sequentiallyConsistent)
+                        XCTAssertTrue(result == 0 || result == 5)
                         expectation.fulfill()
                     }
                 }
@@ -147,7 +154,7 @@ class LockingTests: XCTestCase {
             queue.async {
                 lock.withWriteLock {
                     for _ in 0 ..< 5 {
-                        OSAtomicIncrement32Barrier(&x)
+                        x.add(1, order: .sequentiallyConsistent)
                         timeIntervalSleep(0.1)
                     }
                     expectation.fulfill()
@@ -157,7 +164,7 @@ class LockingTests: XCTestCase {
             for i in 32 ..< 64 {
                 startReader(i)
             }
-            
+
             waitForExpectationsShort()
         }
     }
@@ -176,20 +183,6 @@ class LockingTests: XCTestCase {
         self.measure {
             for _ in 0 ..< iters {
                 lock.withWriteLock(doNothing)
-            }
-        }
-    }
-
-    func measureLock90PercentReadsNThreads(_ lock: Locking, iters: Int, nthreads: Int) {
-        self.measure {
-            var threads: [PerfTestThread] = []
-            for _ in 0 ..< nthreads {
-                let t = PerfTestThread(lock: lock, iters: iters)
-                t.start()
-                threads.append(t)
-            }
-            for t in threads {
-                t.join()
             }
         }
     }
@@ -222,6 +215,51 @@ class LockingTests: XCTestCase {
         measureWriteLockSingleThread(pthreadLock, iters: 250_000)
     }
 
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+    class PerfTestThread: Thread {
+        let iters: Int
+        var lock: Locking
+        let joinLock = NSConditionLock(condition: 0)
+
+        init(lock: Locking, iters: Int) {
+            self.lock = lock
+            self.iters = iters
+            super.init()
+        }
+
+        override func main() {
+            joinLock.lock()
+            let doNothing: () -> () = {}
+            for i in 0 ..< iters {
+                if (i % 10) == 0 {
+                    lock.withWriteLock(doNothing)
+                } else {
+                    lock.withReadLock(doNothing)
+                }
+            }
+            joinLock.unlock(withCondition: 1)
+        }
+
+        func join() {
+            joinLock.lock(whenCondition: 1)
+            joinLock.unlock()
+        }
+    }
+
+    func measureLock90PercentReadsNThreads(_ lock: Locking, iters: Int, nthreads: Int) {
+        self.measure {
+            var threads: [PerfTestThread] = []
+            for _ in 0 ..< nthreads {
+                let t = PerfTestThread(lock: lock, iters: iters)
+                t.start()
+                threads.append(t)
+            }
+            for t in threads {
+                t.join()
+            }
+        }
+    }
+
     func test90PercentReads4ThreadsGCDLock() {
         measureLock90PercentReadsNThreads(dispatchLock, iters: 5_000, nthreads: 4)
     }
@@ -234,5 +272,6 @@ class LockingTests: XCTestCase {
     func test90PercentReads4ThreadsPThreadReadWriteLock() {
         measureLock90PercentReadsNThreads(pthreadLock, iters: 5_000, nthreads: 4)
     }
+    #endif
 
 }

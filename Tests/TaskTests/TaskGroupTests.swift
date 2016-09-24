@@ -7,15 +7,24 @@
 //
 
 import XCTest
+import Dispatch
+
 #if SWIFT_PACKAGE
 import Result
 import Deferred
 @testable import Task
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
 
 class TaskGroupTests: XCTestCase {
+
+    static var allTests : [(String, (TaskGroupTests) -> () throws -> Void)] {
+        return [
+            ("testThatAllCompleteTaskWaitsForAllAccumulatedTasks", testThatAllCompleteTaskWaitsForAllAccumulatedTasks),
+        ]
+    }
 
     private let queue = DispatchQueue(label: "TaskGroupTests", attributes: .concurrent)
     private var accumulator: TaskGroup!
@@ -44,7 +53,7 @@ class TaskGroupTests: XCTestCase {
                 if i % 2 == 0 {
                     deferred.fill(with: .success(()))
                 } else {
-                    deferred.fill(with: .failure(Error.first))
+                    deferred.fill(with: .failure(TestError.first))
                 }
             }
         }

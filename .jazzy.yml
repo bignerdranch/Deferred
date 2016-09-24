@@ -6,25 +6,31 @@ custom_categories:
   - name: Futures and Promises
     children:
     - Deferred
-    - FutureType
-    - PromiseType
-    - Timeout
+    - FutureProtocol
+    - PromiseProtocol
   - name: Transforming Future
     children:
     - Future
-    - CollectionType
-    - SequenceType
+    - Collection
+    - Sequence
     - IgnoringFuture
   - name: Controlling Where Callbacks Execute
     children:
-    - ExecutorType
-    - NSOperationQueue
-    - NSRunLoop
+    - Executor
+    - DispatchQueue
+    - OperationQueue
+    - RunLoop
     - CFRunLoop
+  - name: Task
+    children:
+    - Either
+    - Task
+    - TaskResult
+    - TaskGroup
   - name: Coordinating Access to Data
     children:
-    - LockProtected
-    - ReadWriteLock
+    - Protected
+    - Locking
   - name: Coordination Primitives
     children:
     - DispatchLock

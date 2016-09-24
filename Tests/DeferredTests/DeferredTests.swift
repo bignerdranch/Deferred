@@ -8,14 +8,17 @@
 
 import XCTest
 @testable import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 class DeferredTests: XCTestCase {
-    
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
@@ -149,10 +152,10 @@ class DeferredTests: XCTestCase {
 
         waitForExpectations()
     }
-    
+
     func testUponMainQueueCalledWhenFilled() {
         let d = Deferred<Int>()
-        
+
         let expectation = self.expectation(description: "upon block called on main queue")
         d.upon(.main) { value in
             XCTAssertTrue(Thread.isMainThread)
@@ -160,7 +163,7 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(d.value, 1)
             expectation.fulfill()
         }
-        
+
         d.fill(with: 1)
         waitForExpectationsShort()
     }
@@ -294,7 +297,7 @@ class DeferredTests: XCTestCase {
 
         waitForExpectationsShort()
     }
-    
+
     func testDeferredOptionalBehavesCorrectly() {
         let d = Deferred<Optional<Int>>(filledWith: .none)
 
@@ -311,10 +314,10 @@ class DeferredTests: XCTestCase {
             XCTAssert($0 == .none)
             afterExpectation.fulfill()
         }
-        
+
         waitForExpectationsShort()
     }
-    
+
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
         let d = Deferred<Int>()
         XCTAssertFalse(d.isFilled)

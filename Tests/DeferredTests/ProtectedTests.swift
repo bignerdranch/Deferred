@@ -8,6 +8,9 @@
 
 import XCTest
 import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 class ProtectedTests: XCTestCase {
     var protected: Protected<(Date?, [Int])>!
@@ -19,7 +22,7 @@ class ProtectedTests: XCTestCase {
         protected = Protected(initialValue: (nil, []))
         queue = DispatchQueue(label: "ProtectedTests", attributes: .concurrent)
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()

@@ -44,11 +44,11 @@ private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
     
 }
 
-extension Future where Value: ResultType {
+extension Future where Value: Either {
     /// Create a future having the same underlying task as `other`.
-    public init<Other: FutureProtocol>(task other: Other) where Other.Value: ResultType, Other.Value.Value == Value.Value {
+    public init<Other: FutureProtocol>(task other: Other) where Other.Value: Either, Other.Value.Left == Error, Other.Value.Right == Value.Right {
         self.init(LazyMapFuture(other) {
-            Value(with: $0.extract)
+            Value(from: $0.extract)
         })
     }
 }
@@ -67,7 +67,7 @@ extension Task {
     /// - seealso: map(_:)
     public func ignored() -> Task<Void> {
         let future = Future(LazyMapFuture(self) { (result) -> TaskResult<Void> in
-            result.withValues(ifSuccess: { _ in TaskResult.success() }, ifFailure: TaskResult.failure)
+            result.withValues(ifLeft: TaskResult.failure, ifRight: { _ in TaskResult.success() })
         })
 
         return Task<Void>(future: future, progress: progress)

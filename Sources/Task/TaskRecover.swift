@@ -31,7 +31,7 @@ extension Task {
             defer { progress.resignCurrent() }
 
             return TaskResult {
-                try result.withValues(ifSuccess: { $0 }, ifFailure: { try transform($0) })
+                try result.withValues(ifLeft: { try transform($0) }, ifRight: { $0 })
             }
         }
 

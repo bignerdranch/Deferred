@@ -35,13 +35,13 @@ class ResultRecoveryTests: XCTestCase {
     }
 
     func testInitWithFunctionProducesSuccesses() {
-        let result = Result(with: successFunction)
+        let result = Result(from: successFunction)
         XCTAssertEqual(result.value, "success")
         XCTAssertNil(result.error)
     }
 
     func testInitWithFunctionProducesFailures() {
-        let result = Result(with: failureFunction)
+        let result = Result(from: failureFunction)
         XCTAssertNil(result.value)
         XCTAssertEqual(result.error as? Error, .first)
     }

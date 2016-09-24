@@ -1,5 +1,5 @@
 //
-//  ResultTests.swift
+//  TaskResultTests.swift
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 2/7/15.
@@ -10,16 +10,17 @@ import XCTest
 #if SWIFT_PACKAGE
 import Deferred
 @testable import Result
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
 
-class ResultTests: XCTestCase {
+class TaskResultTests: XCTestCase {
 
     private typealias Result = TaskResult<Int>
 
     private let aSuccessResult = Result.success(42)
-    private let aFailureResult = Result.failure(Error.first)
+    private let aFailureResult = Result.failure(TestError.first)
 
     func testDescriptionSuccess() {
         XCTAssertEqual(String(describing: aSuccessResult), String(42))
@@ -36,7 +37,7 @@ class ResultTests: XCTestCase {
     func testDebugDescriptionFailure() {
         let debugDescription1 = String(reflecting: aFailureResult)
         XCTAssert(debugDescription1.hasPrefix("failure("))
-        XCTAssert(debugDescription1.hasSuffix("Error.first)"))
+        XCTAssert(debugDescription1.hasSuffix("TestError.first)"))
     }
 
     func testSuccessExtract() {

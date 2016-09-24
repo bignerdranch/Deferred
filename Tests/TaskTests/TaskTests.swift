@@ -11,6 +11,7 @@ import XCTest
 import Result
 import Deferred
 @testable import Task
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
@@ -31,7 +32,7 @@ private extension XCTestCase {
 
     @nonobjc var anyFinishedTask: Task<Int> { return Task(success: 42) }
 
-    @nonobjc var anyFailedTask: Task<Int> { return Task(failure: Error.first) }
+    @nonobjc var anyFailedTask: Task<Int> { return Task(failure: TestError.first) }
 
     @nonobjc func contrivedNextTask(for result: Int) -> Task<Int> {
         let d = Deferred<Task<Int>.Result>()
@@ -66,7 +67,7 @@ class TaskTests: CustomExecutorTestCase {
         task.uponSuccess(on: executor, execute: impossible)
         task.uponFailure(on: executor) { _ in expectation.fulfill() }
 
-        d.fail(with: Error.first)
+        d.fail(with: TestError.first)
 
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
@@ -75,11 +76,11 @@ class TaskTests: CustomExecutorTestCase {
     func testThatThrowingMapSubstitutesWithError() {
         let expectation = self.expectation(description: "mapped filled with error")
         let task: Task<String> = anyFinishedTask.map(upon: executor) { _ in
-            throw Error.second
+            throw TestError.second
         }
 
         task.upon(executor) {
-            XCTAssertEqual($0.error as? Error, .second)
+            XCTAssertEqual($0.error as? TestError, .second)
             expectation.fulfill()
         }
 
@@ -102,11 +103,11 @@ class TaskTests: CustomExecutorTestCase {
     func testThatThrowingAndThenSubstitutesWithError() {
         let expectation = self.expectation(description: "flatMapped task is cancelled")
         let task = anyFinishedTask.andThen(upon: executor) { _ -> Task<String> in
-            throw Error.second
+            throw TestError.second
         }
 
         task.uponFailure {
-            XCTAssertEqual($0 as? Error, .second)
+            XCTAssertEqual($0 as? TestError, .second)
             expectation.fulfill()
         }
 
@@ -132,7 +133,7 @@ class TaskTests: CustomExecutorTestCase {
         let task: Task<String> = anyFailedTask.map(upon: executor, transform: impossible)
 
         task.upon {
-            XCTAssertEqual($0.error as? Error, .first)
+            XCTAssertEqual($0.error as? TestError, .first)
             expectation.fulfill()
         }
 

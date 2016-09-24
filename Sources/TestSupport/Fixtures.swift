@@ -7,12 +7,13 @@
 //
 
 import XCTest
-@testable import Deferred
+import Deferred
 #if SWIFT_PACKAGE
 import Result
+import Task
 #endif
 
-enum Error: Swift.Error {
+enum TestError: Error {
     case first
     case second
     case third

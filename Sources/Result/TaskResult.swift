@@ -14,9 +14,9 @@ public enum TaskResult<Value> {
     case failure(Error)
 }
 
-extension TaskResult: ResultType {
+extension TaskResult: Either {
     /// Creates a result with a successful `value`.
-    public init(with body: () throws -> Value) {
+    public init(from body: () throws -> Value) {
         do {
             self = try .success(body())
         } catch {
@@ -25,18 +25,14 @@ extension TaskResult: ResultType {
     }
 
     /// Creates a failed result with `error`.
-    public init(error: Error) {
+    public init(failure error: Error) {
         self = .failure(error)
     }
 
-    /// Case analysis.
-    ///
-    /// Returns the value from the `failure` closure if `self` represents a
-    /// failure, or from the `success` closure if `self` represents a success.
-    public func withValues<Return>(ifSuccess success: (Value) throws -> Return, ifFailure failure: (Error) throws -> Return) rethrows -> Return {
+    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
         switch self {
-        case let .success(value): return try success(value)
-        case let .failure(error): return try failure(error)
+        case let .success(value): return try right(value)
+        case let .failure(error): return try left(error)
         }
     }
 }

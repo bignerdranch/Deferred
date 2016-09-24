@@ -29,15 +29,15 @@ private extension XCTestCase {
         return (d, Task(d))
     }
 
-    @nonobjc var anyFinishedTask: Task<Int> { return Task(value: 42) }
+    @nonobjc var anyFinishedTask: Task<Int> { return Task(success: 42) }
 
-    @nonobjc var anyFailedTask: Task<Int> { return Task(error: Error.first) }
+    @nonobjc var anyFailedTask: Task<Int> { return Task(failure: Error.first) }
 
     @nonobjc func contrivedNextTask(for result: Int) -> Task<Int> {
         let d = Deferred<Task<Int>.Result>()
         let task = Task(d, cancellation: nil)
         afterDelay {
-            d.succeed(result * 2)
+            d.succeed(with: result * 2)
         }
         return task
     }
@@ -53,7 +53,7 @@ class TaskTests: CustomExecutorTestCase {
         task.uponSuccess(executor) { _ in expectation.fulfill() }
         task.uponFailure(executor, execute: impossible)
 
-        d.succeed(1)
+        d.succeed(with: 1)
 
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
@@ -66,7 +66,7 @@ class TaskTests: CustomExecutorTestCase {
         task.uponSuccess(executor, execute: impossible)
         task.uponFailure(executor) { _ in expectation.fulfill() }
 
-        d.fail(Error.first)
+        d.fail(with: Error.first)
 
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)

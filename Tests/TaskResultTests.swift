@@ -62,7 +62,7 @@ class ResultTests: XCTestCase {
     }
 
     func testFlatCoalesceFailure() {
-        let x = aFailureResult ?? Result(value: 84)
+        let x = aFailureResult ?? Result(success: 84)
         XCTAssertEqual(x.value, 84)
         XCTAssertNil(x.error)
     }

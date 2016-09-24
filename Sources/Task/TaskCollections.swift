@@ -12,7 +12,7 @@ import Result
 #endif
 import Foundation
 
-extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: ResultType {
+extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: Either, Iterator.Element.Value.Left == Error {
     /// Compose a number of tasks into a single notifier task.
     ///
     /// If any of the contained tasks fail, the returned task will be determined
@@ -20,7 +20,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
     /// task will be determined a success.
     public var joinedTasks: Task<Void> {
         if isEmpty {
-            return Task(value: ())
+            return Task(success: ())
         }
 
         let coalescingDeferred = Deferred<Task<Void>.Result>()
@@ -35,9 +35,9 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
 
             group.enter()
             task.upon(queue) { result in
-                result.withValues(ifSuccess: { _ in }, ifFailure: { error in
+                result.withValues(ifLeft: { (error) in
                     _ = coalescingDeferred.fill(with: .failure(error))
-                })
+                }, ifRight: { _ in })
 
                 group.leave()
             }

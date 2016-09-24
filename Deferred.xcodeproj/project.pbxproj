@@ -195,7 +195,7 @@
 		DB215F281CC16F5300A88450 /* TaskCollections.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskCollections.swift; sourceTree = "<group>"; };
 		DB215F2D1CC16F6B00A88450 /* ResultFuture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultFuture.swift; sourceTree = "<group>"; };
 		DB215F321CC16F7D00A88450 /* ResultPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultPromise.swift; sourceTree = "<group>"; };
-		DB215F371CC16F9700A88450 /* BlockCancellableTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockCancellableTask.swift; path = Sources/Result/BlockCancellableTask.swift; sourceTree = SOURCE_ROOT; };
+		DB215F371CC16F9700A88450 /* BlockCancellableTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BlockCancellableTask.swift; path = Sources/Task/BlockCancellableTask.swift; sourceTree = SOURCE_ROOT; };
 		DB215F3C1CC16FAB00A88450 /* BlockCancellableTaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockCancellableTaskTests.swift; sourceTree = "<group>"; };
 		DB215F401CC1704300A88450 /* TaskMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskMap.swift; sourceTree = "<group>"; };
 		DB215F4E1CC1788A00A88450 /* TaskRecover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskRecover.swift; sourceTree = "<group>"; };

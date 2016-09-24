@@ -13,8 +13,7 @@ import XCTest
 #endif
 
 class ExistentialFutureTests: XCTestCase {
-
-    static var allTests : [(String, (ExistentialFutureTests) -> () throws -> Void)] {
+    static var allTests: [(String, (ExistentialFutureTests) -> () throws -> Void)] {
         return [
             ("testFilledAnyFutureWaitAlwaysReturns", testFilledAnyFutureWaitAlwaysReturns),
             ("testAnyWaitWithTimeout", testAnyWaitWithTimeout),
@@ -96,5 +95,4 @@ class ExistentialFutureTests: XCTestCase {
         XCTAssertNotNil(anyFuture.wait(until: .now()))
         XCTAssertNotNil(anyFuture.waitShort())  // pass
     }
-
 }

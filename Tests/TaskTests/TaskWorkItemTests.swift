@@ -19,7 +19,7 @@ import Deferred
 #endif
 
 class TaskWorkItemTests: XCTestCase {
-    static var allTests : [(String, (TaskWorkItemTests) -> () throws -> Void)] {
+    static var allTests: [(String, (TaskWorkItemTests) -> () throws -> Void)] {
         return [
             ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
             ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError),
@@ -55,7 +55,7 @@ class TaskWorkItemTests: XCTestCase {
         finishSemaphore.signal()
 
         let result = waitForTaskToComplete(task)
-        XCTAssertEqual(try! result.extract(), 1)
+        XCTAssertEqual(try? result.extract(), 1)
     }
 
     func testThatCancellingBeforeATaskStartsProducesTheCancellationError() {
@@ -74,5 +74,4 @@ class TaskWorkItemTests: XCTestCase {
         semaphore.signal()
         XCTAssertEqual(result.error as? TestError, .second)
     }
-
 }

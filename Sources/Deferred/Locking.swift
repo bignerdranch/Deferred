@@ -124,8 +124,8 @@ public final class CASSpinLock: Locking {
     // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
     // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
     private enum Constants {
-        static var WriterMask:   Int32 { return Int32(bitPattern: 0xFFF00000) }
-        static var ReaderMask:   Int32 { return Int32(bitPattern: 0x000FFFFF) }
+        static var WriterMask: Int32 { return Int32(bitPattern: 0xFFF00000) }
+        static var ReaderMask: Int32 { return Int32(bitPattern: 0x000FFFFF) }
         static var WriterOffset: Int32 { return Int32(bitPattern: 0x00100000) }
     }
 
@@ -156,7 +156,7 @@ public final class CASSpinLock: Locking {
             // there's another writer active; try again
             state.subtract(Constants.WriterOffset, order: .release)
         } while true
-        
+
         defer {
             // decrement writers, potentially unblock readers
             state.subtract(Constants.WriterOffset, order: .release)
@@ -182,7 +182,7 @@ public final class CASSpinLock: Locking {
             // a writer became active while locking; try again
             state.subtract(1, order: .release)
         } while true
-        
+
         defer {
             // decrement readers, potentially unblock writers
             state.subtract(1, order: .release)

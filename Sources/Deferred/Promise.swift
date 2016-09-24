@@ -19,7 +19,7 @@
 public protocol PromiseProtocol {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
-    
+
     /// Creates an instance in a default, unfilled state.
     init()
 

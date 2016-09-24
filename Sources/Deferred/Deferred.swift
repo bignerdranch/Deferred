@@ -12,7 +12,6 @@ import Atomics
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
-
     // Using `ManagedBuffer` has advantages:
     //  - The buffer has a stable pointer when locked to a single element.
     //  - The buffer is appropriately aligned for atomic access.
@@ -32,7 +31,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
         group.enter()
     }
-    
+
     /// Creates an instance resolved with `value`.
     public init(filledWith value: Value) {
         storage.withUnsafeMutablePointerToElements { (pointerToElement) in
@@ -46,7 +45,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         }
     }
 
-    // MARK: -
+    // MARK: FutureProtocol
 
     private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(@escaping() -> Value) -> ()) {
         group.notify(flags: flags, queue: queue) { [storage] in
@@ -57,8 +56,6 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
             }
         }
     }
-
-    // MARK: FutureProtocol
 
     public func upon(_ queue: DispatchQueue, execute body: @escaping (Value) -> Void) {
         notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue) { (getValue) in
@@ -94,7 +91,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
             $0.load(order: .relaxed) != nil
         }
     }
-    
+
     @discardableResult
     public func fill(with value: Value) -> Bool {
         let box = Storage.box(value)
@@ -114,11 +111,8 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     }
 }
 
-
-
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
-
         deinit {
             _ = withUnsafeMutablePointerToElements { (pointerToElements) in
                 pointerToElements.deinitialize()
@@ -126,13 +120,14 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         }
 
         static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
+            // This conversion is guaranteed by convention through id-as-Any.
+            // swiftlint:disable:next force_cast
             return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value
         }
 
         static func box(_ value: Value) -> AnyObject {
             return value as AnyObject
         }
-
     }
 #else
     // In order to assign the value of a scalar in a Deferred using atomics, we must
@@ -146,7 +141,6 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     }
 
     private final class DeferredStorage<Value>: ManagedBuffer<Void, Box<Value>?> {
-
         deinit {
             _ = withUnsafeMutablePointerToElements { (pointerToElements) in
                 pointerToElements.deinitialize()
@@ -160,12 +154,10 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         static func box(_ value: Value) -> Box<Value> {
             return Box(value)
         }
-
     }
 #endif
 
 extension DeferredStorage {
-
     typealias _Self = DeferredStorage<Value>
 
     static func create() -> _Self {
@@ -179,5 +171,4 @@ extension DeferredStorage {
             }
         }
     }
-    
 }

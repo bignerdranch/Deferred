@@ -165,7 +165,7 @@ extension Progress {
         if let task = future as? Task<Future.Value.Right> {
             return task.progress
         }
-        
+
         let progress = Progress(parent: nil, userInfo: nil)
         progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
 

@@ -13,8 +13,7 @@ import XCTest
 #endif
 
 class FutureCustomExecutorTests: CustomExecutorTestCase {
-
-    static var allTests : [(String, (FutureCustomExecutorTests) -> () throws -> Void)] {
+    static var allTests: [(String, (FutureCustomExecutorTests) -> () throws -> Void)] {
         return [
             ("testUpon", testUpon),
             ("testMap", testMap),
@@ -78,5 +77,4 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(3)
     }
-
 }

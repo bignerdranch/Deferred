@@ -21,8 +21,7 @@ func timeIntervalSleep(_ duration: TimeInterval) {
 }
 
 class LockingTests: XCTestCase {
-
-    static var allTests : [(String, (LockingTests) -> () throws -> Void)] {
+    static var allTests: [(String, (LockingTests) -> () throws -> Void)] {
         let universalTests: [(String, (LockingTests) -> () throws -> Void)] = [
             ("testMultipleConcurrentReaders", testMultipleConcurrentReaders),
             ("testMultipleConcurrentWriters", testMultipleConcurrentWriters),
@@ -273,5 +272,4 @@ class LockingTests: XCTestCase {
         measureLock90PercentReadsNThreads(pthreadLock, iters: 5_000, nthreads: 4)
     }
     #endif
-
 }

@@ -16,8 +16,7 @@ import Deferred
 #endif
 
 class VoidResultTests: XCTestCase {
-
-    static var allTests : [(String, (VoidResultTests) -> () throws -> Void)] {
+    static var allTests: [(String, (VoidResultTests) -> () throws -> Void)] {
         return [
             ("testDescriptionSuccess", testDescriptionSuccess),
             ("testDescriptionFailure", testDescriptionFailure),
@@ -54,5 +53,4 @@ class VoidResultTests: XCTestCase {
         XCTAssertNotNil(try? aSuccessResult.extract())
         XCTAssertNil(try? aFailureResult.extract())
     }
-
 }

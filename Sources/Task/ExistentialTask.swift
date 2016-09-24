@@ -40,7 +40,8 @@ public final class Task<SuccessValue>: NSObject, ProgressReporting {
     }
 
     /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
-    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
+    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress)
+        where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
     }
 
@@ -59,7 +60,8 @@ public final class Task<SuccessValue>: NSObject, ProgressReporting {
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
-    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
+    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil)
+        where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: Future(task: base), progress: progress)
     }
@@ -94,7 +96,8 @@ public final class Task<SuccessValue> {
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
-    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
+    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil)
+        where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), cancellation: (base as? _Self)?.cancellation ?? cancellation)
     }
 }

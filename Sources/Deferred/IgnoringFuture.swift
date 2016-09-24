@@ -20,7 +20,7 @@ import Dispatch
 /// But may behave more efficiently.
 public struct IgnoringFuture<Base: FutureProtocol>: FutureProtocol {
     private let base: Base
-    
+
     /// Creates a future that ignores the result of `base`.
     fileprivate init(_ base: Base) {
         self.base = base
@@ -33,7 +33,7 @@ public struct IgnoringFuture<Base: FutureProtocol>: FutureProtocol {
     public func upon(_ executor: Executor, execute body: @escaping() -> Void) {
         base.upon(executor) { _ in body() }
     }
-    
+
     /// Waits synchronously for the event to complete.
     ///
     /// If the event is already completed, the call returns immediately.
@@ -46,7 +46,6 @@ public struct IgnoringFuture<Base: FutureProtocol>: FutureProtocol {
 }
 
 extension FutureProtocol {
-
     /// Returns a future that ignores the result of this future.
     ///
     /// This is semantically identical to the following:
@@ -59,5 +58,4 @@ extension FutureProtocol {
     public func ignored() -> IgnoringFuture<Self> {
         return IgnoringFuture(self)
     }
-
 }

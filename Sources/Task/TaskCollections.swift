@@ -13,7 +13,7 @@ import Result
 
 import Dispatch
 
-// TODO: XPLAT
+// Deferred#124
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import class Foundation.Progress
 

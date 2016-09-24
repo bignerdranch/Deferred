@@ -30,7 +30,8 @@ public struct TaskGroup {
     /// next `allCompleted()` task.
     ///
     /// This method is thread-safe.
-    public func include<Task: FutureProtocol>(_ task: Task) where Task.Value: Either {
+    public func include<Task: FutureProtocol>(_ task: Task)
+        where Task.Value: Either {
         group.enter()
         task.upon(queue) { [group = group] _ in
             group.leave()

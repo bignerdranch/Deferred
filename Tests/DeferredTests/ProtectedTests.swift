@@ -16,8 +16,7 @@ import Deferred
 #endif
 
 class ProtectedTests: XCTestCase {
-
-    static var allTests : [(String, (ProtectedTests) -> () throws -> Void)] {
+    static var allTests: [(String, (ProtectedTests) -> () throws -> Void)] {
         return [
             ("testConcurrentReadingWriting", testConcurrentReadingWriting)
         ]
@@ -41,11 +40,11 @@ class ProtectedTests: XCTestCase {
     func testConcurrentReadingWriting() {
         var lastWriterDate: Date?
 
-        let startReader: (Int) -> () = { i in
-            let expectation = self.expectation(description: "reader \(i)")
+        let startReader: (Int) -> () = { iteration in
+            let expectation = self.expectation(description: "reader \(iteration)")
             self.queue.async {
-                self.protected.withReadLock { (date,items) -> () in
-                    if items.count == 0 && date == nil {
+                self.protected.withReadLock { (date, items) -> () in
+                    if items.isEmpty && date == nil {
                         // OK - we're before the writer has added items
                     } else if items.count == 5 && date == lastWriterDate {
                         // OK - we're after the writer has added items
@@ -78,5 +77,4 @@ class ProtectedTests: XCTestCase {
 
         waitForExpectationsShort()
     }
-
 }

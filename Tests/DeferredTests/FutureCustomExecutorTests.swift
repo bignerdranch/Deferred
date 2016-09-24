@@ -7,7 +7,10 @@
 //
 
 import XCTest
-import Deferred
+@testable import Deferred
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 class FutureCustomExecutorTests: CustomExecutorTestCase {
     func testUpon() {

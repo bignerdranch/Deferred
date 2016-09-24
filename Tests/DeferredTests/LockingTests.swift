@@ -9,6 +9,9 @@
 import XCTest
 import Deferred
 import Atomics
+#if SWIFT_PACKAGE
+@testable import TestSupport
+#endif
 
 func timeIntervalSleep(_ duration: TimeInterval) {
     usleep(useconds_t(duration * TimeInterval(USEC_PER_SEC)))
@@ -66,7 +69,7 @@ class LockingTests: XCTestCase {
 
         queue = DispatchQueue(label: "LockingTests", attributes: .concurrent)
     }
-    
+
     override func tearDown() {
         queue = nil
 
@@ -157,7 +160,7 @@ class LockingTests: XCTestCase {
             for i in 32 ..< 64 {
                 startReader(i)
             }
-            
+
             waitForExpectationsShort()
         }
     }

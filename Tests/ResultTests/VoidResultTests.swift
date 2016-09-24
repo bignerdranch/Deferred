@@ -10,6 +10,7 @@ import XCTest
 #if SWIFT_PACKAGE
 import Deferred
 @testable import Result
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
@@ -19,7 +20,7 @@ class VoidResultTests: XCTestCase {
     private typealias Result = TaskResult<Void>
 
     private let aSuccessResult = Result.success(())
-    private let aFailureResult = Result.failure(Error.first)
+    private let aFailureResult = Result.failure(TestError.first)
 
     func testDescriptionSuccess() {
         XCTAssertEqual(String(describing: aSuccessResult), "()")
@@ -36,7 +37,7 @@ class VoidResultTests: XCTestCase {
     func testDebugDescriptionFailure() {
         let debugDescription = String(reflecting: aFailureResult)
         XCTAssert(debugDescription.hasPrefix("failure("))
-        XCTAssert(debugDescription.hasSuffix("Error.first)"))
+        XCTAssert(debugDescription.hasSuffix("TestError.first)"))
     }
 
     func testExtract() {

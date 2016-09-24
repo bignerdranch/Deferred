@@ -8,7 +8,7 @@
 
 extension ResultType {
     /// Creates a result with a successful `value`.
-    public init(@autoclosure value getValue: () throws -> Value) {
+    public init(value getValue: @autoclosure() throws -> Value) {
         self.init { try getValue() }
     }
 
@@ -19,17 +19,17 @@ extension ResultType {
 }
 
 /// Returns the success value of `left`, or `right` otherwise.
-public func ?? <Left: ResultType>(left: Left, @autoclosure right: () throws -> Left.Value) rethrows -> Left.Value {
+public func ?? <Left: ResultType>(left: Left, right: @autoclosure() throws -> Left.Value) rethrows -> Left.Value {
     return try left.withValues(ifSuccess: { $0 }, ifFailure: { _ in try right() })
 }
 
 /// Returns `left` if it is a success, or `right` otherwise.
-public func ?? <Left: ResultType, Right: ResultType where Right.Value == Left.Value>(result: Left, @autoclosure recover: () throws -> Right) rethrows -> Right {
+public func ?? <Left: ResultType, Right: ResultType>(result: Left, recover: @autoclosure() throws -> Right) rethrows -> Right where Right.Value == Left.Value {
     return try result.withValues(ifSuccess: { Right(value: $0) }, ifFailure: { _ in try recover() })
 }
 
 /// This is an optional you probably don't want.
-@available(*, unavailable, message="Unexpected optional promotion. Please unwrap the Result first.")
-public func ?? <Result: ResultType>(result: Result?, @autoclosure defaultValue: () throws -> Result.Value) rethrows -> Result.Value {
+@available(*, unavailable, message: "Unexpected optional promotion. Please unwrap the Result first.")
+public func ?? <Result: ResultType>(result: Result?, defaultValue: @autoclosure() throws -> Result.Value) rethrows -> Result.Value {
     fatalError("Cannot call unavailable methods")
 }

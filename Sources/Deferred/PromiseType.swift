@@ -33,7 +33,7 @@ public protocol PromiseType {
     ///
     /// - parameter value: A resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
-    func fill(value: Value) -> Bool
+    func fill(_ value: Value) -> Bool
 }
 
 extension PromiseType {
@@ -56,9 +56,9 @@ extension PromiseType {
     ///
     /// - parameter value: A resolved value for the instance.
     /// - parameter assertIfFilled: If `false`, race checking is disabled.
-    public func fill(value: Value, assertIfFilled: Bool, file: StaticString = #file, line: UInt = #line) {
+    public func fill(_ value: Value, assertIfFilled: Bool, file: StaticString = #file, line: UInt = #line) {
         if !fill(value) && assertIfFilled {
-            assertionFailure("Cannot fill an already-filled \(self.dynamicType)", file: file, line: line)
+            assertionFailure("Cannot fill an already-filled \(type(of: self))", file: file, line: line)
         }
     }
 }

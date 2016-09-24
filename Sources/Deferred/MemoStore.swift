@@ -14,8 +14,6 @@ import AtomicSwift
 // Extremely simple surface describing an async rejoin-type notifier for a
 // one-off event.
 protocol CallbacksList {
-    associatedtype FunctionBody = () -> Void
-
     init()
     
     var isCompleted: Bool { get }
@@ -30,7 +28,7 @@ protocol CallbacksList {
     ///
     /// If `isCompleted`, an implementer should immediately submit the `body`
     /// to `queue`.
-    func notify(executor executor: ExecutorType, body: FunctionBody)
+    func notify(upon executor: ExecutorType, body: DispatchWorkItem)
 }
 
 // Atomic compare-and-swap, but safe for an initialize-once, owning pointer:
@@ -38,9 +36,11 @@ protocol CallbacksList {
 //  - Swift: "UnsafeMutablePointer<MyObject!>"
 // If the assignment is made, the new value is retained by its owning pointer.
 // If the assignment is not made, the new value is not retained.
-private func atomicInitialize<T: AnyObject>(target: UnsafeMutablePointer<T?>, to desired: T) -> Bool {
+private func atomicInitialize<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, to desired: T) -> Bool {
     let newPtr = Unmanaged.passRetained(desired).toOpaque()
-    let wonRace = OSAtomicCompareAndSwapPtr(nil, UnsafeMutablePointer(newPtr), UnsafeMutablePointer(target))
+    let wonRace = target.withMemoryRebound(to: Optional<UnsafeMutableRawPointer>.self, capacity: 1) {
+        OSAtomicCompareAndSwapPtr(nil, newPtr, $0)
+    }
     if !wonRace {
         Unmanaged.passUnretained(desired).release()
     }
@@ -66,44 +66,44 @@ final class MemoStore<Value> {
     private typealias Manager = ManagedBufferPointer<Void, Element>
     private typealias Element = Box<Value>?
 
-    static func createWithValue(value: Value?) -> MemoStore<Value> {
+    static func create(with value: Value?) -> MemoStore<Value> {
         // Create storage. Swift uses a two-stage system.
-        let ptr = Manager(bufferClass: self, minimumCapacity: 1) { buffer, _ in
+        let ptr = Manager(bufferClass: self, minimumCapacity: 1) { (buffer, _) in
             // Assign the initial value to managed storage
-            Manager(unsafeBufferObject: buffer).withUnsafeMutablePointerToElements { boxPtr in
-                boxPtr.initialize(value.map(Box.init))
+            Manager(unsafeBufferObject: buffer).withUnsafeMutablePointers { (_, boxPtr) in
+                boxPtr.initialize(to: value.map(Box.init))
             }
         }
         
         // Kindly give back an instance of the ManagedBufferPointer's buffer - self.
-        return unsafeDowncast(ptr.buffer)
+        return unsafeDowncast(ptr.buffer, to: MemoStore<Value>.self)
     }
 
     private init() {
         fatalError("Unavailable method cannot be called")
     }
 
-    private func withUnsafeMutablePointer<Return>(body: UnsafeMutablePointer<Element> -> Return) -> Return {
-        return Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements(body)
+    private func withUnsafeMutablePointer<Return>(_ body: (UnsafeMutablePointer<Element>) -> Return) -> Return {
+        return Manager(unsafeBufferObject: self).withUnsafeMutablePointers { body($1) }
     }
     
     deinit {
         // UnsafeMutablePointer.destroy() is faster than destroy(_:) for single elements
-        withUnsafeMutablePointer { boxPtr in
-            boxPtr.destroy()
+        _ = withUnsafeMutablePointer { boxPtr in
+            boxPtr.deinitialize()
         }
     }
     
-    func withValue(body: Value -> Void) {
+    func withValue(_ body: (Value) -> Void) {
         withUnsafeMutablePointer { boxPtr in
-            guard let box = boxPtr.memory else { return }
+            guard let box = boxPtr.pointee else { return }
             body(box.contents)
         }
     }
     
-    func fill(value: Value) -> Bool {
+    func fill(_ value: Value) -> Bool {
         return withUnsafeMutablePointer { boxPtr in
-            atomicInitialize(boxPtr, to: .init(value))
+            atomicInitialize(boxPtr, to: Box(value))
         }
     }
 }

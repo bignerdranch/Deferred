@@ -12,30 +12,30 @@ import XCTest
 import Result
 #endif
 
-let TestTimeout: NSTimeInterval = 15
+let TestTimeout: TimeInterval = 15
 
-enum Error: ErrorType {
-    case First
-    case Second
-    case Third
+enum Error: Swift.Error {
+    case first
+    case second
+    case third
 }
 
-func afterDelay(delay: NSTimeInterval, upon queue: dispatch_queue_t = dispatch_get_main_queue(), perform body: () -> Void) {
-    let delay = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * NSTimeInterval(NSEC_PER_SEC)))
-    dispatch_after(delay, queue, body)
+func afterDelay(_ delay: TimeInterval, upon queue: DispatchQueue = DispatchQueue.main, perform body: @escaping () -> Void) {
+    let delay = DispatchTime.now() + Double(Int64(delay * TimeInterval(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+    queue.asyncAfter(deadline: delay, execute: body)
 }
 
 extension XCTestCase {
-    func waitForTaskToComplete<T>(task: Task<T>) -> TaskResult<T>! {
-        let expectation = expectationWithDescription("task completed")
+    func waitForTaskToComplete<T>(_ task: Task<T>) -> TaskResult<T> {
+        let expectation = self.expectation(description: "task completed")
         var result: TaskResult<T>?
         task.uponMainQueue { [weak expectation] in
             result = $0
             expectation?.fulfill()
         }
-        waitForExpectationsWithTimeout(TestTimeout, handler: nil)
+        waitForExpectations(timeout: TestTimeout, handler: nil)
 
-        return result
+        return result!
     }
 }
 
@@ -44,7 +44,7 @@ extension ResultType {
         return withValues(ifSuccess: { $0 }, ifFailure: { _ in nil })
     }
 
-    var error: ErrorType? {
+    var error: Swift.Error? {
         return withValues(ifSuccess: { _ in nil }, ifFailure: { $0 })
     }
 }
@@ -55,8 +55,8 @@ class CustomExecutorTestCase: XCTestCase {
 
         unowned let owner: CustomExecutorTestCase
 
-        func submit(body: () -> Void) {
-            owner.submitCount.withWriteLock { (inout count: Int) in
+        func submit(_ body: @escaping() -> Void) {
+            owner.submitCount.withWriteLock { (count: inout Int) in
                 count += 1
             }
 
@@ -70,12 +70,12 @@ class CustomExecutorTestCase: XCTestCase {
         return Executor(owner: self)
     }
 
-    func assertExecutorCalled(times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 == times }), file: file, line: line, "Executor was not called exactly \(times) times")
+    func assertExecutorCalled(_ times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 == times }), "Executor was not called exactly \(times) times")
     }
 
     func assertExecutorCalledAtLeastOnce(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 >= 1 }), file: file, line: line, "Executor was never called")
+        XCTAssert(submitCount.withReadLock({ $0 >= 1 }), "Executor was never called", file: file, line: line)
     }
     
 }
@@ -83,18 +83,18 @@ class CustomExecutorTestCase: XCTestCase {
 class CustomQueueTestCase: XCTestCase {
 
     private struct Constants {
-        static var key = false
+        static let key = DispatchSpecificKey<UnsafeMutableRawPointer!>()
     }
 
-    private(set) var queue: dispatch_queue_t!
-    private var specificPtr: UnsafeMutablePointer<Void>!
+    private(set) var queue: DispatchQueue!
+    fileprivate var specificPtr: UnsafeMutableRawPointer!
 
     override func setUp() {
         super.setUp()
 
-        queue = dispatch_queue_create("Deferred test queue", nil)
+        queue = DispatchQueue(label: "Deferred test queue", attributes: [])
         specificPtr = malloc(0)
-        dispatch_queue_set_specific(queue, &Constants.key, specificPtr, nil)
+        queue.setSpecific(key: Constants.key, value: specificPtr)
     }
 
     override func tearDown() {
@@ -106,7 +106,7 @@ class CustomQueueTestCase: XCTestCase {
     }
 
     func assertOnQueue(inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssertEqual(dispatch_get_specific(&Constants.key), specificPtr, file: file, line: line)
+        XCTAssertEqual(DispatchQueue.getSpecific(key: Constants.key), specificPtr, file: file, line: line)
     }
     
 }

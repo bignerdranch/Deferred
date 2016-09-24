@@ -13,7 +13,7 @@ import Result
 import Foundation
 
 extension Task {
-    private func commonBody<NewTask: FutureType where NewTask.Value: ResultType>(for startNextTask: SuccessValue throws -> NewTask) -> (NSProgress, (Result) -> Task<NewTask.Value.Value>) {
+    private func commonBody<NewTask: FutureType>(for startNextTask: @escaping(SuccessValue) throws -> NewTask) -> (Progress, (Result) -> Task<NewTask.Value.Value>) where NewTask.Value: ResultType {
         let progress = extendedProgress(byUnitCount: 1)
         return (progress, { (result) in
             do {
@@ -22,7 +22,7 @@ extension Task {
                 // We want to become the thread-local progress, but we don't
                 // want to consume units; we may not attach newTask.progress to
                 // the root progress until after the scope ends.
-                progress.becomeCurrentWithPendingUnitCount(0)
+                progress.becomeCurrent(withPendingUnitCount: 0)
                 defer { progress.resignCurrent() }
 
                 // Attempt to create and wrap the next task. Task's own progress
@@ -31,7 +31,7 @@ extension Task {
                 return Task<NewTask.Value.Value>(newTask)
             } catch {
                 // Failure case behaves just like map: just error passthrough.
-                progress.becomeCurrentWithPendingUnitCount(1)
+                progress.becomeCurrent(withPendingUnitCount: 1)
                 defer { progress.resignCurrent() }
                 return Task<NewTask.Value.Value>(error: error)
             }
@@ -51,7 +51,7 @@ extension Task {
     /// `startNextTask` closure. `flatMap` submits `startNextTask` to `executor`
     /// once the task completes successfully.
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: FutureType where NewTask.Value: ResultType>(upon executor: ExecutorType, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+    public func flatMap<NewTask: FutureType>(upon executor: ExecutorType, _ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
         let (progress, body) = commonBody(for: startNextTask)
         let future = flatMap(upon: executor, body)
         return Task<NewTask.Value.Value>(future: future, progress: progress)
@@ -68,7 +68,7 @@ extension Task {
     /// asynchronously once the task completes successfully.
     /// - seealso: flatMap(upon:_:)
     /// - seealso: FutureType.flatMap(upon:_:)
-    public func flatMap<NewTask: FutureType where NewTask.Value: ResultType>(upon queue: dispatch_queue_t, _ startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+    public func flatMap<NewTask: FutureType>(upon queue: DispatchQueue, _ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value>  where NewTask.Value: ResultType {
         let (progress, body) = commonBody(for: startNextTask)
         let future = flatMap(upon: queue, body)
         return Task<NewTask.Value.Value>(future: future, progress: progress)
@@ -85,7 +85,7 @@ extension Task {
     /// background once the task completes successfully.
     /// - seealso: flatMap(upon:_:)
     /// - seealso: FutureType.flatMap(_:)
-    public func flatMap<NewTask: FutureType where NewTask.Value: ResultType>(startNextTask: SuccessValue throws -> NewTask) -> Task<NewTask.Value.Value> {
+    public func flatMap<NewTask: FutureType>(_ startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
         let (progress, body) = commonBody(for: startNextTask)
         let future = flatMap(body)
         return Task<NewTask.Value.Value>(future: future, progress: progress)

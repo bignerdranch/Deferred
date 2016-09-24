@@ -16,21 +16,21 @@ import Deferred
 
 class ResultRecoveryTests: XCTestCase {
 
-    private typealias Result = TaskResult<String>
+    fileprivate typealias Result = TaskResult<String>
 
-    private func tryIsSuccess(text: String?) throws -> String {
-        guard let text = text where text == "success" else {
-            throw Error.First
+    fileprivate func tryIsSuccess(_ text: String?) throws -> String {
+        guard let text = text , text == "success" else {
+            throw Error.first
         }
 
         return text
     }
 
-    private func successFunction() throws -> String {
+    fileprivate func successFunction() throws -> String {
         return try tryIsSuccess("success")
     }
 
-    private func failureFunction() throws -> String {
+    fileprivate func failureFunction() throws -> String {
         return try tryIsSuccess(nil)
     }
 
@@ -43,7 +43,7 @@ class ResultRecoveryTests: XCTestCase {
     func testInitWithFunctionProducesFailures() {
         let result = Result(with: failureFunction)
         XCTAssertNil(result.value)
-        XCTAssertEqual(result.error as? Error, Error.First)
+        XCTAssertEqual(result.error as? Error, Error.first)
     }
 
 }

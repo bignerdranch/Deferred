@@ -50,8 +50,8 @@ class TaskTests: CustomExecutorTestCase {
         let (d, task) = anyUnfinishedTask
         let expectation = self.expectation(description: "upon is called")
 
-        task.uponSuccess(executor) { _ in expectation.fulfill() }
-        task.uponFailure(executor, execute: impossible)
+        task.uponSuccess(on: executor) { _ in expectation.fulfill() }
+        task.uponFailure(on: executor, execute: impossible)
 
         d.succeed(with: 1)
 
@@ -63,8 +63,8 @@ class TaskTests: CustomExecutorTestCase {
         let (d, task) = anyUnfinishedTask
         let expectation = self.expectation(description: "upon is called")
 
-        task.uponSuccess(executor, execute: impossible)
-        task.uponFailure(executor) { _ in expectation.fulfill() }
+        task.uponSuccess(on: executor, execute: impossible)
+        task.uponFailure(on: executor) { _ in expectation.fulfill() }
 
         d.fail(with: Error.first)
 
@@ -142,7 +142,7 @@ class TaskTests: CustomExecutorTestCase {
 
     func testThatRecoverPassesThroughValues() {
         let expectation = self.expectation(description: "mapped filled with same error")
-        let task: Task<Int> = anyFinishedTask.recover(upon: executor, impossible)
+        let task: Task<Int> = anyFinishedTask.recover(upon: executor, substituting: impossible)
 
         task.upon {
             XCTAssertNil($0.error)

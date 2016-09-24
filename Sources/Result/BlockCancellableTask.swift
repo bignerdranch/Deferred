@@ -27,21 +27,22 @@ extension Task {
     /// - seealso: dispatch_block_flags_t
     public convenience init(upon queue: dispatch_queue_t = Task<SuccessValue>.genericQueue, per options: dispatch_block_flags_t = [], @autoclosure(escaping) onCancel produceError: () -> ErrorType, body: () throws -> SuccessValue) {
         let deferred = Deferred<Result>()
+        let semaphore = dispatch_semaphore_create(1)
 
         let block = dispatch_block_create(options) {
+            guard dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW) == 0 else { return }
+            defer { dispatch_semaphore_signal(semaphore) }
+
             deferred.fill(Result(with: body))
         }
 
-        defer {
-            dispatch_async(queue, block)
-        }
-
-        dispatch_block_notify(block, queue) {
-            _ = deferred.fill(.Failure(produceError()))
-        }
+        dispatch_async(queue, block)
 
         self.init(deferred) {
-            dispatch_block_cancel(block)
+            guard dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW) == 0 else { return }
+            defer { dispatch_semaphore_signal(semaphore) }
+
+            _ = deferred.fill(.Failure(produceError()))
         }
     }
 }

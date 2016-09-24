@@ -16,8 +16,7 @@ import Deferred
 #endif
 
 class TaskResultTests: XCTestCase {
-
-    static var allTests : [(String, (TaskResultTests) -> () throws -> Void)] {
+    static var allTests: [(String, (TaskResultTests) -> () throws -> Void)] {
         return [
             ("testDescriptionSuccess", testDescriptionSuccess),
             ("testDescriptionFailure", testDescriptionFailure),
@@ -82,5 +81,4 @@ class TaskResultTests: XCTestCase {
         XCTAssertEqual(x.value, 84)
         XCTAssertNil(x.error)
     }
-
 }

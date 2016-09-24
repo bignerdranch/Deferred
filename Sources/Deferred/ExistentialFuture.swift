@@ -104,7 +104,8 @@ public struct Future<Value>: FutureProtocol {
     private let box: FutureBox<Value>
 
     /// Create a future whose `upon(_:execute:)` methods forward to `base`.
-    public init<Future: FutureProtocol>(_ base: Future) where Future.Value == Value {
+    public init<Future: FutureProtocol>(_ base: Future)
+        where Future.Value == Value {
         self.box = ForwardedTo(base: base)
     }
 
@@ -117,7 +118,7 @@ public struct Future<Value>: FutureProtocol {
     public init() {
         self.box = Never()
     }
-    
+
     /// Create a future having the same underlying future as `other`.
     public init(_ other: Future<Value>) {
         self.box = other.box

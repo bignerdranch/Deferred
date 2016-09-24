@@ -43,7 +43,8 @@ private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
 
 extension Future where Value: Either {
     /// Create a future having the same underlying task as `other`.
-    public init<Other: FutureProtocol>(task other: Other) where Other.Value: Either, Other.Value.Left == Error, Other.Value.Right == Value.Right {
+    public init<Other: FutureProtocol>(task other: Other)
+        where Other.Value: Either, Other.Value.Left == Error, Other.Value.Right == Value.Right {
         self.init(LazyMapFuture(other) {
             Value(from: $0.extract)
         })

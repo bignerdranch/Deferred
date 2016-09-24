@@ -27,7 +27,8 @@ extension Task {
     /// `startNextTask` closure. `andThen` submits `startNextTask` to `executor`
     /// once the task completes successfully.
     /// - seealso: FutureProtocol.andThen(upon:start:)
-    public func andThen<NewTask: FutureProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Right> where NewTask.Value: Either, NewTask.Value.Left == Error {
+    public func andThen<NewTask: FutureProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Right>
+        where NewTask.Value: Either, NewTask.Value.Left == Error {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = extendedProgress(byUnitCount: 1)
         #else

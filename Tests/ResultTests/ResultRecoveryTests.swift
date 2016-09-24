@@ -10,6 +10,7 @@ import XCTest
 #if SWIFT_PACKAGE
 import Deferred
 @testable import Result
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
@@ -20,7 +21,7 @@ class ResultRecoveryTests: XCTestCase {
 
     private func tryIsSuccess(_ text: String?) throws -> String {
         guard let text = text, text == "success" else {
-            throw Error.first
+            throw TestError.first
         }
 
         return text
@@ -43,7 +44,7 @@ class ResultRecoveryTests: XCTestCase {
     func testInitWithFunctionProducesFailures() {
         let result = Result(from: failureFunction)
         XCTAssertNil(result.value)
-        XCTAssertEqual(result.error as? Error, .first)
+        XCTAssertEqual(result.error as? TestError, .first)
     }
 
 }

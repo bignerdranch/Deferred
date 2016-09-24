@@ -32,8 +32,8 @@ Pod::Spec.new do |s|
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source_files  = "Sources/**/*.{swift,h}"
+  s.exclude_files = ["Sources/TestSupport", "Sources/*.h"]
   s.preserve_path = "Sources/**/*.modulemap"
-  s.header_dir    = "Deferred"
   s.module_name   = "Deferred"
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

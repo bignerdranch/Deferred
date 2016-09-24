@@ -35,19 +35,19 @@
 		DB524CEA1D85205400DDF16D /* TaskMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB01D85200C00DDF16D /* TaskMap.swift */; };
 		DB524CEB1D85205400DDF16D /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB11D85200C00DDF16D /* TaskProgress.swift */; };
 		DB524CEC1D85205400DDF16D /* TaskRecover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB21D85200C00DDF16D /* TaskRecover.swift */; };
-		DB524CED1D85206100DDF16D /* BlockCancellableTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB41D85200C00DDF16D /* BlockCancellableTaskTests.swift */; };
-		DB524CEE1D85206100DDF16D /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB51D85200C00DDF16D /* DeferredTests.swift */; };
-		DB524CEF1D85206100DDF16D /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB61D85200C00DDF16D /* ExistentialFutureTests.swift */; };
-		DB524CF01D85206100DDF16D /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB71D85200C00DDF16D /* Fixtures.swift */; };
-		DB524CF11D85206100DDF16D /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB81D85200C00DDF16D /* FutureCustomExecutorTests.swift */; };
-		DB524CF21D85206100DDF16D /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB91D85200C00DDF16D /* IgnoringFutureTests.swift */; };
-		DB524CF31D85206100DDF16D /* LockProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CBB1D85200C00DDF16D /* LockProtectedTests.swift */; };
-		DB524CF41D85206100DDF16D /* ReadWriteLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CBC1D85200C00DDF16D /* ReadWriteLockTests.swift */; };
-		DB524CF51D85206100DDF16D /* ResultRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CBD1D85200C00DDF16D /* ResultRecoveryTests.swift */; };
-		DB524CF61D85206100DDF16D /* TaskAccumulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CBE1D85200C00DDF16D /* TaskAccumulatorTests.swift */; };
-		DB524CF71D85206100DDF16D /* TaskResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CBF1D85200C00DDF16D /* TaskResultTests.swift */; };
-		DB524CF81D85206100DDF16D /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CC01D85200C00DDF16D /* TaskTests.swift */; };
-		DB524CF91D85206100DDF16D /* VoidResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CC11D85200C00DDF16D /* VoidResultTests.swift */; };
+		DB55F1FE1D96968E00FC1439 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1EE1D96968E00FC1439 /* Fixtures.swift */; };
+		DB55F1FF1D96968E00FC1439 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F01D96968E00FC1439 /* DeferredTests.swift */; };
+		DB55F2001D96968E00FC1439 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */; };
+		DB55F2011D96968E00FC1439 /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */; };
+		DB55F2021D96968E00FC1439 /* IgnoringFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F31D96968E00FC1439 /* IgnoringFutureTests.swift */; };
+		DB55F2031D96968E00FC1439 /* LockingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F41D96968E00FC1439 /* LockingTests.swift */; };
+		DB55F2041D96968E00FC1439 /* ProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */; };
+		DB55F2051D96968E00FC1439 /* ResultRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F71D96968E00FC1439 /* ResultRecoveryTests.swift */; };
+		DB55F2061D96968E00FC1439 /* TaskResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */; };
+		DB55F2071D96968E00FC1439 /* VoidResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F91D96968E00FC1439 /* VoidResultTests.swift */; };
+		DB55F2081D96968E00FC1439 /* TaskGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FB1D96968E00FC1439 /* TaskGroupTests.swift */; };
+		DB55F2091D96968E00FC1439 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FC1D96968E00FC1439 /* TaskTests.swift */; };
+		DB55F20A1D96968E00FC1439 /* TaskWorkItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,21 +96,21 @@
 		DB524CB01D85200C00DDF16D /* TaskMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMap.swift; sourceTree = "<group>"; };
 		DB524CB11D85200C00DDF16D /* TaskProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskProgress.swift; sourceTree = "<group>"; };
 		DB524CB21D85200C00DDF16D /* TaskRecover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRecover.swift; sourceTree = "<group>"; };
-		DB524CB41D85200C00DDF16D /* BlockCancellableTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockCancellableTaskTests.swift; sourceTree = "<group>"; };
-		DB524CB51D85200C00DDF16D /* DeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
-		DB524CB61D85200C00DDF16D /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
-		DB524CB71D85200C00DDF16D /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
-		DB524CB81D85200C00DDF16D /* FutureCustomExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureCustomExecutorTests.swift; sourceTree = "<group>"; };
-		DB524CB91D85200C00DDF16D /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
 		DB524CBA1D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB524CBB1D85200C00DDF16D /* LockProtectedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockProtectedTests.swift; sourceTree = "<group>"; };
-		DB524CBC1D85200C00DDF16D /* ReadWriteLockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadWriteLockTests.swift; sourceTree = "<group>"; };
-		DB524CBD1D85200C00DDF16D /* ResultRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRecoveryTests.swift; sourceTree = "<group>"; };
-		DB524CBE1D85200C00DDF16D /* TaskAccumulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAccumulatorTests.swift; sourceTree = "<group>"; };
-		DB524CBF1D85200C00DDF16D /* TaskResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskResultTests.swift; sourceTree = "<group>"; };
-		DB524CC01D85200C00DDF16D /* TaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
-		DB524CC11D85200C00DDF16D /* VoidResultTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoidResultTests.swift; sourceTree = "<group>"; };
 		DB524CFD1D85489500DDF16D /* Atomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Atomics.h; path = include/Atomics.h; sourceTree = "<group>"; };
+		DB55F1EE1D96968E00FC1439 /* Fixtures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fixtures.swift; path = Sources/TestSupport/Fixtures.swift; sourceTree = SOURCE_ROOT; };
+		DB55F1F01D96968E00FC1439 /* DeferredTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
+		DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
+		DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCustomExecutorTests.swift; sourceTree = "<group>"; };
+		DB55F1F31D96968E00FC1439 /* IgnoringFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoringFutureTests.swift; sourceTree = "<group>"; };
+		DB55F1F41D96968E00FC1439 /* LockingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockingTests.swift; sourceTree = "<group>"; };
+		DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProtectedTests.swift; sourceTree = "<group>"; };
+		DB55F1F71D96968E00FC1439 /* ResultRecoveryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultRecoveryTests.swift; sourceTree = "<group>"; };
+		DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskResultTests.swift; sourceTree = "<group>"; };
+		DB55F1F91D96968E00FC1439 /* VoidResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoidResultTests.swift; sourceTree = "<group>"; };
+		DB55F1FB1D96968E00FC1439 /* TaskGroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskGroupTests.swift; sourceTree = "<group>"; };
+		DB55F1FC1D96968E00FC1439 /* TaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
+		DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskWorkItemTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,19 +226,10 @@
 		DB524CB31D85200C00DDF16D /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				DB524CB41D85200C00DDF16D /* BlockCancellableTaskTests.swift */,
-				DB524CB51D85200C00DDF16D /* DeferredTests.swift */,
-				DB524CB61D85200C00DDF16D /* ExistentialFutureTests.swift */,
-				DB524CB71D85200C00DDF16D /* Fixtures.swift */,
-				DB524CB81D85200C00DDF16D /* FutureCustomExecutorTests.swift */,
-				DB524CB91D85200C00DDF16D /* IgnoringFutureTests.swift */,
-				DB524CBB1D85200C00DDF16D /* LockProtectedTests.swift */,
-				DB524CBC1D85200C00DDF16D /* ReadWriteLockTests.swift */,
-				DB524CBD1D85200C00DDF16D /* ResultRecoveryTests.swift */,
-				DB524CBE1D85200C00DDF16D /* TaskAccumulatorTests.swift */,
-				DB524CBF1D85200C00DDF16D /* TaskResultTests.swift */,
-				DB524CC01D85200C00DDF16D /* TaskTests.swift */,
-				DB524CC11D85200C00DDF16D /* VoidResultTests.swift */,
+				DB55F1EF1D96968E00FC1439 /* DeferredTests */,
+				DB55F1F61D96968E00FC1439 /* ResultTests */,
+				DB55F1FA1D96968E00FC1439 /* TaskTests */,
+				DB55F1EE1D96968E00FC1439 /* Fixtures.swift */,
 				DB524CBA1D85200C00DDF16D /* Info.plist */,
 			);
 			path = Tests;
@@ -250,6 +241,39 @@
 				DB524CFD1D85489500DDF16D /* Atomics.h */,
 			);
 			path = Atomics;
+			sourceTree = "<group>";
+		};
+		DB55F1EF1D96968E00FC1439 /* DeferredTests */ = {
+			isa = PBXGroup;
+			children = (
+				DB55F1F01D96968E00FC1439 /* DeferredTests.swift */,
+				DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */,
+				DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */,
+				DB55F1F31D96968E00FC1439 /* IgnoringFutureTests.swift */,
+				DB55F1F41D96968E00FC1439 /* LockingTests.swift */,
+				DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */,
+			);
+			path = DeferredTests;
+			sourceTree = "<group>";
+		};
+		DB55F1F61D96968E00FC1439 /* ResultTests */ = {
+			isa = PBXGroup;
+			children = (
+				DB55F1F71D96968E00FC1439 /* ResultRecoveryTests.swift */,
+				DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */,
+				DB55F1F91D96968E00FC1439 /* VoidResultTests.swift */,
+			);
+			path = ResultTests;
+			sourceTree = "<group>";
+		};
+		DB55F1FA1D96968E00FC1439 /* TaskTests */ = {
+			isa = PBXGroup;
+			children = (
+				DB55F1FB1D96968E00FC1439 /* TaskGroupTests.swift */,
+				DB55F1FC1D96968E00FC1439 /* TaskTests.swift */,
+				DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */,
+			);
+			path = TaskTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -397,19 +421,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB524CEE1D85206100DDF16D /* DeferredTests.swift in Sources */,
-				DB524CF71D85206100DDF16D /* TaskResultTests.swift in Sources */,
-				DB524CF31D85206100DDF16D /* LockProtectedTests.swift in Sources */,
-				DB524CF91D85206100DDF16D /* VoidResultTests.swift in Sources */,
-				DB524CF81D85206100DDF16D /* TaskTests.swift in Sources */,
-				DB524CF41D85206100DDF16D /* ReadWriteLockTests.swift in Sources */,
-				DB524CED1D85206100DDF16D /* BlockCancellableTaskTests.swift in Sources */,
-				DB524CF21D85206100DDF16D /* IgnoringFutureTests.swift in Sources */,
-				DB524CF01D85206100DDF16D /* Fixtures.swift in Sources */,
-				DB524CF11D85206100DDF16D /* FutureCustomExecutorTests.swift in Sources */,
-				DB524CEF1D85206100DDF16D /* ExistentialFutureTests.swift in Sources */,
-				DB524CF61D85206100DDF16D /* TaskAccumulatorTests.swift in Sources */,
-				DB524CF51D85206100DDF16D /* ResultRecoveryTests.swift in Sources */,
+				DB55F2041D96968E00FC1439 /* ProtectedTests.swift in Sources */,
+				DB55F2061D96968E00FC1439 /* TaskResultTests.swift in Sources */,
+				DB55F1FE1D96968E00FC1439 /* Fixtures.swift in Sources */,
+				DB55F2051D96968E00FC1439 /* ResultRecoveryTests.swift in Sources */,
+				DB55F2091D96968E00FC1439 /* TaskTests.swift in Sources */,
+				DB55F1FF1D96968E00FC1439 /* DeferredTests.swift in Sources */,
+				DB55F2071D96968E00FC1439 /* VoidResultTests.swift in Sources */,
+				DB55F2081D96968E00FC1439 /* TaskGroupTests.swift in Sources */,
+				DB55F2011D96968E00FC1439 /* FutureCustomExecutorTests.swift in Sources */,
+				DB55F2001D96968E00FC1439 /* ExistentialFutureTests.swift in Sources */,
+				DB55F2021D96968E00FC1439 /* IgnoringFutureTests.swift in Sources */,
+				DB55F20A1D96968E00FC1439 /* TaskWorkItemTests.swift in Sources */,
+				DB55F2031D96968E00FC1439 /* LockingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

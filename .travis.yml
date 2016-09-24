@@ -11,7 +11,7 @@ env:
   global:
   - NSUnbufferedIO=YES
   matrix:
-  - JOB=Test-macOS DESTINATION='platform=macOS' ACTION=test
+  - JOB=Test-macOS ACTION=test
 matrix:
   include:
   - env: JOB=Test-iOS DEVICE='iPhone 6s (10.0)' PLATFORM='iOS Simulator' ACTION=test
@@ -30,6 +30,8 @@ before_script:
 script:
 - if [[ $DESTINATION ]]; then
     xcodebuild $ACTION -scheme Deferred -destination "$DESTINATION" | xcpretty -c;
+  else
+    swift test;
   fi
 after_success:
 - if [[ "$JOB" == "Misc" ]]; then

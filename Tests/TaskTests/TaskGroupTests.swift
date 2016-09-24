@@ -11,6 +11,7 @@ import XCTest
 import Result
 import Deferred
 @testable import Task
+@testable import TestSupport
 #else
 @testable import Deferred
 #endif
@@ -44,7 +45,7 @@ class TaskGroupTests: XCTestCase {
                 if i % 2 == 0 {
                     deferred.fill(with: .success(()))
                 } else {
-                    deferred.fill(with: .failure(Error.first))
+                    deferred.fill(with: .failure(TestError.first))
                 }
             }
         }

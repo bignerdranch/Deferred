@@ -19,7 +19,6 @@ import Deferred
 #endif
 
 private extension XCTestCase {
-
     func impossible<T, U>(_ value: T) -> U {
         XCTFail("Unreachable code in test")
         repeat {
@@ -44,12 +43,10 @@ private extension XCTestCase {
         }
         return task
     }
-
 }
 
 class TaskTests: CustomExecutorTestCase {
-
-    static var allTests : [(String, (TaskTests) -> () throws -> Void)] {
+    static var allTests: [(String, (TaskTests) -> () throws -> Void)] {
         let universalTests: [(String, (TaskTests) -> () throws -> Void)] = [
             ("testUponSuccess", testUponSuccess),
             ("testUponFailure", testUponFailure),
@@ -270,5 +267,4 @@ class TaskTests: CustomExecutorTestCase {
         assertExecutorCalled(atLeast: 1)
     }
     #endif
-
 }

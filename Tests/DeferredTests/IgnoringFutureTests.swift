@@ -13,8 +13,7 @@ import XCTest
 #endif
 
 class IgnoringFutureTests: XCTestCase {
-
-    static var allTests : [(String, (IgnoringFutureTests) -> () throws -> Void)] {
+    static var allTests: [(String, (IgnoringFutureTests) -> () throws -> Void)] {
         return [
             ("testWaitWithTimeout", testWaitWithTimeout),
             ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled),
@@ -61,5 +60,4 @@ class IgnoringFutureTests: XCTestCase {
 
         waitForExpectations()
     }
-
 }

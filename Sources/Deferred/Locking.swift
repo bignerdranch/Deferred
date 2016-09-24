@@ -124,8 +124,8 @@ public final class CASSpinLock: Locking {
     // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
     // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
     private enum Constants {
-        static var WriterMask:   Int32 { return Int32(bitPattern: 0xFFF00000) }
-        static var ReaderMask:   Int32 { return Int32(bitPattern: 0x000FFFFF) }
+        static var WriterMask: Int32 { return Int32(bitPattern: 0xFFF00000) }
+        static var ReaderMask: Int32 { return Int32(bitPattern: 0x000FFFFF) }
         static var WriterOffset: Int32 { return Int32(bitPattern: 0x00100000) }
     }
 

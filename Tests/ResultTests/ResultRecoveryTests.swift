@@ -16,8 +16,7 @@ import Deferred
 #endif
 
 class ResultRecoveryTests: XCTestCase {
-
-    static var allTests : [(String, (ResultRecoveryTests) -> () throws -> Void)] {
+    static var allTests: [(String, (ResultRecoveryTests) -> () throws -> Void)] {
         return [
             ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
             ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures),
@@ -53,5 +52,4 @@ class ResultRecoveryTests: XCTestCase {
         XCTAssertNil(result.value)
         XCTAssertEqual(result.error as? TestError, .first)
     }
-
 }

@@ -60,3 +60,5 @@ after_failure:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log;
   fi
+notifications:
+  email: false

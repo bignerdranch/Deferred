@@ -43,10 +43,6 @@ public protocol Locking {
 }
 
 extension Locking {
-    /// Call `body` with a lock.
-    ///
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withReadLock(body)
     }
@@ -60,7 +56,7 @@ extension Locking {
 public struct DispatchLock: Locking {
     private let semaphore = DispatchSemaphore(value: 1)
 
-    /// Create a normal instance.
+    /// Creates a normal semaphore.
     public init() {}
 
     private func withLock<Return>(before time: DispatchTime, body: () throws -> Return) rethrows -> Return? {
@@ -72,16 +68,10 @@ public struct DispatchLock: Locking {
 
     }
 
-    /// Call `body` with a lock.
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withLock(before: .distantFuture, body: body)!
     }
 
-    /// Attempt to call `body` with a lock.
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         return try withLock(before: .now(), body: body)
     }
@@ -102,12 +92,9 @@ public struct DispatchLock: Locking {
 public final class SpinLock: Locking {
     private var lock = UnsafeSpinLock()
 
-    /// Allocate a normal spinlock.
+    /// Creates a normal spinlock.
     public init() {}
 
-    /// Call `body` with a lock.
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         lock.lock()
         defer {
@@ -116,9 +103,6 @@ public final class SpinLock: Locking {
         return try body()
     }
 
-    /// Attempt to call `body` with a lock.
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard lock.tryLock() else { return nil }
         defer {
@@ -147,15 +131,9 @@ public final class CASSpinLock: Locking {
 
     private var state = UnsafeAtomicInt32()
 
-    /// Allocate the spinlock.
+    /// Creates a normal spinlock.
     public init() {}
 
-    /// Call `body` with a writing lock.
-    ///
-    /// The given function is guaranteed to be called exclusively.
-    ///
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         // spin until we acquire write lock
         repeat {
@@ -187,12 +165,6 @@ public final class CASSpinLock: Locking {
         return try body()
     }
 
-    /// Call `body` with a reading lock.
-    ///
-    /// The given function may be called concurrently with reads on other threads.
-    ///
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         // spin until we acquire read lock
         repeat {
@@ -219,12 +191,6 @@ public final class CASSpinLock: Locking {
         return try body()
     }
 
-    /// Attempt to call `body` with a lock.
-    ///
-    /// `body` may be called concurrently with reads on other threads.
-    ///
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         // active writer
         guard (state.load(order: .relaxed) & Constants.WriterMask) == 0 else { return nil }
@@ -260,12 +226,6 @@ public final class PThreadReadWriteLock: Locking {
         assert(status == 0)
     }
 
-    /// Call `body` with a reading lock.
-    ///
-    /// The given function may be called concurrently with reads on other threads.
-    ///
-    /// - parameter body: A function that reads a value while locked.
-    /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_rdlock(&lock)
         defer {
@@ -274,12 +234,6 @@ public final class PThreadReadWriteLock: Locking {
         return try body()
     }
 
-    /// Attempt to call `body` with a lock.
-    ///
-    /// `body` may be called concurrently with reads on other threads.
-    ///
-    /// - returns: The value returned from `body`, or `nil` if already locked.
-    /// - seealso: withReadLock(_:)
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
         defer {
@@ -288,12 +242,6 @@ public final class PThreadReadWriteLock: Locking {
         return try body()
     }
 
-    /// Call `body` with a writing lock.
-    ///
-    /// The given function is guaranteed to be called exclusively.
-    ///
-    /// - parameter body: A function that writes a value while locked, then returns some value.
-    /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         pthread_rwlock_wrlock(&lock)
         defer {
@@ -301,5 +249,4 @@ public final class PThreadReadWriteLock: Locking {
         }
         return try body()
     }
-
 }

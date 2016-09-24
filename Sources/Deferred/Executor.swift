@@ -41,33 +41,31 @@ import Foundation
 ///     }
 ///
 public protocol Executor {
-
     /// Execute the `body` closure.
     func submit(_ body: @escaping() -> Void)
 
     /// Execute the `workItem`.
+    ///
+    /// By default, submits the closure contents of the work item.
     func submit(_ workItem: DispatchWorkItem)
 
     /// If the executor is a higher-level wrapper around a dispatch queue,
     /// may be used instead of `submit(_:)` for more efficient execution.
+    ///
+    /// By default, `nil`; the executor's `submit(_:)` is used instead.
     var underlyingQueue: DispatchQueue? { get }
-
 }
 
 public typealias DefaultExecutor = DispatchQueue
 
 extension Executor {
-
-    /// By default, executes the contents of the work item as a closure.
     public func submit(_ workItem: DispatchWorkItem) {
         submit(workItem.perform)
     }
 
-    /// By default, `nil`; the executor's `submit(_:)` is used instead.
     public var underlyingQueue: DispatchQueue? {
         return nil
     }
-
 }
 
 /// Dispatch queues invoke function bodies submitted to them serially in FIFO
@@ -111,12 +109,9 @@ extension DispatchQueue: Executor {
 /// operations. This is ideal for regulating the call relative to other
 /// operations in the queue.
 extension OperationQueue: Executor {
-
-    /// Wraps the `body` closure in an operation and enqueues it.
     @nonobjc public func submit(_ body: @escaping() -> Void) {
         addOperation(body)
     }
-
 }
 
 /// A run loop processes events on a thread, and is a fundamental construct in
@@ -125,16 +120,10 @@ extension OperationQueue: Executor {
 /// As an `Executor`, submitted functions are invoked on the next iteration
 /// of the run loop.
 extension CFRunLoop: Executor {
-
-    /// Enqueues the `body` closure to be executed as the runloop cycles
-    /// in the default mode.
-    ///
-    /// - seealso: kCFRunLoopDefaultMode
     @nonobjc public func submit(_ body: @escaping() -> Void) {
         CFRunLoopPerformBlock(self, CFRunLoopMode.defaultMode.rawValue, body)
         CFRunLoopWakeUp(self)
     }
-
 }
 
 /// A run loop processes events on a thread, and is a fundamental construct in
@@ -143,13 +132,8 @@ extension CFRunLoop: Executor {
 /// As an `Executor`, submitted functions are invoked on the next iteration
 /// of the run loop.
 extension RunLoop: Executor {
-
-    /// Enqueues the `body` closure to be executed as the runloop cycles
-    /// in the default mode.
-    ///
-    /// - seealso: NSDefaultRunLoopMode
     @nonobjc public func submit(_ body: @escaping() -> Void) {
         getCFRunLoop().submit(body)
     }
-
 }
+

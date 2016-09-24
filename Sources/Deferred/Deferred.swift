@@ -14,26 +14,26 @@ import Dispatch
 // second half of Deferred. The `dispatch_block_notify` API defines the notifier
 // list used by `Deferred.upon(queue:body:)`.
 private struct DispatchBlockMarker: CallbacksList {
-    let block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
+    let block = DispatchWorkItem {
         fatalError("This code should never be executed")
-    })
+    }
     
     var isCompleted: Bool {
-        return dispatch_block_testcancel(block) != 0
+        return block.isCancelled
     }
     
     func markCompleted() {
         // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
-        dispatch_block_cancel(block)
+        block.cancel()
         // Executing the block "unblocks" it, calling all the `_notify` blocks
-        block()
+        block.perform()
     }
 
-    func notify(executor executor: ExecutorType, body: dispatch_block_t) {
+    func notify(upon executor: ExecutorType, body: DispatchWorkItem) {
         if let queue = executor.underlyingQueue {
-            dispatch_block_notify(block, queue, body)
+            block.notify(queue: queue, execute: body)
         } else {
-            dispatch_block_notify(block, Deferred<Void>.genericQueue) {
+            block.notify(queue: Deferred<Void>.genericQueue) {
                 executor.submit(body)
             }
         }
@@ -51,25 +51,23 @@ public struct Deferred<Value>: FutureType, PromiseType {
     
     /// Initialize an unfilled Deferred.
     public init() {
-        storage = MemoStore.createWithValue(nil)
+        storage = MemoStore.create(with: nil)
     }
     
     /// Initialize a Deferred filled with the given value.
     public init(value: Value) {
-        storage = MemoStore.createWithValue(value)
+        storage = MemoStore.create(with: value)
         onFilled.markCompleted()
     }
 
     // MARK: FutureType
 
-    private func upon(executor: ExecutorType, per options: dispatch_block_flags_t, execute body: Value -> Void) -> dispatch_block_t {
-        var options = options
-        options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
-        let block = dispatch_block_create(options) { [storage] in
+    private func upon(_ executor: ExecutorType, per flags: DispatchWorkItemFlags, execute body: @escaping(Value) -> Void) -> DispatchWorkItem {
+        let workItem = DispatchWorkItem(flags: flags.union(.assignCurrentContext)) { [storage] in
             storage.withValue(body)
         }
-        onFilled.notify(executor: executor, body: block)
-        return block
+        onFilled.notify(upon: executor, body: workItem)
+        return workItem
     }
 
     /// Check whether or not the receiver is filled.
@@ -84,8 +82,8 @@ public struct Deferred<Value>: FutureType, PromiseType {
     ///
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A function that uses the determined value.
-    public func upon(executor: ExecutorType, body: Value -> Void) {
-        _ = upon(executor, per: DISPATCH_BLOCK_INHERIT_QOS_CLASS, execute: body)
+    public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
+        _ = upon(executor, per: .inheritQoS, execute: body)
     }
 
     /// Waits synchronously for the value to become determined.
@@ -95,9 +93,9 @@ public struct Deferred<Value>: FutureType, PromiseType {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(time: Timeout) -> Value? {
+    public func wait(_ time: Timeout) -> Value? {
         var result: Value?
-        func assign(value: Value) {
+        func assign(_ value: Value) {
             result = value
         }
 
@@ -108,11 +106,11 @@ public struct Deferred<Value>: FutureType, PromiseType {
             return result
         }
 
-        let executor = QueueExecutor(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0))
-        let handler = upon(executor, per: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, execute: assign)
+        let executor = QueueExecutor(.global(qos: .utility))
+        let handler = upon(executor, per: .enforceQoS, execute: assign)
 
-        guard dispatch_block_wait(handler, time.rawValue) == 0 else {
-            dispatch_block_cancel(handler)
+        guard case .success = handler.wait(timeout: time.rawValue) else {
+            handler.cancel()
             return nil
         }
 
@@ -127,7 +125,7 @@ public struct Deferred<Value>: FutureType, PromiseType {
     ///
     /// - parameter value: The resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
-    public func fill(value: Value) -> Bool {
+    public func fill(_ value: Value) -> Bool {
         let wasFilled = storage.fill(value)
         if wasFilled {
             onFilled.markCompleted()

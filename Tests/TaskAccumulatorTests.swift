@@ -17,8 +17,8 @@ import Deferred
 
 class TaskAccumulatorTests: XCTestCase {
 
-    private let queue = dispatch_queue_create("TaskAccumulatorTests", DISPATCH_QUEUE_CONCURRENT)
-    private var accumulator: TaskAccumulator!
+    fileprivate let queue = DispatchQueue(label: "TaskAccumulatorTests", attributes: DispatchQueue.Attributes.concurrent)
+    fileprivate var accumulator: TaskAccumulator!
 
     override func setUp() {
         super.setUp()
@@ -42,22 +42,22 @@ class TaskAccumulatorTests: XCTestCase {
             afterDelay(0.1, upon: queue) {
                 // success/failure should be ignored by TaskAccumulator, so try both!
                 if i % 2 == 0 {
-                    deferred.fill(.Success(()))
+                    deferred.fill(.success(()))
                 } else {
-                    deferred.fill(.Failure(Error.First))
+                    deferred.fill(.failure(Error.first))
                 }
             }
         }
 
-        let expectation = expectationWithDescription("allCompleteTask finished")
+        let expectation = self.expectation(description: "allCompleteTask finished")
         accumulator.allCompleted().upon(queue) { [weak expectation] _ in
             for task in tasks {
-                XCTAssertNotNil(task.wait(.Forever))
+                XCTAssertNotNil(task.wait(.forever))
             }
 
             expectation?.fulfill()
         }
 
-        waitForExpectationsWithTimeout(4, handler: nil)
+        waitForExpectations(timeout: 4, handler: nil)
     }
 }

@@ -21,7 +21,7 @@ class ExistentialFutureTests: XCTestCase {
 
     func testFilledAnyFutureWaitAlwaysReturns() {
         anyFuture = Future(value: 42)
-        let peek = anyFuture.wait(.Forever)
+        let peek = anyFuture.wait(.forever)
         XCTAssertNotNil(peek)
     }
 
@@ -29,30 +29,30 @@ class ExistentialFutureTests: XCTestCase {
         let deferred = Deferred<Int>()
         anyFuture = Future(deferred)
 
-        let expect = expectationWithDescription("value blocks while unfilled")
-        afterDelay(1, upon: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        let expect = expectation(description: "value blocks while unfilled")
+        afterDelay(1, upon: .global()) {
             deferred.fill(42)
             expect.fulfill()
         }
 
-        let peek = anyFuture.wait(.Interval(0.5))
+        let peek = anyFuture.wait(.interval(0.5))
         XCTAssertNil(peek)
 
-        waitForExpectationsWithTimeout(3, handler: nil)
+        waitForExpectations(timeout: 3, handler: nil)
     }
 
     func testFilledAnyFutureUpon() {
         let d = Future(value: 1)
 
         for _ in 0 ..< 10 {
-            let expect = expectationWithDescription("upon blocks called with correct value")
+            let expect = expectation(description: "upon blocks called with correct value")
             d.upon { value in
                 XCTAssertEqual(value, 1)
                 expect.fulfill()
             }
         }
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testUnfilledAnyUponCalledWhenFilled() {
@@ -60,7 +60,7 @@ class ExistentialFutureTests: XCTestCase {
         anyFuture = Future(d)
 
         for _ in 0 ..< 10 {
-            let expect = expectationWithDescription("upon blocks not called while deferred is unfilled")
+            let expect = expectation(description: "upon blocks not called while deferred is unfilled")
             anyFuture.upon { value in
                 XCTAssertEqual(value, 1)
                 XCTAssertEqual(d.value, value)
@@ -70,7 +70,7 @@ class ExistentialFutureTests: XCTestCase {
 
         d.fill(1)
 
-        waitForExpectationsWithTimeout(1, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testFillAndIsFilledPostcondition() {
@@ -80,8 +80,8 @@ class ExistentialFutureTests: XCTestCase {
         deferred.fill(42)
         XCTAssertNotNil(anyFuture.peek())
         XCTAssertTrue(anyFuture.isFilled)
-        XCTAssertNotNil(anyFuture.wait(.Now))
-        XCTAssertNotNil(anyFuture.wait(.Interval(0.1)))  // pass
+        XCTAssertNotNil(anyFuture.wait(.now))
+        XCTAssertNotNil(anyFuture.wait(.interval(0.1)))  // pass
     }
 
 }

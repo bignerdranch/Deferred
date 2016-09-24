@@ -592,9 +592,11 @@
 				TargetAttributes = {
 					DB6ADFD21C237DD500D77BF1 = {
 						CreatedOnToolsVersion = 7.2;
+						LastSwiftMigration = 0800;
 					};
 					DB6ADFDC1C237DD500D77BF1 = {
 						CreatedOnToolsVersion = 7.2;
+						LastSwiftMigration = 0800;
 					};
 					DB6ADFF11C237DF800D77BF1 = {
 						CreatedOnToolsVersion = 7.2;

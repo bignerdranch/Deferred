@@ -20,16 +20,16 @@ import Dispatch
 /// The success or failure of the accumulated tasks is ignored - this type is
 /// only interested in completion.
 public struct TaskAccumulator {
-    private let group = dispatch_group_create()
+    private let group = DispatchGroup()
 
     /// Accumulate another task into the list of tasks that fold into the
     /// next `allCompleted()` task.
     ///
     /// This method is thread-safe.
-    public func accumulate<Task: FutureType where Task.Value: ResultType>(task: Task) {
-        dispatch_group_enter(group)
+    public func accumulate<Task: FutureType>(_ task: Task) where Task.Value: ResultType {
+        group.enter()
         task.upon { [group = group] _ in
-            dispatch_group_leave(group)
+            group.leave()
         }
     }
 
@@ -40,7 +40,7 @@ public struct TaskAccumulator {
     /// if this method is being called at the same time as `accumulate(_:)`.
     public func allCompleted() -> Future<Void> {
         let deferred = Deferred<Void>()
-        dispatch_group_notify(group, Deferred<Void>.genericQueue) {
+        group.notify(queue: Deferred<Void>.genericQueue) {
             deferred.fill()
         }
         return Future(deferred)

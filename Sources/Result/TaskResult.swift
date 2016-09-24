@@ -9,34 +9,34 @@
 /// An enum for returning and propogating recoverable errors.
 public enum TaskResult<Value> {
     /// Contains the success value
-    case Success(Value)
+    case success(Value)
     /// Contains the error value
-    case Failure(ErrorType)
+    case failure(Error)
 }
 
 extension TaskResult: ResultType {
     /// Creates a result with a successful `value`.
-    public init(@noescape with body: () throws -> Value) {
+    public init(with body: () throws -> Value) {
         do {
-            self = try .Success(body())
+            self = try .success(body())
         } catch {
-            self = .Failure(error)
+            self = .failure(error)
         }
     }
 
     /// Creates a failed result with `error`.
-    public init(error: ErrorType) {
-        self = .Failure(error)
+    public init(error: Error) {
+        self = .failure(error)
     }
 
     /// Case analysis.
     ///
     /// Returns the value from the `failure` closure if `self` represents a
     /// failure, or from the `success` closure if `self` represents a success.
-    public func withValues<Return>(@noescape ifSuccess success: Value throws -> Return, @noescape ifFailure failure: ErrorType throws -> Return) rethrows -> Return {
+    public func withValues<Return>(ifSuccess success: (Value) throws -> Return, ifFailure failure: (Error) throws -> Return) rethrows -> Return {
         switch self {
-        case let .Success(value): return try success(value)
-        case let .Failure(error): return try failure(error)
+        case let .success(value): return try success(value)
+        case let .failure(error): return try failure(error)
         }
     }
 }

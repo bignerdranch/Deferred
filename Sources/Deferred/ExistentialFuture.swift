@@ -16,11 +16,11 @@ in a playground, the following post, and the Swift standard library:
 
 // Abstract class that fake-conforms to `FutureType` for use by `Future`.
 private class FutureBox<Value>: FutureType {
-    func upon(executor: ExecutorType, body: Value -> Void) {
+    func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
         fatalError()
     }
 
-    func wait(time: Timeout) -> Value? {
+    func wait(_ time: Timeout) -> Value? {
         fatalError()
     }
 }
@@ -32,11 +32,11 @@ private final class ForwardedTo<Future: FutureType>: FutureBox<Future.Value> {
         self.base = base
     }
 
-    override func upon(executor: ExecutorType, body: Future.Value -> Void) {
+    override func upon(_ executor: ExecutorType, body: @escaping(Future.Value) -> Void) {
         return base.upon(executor, body: body)
     }
 
-    override func wait(time: Timeout) -> Future.Value? {
+    override func wait(_ time: Timeout) -> Future.Value? {
         return base.wait(time)
     }
 }
@@ -48,13 +48,13 @@ private final class Always<Value>: FutureBox<Value> {
         self.value = value
     }
 
-    override func upon(executor: ExecutorType, body: Value -> Void) {
+    override func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
         executor.submit { [value] in
             body(value)
         }
     }
 
-    override func wait(time: Timeout) -> Value? {
+    override func wait(_ time: Timeout) -> Value? {
         return value
     }
 }
@@ -63,9 +63,9 @@ private final class Always<Value>: FutureBox<Value> {
 private final class Never<Value>: FutureBox<Value> {
     override init() {}
 
-    override func upon(executor: ExecutorType, body: Value -> Void) {}
+    override func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {}
 
-    override func wait(time: Timeout) -> Value? {
+    override func wait(_ time: Timeout) -> Value? {
         return nil
     }
 }
@@ -86,7 +86,7 @@ public struct Future<Value>: FutureType {
     private let box: FutureBox<Value>
 
     /// Create a future whose `upon(_:body:)` method forwards to `base`.
-    public init<Future: FutureType where Future.Value == Value>(_ base: Future) {
+    public init<Future: FutureType>(_ base: Future) where Future.Value == Value {
         self.box = ForwardedTo(base: base)
     }
 
@@ -110,7 +110,7 @@ public struct Future<Value>: FutureType {
     ///
     /// If the value is determined, the closure will be submitted to the
     /// `executor` immediately.
-    public func upon(executor: ExecutorType, body: Value -> Void) {
+    public func upon(_ executor: ExecutorType, body: @escaping(Value) -> Void) {
         return box.upon(executor, body: body)
     }
 
@@ -118,7 +118,7 @@ public struct Future<Value>: FutureType {
     ///
     /// - parameter time: A length of time to wait for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(time: Timeout) -> Value? {
+    public func wait(_ time: Timeout) -> Value? {
         return box.wait(time)
     }
 }

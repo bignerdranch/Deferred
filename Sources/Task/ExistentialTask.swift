@@ -36,9 +36,7 @@ public final class Task<SuccessValue>: NSObject, ProgressReporting {
 }
 
 extension Task: FutureProtocol {
-    /// A type that represents the result of some asynchronous operation.
     public typealias Value = Result
-
     public typealias PreferredExecutor = Future<Result>.PreferredExecutor
 
     public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> ()) {
@@ -49,11 +47,6 @@ extension Task: FutureProtocol {
         future.upon(executor, execute: body)
     }
 
-    /// Waits synchronously for the operation to complete.
-    ///
-    /// If the task is complete, the call returns immediately with the value.
-    ///
-    /// - returns: The task's result, if filled within `timeout`, or `nil`.
     public func wait(until timeout: DispatchTime) -> Result? {
         return future.wait(until: timeout)
     }
@@ -75,7 +68,7 @@ extension Task {
 }
 
 extension Task {
-    /// Create a task whose `upon(_:body:)` method uses the result of `base`.
+    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
     public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress) where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
     }
@@ -90,7 +83,7 @@ extension Task {
         self.init(future: base, progress: progress)
     }
 
-    /// Create a task whose `upon(_:_:)` method uses the result of `base`.
+    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
     ///
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
@@ -100,17 +93,17 @@ extension Task {
         self.init(future: Future(task: base), progress: progress)
     }
 
-    /// Wrap an operation that has already completed with `value`.
+    /// Creates an operation that has already completed with `value`.
     public convenience init(success value: @autoclosure() throws -> SuccessValue) {
         self.init(future: Future(value: TaskResult(from: value)), progress: .noWork())
     }
 
-    /// Wrap an operation that has already failed with `error`.
+    /// Creates an operation that has already failed with `error`.
     public convenience init(failure error: Error) {
         self.init(future: Future(value: TaskResult(failure: error)), progress: .noWork())
     }
 
-    /// Create a task having the same underlying operation as the `other` task.
+    /// Creates a task having the same underlying operation as the `other` task.
     public convenience init(_ other: Task<SuccessValue>) {
         self.init(future: other.future, progress: other.progress)
     }

@@ -103,7 +103,7 @@ private final class Never<Value>: FutureBox<Value> {
 public struct Future<Value>: FutureProtocol {
     private let box: FutureBox<Value>
 
-    /// Create a future whose `upon(_:body:)` method forwards to `base`.
+    /// Create a future whose `upon(_:execute:)` methods forward to `base`.
     public init<Future: FutureProtocol>(_ base: Future) where Future.Value == Value {
         self.box = ForwardedTo(base: base)
     }

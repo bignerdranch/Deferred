@@ -16,7 +16,6 @@ import Foundation
 /// through a transform function returning `NewValue`. This value is computed
 /// each time it is read through a call to `upon(queue:body:)`.
 private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
-
     let base: Base
     let transform: (Base.Value) -> NewValue
     fileprivate init(_ base: Base, transform: @escaping(Base.Value) -> NewValue) {
@@ -36,12 +35,9 @@ private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
         }
     }
 
-    /// Waits synchronously, for a maximum `time`, for the calculated value to
-    /// become determined; otherwise, returns `nil`.
     func wait(until time: DispatchTime) -> NewValue? {
         return base.wait(until: time).map(transform)
     }
-    
 }
 
 extension Future where Value: Either {
@@ -64,7 +60,7 @@ extension Task {
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
-    /// - seealso: map(_:)
+    /// - seealso: map(transform:)
     public func ignored() -> Task<Void> {
         let future = Future(LazyMapFuture(self) { (result) -> TaskResult<Void> in
             result.withValues(ifLeft: TaskResult.failure, ifRight: { _ in TaskResult.success() })

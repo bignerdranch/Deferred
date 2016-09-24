@@ -15,7 +15,6 @@ public enum TaskResult<Value> {
 }
 
 extension TaskResult: Either {
-    /// Creates a result with a successful `value`.
     public init(from body: () throws -> Value) {
         do {
             self = try .success(body())
@@ -24,7 +23,6 @@ extension TaskResult: Either {
         }
     }
 
-    /// Creates a failed result with `error`.
     public init(failure error: Error) {
         self = .failure(error)
     }

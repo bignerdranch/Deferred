@@ -26,9 +26,9 @@ extension Task {
     /// `startNextTask` closure. `andThen` submits `startNextTask` to `executor`
     /// once the task completes successfully.
     /// - seealso: FutureProtocol.andThen(upon:start:)
-    public func andThen<NewTask: FutureProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Value> where NewTask.Value: ResultType {
+    public func andThen<NewTask: FutureProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Right> where NewTask.Value: Either, NewTask.Value.Left == Error {
         let progress = extendedProgress(byUnitCount: 1)
-        let future: Future<TaskResult<NewTask.Value.Value>> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Value> in
+        let future: Future<TaskResult<NewTask.Value.Right>> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Right> in
             do {
                 let value = try result.extract()
 
@@ -41,15 +41,15 @@ extension Task {
                 // Attempt to create and wrap the next task. Task's own progress
                 // wrapper logic takes over at this point.
                 let newTask = try startNextTask(value)
-                return Task<NewTask.Value.Value>(newTask)
+                return Task<NewTask.Value.Right>(newTask)
             } catch {
                 // Failure case behaves just like map: just error passthrough.
                 progress.becomeCurrent(withPendingUnitCount: 1)
                 defer { progress.resignCurrent() }
-                return Task<NewTask.Value.Value>(error: error)
+                return Task<NewTask.Value.Right>(failure: error)
             }
         }
 
-        return Task<NewTask.Value.Value>(future: future, progress: progress)
+        return Task<NewTask.Value.Right>(future: future, progress: progress)
     }
 }

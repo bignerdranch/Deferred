@@ -20,18 +20,16 @@ public protocol PromiseProtocol {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
     
-    /// Create the promise in a default, unfilled state
+    /// Creates an instance in a default, unfilled state.
     init()
 
     /// Check whether or not the receiver is filled.
     var isFilled: Bool { get }
 
-    /// Determines the deferred value with a given result.
+    /// Determines the promise with `value`.
     ///
-    /// Filling a deferred value should usually be attempted only once. An
-    /// implementing type may choose to enforce this.
+    /// Filling a deferred value should usually be attempted only once.
     ///
-    /// - parameter value: A resolved value for the instance.
     /// - returns: Whether the promise was fulfilled with `value`.
     @discardableResult
     func fill(with value: Value) -> Bool

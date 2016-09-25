@@ -23,15 +23,6 @@ public protocol Locking {
     /// - returns: The value returned from the given function.
     func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return
 
-    /// Attempt to call `body` with a reading lock.
-    ///
-    /// If the lock cannot immediately be taken, return `nil` instead of
-    /// executing `body`.
-    ///
-    /// - returns: The value returned from the given function, or `nil`.
-    /// - seealso: withReadLock(_:)
-    func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return?
-
     /// Call `body` with a writing lock.
     ///
     /// If the implementing type models a readers-writer lock, this function may
@@ -48,12 +39,26 @@ extension Locking {
     }
 }
 
+// FIXME: These can be made `rethrows` again, and perhaps moved back into
+// `Locking` when a version of Swift is released with a fix for SR-2623:
+// - https://bugs.swift.org/browse/SR-2623
+protocol MaybeLocking: Locking {
+    /// Attempt to call `body` with a reading lock.
+    ///
+    /// If the lock cannot immediately be taken, return `nil` instead of
+    /// executing `body`.
+    ///
+    /// - returns: The value returned from the given function, or `nil`.
+    /// - seealso: withReadLock(_:)
+    func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return?
+}
+
 /// A locking construct using a counting semaphore from Grand Central Dispatch.
 /// This locking type behaves the same for both read and write locks.
 ///
 /// The semaphore lock performs comparably to a spinlock under little lock
 /// contention, and comparably to a platform lock under contention.
-public struct DispatchLock: Locking {
+public struct DispatchLock: Locking, MaybeLocking {
     private let semaphore = DispatchSemaphore(value: 1)
 
     /// Creates a normal semaphore.
@@ -72,8 +77,8 @@ public struct DispatchLock: Locking {
         return try withLock(before: .distantFuture, body: body)!
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        return try withLock(before: .now(), body: body)
+    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
+        return withLock(before: .now(), body: body)
     }
 }
 
@@ -89,7 +94,7 @@ public struct DispatchLock: Locking {
 /// On prior versions of Darwin, or any platform that eagerly suspends threads
 /// for QoS, this may cause unexpected priority inversion, and should be used
 /// with care.
-public final class SpinLock: Locking {
+public final class SpinLock: Locking, MaybeLocking {
     private var lock = UnsafeSpinLock()
 
     /// Creates a normal spinlock.
@@ -103,12 +108,12 @@ public final class SpinLock: Locking {
         return try body()
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
         guard lock.tryLock() else { return nil }
         defer {
             lock.unlock()
         }
-        return try body()
+        return body()
     }
 }
 
@@ -120,7 +125,7 @@ public final class SpinLock: Locking {
 ///
 /// On Darwin, or any platform that eagerly suspends threads for QoS, this may
 /// cause unexpected priority inversion, and should be used with care.
-public final class CASSpinLock: Locking {
+public final class CASSpinLock: Locking, MaybeLocking {
     // Original inspiration: http://joeduffyblog.com/2009/01/29/a-singleword-readerwriter-spin-lock/
     // Updated/optimized version: https://jfdube.wordpress.com/2014/01/12/optimizing-the-recursive-read-write-spinlock/
     private enum Constants {
@@ -191,7 +196,7 @@ public final class CASSpinLock: Locking {
         return try body()
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
         // active writer
         guard (state.load(order: .relaxed) & Constants.WriterMask) == 0 else { return nil }
 
@@ -206,13 +211,13 @@ public final class CASSpinLock: Locking {
             state.subtract(1, order: .release)
         }
 
-        return try body()
+        return body()
     }
 }
 
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads
-public final class PThreadReadWriteLock: Locking {
+public final class PThreadReadWriteLock: Locking, MaybeLocking {
     private var lock = pthread_rwlock_t()
 
     /// Create the standard platform lock.
@@ -234,12 +239,12 @@ public final class PThreadReadWriteLock: Locking {
         return try body()
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
         guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
         defer {
             pthread_rwlock_unlock(&lock)
         }
-        return try body()
+        return body()
     }
 
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {

@@ -9,8 +9,11 @@
 /// A protected value only allows access from within a locking statement. This
 /// prevents accidental unsafe access when thread safety is desired.
 public final class Protected<T> {
-    private var lock: Locking
-    private var value: T
+    // FIXME: These can be made `private` again by re-introducing a
+    // `fileprivate var synchronizedValue` when a version of Swift is released
+    // with a fix for SR-2623: https://bugs.swift.org/browse/SR-2623
+    fileprivate var lock: Locking
+    fileprivate var value: T
 
     /// Creates a protected `value` with a type implementing a `lock`.
     public init(initialValue value: T, lock: Locking = CASSpinLock()) {
@@ -35,26 +38,26 @@ public final class Protected<T> {
             try body(&value)
         }
     }
-
-    fileprivate var synchronizedValue: T? {
-        return lock.withAttemptedReadLock { value }
-    }
 }
 
 extension Protected: CustomDebugStringConvertible, CustomReflectable {
     public var debugDescription: String {
-        if let value = synchronizedValue {
-            return "Protected(\(String(reflecting: value)))"
-        } else {
-            return "\(type(of: self)) (lock contended)"
+        guard let lock = lock as? MaybeLocking else {
+            return "\(type(of: self))"
         }
+
+        return lock.withAttemptedReadLock {
+            "\(type(of: self))(\(String(reflecting: value)))"
+        } ?? "\(type(of: self)) (lock contended)"
     }
 
     public var customMirror: Mirror {
-        if let value = synchronizedValue {
-            return Mirror(self, children: [ "item": value ], displayStyle: .optional)
-        } else {
-            return Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
+        guard let lock = lock as? MaybeLocking else {
+            return Mirror(self, children: [ "locked": "unknown" ], displayStyle: .tuple)
         }
+
+        return lock.withAttemptedReadLock {
+            Mirror(self, children: [ "item": value ], displayStyle: .optional)
+        } ?? Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
     }
 }

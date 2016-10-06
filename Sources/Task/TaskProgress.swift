@@ -75,7 +75,7 @@ private final class ProxyProgress: Progress {
         }
     }
 
-    private override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         switch (keyPath, context) {
         case (KVO.KeyPath.cancelled.rawValue?, (&KVO.context)?):
             guard change?[.newKey] as? Bool == true else { return }

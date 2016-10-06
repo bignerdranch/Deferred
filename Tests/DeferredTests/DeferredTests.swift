@@ -14,11 +14,26 @@ import XCTest
 
 import Dispatch
 #if os(Linux)
-    import Glibc
+import Glibc
 #endif
 
 // swiftlint:disable type_body_length
 // We wanna test things!
+
+private extension RandomAccessCollection {
+
+    func random() -> Iterator.Element {
+        precondition(!isEmpty, "Should not be called on empty collection")
+        #if os(Linux)
+            let offset = Glibc.random() % numericCast(count)
+        #else // arc4random_uniform is also available on BSD and Bionic
+            let offset = arc4random_uniform(numericCast(count))
+        #endif
+        let i = index(startIndex, offsetBy: numericCast(offset))
+        return self[i]
+    }
+
+}
 
 class DeferredTests: XCTestCase {
     static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
@@ -258,13 +273,7 @@ class DeferredTests: XCTestCase {
             XCTAssertEqual(allValues, expectedValues, "all deferreds are the same value")
         }
 
-        #if os(Linux)
-        let randomIndex = Int(random() % allDeferreds.count)
-        #else // arc4random_uniform is also available on BSD and Bionic
-        let randomIndex = Int(arc4random_uniform(numericCast(allDeferreds.count)))
-        #endif
-        let oneOfTheDeferreds = allDeferreds[numericCast(randomIndex)]
-        oneOfTheDeferreds.fill(with: anyValue)
+        allDeferreds.random().fill(with: anyValue)
 
         waitForExpectationsShort()
     }
@@ -362,6 +371,29 @@ class DeferredTests: XCTestCase {
         XCTAssertTrue(deferred.isFilled)
         XCTAssertNotNil(deferred.wait(until: .now()))
         XCTAssertNotNil(deferred.waitShort())  // pass
+    }
+
+    func testSimultaneousFill() {
+        let deferred = Deferred<Int>()
+        let startGroup = DispatchGroup()
+        startGroup.enter()
+        let finishGroup = DispatchGroup()
+
+        let expect = expectation(description: "isFilled is true when filled")
+        deferred.upon { _ in
+            expect.fulfill()
+        }
+
+        for i in 0 ..< (3 ..< 10).random() {
+            DispatchQueue.global().async(group: finishGroup) {
+                XCTAssertEqual(startGroup.wait(timeout: .distantFuture), .success)
+                deferred.fill(with: i)
+            }
+        }
+
+        startGroup.leave()
+        XCTAssertEqual(finishGroup.wait(timeout: .distantFuture), .success)
+        waitForExpectationsShort()
     }
 }
 

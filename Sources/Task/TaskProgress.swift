@@ -16,25 +16,26 @@ import Foundation
 
 // MARK: - Backports
 
-private struct KVO {
-    static var context = false
-    enum KeyPath: String {
-        case completedUnitCount
-        case totalUnitCount
-        case localizedDescription
-        case localizedAdditionalDescription
-        case cancellable
-        case pausable
-        case cancelled
-        case paused
-        case kind
-        static let all: [KeyPath] = [ .totalUnitCount, .completedUnitCount, .localizedDescription, .localizedAdditionalDescription, .cancellable, .pausable, .cancelled, .paused, .kind ]
-    }
-}
-
 /// A progress object whose attributes reflect that of an external progress
 /// tree.
 private final class ProxyProgress: Progress {
+
+    private enum KVO {
+        static var context = false
+        static let cancelled = #keyPath(Progress.cancelled)
+        static let paused = #keyPath(Progress.paused)
+        static let keyPaths = [
+            #keyPath(Progress.completedUnitCount),
+            #keyPath(Progress.totalUnitCount),
+            #keyPath(Progress.localizedDescription),
+            #keyPath(Progress.localizedAdditionalDescription),
+            #keyPath(Progress.cancellable),
+            #keyPath(Progress.pausable),
+            #keyPath(Progress.kind),
+            cancelled, paused
+        ]
+    }
+
     let original: Progress
 
     init(cloning original: Progress) {
@@ -48,40 +49,32 @@ private final class ProxyProgress: Progress {
     }
 
     func attach() {
-        for keyPath in KVO.KeyPath.all {
-            original.addObserver(self, forKeyPath: keyPath.rawValue, options: [.initial, .new], context: &KVO.context)
-        }
-
         if Progress.current()?.isCancelled == true {
             original.cancel()
-        } else {
-            cancellationHandler = original.cancel
         }
 
         if Progress.current()?.isPaused == true {
             original.pause()
-        } else {
-            pausingHandler = original.pause
         }
 
-        if #available(OSX 10.11, iOS 9.0, *) {
-            resumingHandler = original.resume
+        for keyPath in KVO.keyPaths {
+            original.addObserver(self, forKeyPath: keyPath, options: [.initial, .new], context: &KVO.context)
         }
     }
 
     func detach() {
-        for keyPath in KVO.KeyPath.all {
-            original.removeObserver(self, forKeyPath: keyPath.rawValue, context: &KVO.context)
+        for keyPath in KVO.keyPaths {
+            original.removeObserver(self, forKeyPath: keyPath, context: &KVO.context)
         }
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         switch (keyPath, context) {
-        case (KVO.KeyPath.cancelled.rawValue?, (&KVO.context)?):
+        case (KVO.cancelled?, (&KVO.context)?):
             guard change?[.newKey] as? Bool == true else { return }
             cancellationHandler = nil
             cancel()
-        case (KVO.KeyPath.paused.rawValue?, (&KVO.context)?):
+        case (KVO.paused?, (&KVO.context)?):
             if change?[.newKey] as? Bool == true {
                 pausingHandler = nil
                 pause()
@@ -101,7 +94,7 @@ private final class ProxyProgress: Progress {
     }
 
     @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
-        return [ "original.userInfo" ]
+        return [ #keyPath(original.userInfo) ]
     }
 
     override var userInfo: [ProgressUserInfoKey : Any] {

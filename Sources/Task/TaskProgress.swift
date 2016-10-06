@@ -101,7 +101,7 @@ private final class ProxyProgress: Progress {
     }
 
     @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
-        return [ "original.userInfo" ]
+        return [ #keyPath(original.userInfo) ]
     }
 
     override var userInfo: [ProgressUserInfoKey : Any] {

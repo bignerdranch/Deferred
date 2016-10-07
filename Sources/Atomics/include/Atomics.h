@@ -16,6 +16,7 @@
 #include <stdbool.h>
 #include <os/linux_base.h>
 #endif // !__APPLE__
+#include <pthread.h>
 
 #if !defined(OS_INLINE)
 #if __GNUC__
@@ -35,28 +36,13 @@
 
 // We should be using OS_ENUM, but Swift looks for particular macro patterns.
 #if !defined(SWIFT_ENUM)
-#if __has_extension(cxx_strong_enums) || __has_feature(objc_fixed_enum)
-#define SWIFT_ENUM(_name, _type, ...) enum : _type { __VA_ARGS__ } _name##_t
-#else
-#define SWIFT_ENUM(_name, _type, ...) enum { __VA_ARGS__ } _name##_t
-#endif
+#define SWIFT_ENUM(_name, ...) enum { __VA_ARGS__ } _name##_t
 #endif
 
 OS_ASSUME_NONNULL_BEGIN
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.spin())
-void bnr_atomic_spin(void) {
-#if defined(__x86_64__) || defined(__i386__)
-    __asm__ __volatile__("pause" ::: "memory");
-#elif defined(__arm__) || defined(__arm64__)
-    __asm__ __volatile__("yield" ::: "memory");
-#else
-    do {} while (0);
-#endif
-}
-
 OS_SWIFT_NAME(AtomicMemoryOrder)
-typedef SWIFT_ENUM(bnr_atomic_memory_order, int32_t,
+typedef SWIFT_ENUM(bnr_atomic_memory_order,
     bnr_atomic_memory_order_relaxed OS_SWIFT_NAME(relaxed) = __ATOMIC_RELAXED,
     bnr_atomic_memory_order_consume OS_SWIFT_NAME(consume) = __ATOMIC_CONSUME,
     bnr_atomic_memory_order_acquire OS_SWIFT_NAME(acquire) = __ATOMIC_ACQUIRE,
@@ -65,49 +51,70 @@ typedef SWIFT_ENUM(bnr_atomic_memory_order, int32_t,
     bnr_atomic_memory_order_seq_cst OS_SWIFT_NAME(sequentiallyConsistent) = __ATOMIC_SEQ_CST
 );
 
-OS_SWIFT_NAME(UnsafeSpinLock)
+OS_SWIFT_NAME(UnsafeNativeLock)
 typedef struct {
     union {
-        _Atomic(_Bool) legacy;
+        pthread_mutex_t legacy;
 #if defined(__APPLE__)
         os_unfair_lock modern;
 #endif
-    } impl;
+    } __impl;
 } bnr_spinlock_t;
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeSpinLock.tryLock(self:))
-bool bnr_spinlock_trylock(bnr_spinlock_t *_Nonnull address) {
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.setup(self:))
+void bnr_native_lock_create(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
-    if (os_unfair_lock_trylock != NULL) {
-        return os_unfair_lock_trylock(&address->impl.modern);
+    if (&os_unfair_lock_trylock != NULL) {
+        address->__impl.modern = OS_UNFAIR_LOCK_INIT;
+        return;
     }
 #endif
 
-    return !__c11_atomic_exchange(&address->impl.legacy, 1, __ATOMIC_ACQUIRE);
+    pthread_mutex_init(&address->__impl.legacy, NULL);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeSpinLock.lock(self:))
-void bnr_spinlock_lock(bnr_spinlock_t *_Nonnull address) {
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.invalidate(self:))
+void bnr_native_lock_destroy(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
-    if (os_unfair_lock_lock != NULL) {
-        return os_unfair_lock_lock(&address->impl.modern);
+    if (&os_unfair_lock_trylock != NULL) {
+        return;
     }
 #endif
 
-    while (!OS_EXPECT(bnr_spinlock_trylock(address), true)) {
-        bnr_atomic_spin();
-    }
+    pthread_mutex_destroy(&address->__impl.legacy);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeSpinLock.unlock(self:))
-void bnr_spinlock_unlock(bnr_spinlock_t *_Nonnull address) {
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.lock(self:))
+void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
-    if (os_unfair_lock_unlock != NULL) {
-        return os_unfair_lock_unlock(&address->impl.modern);
+    if (&os_unfair_lock_lock != NULL) {
+        return os_unfair_lock_lock(&address->__impl.modern);
     }
 #endif
 
-    __c11_atomic_store(&address->impl.legacy, 0, __ATOMIC_RELEASE);
+    pthread_mutex_lock(&address->__impl.legacy);
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.tryLock(self:))
+bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
+#if defined(__APPLE__)
+    if (&os_unfair_lock_trylock != NULL) {
+        return os_unfair_lock_trylock(&address->__impl.modern);
+    }
+#endif
+
+    return pthread_mutex_trylock(&address->__impl.legacy) == 0;
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.unlock(self:))
+void bnr_native_lock_unlock(bnr_spinlock_t *_Nonnull address) {
+#if defined(__APPLE__)
+    if (&os_unfair_lock_unlock != NULL) {
+        return os_unfair_lock_unlock(&address->__impl.modern);
+    }
+#endif
+
+    pthread_mutex_unlock(&address->__impl.legacy);
 }
 
 OS_SWIFT_NAME(UnsafeAtomicInt32)

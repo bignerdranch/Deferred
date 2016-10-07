@@ -14,12 +14,31 @@ import Task
 #endif
 
 import Dispatch
-import typealias Foundation.TimeInterval
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+import Darwin
+#else
+import Glibc
+#endif
 
 enum TestError: Error {
     case first
     case second
     case third
+}
+
+func sleep(_ duration: DispatchTimeInterval) {
+    var t = timespec(tv_sec: 0, tv_nsec: 0)
+    switch duration {
+    case .microseconds(let micro):
+        t.tv_nsec = micro * 1_000
+    case .nanoseconds(let nano):
+        t.tv_nsec = nano
+    case .milliseconds(let millo):
+        t.tv_nsec = millo * 1_000
+    case .seconds(let sec):
+        t.tv_sec = sec
+    }
+    nanosleep(&t, nil)
 }
 
 extension XCTestCase {
@@ -36,7 +55,7 @@ extension XCTestCase {
     }
 
     func waitForExpectations(file: StaticString = #file, line: UInt = #line) {
-        let timeout: TimeInterval = 10
+        let timeout: Double = 10
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
             waitForExpectations(timeout: timeout, handler: nil)
         #else
@@ -45,7 +64,7 @@ extension XCTestCase {
     }
 
     func waitForExpectationsShort(file: StaticString = #file, line: UInt = #line) {
-        let timeout: TimeInterval = 3
+        let timeout: Double = 3
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
             waitForExpectations(timeout: timeout, handler: nil)
         #else

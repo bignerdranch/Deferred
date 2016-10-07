@@ -16,7 +16,7 @@ public final class Protected<T> {
     fileprivate var value: T
 
     /// Creates a protected `value` with a type implementing a `lock`.
-    public init(initialValue value: T, lock: Locking = CASSpinLock()) {
+    public init(initialValue value: T, lock: Locking = NativeLock()) {
         self.value = value
         self.lock = lock
     }

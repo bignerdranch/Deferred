@@ -65,7 +65,7 @@ class ProtectedTests: XCTestCase {
                 for i in 0 ..< 5 {
                     dateItemsTuple.0 = Date()
                     dateItemsTuple.1.append(i)
-                    timeIntervalSleep(0.1)
+                    sleep(.milliseconds(100))
                 }
                 lastWriterDate = dateItemsTuple.0
             }

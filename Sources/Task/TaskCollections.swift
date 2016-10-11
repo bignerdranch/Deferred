@@ -36,7 +36,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
 
         for task in self {
             let innerProgress = Progress.wrapped(task, cancellation: nil)
-            outerProgress.adoptChild(innerProgress, orphaned: true, pendingUnitCount: 1)
+            outerProgress.adoptChild(innerProgress, orphaned: false, pendingUnitCount: 1)
 
             group.enter()
             task.upon(queue) { result in

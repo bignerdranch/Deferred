@@ -129,7 +129,7 @@ extension Task {
     /// * The operation has entered an uncancelable state.
     /// * The underlying task is not cancellable.
     ///
-    /// - seealso: isFilled
+    /// - see: isFilled
     public func cancel() {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         progress.cancel()

@@ -22,7 +22,7 @@ extension Task {
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
-    /// - seealso: FutureProtocol.map(upon:transform:)
+    /// - see: FutureProtocol.map(upon:transform:)
     public func map<NewSuccessValue>(upon executor: Executor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = extendedProgress(byUnitCount: 1)

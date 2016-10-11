@@ -50,7 +50,7 @@ protocol MaybeLocking: Locking {
     /// executing `body`.
     ///
     /// - returns: The value returned from the given function, or `nil`.
-    /// - seealso: withReadLock(_:)
+    /// - see: withReadLock(_:)
     func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return?
 }
 

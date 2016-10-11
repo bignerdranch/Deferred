@@ -62,7 +62,7 @@ extension Task {
     ///
     /// The resulting task is cancellable in the same way the recieving task is.
     ///
-    /// - seealso: map(transform:)
+    /// - see: map(transform:)
     public func ignored() -> Task<Void> {
         let future = Future(LazyMapFuture(self) { (result) -> TaskResult<Void> in
             result.withValues(ifLeft: TaskResult.failure, ifRight: { _ in TaskResult.success() })

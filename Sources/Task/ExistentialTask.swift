@@ -28,6 +28,7 @@ public final class Task<SuccessValue>: NSObject {
     fileprivate let future: Future<Result>
 
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+    /// The progress of the task, which is updated as work is completed.
     public let progress: Progress
 
     /// Creates a task given a `future` and its `progress`.

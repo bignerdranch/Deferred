@@ -13,9 +13,9 @@ import Result
 
 import Dispatch
 
-// Deferred#124
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import class Foundation.Progress
+#endif
 
 extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: Either, Iterator.Element.Value.Left == Error {
     /// Compose a number of tasks into a single notifier task.
@@ -29,14 +29,26 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         }
 
         let coalescingDeferred = Deferred<Task<Void>.Result>()
-        let outerProgress = Progress(parent: nil, userInfo: nil)
-        outerProgress.totalUnitCount = numericCast(count)
         let group = DispatchGroup()
         let queue = DispatchQueue.global(qos: .utility)
 
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let outerProgress = Progress(parent: nil, userInfo: nil)
+        outerProgress.totalUnitCount = numericCast(count)
+        #else
+        var cancellations = Array<(Void) -> Void>()
+        cancellations.reserveCapacity(numericCast(underestimatedCount))
+        #endif
+
         for task in self {
+            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             let innerProgress = Progress.wrapped(task, cancellation: nil)
             outerProgress.adoptChild(innerProgress, orphaned: false, pendingUnitCount: 1)
+            #else
+            if let task = task as? Task<Iterator.Element.Value.Left> {
+                cancellations.append(task.cancel)
+            }
+            #endif
 
             group.enter()
             task.upon(queue) { result in
@@ -52,7 +64,16 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
             _ = coalescingDeferred.fill(with: .success())
         }
 
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task(coalescingDeferred, progress: outerProgress)
+        #else
+        let capturePromotionWorkaround = cancellations
+        return Task(coalescingDeferred) {
+            // https://bugs.swift.org/browse/SR-293
+            for cancellation in capturePromotionWorkaround {
+                cancellation()
+            }
+        }
+        #endif
     }
 }
-#endif

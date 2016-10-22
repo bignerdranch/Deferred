@@ -35,9 +35,6 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
     associatedtype PreferredExecutor: Executor = DefaultExecutor
 
     /// Calls some `body` closure once the value is determined.
-    ///
-    /// By default, calls `upon(_:body:)` with an `Executor`. This method
-    /// serves as sugar for types with global members such as `DispatchQueue`.
     func upon(_ executor: PreferredExecutor, execute body: @escaping(Value) -> Void)
 
     /// Call some `body` closure once the value is determined.
@@ -57,6 +54,8 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
 }
 
 extension FutureProtocol {
+    /// By default, calls `upon(_:body:)` with an `Executor`. This method
+    /// serves as sugar for types with global members such as `DispatchQueue`.
     public func upon(_ executor: PreferredExecutor, execute body: @escaping(Value) -> Void) {
         upon(executor as Executor, execute: body)
     }

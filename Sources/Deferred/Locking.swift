@@ -40,9 +40,6 @@ extension Locking {
     }
 }
 
-// FIXME: These can be made `rethrows` again, and perhaps moved back into
-// `Locking` when a version of Swift is released with a fix for SR-2623:
-// - https://bugs.swift.org/browse/SR-2623
 protocol MaybeLocking: Locking {
     /// Attempt to call `body` with a reading lock.
     ///
@@ -66,6 +63,7 @@ public final class NativeLock: Locking, MaybeLocking {
 
     private var lock = UnsafeNativeLock()
 
+    /// Creates a standard platform lock.
     public init() {
         lock.setup()
     }

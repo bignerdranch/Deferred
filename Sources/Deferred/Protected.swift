@@ -40,7 +40,7 @@ public final class Protected<T> {
     }
 }
 
-extension Protected: CustomDebugStringConvertible, CustomReflectable {
+extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
     public var debugDescription: String {
         guard let lock = lock as? MaybeLocking else {
             return "\(type(of: self))"
@@ -59,5 +59,9 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable {
         return lock.withAttemptedReadLock {
             Mirror(self, children: [ "item": value ], displayStyle: .optional)
         } ?? Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
+    }
+
+    public var customPlaygroundQuickLook: PlaygroundQuickLook {
+        return PlaygroundQuickLook(reflecting: (lock as? MaybeLocking).flatMap({ $0.withAttemptedReadLock { value } }))
     }
 }

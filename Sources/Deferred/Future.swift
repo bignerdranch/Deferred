@@ -26,7 +26,7 @@ import Dispatch
 /// access, though ideally all members of the future could be called from any
 /// thread.
 ///
-public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable {
+public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
@@ -114,10 +114,16 @@ extension FutureProtocol {
 
     /// Return the `Mirror` for `self`.
     public var customMirror: Mirror {
-        if Value.self != Void.self, let value = peek() {
+        switch peek() {
+        case let value? where Value.self != Void.self:
             return Mirror(self, children: [ "value": value ], displayStyle: .optional)
-        } else {
-            return Mirror(self, children: [ "isFilled": isFilled ], displayStyle: .tuple)
+        case let value:
+            return Mirror(self, children: [ "isFilled": value != nil ], displayStyle: .tuple)
         }
+    }
+
+    /// A custom playground Quick Look for this instance.
+    public var customPlaygroundQuickLook: PlaygroundQuickLook {
+        return PlaygroundQuickLook(reflecting: value)
     }
 }

@@ -12,37 +12,28 @@ import Result
 #endif
 
 import Dispatch
+import class Foundation.NSObject
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+import class Foundation.Progress
+import protocol Foundation.ProgressReporting
+#endif
 
 /// A wrapper over any task.
 ///
 /// Forwards operations to an arbitrary underlying future having the same result
 /// type, optionally combined with some `cancellation`.
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-import class Foundation.Progress
-import protocol Foundation.ProgressReporting
-
-public final class Task<SuccessValue>: NSObject, ProgressReporting {
+public final class Task<SuccessValue>: NSObject {
     public typealias Result = TaskResult<SuccessValue>
 
     fileprivate let future: Future<Result>
+
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     public let progress: Progress
 
     /// Creates a task given a `future` and its `progress`.
     public init(future: Future<Result>, progress: Progress) {
         self.future = future
         self.progress = .taskRoot(for: progress)
-    }
-
-    /// Create a task that will never complete.
-    public override init() {
-        self.future = Future()
-        self.progress = .indefinite()
-    }
-
-    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
-    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress)
-        where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
-        self.init(future: Future(task: base), progress: progress)
     }
 
     /// Creates a task given a `future` and an optional `cancellation`.
@@ -56,22 +47,12 @@ public final class Task<SuccessValue>: NSObject, ProgressReporting {
     }
 
     /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
-    ///
-    /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
-    /// but not on any specific queue. If you must do work on a specific queue,
-    /// schedule work on it.
-    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil)
+    public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress)
         where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
-        let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: Future(task: base), progress: progress)
     }
-}
-#else
-public final class Task<SuccessValue> {
-    public typealias Result = TaskResult<SuccessValue>
-
-    fileprivate let future: Future<Result>
-    public let cancellation: (() -> Void)
+    #else
+    internal let cancellation: (() -> Void)
 
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
@@ -82,11 +63,16 @@ public final class Task<SuccessValue> {
         self.future = future
         self.cancellation = cancellation ?? {}
     }
+    #endif
 
     /// Create a task that will never complete.
-    public init() {
+    public override init() {
         self.future = Future()
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        self.progress = .indefinite()
+        #else
         self.cancellation = {}
+        #endif
     }
 
     private typealias _Self = Task<SuccessValue>
@@ -98,10 +84,15 @@ public final class Task<SuccessValue> {
     /// schedule work on it.
     public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil)
         where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let progress = Progress.wrapped(base, cancellation: cancellation)
+        self.init(future: Future(task: base), progress: progress)
+        #else
         self.init(future: Future(task: base), cancellation: (base as? _Self)?.cancellation ?? cancellation)
+        #endif
     }
+
 }
-#endif
 
 extension Task: FutureProtocol {
     public typealias Value = Result

@@ -63,6 +63,7 @@ public final class NativeLock: Locking, MaybeLocking {
 
     private var lock = UnsafeNativeLock()
 
+    /// Creates a standard platform lock.
     public init() {
         lock.setup()
     }

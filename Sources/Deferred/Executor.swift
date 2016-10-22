@@ -47,24 +47,22 @@ public protocol Executor {
     func submit(_ body: @escaping() -> Void)
 
     /// Execute the `workItem`.
-    ///
-    /// By default, submits the closure contents of the work item.
     func submit(_ workItem: DispatchWorkItem)
 
     /// If the executor is a higher-level wrapper around a dispatch queue,
     /// may be used instead of `submit(_:)` for more efficient execution.
-    ///
-    /// By default, `nil`; the executor's `submit(_:)` is used instead.
     var underlyingQueue: DispatchQueue? { get }
 }
 
 public typealias DefaultExecutor = DispatchQueue
 
 extension Executor {
+    /// By default, submits the closure contents of the work item.
     public func submit(_ workItem: DispatchWorkItem) {
         submit(workItem.perform)
     }
 
+    /// By default, `nil`; the executor's `submit(_:)` is used instead.
     public var underlyingQueue: DispatchQueue? {
         return nil
     }

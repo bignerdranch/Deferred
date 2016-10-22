@@ -26,10 +26,12 @@ public protocol Either: CustomStringConvertible, CustomDebugStringConvertible {
 }
 
 extension Either {
+    /// A textual representation of this instance.
     public var description: String {
         return withValues(ifLeft: { String(describing: $0) }, ifRight: { String(describing: $0) })
     }
 
+    /// A textual representation of this instance, suitable for debugging.
     public var debugDescription: String {
         return withValues(ifLeft: {
             "failure(\(String(reflecting: $0)))"

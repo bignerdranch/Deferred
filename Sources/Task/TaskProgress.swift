@@ -41,7 +41,6 @@ private final class ProxyProgress: Progress {
     init(cloning original: Progress) {
         self.original = original
         super.init(parent: .current(), userInfo: nil)
-        attach()
     }
 
     deinit {
@@ -123,10 +122,14 @@ extension Progress {
             }
 
             becomeCurrent(withPendingUnitCount: pendingUnitCount)
-            _ = ProxyProgress(cloning: progress)
 
-            if !changedPendingUnitCount {
-                resignCurrent()
+            let progress = ProxyProgress(cloning: progress)
+            progress.attach()
+
+            withExtendedLifetime(progress) {
+                if !changedPendingUnitCount {
+                    resignCurrent()
+                }
             }
         }
     }
@@ -169,9 +172,9 @@ extension Progress {
         }
 
         let queue = DispatchQueue.global(qos: .background)
-        future.upon(queue) { [weak progress] _ in
-            progress?.totalUnitCount = 1
-            progress?.completedUnitCount = 1
+        future.upon(queue) { _ in
+            progress.totalUnitCount = 1
+            progress.completedUnitCount = 1
         }
 
         return progress

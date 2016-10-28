@@ -78,3 +78,13 @@ extension FutureProtocol where Value: Either, PreferredExecutor == DispatchQueue
         upon(.any(), execute: commonFailureBody(body))
     }
 }
+
+extension Future where Value: Either {
+    /// Create a future having the same underlying task as `other`.
+    public init<Other: FutureProtocol>(task other: Other)
+        where Other.Value: Either, Other.Value.Left == Error, Other.Value.Right == Value.Right {
+        self.init(other.every {
+            Value(from: $0.extract)
+        })
+    }
+}

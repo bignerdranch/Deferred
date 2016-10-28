@@ -1,5 +1,5 @@
 //
-//  IgnoringFutureTests.swift
+//  FutureIgnoreTests.swift
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 9/3/15.
@@ -12,15 +12,15 @@ import XCTest
 @testable import TestSupport
 #endif
 
-class IgnoringFutureTests: XCTestCase {
-    static var allTests: [(String, (IgnoringFutureTests) -> () throws -> Void)] {
+class FutureIgnoreTests: XCTestCase {
+    static var allTests: [(String, (FutureIgnoreTests) -> () throws -> Void)] {
         return [
             ("testWaitWithTimeout", testWaitWithTimeout),
             ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled),
         ]
     }
 
-    var future: IgnoringFuture<Deferred<Int>>!
+    var future: Future<Void>!
 
     override func tearDown() {
         future = nil

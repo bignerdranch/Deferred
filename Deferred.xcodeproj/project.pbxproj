@@ -49,6 +49,7 @@
 		DB55F2091D96968E00FC1439 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FC1D96968E00FC1439 /* TaskTests.swift */; };
 		DB55F20A1D96968E00FC1439 /* TaskWorkItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */; };
 		DB55F20C1D969A1B00FC1439 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F20B1D969A1B00FC1439 /* FutureTests.swift */; };
+		DBC742641DC2F6D4002FB30D /* FutureEveryMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +114,7 @@
 		DB55F1FC1D96968E00FC1439 /* TaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
 		DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskWorkItemTests.swift; sourceTree = "<group>"; };
 		DB55F20B1D969A1B00FC1439 /* FutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTests.swift; sourceTree = "<group>"; };
+		DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureEveryMap.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,9 +187,10 @@
 				DB524C941D85200C00DDF16D /* Executor.swift */,
 				DB524C951D85200C00DDF16D /* ExistentialFuture.swift */,
 				DB524C9A1D85200C00DDF16D /* Future.swift */,
+				DB524C981D85200C00DDF16D /* FutureAndThen.swift */,
 				DB524C961D85200C00DDF16D /* FutureCollections.swift */,
 				DB524C971D85200C00DDF16D /* FutureComposition.swift */,
-				DB524C981D85200C00DDF16D /* FutureAndThen.swift */,
+				DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */,
 				DB524C991D85200C00DDF16D /* FutureMap.swift */,
 				DB524C9B1D85200C00DDF16D /* IgnoringFuture.swift */,
 				DB524C9F1D85200C00DDF16D /* Locking.swift */,
@@ -399,6 +402,7 @@
 				DB524CDD1D85204B00DDF16D /* Locking.swift in Sources */,
 				DB524CEB1D85205400DDF16D /* TaskProgress.swift in Sources */,
 				DB524CEA1D85205400DDF16D /* TaskMap.swift in Sources */,
+				DBC742641DC2F6D4002FB30D /* FutureEveryMap.swift in Sources */,
 				DB524CD71D85204B00DDF16D /* FutureMap.swift in Sources */,
 				DB524CE31D85205400DDF16D /* ExistentialTask.swift in Sources */,
 				DB524CE11D85205200DDF16D /* TaskResult.swift in Sources */,

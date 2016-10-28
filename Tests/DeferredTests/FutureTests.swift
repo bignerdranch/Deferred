@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import Deferred
+import Atomics
 #if SWIFT_PACKAGE
 @testable import TestSupport
 #endif
@@ -105,5 +106,26 @@ class FutureTests: XCTestCase {
         }
 
         waitForExpectations()
+    }
+
+    func testEveryMapTransformerIsCalledMultipleTimes() {
+        let d = Deferred(filledWith: 1)
+        var counter = UnsafeAtomicInt32()
+
+        let mapped = d.every { (value) -> (Int) in
+            counter.add(1, order: .sequentiallyConsistent)
+            return value * 2
+        }
+
+        let expect = expectation(description: "upon is called when filled")
+        mapped.upon { (value) in
+            XCTAssertEqual(value, 2)
+            expect.fulfill()
+        }
+        waitForExpectationsShort()
+
+        XCTAssertEqual(mapped.waitShort(), 2)
+
+        XCTAssertEqual(counter.load(order: .sequentiallyConsistent), 2)
     }
 }

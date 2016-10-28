@@ -62,6 +62,6 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlay
     }
 
     public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: (lock as? MaybeLocking).flatMap({ $0.withAttemptedReadLock { value } }))
+        return PlaygroundQuickLook(reflecting: (lock as? MaybeLocking).flatMap({ $0.withAttemptedReadLock { value } }) as Any)
     }
 }

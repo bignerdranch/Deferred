@@ -59,7 +59,11 @@ public typealias DefaultExecutor = DispatchQueue
 extension Executor {
     /// By default, submits the closure contents of the work item.
     public func submit(_ workItem: DispatchWorkItem) {
-        submit(workItem.perform)
+        // This is ideally `submit(workItem.perform)`, but Swift 3.0.1 seems to
+        // have issues reabstracting it.
+        submit {
+            workItem.perform()
+        }
     }
 
     /// By default, `nil`; the executor's `submit(_:)` is used instead.

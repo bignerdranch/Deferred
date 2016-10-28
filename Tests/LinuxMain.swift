@@ -15,8 +15,8 @@ XCTMain([
     testCase(DeferredTests.allTests),
     testCase(ExistentialFutureTests.allTests),
     testCase(FutureCustomExecutorTests.allTests),
+    testCase(FutureIgnoreTests.allTests),
     testCase(FutureTests.allTests),
-    testCase(IgnoringFutureTests.allTests),
     testCase(LockingTests.allTests),
     testCase(ProtectedTests.allTests),
 

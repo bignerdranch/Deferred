@@ -30,20 +30,18 @@ class FutureTests: XCTestCase {
         let d2 = Deferred<String>()
         let both = d1.and(d2)
 
-        XCTAssertFalse(both.isFilled)
-
-        d1.fill(with: 1)
-        XCTAssertFalse(both.isFilled)
-        d2.fill(with: "foo")
-
         let expectation = self.expectation(description: "paired deferred should be filled")
-        both.upon { _ in
-            XCTAssert(d1.isFilled)
-            XCTAssert(d2.isFilled)
-            XCTAssertEqual(both.value.0, 1)
-            XCTAssertEqual(both.value.1, "foo")
+        both.upon(.main) { (value) in
+            XCTAssertEqual(value.0, 1)
+            XCTAssertEqual(value.1, "foo")
             expectation.fulfill()
         }
+
+        XCTAssertFalse(both.isFilled)
+        d1.fill(with: 1)
+
+        XCTAssertFalse(both.isFilled)
+        d2.fill(with: "foo")
 
         waitForExpectations()
     }

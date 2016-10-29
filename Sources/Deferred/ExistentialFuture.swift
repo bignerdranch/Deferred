@@ -104,9 +104,13 @@ public struct Future<Value>: FutureProtocol {
     private let box: FutureBox<Value>
 
     /// Create a future whose `upon(_:execute:)` methods forward to `base`.
-    public init<Future: FutureProtocol>(_ base: Future)
-        where Future.Value == Value {
-        self.box = ForwardedTo(base: base)
+    public init<OtherFuture: FutureProtocol>(_ base: OtherFuture)
+        where OtherFuture.Value == Value {
+        if let future = base as? Future<Value> {
+            self.box = future.box
+        } else {
+            self.box = ForwardedTo(base: base)
+        }
     }
 
     /// Wrap and forward future as if it were always filled with `value`.

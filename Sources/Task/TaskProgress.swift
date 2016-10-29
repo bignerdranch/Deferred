@@ -34,7 +34,6 @@ private final class ProxyProgress: NSProgress {
     init(cloning original: NSProgress) {
         self.original = original
         super.init(parent: .currentProgress(), userInfo: nil)
-        attach()
     }
 
     deinit {
@@ -125,10 +124,14 @@ extension NSProgress {
             }
 
             becomeCurrentWithPendingUnitCount(pendingUnitCount)
-            _ = ProxyProgress(cloning: progress)
 
-            if !changedPendingUnitCount {
-                resignCurrent()
+            let progress = ProxyProgress(cloning: progress)
+            progress.attach()
+
+            withExtendedLifetime(progress) {
+                if !changedPendingUnitCount {
+                    resignCurrent()
+                }
             }
         }
     }
@@ -170,9 +173,10 @@ extension NSProgress {
             progress.cancellable = false
         }
 
-        future.upon { [weak progress] _ in
-            progress?.totalUnitCount = 1
-            progress?.completedUnitCount = 1
+        let queue = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+        future.upon(queue) { _ in
+            progress.totalUnitCount = 1
+            progress.completedUnitCount = 1
         }
 
         return progress

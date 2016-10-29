@@ -40,6 +40,7 @@ class TaskAllSucceededTests: XCTestCase {
 
             cancellationWasPropagated = (taskError == TaskProducerError.userCancelled)
         }
+        task.cancel()
         _ = semaphore.wait(timeout: .now() + .seconds(5))
         
         XCTAssert(cancellationWasPropagated)

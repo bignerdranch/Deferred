@@ -174,7 +174,7 @@ extension Progress {
             progress.isCancellable = false
         }
 
-        let queue = DispatchQueue.global(qos: .background)
+        let queue = DispatchQueue.global(qos: .utility)
         future.upon(queue) { _ in
             progress.totalUnitCount = 1
             progress.completedUnitCount = 1

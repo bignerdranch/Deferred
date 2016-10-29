@@ -54,7 +54,7 @@ private enum TaskProducerError: Error {
 
 private class TaskProducer {
     
-    typealias SyncHandler = (NSError?) -> Void
+    typealias SyncHandler = (Error?) -> Void
     
     static func produceTask() -> Task<()> {
         return syncFolder(folderID: "0")
@@ -132,9 +132,8 @@ extension String {
         let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         var randomString: String = ""
         
-        for _ in 0..<length {
-            let randomValue = arc4random_uniform(UInt32(base.characters.count))
-            randomString += "\(base[base.index(base.startIndex, offsetBy: Int(randomValue))])"
+        for _ in 0 ..< length {
+            randomString.unicodeScalars.append(UnicodeScalar(base.utf16.random())!)
         }
         return randomString
     }

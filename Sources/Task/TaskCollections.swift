@@ -31,7 +31,7 @@ extension CollectionType where Generator.Element: FutureType, Generator.Element.
 
         for task in self {
             let innerProgress = NSProgress.wrapped(task, cancellation: nil)
-            outerProgress.adoptChild(innerProgress, orphaned: true, pendingUnitCount: 1)
+            outerProgress.adoptChild(innerProgress, orphaned: false, pendingUnitCount: 1)
 
             dispatch_group_enter(group)
             task.upon { result in

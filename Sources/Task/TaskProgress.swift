@@ -12,99 +12,148 @@ import Deferred
 #endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+import Atomics
 import Foundation
-
-// MARK: - Backports
 
 /// A progress object whose attributes reflect that of an external progress
 /// tree.
 private final class ProxyProgress: Progress {
 
-    private enum KVO {
-        static var context = false
-        static let cancelled = #keyPath(Progress.cancelled)
-        static let paused = #keyPath(Progress.paused)
-        static let keyPaths = [
+    private let observee: Progress
+    private var token: Observation?
+
+    init(attachingTo observee: Progress) {
+        let current = Progress.current()
+        self.observee = observee
+        super.init(parent: current, userInfo: nil)
+
+        if current?.isCancelled == true {
+            observee.cancel()
+        }
+
+        if current?.isPaused == true {
+            observee.pause()
+        }
+
+        token = Observation(observing: observee, observer: self)
+    }
+    
+    deinit {
+        token?.cancel(observing: observee)
+        token = nil
+    }
+
+    private func inheritCancelled(_ value: Bool) {
+        if value {
+            cancellationHandler = nil
+            cancel()
+        } else {
+            cancellationHandler = observee.cancel
+        }
+    }
+
+    private func inheritPaused(_ value: Bool) {
+        if value {
+            pausingHandler = nil
+            pause()
+            if #available(OSX 10.11, iOS 9.0, *) {
+                resumingHandler = observee.resume
+            }
+        } else if #available(OSX 10.11, iOS 9.0, *) {
+            resumingHandler = nil
+            resume()
+            pausingHandler = observee.pause
+        }
+    }
+
+    // MARK: - Derived values
+
+    private func inheritValue(_ value: Any, forKeyPath keyPath: String) {
+        setValue(value, forKeyPath: keyPath)
+    }
+
+    @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
+        return [ "observee.userInfo" ]
+    }
+
+    override var userInfo: [ProgressUserInfoKey : Any] {
+        return observee.userInfo
+    }
+
+    override func setUserInfoObject(_ objectOrNil: Any?, forKey key: ProgressUserInfoKey) {
+        observee.setUserInfoObject(objectOrNil, forKey: key)
+    }
+
+    // MARK: - KVO babysitting
+
+    /// A side-table object to weakify the progress observer and prevent
+    /// delivery of notifications after deinit.
+    private final class Observation: NSObject {
+        private static let options: NSKeyValueObservingOptions = [.initial, .new]
+        private static var cancelledContext = false
+        private static var pausedContext = false
+        private static let attributes = [
             #keyPath(Progress.completedUnitCount),
             #keyPath(Progress.totalUnitCount),
             #keyPath(Progress.localizedDescription),
             #keyPath(Progress.localizedAdditionalDescription),
             #keyPath(Progress.cancellable),
             #keyPath(Progress.pausable),
-            #keyPath(Progress.kind),
-            cancelled, paused
+            #keyPath(Progress.kind)
         ]
-    }
+        private static var attributesContext = false
 
-    let original: Progress
-
-    init(cloning original: Progress) {
-        self.original = original
-        super.init(parent: .current(), userInfo: nil)
-    }
-
-    deinit {
-        detach()
-    }
-
-    func attach() {
-        if Progress.current()?.isCancelled == true {
-            original.cancel()
+        private struct State: OptionSet {
+            let rawValue: UInt8
+            static let ready = State(rawValue: 1 << 0)
+            static let observing = State(rawValue: 1 << 1)
+            static let cancellable: State = [.ready, .observing]
+            static let cancelled = State(rawValue: 1 << 2)
         }
 
-        if Progress.current()?.isPaused == true {
-            original.pause()
-        }
+        private weak var observer: ProxyProgress?
+        private var state = UnsafeAtomicBitmask() // see State
 
-        for keyPath in KVO.keyPaths {
-            original.addObserver(self, forKeyPath: keyPath, options: [.initial, .new], context: &KVO.context)
-        }
-    }
+        init(observing observee: Progress, observer: ProxyProgress) {
+            self.observer = observer
+            state.setInitialValue(State.ready.rawValue)
+            super.init()
 
-    func detach() {
-        for keyPath in KVO.keyPaths {
-            original.removeObserver(self, forKeyPath: keyPath, context: &KVO.context)
-        }
-    }
-
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        switch (keyPath, context) {
-        case (KVO.cancelled?, (&KVO.context)?):
-            if change?[.newKey] as? Bool == true {
-                cancellationHandler = nil
-                cancel()
-            } else {
-                cancellationHandler = original.cancel
+            for key in Observation.attributes {
+                observee.addObserver(self, forKeyPath: key, options: Observation.options, context: &Observation.attributesContext)
             }
-        case (KVO.paused?, (&KVO.context)?):
-            if change?[.newKey] as? Bool == true {
-                pausingHandler = nil
-                pause()
-                if #available(OSX 10.11, iOS 9.0, *) {
-                    resumingHandler = original.resume
-                }
-            } else if #available(OSX 10.11, iOS 9.0, *) {
-                resumingHandler = nil
-                resume()
-                pausingHandler = original.pause
-            }
-        case (let keyPath?, (&KVO.context)?):
-            setValue(change?[.newKey], forKeyPath: keyPath)
-        default:
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: Observation.options, context: &Observation.cancelledContext)
+            observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: Observation.options, context: &Observation.pausedContext)
+
+            state.or(with: State.observing.rawValue, order: .release)
         }
-    }
 
-    @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
-        return [ #keyPath(original.userInfo) ]
-    }
+        func cancel(observing observee: Progress) {
+            let oldState = State(rawValue: state.and(with: ~State.ready.rawValue, order: .relaxed))
+            guard !oldState.isStrictSuperset(of: .cancellable) else { return }
+            state.or(with: State.cancelled.rawValue, order: .relaxed)
 
-    override var userInfo: [ProgressUserInfoKey : Any] {
-        return original.userInfo
-    }
+            for key in Observation.attributes {
+                observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
+            }
+            observee.removeObserver(self, forKeyPath: #keyPath(Progress.cancelled), context: &Observation.cancelledContext)
+            observee.removeObserver(self, forKeyPath: #keyPath(Progress.paused), context: &Observation.pausedContext)
 
-    override func setUserInfoObject(_ objectOrNil: Any?, forKey key: ProgressUserInfoKey) {
-        original.setUserInfoObject(objectOrNil, forKey: key)
+        }
+
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+            guard let keyPath = keyPath, object != nil, state.test(for: State.ready.rawValue, order: .relaxed), let observer = observer, let newValue = change?[.newKey] else { return }
+            switch context {
+            case (&Observation.cancelledContext)?:
+                observer.inheritCancelled(newValue as! Bool)
+            case (&Observation.pausedContext)?:
+                observer.inheritPaused(newValue as! Bool)
+            case (&Observation.attributesContext)?:
+                observer.inheritValue(newValue, forKeyPath: keyPath)
+            default:
+                preconditionFailure("Unexpected KVO context for private object")
+            }
+        }
     }
 }
 
@@ -115,9 +164,11 @@ extension Progress {
     ///
     /// Send `isOrphaned: false` if the iOS 9 behavior cannot be trusted (i.e.,
     /// `progress` is not understood to have no parent).
-    @nonobjc func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) {
+    @discardableResult
+    @nonobjc func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
         if #available(OSX 10.11, iOS 9.0, *), canAdopt {
             addChild(progress, withPendingUnitCount: pendingUnitCount)
+            return progress
         } else {
             let changedPendingUnitCount = Progress.current() === self
             if changedPendingUnitCount {
@@ -126,14 +177,13 @@ extension Progress {
 
             becomeCurrent(withPendingUnitCount: pendingUnitCount)
 
-            let progress = ProxyProgress(cloning: progress)
-            progress.attach()
+            let progress = ProxyProgress(attachingTo: progress)
 
-            withExtendedLifetime(progress) {
-                if !changedPendingUnitCount {
-                    resignCurrent()
-                }
+            if !changedPendingUnitCount {
+                resignCurrent()
             }
+
+            return progress
         }
     }
 }

@@ -177,6 +177,31 @@ bool bnr_atomic_flag_test(volatile bnr_atomic_flag_t *_Nonnull target) {
     return __c11_atomic_load(&target->value, __ATOMIC_RELAXED);
 }
 
+OS_SWIFT_NAME(UnsafeAtomicBitmask)
+typedef struct {
+    _Atomic(uint_fast8_t) value;
+} bnr_atomic_bitmask_t;
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.setInitialValue(self:_:))
+void bnr_atomic_bitmask_init(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
+    __c11_atomic_init(&target->value, value);
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.or(self:with:order:))
+uint_fast8_t bnr_atomic_bitmask_or(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
+    return __c11_atomic_fetch_or(&target->value, value, order);
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.and(self:with:order:))
+uint_fast8_t bnr_atomic_bitmask_and(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
+    return __c11_atomic_fetch_and(&target->value, value, order);
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.test(self:for:order:))
+bool bnr_atomic_bitmask_test(const bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
+    return (__c11_atomic_load((_Atomic(uint_fast8_t) *)&target->value, order) & value) != 0;
+}
+
 OS_ASSUME_NONNULL_END
 
 #endif // __BNR_DEFERRED_ATOMIC_SHIMS__

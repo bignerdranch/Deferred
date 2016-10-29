@@ -42,24 +42,16 @@ private final class ProxyProgress: NSProgress {
     }
 
     func attach() {
-        for keyPath in KVO.KeyPath.all {
-            original.addObserver(self, forKeyPath: keyPath.rawValue, options: [.Initial, .New], context: &KVO.context)
-        }
-
         if NSProgress.currentProgress()?.cancelled == true {
             original.cancel()
-        } else {
-            cancellationHandler = original.cancel
         }
 
         if NSProgress.currentProgress()?.paused == true {
             original.pause()
-        } else {
-            pausingHandler = original.pause
         }
 
-        if #available(OSX 10.11, iOS 9.0, *) {
-            resumingHandler = original.resume
+        for keyPath in KVO.KeyPath.all {
+            original.addObserver(self, forKeyPath: keyPath.rawValue, options: [.Initial, .New], context: &KVO.context)
         }
     }
 
@@ -72,9 +64,12 @@ private final class ProxyProgress: NSProgress {
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         switch (keyPath, context) {
         case (KVO.KeyPath.cancelled.rawValue?, &KVO.context):
-            guard change?[NSKeyValueChangeNewKey] as? Bool == true else { return }
-            cancellationHandler = nil
-            cancel()
+            if change?[NSKeyValueChangeNewKey] as? Bool == true {
+                cancellationHandler = nil
+                cancel()
+            } else {
+                cancellationHandler = original.cancel
+            }
         case (KVO.KeyPath.paused.rawValue?, &KVO.context):
             if change?[NSKeyValueChangeNewKey] as? Bool == true {
                 pausingHandler = nil

@@ -50,6 +50,7 @@
 		DB55F20A1D96968E00FC1439 /* TaskWorkItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */; };
 		DB55F20C1D969A1B00FC1439 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F20B1D969A1B00FC1439 /* FutureTests.swift */; };
 		DBC742641DC2F6D4002FB30D /* FutureEveryMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */; };
+		EBEB828E1DC4A7FD00B7E089 /* TaskAllSucceededTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEB828C1DC4A79A00B7E089 /* TaskAllSucceededTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +116,7 @@
 		DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskWorkItemTests.swift; sourceTree = "<group>"; };
 		DB55F20B1D969A1B00FC1439 /* FutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTests.swift; sourceTree = "<group>"; };
 		DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureEveryMap.swift; sourceTree = "<group>"; };
+		EBEB828C1DC4A79A00B7E089 /* TaskAllSucceededTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskAllSucceededTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +280,7 @@
 				DB55F1FB1D96968E00FC1439 /* TaskGroupTests.swift */,
 				DB55F1FC1D96968E00FC1439 /* TaskTests.swift */,
 				DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */,
+				EBEB828C1DC4A79A00B7E089 /* TaskAllSucceededTests.swift */,
 			);
 			path = TaskTests;
 			sourceTree = "<group>";
@@ -431,6 +434,7 @@
 				DB55F20C1D969A1B00FC1439 /* FutureTests.swift in Sources */,
 				DB55F2041D96968E00FC1439 /* ProtectedTests.swift in Sources */,
 				DB55F2061D96968E00FC1439 /* TaskResultTests.swift in Sources */,
+				EBEB828E1DC4A7FD00B7E089 /* TaskAllSucceededTests.swift in Sources */,
 				DB55F1FE1D96968E00FC1439 /* Fixtures.swift in Sources */,
 				DB55F2051D96968E00FC1439 /* ResultRecoveryTests.swift in Sources */,
 				DB55F2091D96968E00FC1439 /* TaskTests.swift in Sources */,

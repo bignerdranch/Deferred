@@ -70,9 +70,12 @@ private final class ProxyProgress: Progress {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         switch (keyPath, context) {
         case (KVO.cancelled?, (&KVO.context)?):
-            guard change?[.newKey] as? Bool == true else { return }
-            cancellationHandler = nil
-            cancel()
+            if change?[.newKey] as? Bool == true {
+                cancellationHandler = nil
+                cancel()
+            } else {
+                cancellationHandler = original.cancel
+            }
         case (KVO.paused?, (&KVO.context)?):
             if change?[.newKey] as? Bool == true {
                 pausingHandler = nil

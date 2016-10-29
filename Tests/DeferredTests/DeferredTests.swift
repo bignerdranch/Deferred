@@ -20,21 +20,6 @@ import Glibc
 // swiftlint:disable type_body_length
 // We wanna test things!
 
-private extension RandomAccessCollection {
-
-    func random() -> Iterator.Element {
-        precondition(!isEmpty, "Should not be called on empty collection")
-        #if os(Linux)
-            let offset = Glibc.random() % numericCast(count)
-        #else // arc4random_uniform is also available on BSD and Bionic
-            let offset = arc4random_uniform(numericCast(count))
-        #endif
-        let i = index(startIndex, offsetBy: numericCast(offset))
-        return self[i]
-    }
-
-}
-
 class DeferredTests: XCTestCase {
     static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
         let universalTests: [(String, (DeferredTests) -> () throws -> Void)] = [

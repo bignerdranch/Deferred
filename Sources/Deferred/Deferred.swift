@@ -119,10 +119,10 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
             }
         }
 
-        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
+        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value! {
             // This conversion is guaranteed by convention through id-as-Any.
             // swiftlint:disable:next force_cast
-            return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as! Value
+            return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? Value
         }
 
         static func box(_ value: Value) -> AnyObject {
@@ -147,7 +147,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
             }
         }
 
-        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
+        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value! {
             return Unmanaged<Box<Value>>.fromOpaque(ptr).takeUnretainedValue().contents
         }
 

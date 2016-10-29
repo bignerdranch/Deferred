@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import Deferred
+import Atomics
 #if SWIFT_PACKAGE
 @testable import TestSupport
 #endif
@@ -29,20 +30,18 @@ class FutureTests: XCTestCase {
         let d2 = Deferred<String>()
         let both = d1.and(d2)
 
-        XCTAssertFalse(both.isFilled)
-
-        d1.fill(with: 1)
-        XCTAssertFalse(both.isFilled)
-        d2.fill(with: "foo")
-
         let expectation = self.expectation(description: "paired deferred should be filled")
-        both.upon { _ in
-            XCTAssert(d1.isFilled)
-            XCTAssert(d2.isFilled)
-            XCTAssertEqual(both.value.0, 1)
-            XCTAssertEqual(both.value.1, "foo")
+        both.upon(.main) { (value) in
+            XCTAssertEqual(value.0, 1)
+            XCTAssertEqual(value.1, "foo")
             expectation.fulfill()
         }
+
+        XCTAssertFalse(both.isFilled)
+        d1.fill(with: 1)
+
+        XCTAssertFalse(both.isFilled)
+        d2.fill(with: "foo")
 
         waitForExpectations()
     }
@@ -105,5 +104,26 @@ class FutureTests: XCTestCase {
         }
 
         waitForExpectations()
+    }
+
+    func testEveryMapTransformerIsCalledMultipleTimes() {
+        let d = Deferred(filledWith: 1)
+        var counter = UnsafeAtomicInt32()
+
+        let mapped = d.every { (value) -> (Int) in
+            counter.add(1, order: .sequentiallyConsistent)
+            return value * 2
+        }
+
+        let expect = expectation(description: "upon is called when filled")
+        mapped.upon { (value) in
+            XCTAssertEqual(value, 2)
+            expect.fulfill()
+        }
+        waitForExpectationsShort()
+
+        XCTAssertEqual(mapped.waitShort(), 2)
+
+        XCTAssertEqual(counter.load(order: .sequentiallyConsistent), 2)
     }
 }

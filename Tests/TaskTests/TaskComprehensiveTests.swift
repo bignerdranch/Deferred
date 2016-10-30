@@ -1,6 +1,14 @@
 //
+//  TaskComprehensiveTests.swift
+//  DeferredTests
+//
 //  Created by Pierluigi Cifani on 29/10/2016.
 //  Copyright © 2016 Big Nerd Ranch. All rights reserved.
+//
+//  The following test case aggressively exercises a few features of Task and
+//  Deferred. It is not a unit test, per se, but has reliably uncovered several
+//  full-stack threading problems in the framework, and is included in the suite
+//  as a smoke test of sorts.
 //
 
 import XCTest
@@ -15,15 +23,15 @@ import Dispatch
     @testable import Deferred
 #endif
 
-class TaskAllSucceededTests: XCTestCase {
-    static var allTests: [(String, (TaskAllSucceededTests) -> () throws -> Void)] {
+class TaskComprehensiveTests: XCTestCase {
+    static var allTests: [(String, (TaskComprehensiveTests) -> () throws -> Void)] {
         return [
+            ("testThatSeveralIterationsRunCorrectly", testThatSeveralIterationsRunCorrectly),
             ("testThatCancellingATaskPropagatesTheCancellation", testThatCancellingATaskPropagatesTheCancellation),
         ]
     }
     
     func testThatCancellingATaskPropagatesTheCancellation() {
-
         let semaphore = DispatchSemaphore(value: 0)
         var cancellationWasPropagated = false
         
@@ -45,22 +53,39 @@ class TaskAllSucceededTests: XCTestCase {
         
         XCTAssert(cancellationWasPropagated)
     }
+
+    func testThatSeveralIterationsRunCorrectly() {
+        let semaphore = DispatchSemaphore(value: 0)
+        let numberOfIterations = 20
+
+        for _ in 0 ..< numberOfIterations {
+            let task = TaskProducer.produceTask()
+            task.upon(.any()) { _ in
+                semaphore.signal()
+            }
+            XCTAssertEqual(semaphore.wait(timeout: .now() + .seconds(5)), .success)
+        }
+    }
 }
+
+// MARK: - Fixtures
 
 private enum TaskProducerError: Error {
     case unknown
     case userCancelled
 }
 
-private class TaskProducer {
+private final class TaskProducer {
     
     typealias SyncHandler = (Error?) -> Void
     
-    static func produceTask() -> Task<()> {
-        return syncFolder(folderID: "0")
+    static func produceTask() -> Task<Void> {
+        return (0 ..< 5).map {
+            syncFolder(folderID: String($0))
+        }.allSucceeded()
     }
     
-    static private func sync(items: [Item]) -> [Task<()>] {
+    static func sync(items: [Item]) -> [Task<()>] {
         return items.map { (item) in
             if item.isFolder {
                 return self.syncFolder(folder: item as! Folder)
@@ -83,7 +108,8 @@ private class TaskProducer {
     static private func sync(file: File) -> Task<()> {
         let deferred = Deferred<TaskResult<()>>()
         
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) {
+        let queue = DispatchQueue(label: String.random())
+        queue.asyncAfter(deadline: .now() + 0.3) {
             deferred.fill(with: .success())
         }
         
@@ -95,8 +121,9 @@ private class TaskProducer {
     static private func fetchFolderInfo(folderID: String) -> Task<[Item]> {
         let deferred = Deferred<TaskResult<[Item]>>()
         
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-            let items = [File(), File(), File(), File(), File()]
+        let queue = DispatchQueue(label: String.random())
+        queue.asyncAfter(deadline: .now() + 0.5) {
+            let items = (0 ..< 25).map { _ in File() }
             deferred.fill(with: .success((items)))
         }
         
@@ -106,7 +133,7 @@ private class TaskProducer {
     }
 }
 
-//MARK: Model
+// MARK: - Models
 
 private protocol Item {
     var modelID: String { get }

@@ -162,6 +162,21 @@ bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target,
     return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, order, __ATOMIC_RELAXED);
 }
 
+OS_SWIFT_NAME(UnsafeAtomicBool)
+typedef struct {
+    _Atomic(bool) value;
+} bnr_atomic_flag_t;
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBool.testAndSet(self:))
+bool bnr_atomic_flag_test_and_set(volatile bnr_atomic_flag_t *_Nonnull target) {
+    return __c11_atomic_exchange(&target->value, 1, __ATOMIC_RELAXED);
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBool.test(self:))
+bool bnr_atomic_flag_test(volatile bnr_atomic_flag_t *_Nonnull target) {
+    return __c11_atomic_load(&target->value, __ATOMIC_RELAXED);
+}
+
 OS_ASSUME_NONNULL_END
 
 #endif // __BNR_DEFERRED_ATOMIC_SHIMS__

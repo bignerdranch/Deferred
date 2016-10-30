@@ -161,10 +161,6 @@ extension Progress {
 
     /// A simple indeterminate progress with a cancellation function.
     @nonobjc static func wrapped<Future: FutureProtocol>(_ future: Future, cancellation: ((Void) -> Void)?) -> Progress where Future.Value: Either {
-        if let task = future as? Task<Future.Value.Right> {
-            return task.progress
-        }
-
         let progress = Progress(parent: nil, userInfo: nil)
         progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
 

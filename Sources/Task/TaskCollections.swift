@@ -33,8 +33,8 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         let queue = DispatchQueue.global(qos: .utility)
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let outerProgress = Progress(parent: nil, userInfo: nil)
-        outerProgress.totalUnitCount = numericCast(count)
+        let progress = Progress(parent: nil, userInfo: nil)
+        progress.totalUnitCount = numericCast(count)
         #else
         var cancellations = Array<(Void) -> Void>()
         cancellations.reserveCapacity(numericCast(underestimatedCount))
@@ -42,10 +42,13 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
 
         for task in self {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let innerProgress = Progress.wrapped(task, cancellation: nil)
-            outerProgress.adoptChild(innerProgress, orphaned: false, pendingUnitCount: 1)
+            if let task = task as? Task<Iterator.Element.Value.Right> {
+                progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+            } else {
+                progress.adoptChild(.wrapped(task, cancellation: nil), orphaned: true, pendingUnitCount: 1)
+            }
             #else
-            if let task = task as? Task<Iterator.Element.Value.Left> {
+            if let task = task as? Task<Iterator.Element.Value.Right> {
                 cancellations.append(task.cancel)
             }
             #endif
@@ -65,7 +68,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task(coalescingDeferred, progress: outerProgress)
+        return Task(coalescingDeferred, progress: progress)
         #else
         let capturePromotionWorkaround = cancellations
         return Task(coalescingDeferred) {

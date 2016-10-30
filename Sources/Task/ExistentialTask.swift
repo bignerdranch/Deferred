@@ -12,6 +12,7 @@ import Result
 #endif
 
 import Dispatch
+import Atomics
 import class Foundation.NSObject
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import class Foundation.Progress
@@ -53,7 +54,8 @@ public final class Task<SuccessValue>: NSObject {
         self.init(future: Future(task: base), progress: progress)
     }
     #else
-    internal let cancellation: (() -> Void)
+    fileprivate let cancellation: (() -> Void)
+    fileprivate var rawIsCancelled = UnsafeAtomicBool()
 
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
@@ -85,11 +87,16 @@ public final class Task<SuccessValue>: NSObject {
     /// schedule work on it.
     public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil)
         where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
+        let asTask = base as? _Self
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = Progress.wrapped(base, cancellation: cancellation)
-        self.init(future: Future(task: base), progress: progress)
+        let underlying = asTask?.progress ?? .wrapped(base, cancellation: cancellation)
+        self.init(future: Future(task: base), progress: underlying)
         #else
-        self.init(future: Future(task: base), cancellation: (base as? _Self)?.cancellation ?? cancellation)
+        let underlying = asTask?.cancellation ?? cancellation
+        self.init(future: Future(task: base), cancellation: underlying)
+        if asTask?.isCancelled == true {
+            cancel()
+        }
         #endif
     }
 
@@ -126,7 +133,23 @@ extension Task {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         progress.cancel()
 #else
+        markCancelled()
         DispatchQueue.any().async(execute: cancellation)
+#endif
+    }
+
+#if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+    fileprivate func markCancelled() {
+        _ = rawIsCancelled.testAndSet()
+    }
+#endif
+
+    /// Tests whether the given task has been cancelled.
+    public var isCancelled: Bool {
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        return progress.isCancelled
+#else
+        return rawIsCancelled.test()
 #endif
     }
 }
@@ -158,6 +181,9 @@ extension Task {
         self.init(future: other.future, progress: other.progress)
 #else
         self.init(future: other.future, cancellation: other.cancellation)
+        if other.isCancelled {
+            markCancelled()
+        }
 #endif
     }
 }

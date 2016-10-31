@@ -29,15 +29,15 @@ extension CollectionType where Generator.Element: FutureType, Generator.Element.
         progress.totalUnitCount = numericCast(count)
         let group = dispatch_group_create()
 
-        for task in self {
-            if let task = task as? Task<Generator.Element.Value.Value> {
+        for future in self {
+            if let task = future as? Task<Generator.Element.Value.Value> {
                 progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             } else {
-                progress.adoptChild(NSProgress.wrapped(task, cancellation: nil), orphaned: true, pendingUnitCount: 1)
+                progress.adoptChild(NSProgress.wrapped(future, cancellation: nil), orphaned: true, pendingUnitCount: 1)
             }
 
             dispatch_group_enter(group)
-            task.upon { result in
+            future.upon { result in
                 result.withValues(ifSuccess: { _ in }, ifFailure: { error in
                     _ = coalescingDeferred.fill(.Failure(error))
                 })

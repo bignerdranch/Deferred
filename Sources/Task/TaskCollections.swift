@@ -25,13 +25,16 @@ extension CollectionType where Generator.Element: FutureType, Generator.Element.
         }
 
         let coalescingDeferred = Deferred<Task<Void>.Result>()
-        let outerProgress = NSProgress(parent: nil, userInfo: nil)
-        outerProgress.totalUnitCount = numericCast(count)
+        let progress = NSProgress(parent: nil, userInfo: nil)
+        progress.totalUnitCount = numericCast(count)
         let group = dispatch_group_create()
 
         for task in self {
-            let innerProgress = NSProgress.wrapped(task, cancellation: nil)
-            outerProgress.adoptChild(innerProgress, orphaned: false, pendingUnitCount: 1)
+            if let task = task as? Task<Generator.Element.Value.Value> {
+                progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+            } else {
+                progress.adoptChild(NSProgress.wrapped(task, cancellation: nil), orphaned: true, pendingUnitCount: 1)
+            }
 
             dispatch_group_enter(group)
             task.upon { result in
@@ -47,6 +50,6 @@ extension CollectionType where Generator.Element: FutureType, Generator.Element.
             _ = coalescingDeferred.fill(.Success())
         }
 
-        return Task(coalescingDeferred, progress: outerProgress)
+        return Task(coalescingDeferred, progress: progress)
     }
 }

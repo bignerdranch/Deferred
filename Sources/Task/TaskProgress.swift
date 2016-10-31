@@ -160,10 +160,6 @@ extension NSProgress {
 
     /// A simple indeterminate progress with a cancellation function.
     @nonobjc static func wrapped<Future: FutureType where Future.Value: ResultType>(future: Future, cancellation: ((Void) -> Void)?) -> NSProgress {
-        if let task = future as? Task<Future.Value.Value> {
-            return task.progress
-        }
-
         let progress = NSProgress(parent: nil, userInfo: nil)
         progress.totalUnitCount = future.isFilled ? 0 : -1
 

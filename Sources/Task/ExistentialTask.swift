@@ -91,14 +91,16 @@ extension Task {
         self.init(future: base, progress: progress)
     }
 
+    private typealias _Self = Task<SuccessValue>
+
     /// Create a task whose `upon(_:_:)` method uses the result of `base`.
     ///
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
     /// but not on any specific queue. If you must do work on a specific queue,
     /// schedule work on it.
     public convenience init<Task: FutureType where Task.Value: ResultType, Task.Value.Value == SuccessValue>(_ base: Task, cancellation: ((Void) -> Void)? = nil) {
-        let progress = NSProgress.wrapped(base, cancellation: cancellation)
-        self.init(future: Future(task: base), progress: progress)
+        let underlying = (base as? _Self)?.progress ?? NSProgress.wrapped(base, cancellation: cancellation)
+        self.init(future: Future(task: base), progress: underlying)
     }
 
     /// Wrap an operation that has already completed with `value`.

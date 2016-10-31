@@ -2,9 +2,11 @@ language: objective-c
 osx_image: xcode7.3
 rvm:
 - 2.2.5
+before_install:
+- brew update
 install:
 - bundle install --jobs=3 --retry=3
-- brew install carthage --force-bottle
+- brew outdated carthage || brew upgrade carthage --force-bottle
 env:
   matrix:
   - SCAN_OPEN_REPORT=false

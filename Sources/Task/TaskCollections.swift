@@ -40,21 +40,21 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         cancellations.reserveCapacity(numericCast(underestimatedCount))
         #endif
 
-        for task in self {
+        for future in self {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            if let task = task as? Task<Iterator.Element.Value.Right> {
+            if let task = future as? Task<Iterator.Element.Value.Right> {
                 progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             } else {
-                progress.adoptChild(.wrapped(task, cancellation: nil), orphaned: true, pendingUnitCount: 1)
+                progress.adoptChild(.wrapped(future, cancellation: nil), orphaned: true, pendingUnitCount: 1)
             }
             #else
-            if let task = task as? Task<Iterator.Element.Value.Right> {
+            if let task = future as? Task<Iterator.Element.Value.Right> {
                 cancellations.append(task.cancel)
             }
             #endif
 
             group.enter()
-            task.upon(queue) { result in
+            future.upon(queue) { result in
                 result.withValues(ifLeft: { (error) in
                     _ = coalescingDeferred.fill(with: .failure(error))
                 }, ifRight: { _ in })

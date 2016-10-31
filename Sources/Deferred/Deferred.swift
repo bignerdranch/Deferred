@@ -49,7 +49,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         group.notify(flags: flags, queue: queue) { [storage] in
-            guard let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return }
+            guard let ptr = storage.withAtomicPointerToElement({ $0.load(order: .none) }) else { return }
             body(Storage.unbox(from: ptr))
         }
     }
@@ -74,7 +74,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     public func wait(until time: DispatchTime) -> Value? {
         guard case .success = group.wait(timeout: time),
-            let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return nil }
+            let ptr = storage.withAtomicPointerToElement({ $0.load(order: .none) }) else { return nil }
 
         return Storage.unbox(from: ptr)
     }
@@ -83,7 +83,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     public var isFilled: Bool {
         return storage.withAtomicPointerToElement {
-            $0.load(order: .relaxed) != nil
+            $0.load(order: .none) != nil
         }
     }
 
@@ -92,7 +92,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         let box = Storage.box(value)
 
         let wonRace = storage.withAtomicPointerToElement {
-            $0.compareAndSwap(from: nil, to: box.toOpaque(), order: .acquireRelease)
+            $0.compareAndSwap(from: nil, to: box.toOpaque(), order: .thread)
         }
 
         if wonRace {
@@ -139,7 +139,7 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Valu
     }
 
     deinit {
-        guard let ptr = withAtomicPointerToElement({ $0.load(order: .sequentiallyConsistent) }) else { return }
+        guard let ptr = withAtomicPointerToElement({ $0.load(order: .global) }) else { return }
         Element.fromOpaque(ptr).release()
     }
 

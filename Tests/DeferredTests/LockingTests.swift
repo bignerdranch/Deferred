@@ -104,7 +104,7 @@ class LockingTests: XCTestCase {
 
     func testMultipleConcurrentWriters() {
         for lock in allLocks {
-            var x = UnsafeAtomicInt32()
+            var x = UnsafeAtomicCounter()
 
             // spin up 5 writers concurrently...
             for i in 0 ..< 5 {
@@ -113,9 +113,9 @@ class LockingTests: XCTestCase {
                     lock.withWriteLock {
                         // ... and make sure each runs in order by checking that
                         // no two blocks increment x at the same time
-                        XCTAssertEqual(x.add(1, order: .sequentiallyConsistent), 1)
+                        XCTAssertEqual(x.increment(), 1)
                         sleep(.milliseconds(50))
-                        XCTAssertEqual(x.subtract(1, order: .sequentiallyConsistent), 0)
+                        XCTAssertEqual(x.decrement(), 0)
                         expectation.fulfill()
                     }
                 }
@@ -126,7 +126,7 @@ class LockingTests: XCTestCase {
 
     func testSimultaneousReadersAndWriters() {
         for lock in allLocks {
-            var x = UnsafeAtomicInt32()
+            var x = UnsafeAtomicCounter()
 
             let startReader: (Int) -> () = { i in
                 let expectation = self.expectation(description: "reader \(i)")
@@ -134,7 +134,7 @@ class LockingTests: XCTestCase {
                     lock.withReadLock {
                         // make sure we get the value of x either before or after
                         // the writer runs, never a partway-through value
-                        let result = x.load(order: .sequentiallyConsistent)
+                        let result = x.load()
                         XCTAssertTrue(result == 0 || result == 5)
                         expectation.fulfill()
                     }
@@ -150,7 +150,7 @@ class LockingTests: XCTestCase {
             queue.async {
                 lock.withWriteLock {
                     for _ in 0 ..< 5 {
-                        x.add(1, order: .sequentiallyConsistent)
+                        x.increment()
                         sleep(.milliseconds(100))
                     }
                     expectation.fulfill()

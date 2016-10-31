@@ -125,13 +125,13 @@ private final class ProxyProgress: Progress {
             observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: Observation.options, context: &Observation.cancelledContext)
             observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: Observation.options, context: &Observation.pausedContext)
 
-            state.or(with: State.observing.rawValue, order: .release)
+            state.or(with: State.observing.rawValue, order: .write)
         }
 
         func cancel(observing observee: Progress) {
-            let oldState = State(rawValue: state.and(with: ~State.ready.rawValue, order: .relaxed))
+            let oldState = State(rawValue: state.and(with: ~State.ready.rawValue, order: .none))
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
-            state.or(with: State.cancelled.rawValue, order: .relaxed)
+            state.or(with: State.cancelled.rawValue, order: .none)
 
             for key in Observation.attributes {
                 observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
@@ -142,7 +142,7 @@ private final class ProxyProgress: Progress {
         }
 
         override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-            guard let keyPath = keyPath, object != nil, state.test(for: State.ready.rawValue, order: .relaxed), let observer = observer, let newValue = change?[.newKey] else { return }
+            guard let keyPath = keyPath, object != nil, state.test(for: State.ready.rawValue), let observer = observer, let newValue = change?[.newKey] else { return }
             switch context {
             case (&Observation.cancelledContext)?:
                 observer.inheritCancelled(newValue as! Bool)

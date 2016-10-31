@@ -43,12 +43,11 @@ OS_ASSUME_NONNULL_BEGIN
 
 OS_SWIFT_NAME(AtomicMemoryOrder)
 typedef SWIFT_ENUM(bnr_atomic_memory_order,
-    bnr_atomic_memory_order_relaxed OS_SWIFT_NAME(relaxed) = __ATOMIC_RELAXED,
-    bnr_atomic_memory_order_consume OS_SWIFT_NAME(consume) = __ATOMIC_CONSUME,
-    bnr_atomic_memory_order_acquire OS_SWIFT_NAME(acquire) = __ATOMIC_ACQUIRE,
-    bnr_atomic_memory_order_release OS_SWIFT_NAME(release) = __ATOMIC_RELEASE,
-    bnr_atomic_memory_order_acq_rel OS_SWIFT_NAME(acquireRelease) = __ATOMIC_ACQ_REL,
-    bnr_atomic_memory_order_seq_cst OS_SWIFT_NAME(sequentiallyConsistent) = __ATOMIC_SEQ_CST
+    bnr_atomic_memory_order_relaxed OS_SWIFT_NAME(none) = __ATOMIC_RELAXED,
+    bnr_atomic_memory_order_acquire OS_SWIFT_NAME(read) = __ATOMIC_ACQUIRE,
+    bnr_atomic_memory_order_release OS_SWIFT_NAME(write) = __ATOMIC_RELEASE,
+    bnr_atomic_memory_order_acq_rel OS_SWIFT_NAME(thread) = __ATOMIC_ACQ_REL,
+    bnr_atomic_memory_order_seq_cst OS_SWIFT_NAME(global) = __ATOMIC_SEQ_CST
 );
 
 OS_SWIFT_NAME(UnsafeNativeLock)
@@ -117,36 +116,6 @@ void bnr_native_lock_unlock(bnr_spinlock_t *_Nonnull address) {
     pthread_mutex_unlock(&address->__impl.legacy);
 }
 
-OS_SWIFT_NAME(UnsafeAtomicInt32)
-typedef struct {
-    _Atomic(int32_t) value;
-} bnr_atomic_int32_t;
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.load(self:order:))
-int32_t bnr_atomic_int32_load(volatile bnr_atomic_int32_t *_Nonnull target, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_load(&target->value, order);
-}
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.store(self:_:order:))
-void bnr_atomic_int32_store(volatile bnr_atomic_int32_t *_Nonnull target, int32_t desired, bnr_atomic_memory_order_t order) {
-    __c11_atomic_store(&target->value, desired, order);
-}
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.compareAndSwap(self:from:to:success:failure:))
-bool bnr_atomic_int32_compare_and_swap(volatile bnr_atomic_int32_t *_Nonnull target, int32_t expected, int32_t desired, bnr_atomic_memory_order_t success, bnr_atomic_memory_order_t failure) {
-    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, success, failure);
-}
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.add(self:_:order:))
-int32_t bnr_atomic_int32_add(volatile bnr_atomic_int32_t *_Nonnull target, int32_t amount, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_fetch_add(&target->value, amount, order) + amount;
-}
-
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicInt32.subtract(self:_:order:))
-int32_t bnr_atomic_int32_subtract(volatile bnr_atomic_int32_t *_Nonnull target, int32_t amount, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_fetch_sub(&target->value, amount, order) - amount;
-}
-
 OS_SWIFT_NAME(UnsafeAtomicRawPointer)
 typedef struct {
     _Atomic(void *_Nullable) value;
@@ -159,7 +128,7 @@ void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_Nonnull target, 
 
 OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.compareAndSwap(self:from:to:order:))
 bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable expected, void *_Nullable desired, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, order, __ATOMIC_RELAXED);
+    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
 }
 
 OS_SWIFT_NAME(UnsafeAtomicBool)
@@ -197,9 +166,29 @@ uint_fast8_t bnr_atomic_bitmask_and(volatile bnr_atomic_bitmask_t *_Nonnull targ
     return __c11_atomic_fetch_and(&target->value, value, order);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.test(self:for:order:))
-bool bnr_atomic_bitmask_test(const bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
-    return (__c11_atomic_load((_Atomic(uint_fast8_t) *)&target->value, order) & value) != 0;
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.test(self:for:))
+bool bnr_atomic_bitmask_test(const bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
+    return (__c11_atomic_load((_Atomic(uint_fast8_t) *)&target->value, __ATOMIC_RELAXED) & value) != 0;
+}
+
+OS_SWIFT_NAME(UnsafeAtomicCounter)
+typedef struct {
+    _Atomic(int_fast32_t) value;
+} bnr_atomic_counter_t;
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicCounter.increment(self:))
+int_fast32_t bnr_atomic_counter_increment(volatile bnr_atomic_counter_t *_Nonnull target) {
+    return __c11_atomic_fetch_add(&target->value, 1, __ATOMIC_SEQ_CST) + 1;
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicCounter.decrement(self:))
+int_fast32_t bnr_atomic_counter_decrement(volatile bnr_atomic_counter_t *_Nonnull target) {
+    return __c11_atomic_fetch_sub(&target->value, 1, __ATOMIC_SEQ_CST) - 1;
+}
+
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicCounter.load(self:))
+int_fast32_t bnr_atomic_counter_load(volatile bnr_atomic_counter_t *_Nonnull target) {
+    return __c11_atomic_load(&target->value, __ATOMIC_SEQ_CST);
 }
 
 OS_ASSUME_NONNULL_END

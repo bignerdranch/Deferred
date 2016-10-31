@@ -217,8 +217,11 @@ extension NSProgress {
         if progress.isTaskRoot || progress === NSProgress.currentProgress() {
             // Task<Value> has already taken care of this at a deeper level.
             return progress
-        } else if let root = NSProgress.currentProgress().flatMap({ return $0.isTaskRoot ? $0 : nil }) {
+        } else if let root = NSProgress.currentProgress(), lock = root.userInfo[NSProgressTaskRootLockKey] as? NSLock {
             // We're in a `extendingTask(unitCount:body:)` block, append it.
+            lock.lock()
+            defer { lock.unlock() }
+
             root.adoptChild(progress, orphaned: true, pendingUnitCount: 1)
             return root
         } else {

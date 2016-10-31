@@ -42,7 +42,7 @@ extension Task {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task<NewSuccessValue>(future: future, progress: progress)
         #else
-        return Task<NewSuccessValue>(future: future, cancellation: cancellation)
+        return Task<NewSuccessValue>(future: future, cancellation: cancel)
         #endif
     }
 }

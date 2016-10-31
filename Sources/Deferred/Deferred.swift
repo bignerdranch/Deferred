@@ -47,20 +47,15 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     // MARK: FutureProtocol
 
-    private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(@escaping() -> Value) -> ()) {
+    private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         group.notify(flags: flags, queue: queue) { [storage] in
-            guard let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return }
-
-            body {
-                Storage.unbox(from: ptr)
-            }
+            guard let ptr = storage.withAtomicPointerToElement({ $0.load(order: .none) }) else { return }
+            body(Storage.unbox(from: ptr))
         }
     }
 
     public func upon(_ queue: DispatchQueue, execute body: @escaping (Value) -> Void) {
-        notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue) { (getValue) in
-            body(getValue())
-        }
+        notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue, execute: body)
     }
 
     public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
@@ -70,16 +65,16 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
             return upon(queue, execute: body)
         }
 
-        notify(flags: .assignCurrentContext, upon: .any()) { (getValue) in
+        notify(flags: .assignCurrentContext, upon: .any()) { (value) in
             executor.submit {
-                body(getValue())
+                body(value)
             }
         }
     }
 
     public func wait(until time: DispatchTime) -> Value? {
         guard case .success = group.wait(timeout: time),
-            let ptr = storage.withAtomicPointerToElement({ $0.load(order: .relaxed) }) else { return nil }
+            let ptr = storage.withAtomicPointerToElement({ $0.load(order: .none) }) else { return nil }
 
         return Storage.unbox(from: ptr)
     }
@@ -88,23 +83,22 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     public var isFilled: Bool {
         return storage.withAtomicPointerToElement {
-            $0.load(order: .relaxed) != nil
+            $0.load(order: .none) != nil
         }
     }
 
     @discardableResult
     public func fill(with value: Value) -> Bool {
         let box = Storage.box(value)
-        let boxPtr = Unmanaged.passRetained(box).toOpaque()
 
         let wonRace = storage.withAtomicPointerToElement {
-            $0.compareAndSwap(from: nil, to: boxPtr, order: .acquireRelease)
+            $0.compareAndSwap(from: nil, to: box.toOpaque(), order: .thread)
         }
 
         if wonRace {
             group.leave()
         } else {
-            Unmanaged<AnyObject>.fromOpaque(boxPtr).release()
+            box.release()
         }
 
         return wonRace
@@ -112,53 +106,25 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 }
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-    private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
-        deinit {
-            _ = withUnsafeMutablePointerToElements { (pointerToElements) in
-                pointerToElements.deinitialize()
-            }
-        }
-
-        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value! {
-            // This conversion is guaranteed by convention through id-as-Any.
-            // swiftlint:disable:next force_cast
-            return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? Value
-        }
-
-        static func box(_ value: Value) -> AnyObject {
-            return value as AnyObject
-        }
-    }
+private typealias DeferredRaw<T> = Unmanaged<AnyObject>
 #else
-    // In order to assign the value of a scalar in a Deferred using atomics, we must
-    // box it up into something word-sized. See `atomicInitialize` above.
-    private final class Box<T> {
-        let contents: T
+// In order to assign the value of a scalar in a Deferred using atomics, we must
+// box it up into something word-sized. See `atomicInitialize` above.
+private final class Box<T> {
+    let contents: T
 
-        init(_ contents: T) {
-            self.contents = contents
-        }
+    init(_ contents: T) {
+        self.contents = contents
     }
+}
 
-    private final class DeferredStorage<Value>: ManagedBuffer<Void, Box<Value>?> {
-        deinit {
-            _ = withUnsafeMutablePointerToElements { (pointerToElements) in
-                pointerToElements.deinitialize()
-            }
-        }
-
-        static func unbox(from ptr: UnsafeMutableRawPointer) -> Value! {
-            return Unmanaged<Box<Value>>.fromOpaque(ptr).takeUnretainedValue().contents
-        }
-
-        static func box(_ value: Value) -> Box<Value> {
-            return Box(value)
-        }
-    }
+private typealias DeferredRaw<T> = Unmanaged<Box<T>>
 #endif
 
-extension DeferredStorage {
+private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Value>?> {
+
     typealias _Self = DeferredStorage<Value>
+    typealias Element = DeferredRaw<Value>
 
     static func create() -> _Self {
         return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: _Self.self)
@@ -171,4 +137,27 @@ extension DeferredStorage {
             }
         }
     }
+
+    deinit {
+        guard let ptr = withAtomicPointerToElement({ $0.load(order: .global) }) else { return }
+        Element.fromOpaque(ptr).release()
+    }
+
+    static func unbox(from ptr: UnsafeMutableRawPointer) -> Value! {
+        let raw = Element.fromOpaque(ptr)
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        return raw.takeUnretainedValue() as? Value
+        #else
+        return raw.takeUnretainedValue().contents
+        #endif
+    }
+
+    static func box(_ value: Value) -> Element {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        return Unmanaged.passRetained(value as AnyObject)
+        #else
+        return Unmanaged.passRetained(Box(value))
+        #endif
+    }
+
 }

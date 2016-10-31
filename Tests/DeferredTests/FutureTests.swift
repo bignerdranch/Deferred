@@ -108,10 +108,10 @@ class FutureTests: XCTestCase {
 
     func testEveryMapTransformerIsCalledMultipleTimes() {
         let d = Deferred(filledWith: 1)
-        var counter = UnsafeAtomicInt32()
+        var counter = UnsafeAtomicCounter()
 
         let mapped = d.every { (value) -> (Int) in
-            counter.add(1, order: .sequentiallyConsistent)
+            counter.increment()
             return value * 2
         }
 
@@ -124,6 +124,6 @@ class FutureTests: XCTestCase {
 
         XCTAssertEqual(mapped.waitShort(), 2)
 
-        XCTAssertEqual(counter.load(order: .sequentiallyConsistent), 2)
+        XCTAssertEqual(counter.load(), 2)
     }
 }

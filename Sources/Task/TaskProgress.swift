@@ -8,24 +8,6 @@
 
 import Foundation
 
-// MARK: - Backports
-
-private struct KVO {
-    static var context = false
-    enum KeyPath: String {
-        case completedUnitCount
-        case totalUnitCount
-        case localizedDescription
-        case localizedAdditionalDescription
-        case cancellable
-        case pausable
-        case cancelled
-        case paused
-        case kind
-        static let all: [KeyPath] = [ .totalUnitCount, .completedUnitCount, .localizedDescription, .localizedAdditionalDescription, .cancellable, .pausable, .cancelled, .paused, .kind ]
-    }
-}
-
 /// A progress object whose attributes reflect that of an external progress
 /// tree.
 private final class ProxyProgress: NSProgress {

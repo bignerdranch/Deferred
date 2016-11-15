@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB40026B1DDC225200382BAE /* SwiftBugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4002691DDC21B300382BAE /* SwiftBugTests.swift */; };
 		DB524C7B1D851E3800DDF16D /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB524C711D851E3800DDF16D /* Deferred.framework */; };
 		DB524CC21D85202C00DDF16D /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB524CD11D85204B00DDF16D /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C931D85200C00DDF16D /* Deferred.swift */; };
@@ -64,6 +65,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DB4002691DDC21B300382BAE /* SwiftBugTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftBugTests.swift; sourceTree = "<group>"; };
 		DB524C711D851E3800DDF16D /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB524C7A1D851E3800DDF16D /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB524C8C1D851E5B00DDF16D /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 				DB55F20B1D969A1B00FC1439 /* FutureTests.swift */,
 				DB55F1F41D96968E00FC1439 /* LockingTests.swift */,
 				DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */,
+				DB4002691DDC21B300382BAE /* SwiftBugTests.swift */,
 			);
 			path = DeferredTests;
 			sourceTree = "<group>";
@@ -443,6 +446,7 @@
 				DB55F2081D96968E00FC1439 /* TaskGroupTests.swift in Sources */,
 				DB55F2011D96968E00FC1439 /* FutureCustomExecutorTests.swift in Sources */,
 				DB55F2001D96968E00FC1439 /* ExistentialFutureTests.swift in Sources */,
+				DB40026B1DDC225200382BAE /* SwiftBugTests.swift in Sources */,
 				DB55F2021D96968E00FC1439 /* FutureIgnoreTests.swift in Sources */,
 				DB55F20A1D96968E00FC1439 /* TaskWorkItemTests.swift in Sources */,
 				DB55F2031D96968E00FC1439 /* LockingTests.swift in Sources */,

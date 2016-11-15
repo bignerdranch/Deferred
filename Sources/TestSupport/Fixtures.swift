@@ -136,3 +136,33 @@ extension RandomAccessCollection {
     }
 
 }
+
+enum SomeMultipayloadEnum: Hashable {
+    case one
+    case two(String)
+    case three(Double)
+
+    var hashValue: Int {
+        switch self {
+        case .one:
+            return 1
+        case .two(let str):
+            return str.hashValue
+        case .three(let obj):
+            return obj.hashValue
+        }
+    }
+
+    static func ==(lhs: SomeMultipayloadEnum, rhs: SomeMultipayloadEnum) -> Bool {
+        switch (lhs, rhs) {
+        case (.one, .one):
+            return true
+        case let (.two(lhs), .two(rhs)):
+            return lhs == rhs
+        case let (.three(lhs), .three(rhs)):
+            return lhs == rhs
+        default:
+            return false
+        }
+    }
+}

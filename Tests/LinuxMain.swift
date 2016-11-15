@@ -13,6 +13,7 @@ import XCTest
 
 XCTMain([
     testCase(DeferredTests.allTests),
+    testCase(SwiftBugTests.allTests),
     testCase(ExistentialFutureTests.allTests),
     testCase(FutureCustomExecutorTests.allTests),
     testCase(FutureIgnoreTests.allTests),

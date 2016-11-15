@@ -41,7 +41,8 @@ class DeferredTests: XCTestCase {
             ("testDeferredOptionalBehavesCorrectly", testDeferredOptionalBehavesCorrectly),
             ("testIsFilledCanBeCalledMultipleTimesNotFilled", testIsFilledCanBeCalledMultipleTimesNotFilled),
             ("testIsFilledCanBeCalledMultipleTimesWhenFilled", testIsFilledCanBeCalledMultipleTimesWhenFilled),
-            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition)
+            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition),
+            ("testSimultaneousFill", testSimultaneousFill)
         ]
 
         #if os(OSX)

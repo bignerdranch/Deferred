@@ -143,10 +143,10 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Valu
         Element.fromOpaque(ptr).release()
     }
 
-    static func unbox(from ptr: UnsafeMutableRawPointer) -> Value! {
+    static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
         let raw = Element.fromOpaque(ptr)
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return raw.takeUnretainedValue() as? Value
+        return raw.takeUnretainedValue() as! Value
         #else
         return raw.takeUnretainedValue().contents
         #endif

@@ -27,3 +27,4 @@ docs/
 
 # Fastlane/Scan
 test_output/
+fastlane/report.xml

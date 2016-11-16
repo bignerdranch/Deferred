@@ -8,7 +8,12 @@
 
 import Dispatch
 import Foundation
+
+#if SWIFT_PACKAGE
 import Atomics
+#else
+import Deferred.Atomics
+#endif
 
 /// A type that mutually excludes execution of code such that only one unit of
 /// code is running at any given time. An implementing type may choose to have

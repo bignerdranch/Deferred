@@ -10,10 +10,12 @@ import XCTest
 import Dispatch
 import Foundation
 
-import Deferred
-import Atomics
+@testable import Deferred
 #if SWIFT_PACKAGE
+import Atomics
 @testable import TestSupport
+#else
+import Deferred.Atomics
 #endif
 
 class LockingTests: XCTestCase {

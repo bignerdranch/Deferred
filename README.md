@@ -4,20 +4,20 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 ### Vital Statistics
 
-|                                                                                     |
-|-------------------------------------------------------------------------------------|
-|[![Swift 3.0 required](https://img.shields.io/badge/swift-3.0-EF5138.svg?)][Swift]   |
-|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]       |
-|![iOS, OS X, tvOS, and watchOS](https://img.shields.io/cocoapods/p/BNRDeferred.svg)  |
-|[![CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods]        |
-|[![Carthage](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)][Carthage] |
-|[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred/swift-3_0.svg)][CI]|
+|                                                                                                     |
+|-----------------------------------------------------------------------------------------------------|
+|[![Swift 3.0](https://img.shields.io/badge/swift-3.0.x-EF5138.svg)][Swift]                           |
+|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]                       |
+|![Multiplatform](https://img.shields.io/badge/platforms-macOS,%20iOS,%20linux,%20bsd-lightgrey.svg)  |
+|[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred/swift-3_0.svg)][CI]                |
+|[![CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods]                        |
+|[![Swift Package Manager](https://img.shields.io/badge/swiftpm-supported-orange.svg)][SwiftPM]       |
 
 [Swift]: https://swift.org
 [MIT]: https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt
-[CocoaPods]: https://cocoapods.org/pods/BNRDeferred
-[Carthage]: https://github.com/Carthage/Carthage
 [CI]: http://travis-ci.org/bignerdranch/Deferred
+[CocoaPods]: https://cocoapods.org/pods/BNRDeferred
+[SwiftPM]: https://github.com/apple/swift-package-manager
 
 ## Don't Panic!
 

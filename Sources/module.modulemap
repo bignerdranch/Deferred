@@ -1,0 +1,11 @@
+framework module Deferred {
+  umbrella header "Deferred.h"
+
+  export *
+  module * { export * }
+
+  explicit module Atomics {
+    header "Atomics.h"
+    export *
+  }
+}

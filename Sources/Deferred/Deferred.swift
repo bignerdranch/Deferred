@@ -7,7 +7,12 @@
 //
 
 import Dispatch
+
+#if SWIFT_PACKAGE
 import Atomics
+#else
+import Deferred.Atomics
+#endif
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.

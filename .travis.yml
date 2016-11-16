@@ -1,6 +1,6 @@
 language: generic
 os: osx
-osx_image: xcode8
+osx_image: xcode8.1
 before_install:
 - rvm use $(< .ruby-version) --install --binary --fuzzy
 install:
@@ -58,6 +58,7 @@ after_success:
   fi
 after_failure:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    cat ~/Library/Logs/DiagnosticReports/xctest_*.crash;
     cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log;
   fi
 notifications:

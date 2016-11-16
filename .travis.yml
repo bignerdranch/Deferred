@@ -58,6 +58,7 @@ after_success:
   fi
 after_failure:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    cat ~/Library/Logs/DiagnosticReports/xctest_*.crash;
     cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log;
   fi
 notifications:

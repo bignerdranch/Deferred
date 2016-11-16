@@ -30,18 +30,18 @@ class TaskComprehensiveTests: XCTestCase {
             ("testThatCancellingATaskPropagatesTheCancellation", testThatCancellingATaskPropagatesTheCancellation),
         ]
     }
-    
+
     func testThatCancellingATaskPropagatesTheCancellation() {
         let semaphore = DispatchSemaphore(value: 0)
         var cancellationWasPropagated = false
-        
+
         let task1 = TaskProducer.produceTask()
         let task2 = TaskProducer.produceTask()
         let task = [task1, task2].allSucceeded()
         task.upon(DispatchQueue.any()) { result in
-            
+
             defer { semaphore.signal() }
-            
+
             guard let error = result.error, let taskError = error as? TaskProducerError else {
                 return
             }
@@ -50,7 +50,7 @@ class TaskComprehensiveTests: XCTestCase {
         }
         task.cancel()
         _ = semaphore.wait(timeout: .now() + .seconds(5))
-        
+
         XCTAssert(cancellationWasPropagated)
     }
 
@@ -76,57 +76,59 @@ private enum TaskProducerError: Error {
 }
 
 private final class TaskProducer {
-    
+
     typealias SyncHandler = (Error?) -> Void
-    
+
     static func produceTask() -> Task<Void> {
         return (0 ..< 5).map {
             syncFolder(folderID: String($0))
         }.allSucceeded()
     }
-    
+
     static func sync(items: [Item]) -> [Task<()>] {
         return items.map { (item) in
+            // swiftlint:disable force_cast
             if item.isFolder {
                 return self.syncFolder(folder: item as! Folder)
             } else {
                 return self.sync(file: item as! File)
             }
+            // swiftlint:enable force_cast
         }
     }
-    
+
     static private func syncFolder(folderID: String) -> Task<()> {
         return fetchFolderInfo(folderID: folderID).andThen(upon: DispatchQueue.any()) { (items) in
             return sync(items: items).allSucceeded()
         }
     }
-    
+
     static private func syncFolder(folder: Folder) -> Task<()> {
         return syncFolder(folderID: folder.modelID)
     }
-    
+
     static private func sync(file: File) -> Task<()> {
         let deferred = Deferred<TaskResult<()>>()
-        
+
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.3) {
             deferred.fill(with: .success())
         }
-        
+
         return Task(future: Future(deferred), cancellation: {
             deferred.fill(with: .failure(TaskProducerError.userCancelled))
         })
     }
-    
+
     static private func fetchFolderInfo(folderID: String) -> Task<[Item]> {
         let deferred = Deferred<TaskResult<[Item]>>()
-        
+
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.5) {
             let items = (0 ..< 25).map { _ in File() }
             deferred.fill(with: .success((items)))
         }
-        
+
         return Task(future: Future(deferred), cancellation: {
             deferred.fill(with: .failure(TaskProducerError.userCancelled))
         })
@@ -154,11 +156,11 @@ private struct Folder: Item {
 }
 
 extension String {
-    
+
     static func random(length: Int = 20) -> String {
         let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         var randomString: String = ""
-        
+
         for _ in 0 ..< length {
             randomString.unicodeScalars.append(UnicodeScalar(base.utf16.random())!)
         }

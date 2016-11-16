@@ -53,6 +53,5 @@ head: |
   <link rel="shortcut icon" type="image/x-icon" href="//www.bignerdranch.com/favicon.png">
 hide_documentation_coverage: true
 module: Deferred
-module_version: "3.0.0-beta.3"
 root_url: "http://bignerdranch.github.io/Deferred/"
 theme: fullwidth

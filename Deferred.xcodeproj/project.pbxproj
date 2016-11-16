@@ -65,6 +65,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		69A000D21DDCECF800862A99 /* Deferred.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = Deferred.modulemap; path = Deferred/Deferred.modulemap; sourceTree = "<group>"; };
 		DB4002691DDC21B300382BAE /* SwiftBugTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftBugTests.swift; sourceTree = "<group>"; };
 		DB524C711D851E3800DDF16D /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB524C7A1D851E3800DDF16D /* DeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -177,6 +178,7 @@
 				DB524CFA1D85489500DDF16D /* Atomics */,
 				DB524C921D85200C00DDF16D /* Deferred */,
 				DB524CA11D85200C00DDF16D /* Deferred.h */,
+				69A000D21DDCECF800862A99 /* Deferred.modulemap */,
 				DB524CA21D85200C00DDF16D /* Info.plist */,
 				DB524CA31D85200C00DDF16D /* Result */,
 				DB524CA71D85200C00DDF16D /* Task */,
@@ -482,6 +484,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
+				MODULEMAP_FILE = Sources/Deferred/Deferred.modulemap;
 			};
 			name = Debug;
 		};
@@ -489,6 +492,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
+				MODULEMAP_FILE = Sources/Deferred/Deferred.modulemap;
 			};
 			name = Release;
 		};

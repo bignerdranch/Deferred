@@ -37,7 +37,7 @@ private final class ProxyProgress: Progress {
 
         token = Observation(observing: observee, observer: self)
     }
-    
+
     deinit {
         token?.cancel(observing: observee)
         token = nil
@@ -138,15 +138,18 @@ private final class ProxyProgress: Progress {
             }
             observee.removeObserver(self, forKeyPath: #keyPath(Progress.cancelled), context: &Observation.cancelledContext)
             observee.removeObserver(self, forKeyPath: #keyPath(Progress.paused), context: &Observation.pausedContext)
-
         }
 
         override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
             guard let keyPath = keyPath, object != nil, state.test(for: State.ready.rawValue), let observer = observer, let newValue = change?[.newKey] else { return }
             switch context {
             case (&Observation.cancelledContext)?:
+                // Gotta trust KVO a little
+                // swiftlint:disable:next force_cast
                 observer.inheritCancelled(newValue as! Bool)
             case (&Observation.pausedContext)?:
+                // Gotta trust KVO a little
+                // swiftlint:disable:next force_cast
                 observer.inheritPaused(newValue as! Bool)
             case (&Observation.attributesContext)?:
                 observer.inheritValue(newValue, forKeyPath: keyPath)

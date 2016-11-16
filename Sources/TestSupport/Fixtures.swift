@@ -153,7 +153,7 @@ enum SomeMultipayloadEnum: Hashable {
         }
     }
 
-    static func ==(lhs: SomeMultipayloadEnum, rhs: SomeMultipayloadEnum) -> Bool {
+    static func == (lhs: SomeMultipayloadEnum, rhs: SomeMultipayloadEnum) -> Bool {
         switch (lhs, rhs) {
         case (.one, .one):
             return true

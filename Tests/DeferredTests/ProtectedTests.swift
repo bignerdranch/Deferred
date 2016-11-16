@@ -8,9 +8,9 @@
 
 import XCTest
 import Dispatch
-import struct Foundation.Date
+import Foundation
 
-import Deferred
+@testable import Deferred
 #if SWIFT_PACKAGE
 @testable import TestSupport
 #endif

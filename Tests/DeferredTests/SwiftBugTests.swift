@@ -7,12 +7,11 @@
 //
 
 import XCTest
+
 @testable import Deferred
 #if SWIFT_PACKAGE
 @testable import TestSupport
 #endif
-
-import Dispatch
 
 class SwiftBugTests: XCTestCase {
     static var allTests: [(String, (SwiftBugTests) -> () throws -> Void)] {

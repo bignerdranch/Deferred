@@ -105,7 +105,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     }
 }
 
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+#if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
 private typealias DeferredRaw<T> = Unmanaged<AnyObject>
 #else
 // In order to assign the value of a scalar in a Deferred using atomics, we must
@@ -145,7 +145,7 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Valu
 
     static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
         let raw = Element.fromOpaque(ptr)
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
         return raw.takeUnretainedValue() as! Value
         #else
         return raw.takeUnretainedValue().contents
@@ -153,7 +153,7 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Valu
     }
 
     static func box(_ value: Value) -> Element {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
         return Unmanaged.passRetained(value as AnyObject)
         #else
         return Unmanaged.passRetained(Box(value))

@@ -7,8 +7,10 @@
 //
 
 import Dispatch
-import CoreFoundation
 import Foundation
+#if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+import CoreFoundation
+#endif
 
 /// An executor calls closures submitted to it in first-in, first-out order,
 /// typically on some other thread. An executor may also be used to model locks

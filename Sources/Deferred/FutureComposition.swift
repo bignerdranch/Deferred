@@ -9,7 +9,9 @@
 import Dispatch
 
 // swiftlint:disable force_cast
-// Downcast from Any enforced by internal contract
+// swiftlint:disable function_parameter_count
+// swiftlint:disable line_length
+// We darn well know what unholiness we are pulling
 
 extension FutureProtocol {
     private func toAny() -> Future<Any> {
@@ -122,4 +124,6 @@ extension FutureProtocol {
     }
 }
 
+// swiftlint:enable line_length
+// swiftlint:enable function_parameter_count
 // swiftlint:enable force_cast

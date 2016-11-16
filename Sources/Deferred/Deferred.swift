@@ -146,6 +146,8 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Valu
     static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
         let raw = Element.fromOpaque(ptr)
         #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+        // Contract of using box(_:) counterpart
+        // swiftlint:disable:next force_cast
         return raw.takeUnretainedValue() as! Value
         #else
         return raw.takeUnretainedValue().contents

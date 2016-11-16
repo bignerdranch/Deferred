@@ -1,6 +1,6 @@
 language: generic
 os: osx
-osx_image: xcode8
+osx_image: xcode8.1
 before_install:
 - rvm use $(< .ruby-version) --install --binary --fuzzy
 install:

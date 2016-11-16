@@ -1,55 +1,34 @@
 language: generic
 os: osx
-osx_image: xcode8
-before_install:
-- rvm use $(< .ruby-version) --install --binary --fuzzy
+osx_image: xcode8.1
 install:
-- gem install bundler
-- bundle install --jobs=3 --retry=3
-cache: bundler
+  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
+  - gem install jazzy --no-rdoc --no-ri --no-document --quiet
+  - gem install semantic --no-rdoc --no-ri --no-document --quiet
 env:
-  global:
-  - NSUnbufferedIO=YES
   matrix:
-  - JOB=Test-macOS ACTION=test
+    - JOB=macOS
+  global:
+    - secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=   
 matrix:
   include:
-  - env: JOB=Test-iOS DEVICE='iPhone 6s (10.0)' PLATFORM='iOS Simulator' ACTION=test
-  - env: JOB=Build-tvOS DESTINATION='platform=tvOS Simulator,name=Apple TV 1080p' ACTION=build
-  - env: JOB=Build-watchOS DESTINATION='platform=watchOS Simulator,name=Apple Watch - 42mm' ACTION=build
-  - os: linux
-    dist: trusty
-    sudo: required
-    env: JOB=Test-Linux
-    install:
-    - eval "$(curl -sL https://gist.githubusercontent.com/kylef/5c0475ff02b7c7671d2a/raw/9f442512a46d7a2af7b850d65a7e9bd31edfb09b/swiftenv-install.sh)"
-    script:
-    - swift test
-  - env: JOB=Misc
-    script:
-    - bundle exec pod lib lint --quick
-before_script:
-- set -o pipefail
-- if [[ $DEVICE && $PLATFORM ]]; then
-    export DESTINATION_UUID=`instruments -s devices | grep "$DEVICE" | awk -F '[ ]' '{print $4}' | awk -F '[\[]' '{print $2}' | sed 's/.$//'`;
-    export DESTINATION="platform=$PLATFORM,id=$DESTINATION_UUID";
-    open -b com.apple.iphonesimulator --args -CurrentDeviceUDID $DESTINATION_UUID;
-  fi
+    - script: fastlane ios ci
+      env: JOB=iOS
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: JOB=Linux
+      install:
+        - eval "$(curl -sL https://gist.githubusercontent.com/kylef/5c0475ff02b7c7671d2a/raw/9f442512a46d7a2af7b850d65a7e9bd31edfb09b/swiftenv-install.sh)"
+      script:
+        - swift test
 script:
-- if [[ $DESTINATION ]]; then
-    xcodebuild $ACTION -scheme Deferred -destination "$DESTINATION" | xcpretty -c;
-  else
-    swift test;
-  fi
-after_success:
-- if [[ "$JOB" == "Misc" ]]; then
-    ./Configurations/publish_docs.sh;
-  else
-    sleep 5;
-  fi
+  - fastlane mac ci
 after_failure:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-DeferredTests-*.log;
+    cat -n ~/Library/Logs/DiagnosticReports/xctest_*.crash;
+    cat -n ~/Library/Logs/scan/*;
   fi
 notifications:
   email: false

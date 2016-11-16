@@ -20,18 +20,9 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    addons:
-      apt:
-        packages:
-        - clang-3.8
-        - libicu-dev
-    env: JOB=Test-Linux COMPILER=clang-3.8
-    before_install:
-    - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
+    env: JOB=Test-Linux
     install:
-    - wget https://swift.org/builds/swift-3.0-release/ubuntu1404/swift-3.0-RELEASE/swift-3.0-RELEASE-ubuntu14.04.tar.gz
-    - tar xzf swift-3.0-RELEASE-ubuntu14.04.tar.gz
-    - export PATH=swift-3.0-RELEASE-ubuntu14.04/usr/bin:$PATH
+    - eval "$(curl -sL https://gist.githubusercontent.com/kylef/5c0475ff02b7c7671d2a/raw/9f442512a46d7a2af7b850d65a7e9bd31edfb09b/swiftenv-install.sh)"
     script:
     - swift test
   - env: JOB=Misc

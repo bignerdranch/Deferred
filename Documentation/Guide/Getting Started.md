@@ -1,8 +1,8 @@
 ## Getting Started
 
-Deferred is designed to be used as an embedded framework, which requires a minimum deployment target of iOS 8 or macOS 10.10. Embedding through any other means may work, but is not officially supported.
+Deferred is designed to be used as an embedded framework on Apple platforms, which requires a minimum deployment target of iOS 8, macOS 10.10, watchOS 2.0, or tvOS 9.0.
 
-Linux is not yet supported.
+Linux is also supported.
 
 There are a few different options to install Deferred.
 

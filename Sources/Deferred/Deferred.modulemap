@@ -1,8 +1,0 @@
-framework module Deferred {
-    umbrella header "Deferred.h"
-    
-    use Atomics
-
-    export *
-    module * { export * }
-}

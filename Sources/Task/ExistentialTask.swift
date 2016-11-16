@@ -12,11 +12,9 @@ import Result
 #endif
 
 import Dispatch
+import Foundation
+#if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
 import Atomics
-import class Foundation.NSObject
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-import class Foundation.Progress
-import protocol Foundation.ProgressReporting
 #endif
 
 /// A wrapper over any task.

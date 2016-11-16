@@ -12,9 +12,8 @@ import Result
 #endif
 
 import Dispatch
-
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-import class Foundation.Progress
+import Foundation
 #endif
 
 extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Value: Either, Iterator.Element.Value.Left == Error {

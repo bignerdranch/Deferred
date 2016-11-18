@@ -6,15 +6,17 @@
 //  Copyright © 2016 Big Nerd Ranch. All rights reserved.
 //
 
+import Foundation
+
 #if SWIFT_PACKAGE
-import Result
+import Atomics
 import Deferred
+import Result
+#else
+import Deferred.Atomics
 #endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-import Atomics
-import Foundation
-
 /// A progress object whose attributes reflect that of an external progress
 /// tree.
 private final class ProxyProgress: Progress {

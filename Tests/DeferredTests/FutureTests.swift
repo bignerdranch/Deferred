@@ -7,13 +7,15 @@
 //
 
 import XCTest
-@testable import Deferred
-import Atomics
-#if SWIFT_PACKAGE
-@testable import TestSupport
-#endif
-
 import Dispatch
+
+@testable import Deferred
+#if SWIFT_PACKAGE
+import Atomics
+@testable import TestSupport
+#else
+import Deferred.Atomics
+#endif
 
 class FutureTests: XCTestCase {
     static var allTests: [(String, (FutureTests) -> () throws -> Void)] {

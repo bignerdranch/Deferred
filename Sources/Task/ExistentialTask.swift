@@ -6,15 +6,15 @@
 //  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
-#if SWIFT_PACKAGE
-import Deferred
-import Result
-#endif
-
 import Dispatch
 import Foundation
-#if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+
+#if SWIFT_PACKAGE
 import Atomics
+import Deferred
+import Result
+#else
+import Deferred.Atomics
 #endif
 
 /// A wrapper over any task.

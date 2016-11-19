@@ -51,6 +51,47 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable,
     /// - parameter time: A deadline for the value to be determined.
     /// - returns: The determined value, if filled within the timeout, or `nil`.
     func wait(until time: DispatchTime) -> Value?
+
+    /// Returns a future containing the result of mapping `transform` over the
+    /// deferred value.
+    func map<NewValue>(upon executor: PreferredExecutor, transform: @escaping(Value) -> NewValue) -> Future<NewValue>
+
+    /// Returns a future containing the result of mapping `transform` over the
+    /// deferred value.
+    ///
+    /// `map` submits the `transform` to the `executor` once the future's value
+    /// is determined.
+    ///
+    /// - parameter executor: Context to execute the transformation on.
+    /// - parameter transform: Creates something using the deferred value.
+    /// - returns: A new future that is filled once the receiver is determined.
+    func map<NewValue>(upon executor: Executor, transform: @escaping(Value) -> NewValue) -> Future<NewValue>
+
+    /// Begins another asynchronous operation by passing the deferred value to
+    /// `requestNextValue` once it becomes determined.
+    ///
+    /// `andThen` is similar to `map`, but `requestNextValue` returns another
+    /// future instead of an immediate value. Use `andThen` when you want
+    /// the reciever to feed into another asynchronous operation. You might hear
+    /// this referred to as "chaining" or "binding".
+    func andThen<NewFuture: FutureProtocol>(upon executor: PreferredExecutor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value>
+
+    /// Begins another asynchronous operation by passing the deferred value to
+    /// `requestNextValue` once it becomes determined.
+    ///
+    /// `andThen` is similar to `map`, but `requestNextValue` returns another
+    /// future instead of an immediate value. Use `andThen` when you want
+    /// the reciever to feed into another asynchronous operation. You might hear
+    /// this referred to as "chaining" or "binding".
+    ///
+    /// - note: It is important to keep in mind the thread safety of the
+    /// `requestNextValue` closure. Creating a new asynchronous task typically
+    /// involves state. Ensure the function is compatible with `executor`.
+    ///
+    /// - parameter executor: Context to execute the transformation on.
+    /// - parameter requestNextValue: Start a new operation with the future value.
+    /// - returns: The new deferred value returned by the `transform`.
+    func andThen<NewFuture: FutureProtocol>(upon executor: Executor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value>
 }
 
 extension FutureProtocol {

@@ -19,12 +19,6 @@ private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
         self.transform = transform
     }
 
-    func upon(_ executor: Base.PreferredExecutor, execute body: @escaping(NewValue) -> Void) {
-        return base.upon(executor) { [transform] in
-            body(transform($0))
-        }
-    }
-
     func upon(_ executor: Executor, execute body: @escaping(NewValue) -> Void) {
         return base.upon(executor) { [transform] in
             body(transform($0))

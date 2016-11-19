@@ -102,7 +102,6 @@ public final class Task<SuccessValue>: NSObject {
 
 extension Task: FutureProtocol {
     public typealias Value = Result
-    public typealias PreferredExecutor = Future<Result>.PreferredExecutor
 
     public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> ()) {
         future.upon(queue, execute: body)

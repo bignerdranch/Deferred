@@ -15,6 +15,17 @@ extension Task {
     /// Returns a `Task` containing the result of mapping `transform` over the
     /// successful task's value.
     ///
+    /// Mapping a task appends a unit of progress to the root task. A root task
+    /// is the earliest, or parent-most, task in a tree of tasks.
+    ///
+    /// The resulting task is cancellable in the same way the recieving task is.
+    public func map<NewSuccessValue>(upon queue: PreferredExecutor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+        return map(upon: queue as Executor, transform: transform)
+    }
+
+    /// Returns a `Task` containing the result of mapping `transform` over the
+    /// successful task's value.
+    ///
     /// The `transform` is submitted to the `executor` once the task completes.
     ///
     /// Mapping a task appends a unit of progress to the root task. A root task

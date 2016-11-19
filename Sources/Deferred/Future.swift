@@ -8,6 +8,10 @@
 
 import Dispatch
 
+/// The natural executor for use with Futures; a policy of the framework to
+/// allow for shorthand syntax with `Future.upon(_:execute:)` and others.
+public typealias PreferredExecutor = DispatchQueue
+
 /// A future models reading a value which may become available at some point.
 ///
 /// A `FutureProtocol` may be preferable to an architecture using completion
@@ -30,10 +34,6 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable,
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
-    /// The natural executor for use with this future, either by convention or
-    /// implementation detail.
-    associatedtype PreferredExecutor: Executor = DefaultExecutor
-
     /// Calls some `body` closure once the value is determined.
     func upon(_ executor: PreferredExecutor, execute body: @escaping(Value) -> Void)
 
@@ -54,20 +54,12 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable,
 }
 
 extension FutureProtocol {
-    /// By default, calls `upon(_:body:)` with an `Executor`. This method
-    /// serves as sugar for types with global members such as `DispatchQueue`.
-    public func upon(_ executor: PreferredExecutor, execute body: @escaping(Value) -> Void) {
-        upon(executor as Executor, execute: body)
-    }
-}
-
-extension FutureProtocol where PreferredExecutor == DispatchQueue {
     /// Call some `body` closure in the background once the value is determined.
     ///
     /// If the value is determined, the closure will be enqueued immediately,
     /// but this call is always asynchronous.
-    public func upon(execute body: @escaping(Value) -> Void) {
-        upon(.any(), execute: body)
+    public func upon(_ executor: PreferredExecutor = .any(), execute body: @escaping(Value) -> Void) {
+        upon(executor as Executor, execute: body)
     }
 }
 

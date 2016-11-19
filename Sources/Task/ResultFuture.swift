@@ -49,7 +49,7 @@ extension FutureProtocol where Value: Either {
     ///
     /// - see: uponSuccess(on:execute:)
     /// - see: upon(_:execute:)
-    public func uponSuccess(on executor: PreferredExecutor, execute body: @escaping(Value.Right) -> Void) {
+    public func uponSuccess(on executor: PreferredExecutor = .any(), execute body: @escaping(Value.Right) -> Void) {
         upon(executor, execute: commonSuccessBody(body))
     }
 
@@ -57,25 +57,8 @@ extension FutureProtocol where Value: Either {
     ///
     /// - see: uponFailure(on:execute:)
     /// - see: upon(_:body:)
-    public func uponFailure(on executor: PreferredExecutor, execute body: @escaping(Value.Left) -> Void) {
+    public func uponFailure(on executor: PreferredExecutor = .any(), execute body: @escaping(Value.Left) -> Void) {
         upon(executor, execute: commonFailureBody(body))
-    }
-}
-
-extension FutureProtocol where Value: Either, PreferredExecutor == DispatchQueue {
-    /// Call some `body` in the background if the future successfully resolves
-    /// a value.
-    ///
-    /// - see: uponSuccess(on:execute:)
-    public func uponSuccess(execute body: @escaping(Value.Right) -> Void) {
-        upon(.any(), execute: commonSuccessBody(body))
-    }
-
-    /// Call some `body` in the background if the future produces an error.
-    ///
-    /// - see: uponFailure(on:execute:)
-    public func uponFailure(execute body: @escaping(Value.Left) -> Void) {
-        upon(.any(), execute: commonFailureBody(body))
     }
 }
 

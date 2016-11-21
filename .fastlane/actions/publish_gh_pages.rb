@@ -21,10 +21,20 @@ module Fastlane
 
         remote = URI(sh('git remote get-url origin').strip)
         if params[:github_token]
-          remote = params[:github_token]
+          remote.userinfo = params[:github_token]
         end
 
-        sh "#{git} push --force #{remote.to_s.shellescape} master:gh-pages"
+        UI.command("#{git} push [[REDACTED]]")
+
+        Actions.sh_control_output("#{git} push --force #{remote.to_s.shellescape} master:gh-pages",
+          print_command: false, print_command_output: false,
+          error_callback: proc do |error|
+            if params[:github_token]
+              UI.error(error.gsub(params[:github_token], '[[GITHUB_TOKEN]]'))
+            else
+              UI.error(message)
+            end
+        end)
       end
 
       #####################################################
@@ -45,7 +55,7 @@ module Fastlane
                                          UI.user_error!("Not a directory at '#{value}'") unless File.directory?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :github_token,
-                                       env_name: "GITHUB_ACCESS_TOKEN",
+                                       env_name: "GITHUB_API_TOKEN",
                                        description: "Personal API token for pushing to GitHub - generate one at https://github.com/settings/tokens",
                                        type: String,
                                        optional: true),

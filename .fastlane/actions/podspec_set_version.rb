@@ -1,9 +1,10 @@
-require 'semantic'
-
 module Fastlane
   module Actions
     class PodspecSetVersionAction < Action
       def self.run(params)
+        Actions.verify_gem!('semantic')
+        require 'semantic'
+
         podspec_path = params[:path]
         UI.user_error!("Could not find podspec file at path #{podspec_path}") unless File.exist? podspec_path
 

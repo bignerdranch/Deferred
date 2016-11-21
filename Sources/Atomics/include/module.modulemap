@@ -1,0 +1,3 @@
+module Atomics {
+    header "Atomics.h"
+}

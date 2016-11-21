@@ -1,24 +1,34 @@
-language: objective-c
-osx_image: xcode7.3
-rvm:
-- 2.2.5
-before_install:
-- brew update
+language: generic
+os: osx
+osx_image: xcode8.1
 install:
-- bundle install --jobs=3 --retry=3
-- brew outdated carthage || brew upgrade carthage --force-bottle
+  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
+  - gem install jazzy --no-rdoc --no-ri --no-document --quiet
+  - gem install semantic --no-rdoc --no-ri --no-document --quiet
 env:
   matrix:
-  - SCAN_OPEN_REPORT=false
+    - JOB=macOS
   global:
-    secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=
+    - secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=   
+matrix:
+  include:
+    - script: fastlane ios ci
+      env: JOB=iOS
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: JOB=Linux
+      install:
+        - eval "$(curl -sL https://gist.githubusercontent.com/kylef/5c0475ff02b7c7671d2a/raw/9f442512a46d7a2af7b850d65a7e9bd31edfb09b/swiftenv-install.sh)"
+      script:
+        - swift test
 script:
-- scan -s Deferred
-- scan -s MobileDeferred --devices "iPhone 5s (8.4), iPhone 6s (9.3)"
-- carthage build --no-skip-current --configuration Debug --platform tvOS,watchOS
-- pod lib lint --quick
-after_success:
-- "./Configurations/publish_docs.sh"
+  - fastlane mac ci
+after_failure:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    cat -n ~/Library/Logs/DiagnosticReports/xctest_*.crash;
+    cat -n ~/Library/Logs/scan/*;
+  fi
 notifications:
-  slack:
-    secure: B1vBvRCVa/IJZKtuRGLastyhSZQwP5coR3+/JOrBMXWE+5733MI0u6i462FVKfNfpPkSGS7t1/PXBknX/dF5auzAGsUyKZOuvyUfPe/Sd+kMOaIPw7M8fGONml0jQT0H/OgayZY3wcrlNm42yYFwzQdGd3HBfZIDkM2Ui5P/kn8=
+  email: false

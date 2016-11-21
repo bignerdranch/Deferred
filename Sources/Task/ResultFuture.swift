@@ -12,65 +12,62 @@ import Result
 #endif
 import Dispatch
 
-private func commonUponSuccess<Result: ResultType>(body: Result.Value -> Void) -> (Result) -> Void {
-    return { result in
-        result.withValues(ifSuccess: body, ifFailure: { _ in () })
+private extension FutureProtocol where Value: Either {
+    func commonSuccessBody(_ body: @escaping(Value.Right) -> Void) -> (Value) -> Void {
+        return { result in
+            result.withValues(ifLeft: { _ in () }, ifRight: body)
+        }
+    }
+
+    func commonFailureBody(_ body: @escaping(Value.Left) -> Void) -> (Value) -> Void {
+        return { result in
+            result.withValues(ifLeft: body, ifRight: { _ in () })
+        }
     }
 }
 
-private func commonUponFailure<Result: ResultType>(body: ErrorType -> Void) -> (Result) -> Void {
-    return { result in
-        result.withValues(ifSuccess: { _ in () }, ifFailure: body)
-    }
-}
-
-extension FutureType where Value: ResultType {
+extension FutureProtocol where Value: Either {
     /// Call some `body` closure if the future successfully resolves a value.
     ///
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined success value.
-    /// - seealso: upon(_:body:)
-    public func uponSuccess(executor: ExecutorType, body: Value.Value -> Void) {
-        upon(executor, body: commonUponSuccess(body))
+    /// - see: upon(_:execute:)
+    public func uponSuccess(on executor: Executor, execute body: @escaping(Value.Right) -> Void) {
+        upon(executor, execute: commonSuccessBody(body))
     }
 
     /// Call some `body` closure if the future produces an error.
     ///
     /// - parameter executor: A context for handling the `body` on fill.
     /// - parameter body: A closure that uses the determined failure value.
-    /// - seealso: upon(_:body:)
-    public func uponFailure(executor: ExecutorType, body: ErrorType -> Void) {
-        upon(executor, body: commonUponFailure(body))
+    /// - see: upon(_:execute:)
+    public func uponFailure(on executor: Executor, execute body: @escaping(Value.Left) -> Void) {
+        upon(executor, execute: commonFailureBody(body))
     }
 
     /// Call some `body` closure if the future successfully resolves a value.
     ///
-    /// - seealso: `uponSuccess(_:body:)`.
-    /// - seealso: `upon(_:body:)`.
-    public func uponSuccess(queue: dispatch_queue_t, body: Value.Value -> Void) {
-        upon(queue, body: commonUponSuccess(body))
+    /// - see: uponSuccess(on:execute:)
+    /// - see: upon(_:execute:)
+    public func uponSuccess(on executor: PreferredExecutor = .any(), execute body: @escaping(Value.Right) -> Void) {
+        upon(executor, execute: commonSuccessBody(body))
     }
 
     /// Call some `body` closure if the future produces an error.
     ///
-    /// - seealso: `uponFailure(_:body:)`.
-    /// - seealso: `upon(_:body:)`.
-    public func uponFailure(queue: dispatch_queue_t, body: ErrorType -> Void) {
-        upon(queue, body: commonUponFailure(body))
+    /// - see: uponFailure(on:execute:)
+    /// - see: upon(_:body:)
+    public func uponFailure(on executor: PreferredExecutor = .any(), execute body: @escaping(Value.Left) -> Void) {
+        upon(executor, execute: commonFailureBody(body))
     }
+}
 
-    /// Call some `body` in the background if the future successfully resolves
-    /// a value.
-    ///
-    /// - seealso: `uponSuccess(_:body:)`.
-    public func uponSuccess(body: Value.Value -> Void) {
-        upon(Self.genericQueue, body: commonUponSuccess(body))
-    }
-
-    /// Call some `body` in the background if the future produces an error.
-    ///
-    /// - seealso: `uponFailure(_:body:)`.
-    public func uponFailure(body: ErrorType -> Void) {
-        upon(Self.genericQueue, body: commonUponFailure(body))
+extension Future where Value: Either {
+    /// Create a future having the same underlying task as `other`.
+    public init<Other: FutureProtocol>(task other: Other)
+        where Other.Value: Either, Other.Value.Left == Error, Other.Value.Right == Value.Right {
+        self.init(other.every {
+            Value(from: $0.extract)
+        })
     }
 }

@@ -1,5 +1,3 @@
-require 'semantic'
-
 module Fastlane
   module Actions
     module SharedValues
@@ -8,6 +6,9 @@ module Fastlane
 
     class VersionBumpXcconfigAction < Action
       def self.run(params)
+        Actions.verify_gem!('semantic')
+        require 'semantic'
+
         xcconfig_path = params[:path]
         UI.user_error!("Could not find xcconfig file at path #{xcconfig_path}") unless File.exist? xcconfig_path
 

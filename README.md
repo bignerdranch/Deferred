@@ -21,6 +21,6 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 ## Don't Panic!
 
-See Deferred's comprehensive programming guide and documentation at the [Deferred Reference](http://bignerdranch.github.io/Deferred/).
+See Deferred's comprehensive programming guide and documentation at the [Deferred Reference](https://bignerdranch.github.io/Deferred/).
 
 If you have a question not answered by there or the module comments, please open an issue!

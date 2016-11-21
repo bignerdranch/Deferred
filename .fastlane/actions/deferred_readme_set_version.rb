@@ -1,10 +1,11 @@
-require 'semantic'
-
 module Fastlane
   module Actions
 
     class DeferredReadmeSetVersionAction < Action
       def self.run(params)
+        Actions.verify_gem!('semantic')
+        require 'semantic'
+
         readme_path = params[:path]
         UI.user_error!("Could not find README at path #{readme_path}") unless File.exist? readme_path
 

@@ -4,14 +4,14 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 ### Vital Statistics
 
-|                                                                                                     |
-|-----------------------------------------------------------------------------------------------------|
-|[![Swift 3.0](https://img.shields.io/badge/swift-3.0.x-EF5138.svg)][Swift]                           |
-|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]                       |
-|![Multiplatform](https://img.shields.io/badge/platforms-macOS,%20iOS,%20linux,%20bsd-lightgrey.svg)  |
-|[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred/swift-3_0.svg)][CI]                |
-|[![CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods]                        |
-|[![Swift Package Manager](https://img.shields.io/badge/swiftpm-supported-orange.svg)][SwiftPM]       |
+|                                                                                              |
+|----------------------------------------------------------------------------------------------|
+|[![Swift 3.0](https://img.shields.io/badge/swift-3.0.x-EF5138.svg)][Swift]                    |
+|[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]                |
+|![Multiplatform](https://img.shields.io/badge/platforms-macOS,_iOS,_linux,_bsd-lightgrey.svg) |
+|[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred.svg)][CI]                   |
+|[![CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods]                 |
+|[![Swift Package Manager](https://img.shields.io/badge/swiftpm-supported-orange.svg)][SwiftPM]|
 
 [Swift]: https://swift.org
 [MIT]: https://github.com/bignerdranch/Deferred/blob/master/LICENSE.txt

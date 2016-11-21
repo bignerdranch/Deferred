@@ -24,6 +24,7 @@ custom_categories:
     children:
     - Executor
     - DispatchQueue
+    - PreferredExecutor
     - OperationQueue
     - RunLoop
     - CFRunLoop

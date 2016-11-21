@@ -9,8 +9,6 @@ install:
 env:
   matrix:
     - JOB=macOS
-  global:
-    - secure: cqco7locH7wY0iSSQTyvSUHmCRNsxrXSPi65HgVHLKhAfNrto/SYKw68PokkVdTLaJlzcglOMFFZnwHcX0ubSgaWt4xiGd3Kx9aFQC/uHc8Nt7w56sG8DlUG1C+5rlsiayNwlqXNZuQizrDeqTYtiECDavIlcFdwk4JknlOMKUc=   
 matrix:
   include:
     - script: fastlane ios ci
@@ -27,8 +25,8 @@ script:
   - fastlane mac ci
 after_failure:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    cat -n ~/Library/Logs/DiagnosticReports/xctest_*.crash;
-    cat -n ~/Library/Logs/scan/*;
+    cat ~/Library/Logs/DiagnosticReports/xctest_*.crash;
+    cat ~/Library/Logs/scan/*;
   fi
 notifications:
   email: false

@@ -30,15 +30,11 @@ Pod::Spec.new do |s|
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "#{s.version}" }
 
-  # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source_files  = "Sources/**/*.swift"
+  # ――― Source Settings ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.source_files  = "Sources/**/*.{h,swift}"
   s.exclude_files = "Sources/TestSupport"
-  s.preserve_path = ["Sources/**/*.modulemap", "Sources/**/*.h"]
+  s.preserve_path = "Sources/**/*.modulemap"
   s.module_name   = "Deferred"
-
-  # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.requires_arc = true
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.0',
-                            'MODULEMAP_FILE' => '$(PODS_ROOT)/BNRDeferred/Sources/module.modulemap' }
+  s.module_map    = "Sources/module.modulemap"
 
 end

@@ -3,135 +3,168 @@
 //  Deferred
 //
 //  Created by John Gallagher on 7/19/14.
-//  Copyright © 2014-2015 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
 
-// MARK: - DispatchBlockMarker
-
-// A dispatch block (which is different from a plain closure!) constitutes the
-// second half of Deferred. The `dispatch_block_notify` API defines the notifier
-// list used by `Deferred.upon(queue:body:)`.
-private struct DispatchBlockMarker: CallbacksList {
-    let block = dispatch_block_create(DISPATCH_BLOCK_NO_QOS_CLASS, {
-        fatalError("This code should never be executed")
-    })
-    
-    var isCompleted: Bool {
-        return dispatch_block_testcancel(block) != 0
-    }
-    
-    func markCompleted() {
-        // Cancel it so we can use `dispatch_block_testcancel` to mean "filled"
-        dispatch_block_cancel(block)
-        // Executing the block "unblocks" it, calling all the `_notify` blocks
-        block()
-    }
-
-    func notify(executor executor: ExecutorType, body: dispatch_block_t) {
-        if let queue = executor.underlyingQueue {
-            dispatch_block_notify(block, queue, body)
-        } else {
-            dispatch_block_notify(block, Deferred<Void>.genericQueue) {
-                executor.submit(body)
-            }
-        }
-    }
-}
-
-// MARK: - Deferred
+#if SWIFT_PACKAGE
+import Atomics
+#else
+import Deferred.Atomics
+#endif
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
-public struct Deferred<Value>: FutureType, PromiseType {
+public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
+    // Using `ManagedBuffer` has advantages:
+    //  - The buffer has a stable pointer when locked to a single element.
+    //  - The buffer is appropriately aligned for atomic access.
+    //  - Better `holdsUniqueReference` support allows for future optimization.
+    private typealias Storage =
+        DeferredStorage<Value>
 
-    private let storage: MemoStore<Value>
-    private let onFilled = DispatchBlockMarker()
-    
-    /// Initialize an unfilled Deferred.
+    // Heap storage that is initialized with a value once-and-only-once.
+    private let storage = Storage.create()
+    // A semaphore that keeps efficiently keeps track of a callbacks list.
+    private let group = DispatchGroup()
+
     public init() {
-        storage = MemoStore.createWithValue(nil)
-    }
-    
-    /// Initialize a Deferred filled with the given value.
-    public init(value: Value) {
-        storage = MemoStore.createWithValue(value)
-        onFilled.markCompleted()
-    }
-
-    // MARK: FutureType
-
-    private func upon(executor: ExecutorType, per options: dispatch_block_flags_t, execute body: Value -> Void) -> dispatch_block_t {
-        var options = options
-        options.rawValue |= DISPATCH_BLOCK_ASSIGN_CURRENT.rawValue
-        let block = dispatch_block_create(options) { [storage] in
-            storage.withValue(body)
+        storage.withUnsafeMutablePointerToElements { (pointerToElement) in
+            pointerToElement.initialize(to: nil)
         }
-        onFilled.notify(executor: executor, body: block)
-        return block
+
+        group.enter()
     }
 
-    /// Check whether or not the receiver is filled.
+    /// Creates an instance resolved with `value`.
+    public init(filledWith value: Value) {
+        storage.withUnsafeMutablePointerToElements { (pointerToElement) in
+            pointerToElement.initialize(to: Storage.box(value))
+        }
+    }
+
+    deinit {
+        if !isFilled {
+            group.leave()
+        }
+    }
+
+    // MARK: FutureProtocol
+
+    private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
+        group.notify(flags: flags, queue: queue) { [storage] in
+            guard let ptr = storage.withAtomicPointerToElement({ $0.load(order: .none) }) else { return }
+            body(Storage.unbox(from: ptr))
+        }
+    }
+
+    public func upon(_ queue: DispatchQueue, execute body: @escaping (Value) -> Void) {
+        notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue, execute: body)
+    }
+
+    public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
+        if let queue = executor.underlyingQueue {
+            return upon(queue, execute: body)
+        } else if let queue = executor as? DispatchQueue {
+            return upon(queue, execute: body)
+        }
+
+        notify(flags: .assignCurrentContext, upon: .any()) { (value) in
+            executor.submit {
+                body(value)
+            }
+        }
+    }
+
+    public func wait(until time: DispatchTime) -> Value? {
+        guard case .success = group.wait(timeout: time),
+            let ptr = storage.withAtomicPointerToElement({ $0.load(order: .none) }) else { return nil }
+
+        return Storage.unbox(from: ptr)
+    }
+
+    // MARK: PromiseProtocol
+
     public var isFilled: Bool {
-        return onFilled.isCompleted
+        return storage.withAtomicPointerToElement {
+            $0.load(order: .none) != nil
+        }
     }
 
-    /// Call some `body` closure once the value is determined.
-    ///
-    /// If the value is determined, the function will be submitted to
-    /// to the `executor` immediately.
-    ///
-    /// - parameter executor: A context for handling the `body` on fill.
-    /// - parameter body: A function that uses the determined value.
-    public func upon(executor: ExecutorType, body: Value -> Void) {
-        _ = upon(executor, per: DISPATCH_BLOCK_INHERIT_QOS_CLASS, execute: body)
+    @discardableResult
+    public func fill(with value: Value) -> Bool {
+        let box = Storage.box(value)
+
+        let wonRace = storage.withAtomicPointerToElement {
+            $0.compareAndSwap(from: nil, to: box.toOpaque(), order: .thread)
+        }
+
+        if wonRace {
+            group.leave()
+        } else {
+            box.release()
+        }
+
+        return wonRace
+    }
+}
+
+#if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+private typealias DeferredRaw<T> = Unmanaged<AnyObject>
+#else
+// In order to assign the value of a scalar in a Deferred using atomics, we must
+// box it up into something word-sized. See `atomicInitialize` above.
+private final class Box<T> {
+    let contents: T
+
+    init(_ contents: T) {
+        self.contents = contents
+    }
+}
+
+private typealias DeferredRaw<T> = Unmanaged<Box<T>>
+#endif
+
+private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Value>?> {
+
+    typealias _Self = DeferredStorage<Value>
+    typealias Element = DeferredRaw<Value>
+
+    static func create() -> _Self {
+        return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: _Self.self)
     }
 
-    /// Waits synchronously for the value to become determined.
-    ///
-    /// If the value is already determined, the call returns immediately with
-    /// the value.
-    ///
-    /// - parameter time: A length of time to wait for the value to be determined.
-    /// - returns: The determined value, if filled within the timeout, or `nil`.
-    public func wait(time: Timeout) -> Value? {
-        var result: Value?
-        func assign(value: Value) {
-            result = value
+    func withAtomicPointerToElement<Return>(_ body: (inout UnsafeAtomicRawPointer) throws -> Return) rethrows -> Return {
+        return try withUnsafeMutablePointerToElements { target in
+            try target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1) { (atomicPointertoElement) in
+                try body(&atomicPointertoElement.pointee)
+            }
         }
-
-        // FutureType can't generally do this; `isFilled` is normally
-        // implemented in terms of wait() normally.
-        if isFilled {
-            storage.withValue(assign)
-            return result
-        }
-
-        let executor = QueueExecutor(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0))
-        let handler = upon(executor, per: DISPATCH_BLOCK_ENFORCE_QOS_CLASS, execute: assign)
-
-        guard dispatch_block_wait(handler, time.rawValue) == 0 else {
-            dispatch_block_cancel(handler)
-            return nil
-        }
-
-        return result
     }
 
-    // MARK: PromiseType
-    
-    /// Determines the deferred value with a given result.
-    ///
-    /// Filling a deferred value should usually be attempted only once.
-    ///
-    /// - parameter value: The resolved value for the instance.
-    /// - returns: Whether the promise was fulfilled with `value`.
-    public func fill(value: Value) -> Bool {
-        let wasFilled = storage.fill(value)
-        if wasFilled {
-            onFilled.markCompleted()
-        }
-        return wasFilled
+    deinit {
+        guard let ptr = withAtomicPointerToElement({ $0.load(order: .global) }) else { return }
+        Element.fromOpaque(ptr).release()
     }
+
+    static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
+        let raw = Element.fromOpaque(ptr)
+        #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+        // Contract of using box(_:) counterpart
+        // swiftlint:disable:next force_cast
+        return raw.takeUnretainedValue() as! Value
+        #else
+        return raw.takeUnretainedValue().contents
+        #endif
+    }
+
+    static func box(_ value: Value) -> Element {
+        #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+        return Unmanaged.passRetained(value as AnyObject)
+        #else
+        return Unmanaged.passRetained(Box(value))
+        #endif
+    }
+
 }

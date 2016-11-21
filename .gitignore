@@ -25,5 +25,6 @@ Packages/
 # Jazzy
 docs/
 
-# Fastlane/Scan
+# Fastlane
 test_output/
+.fastlane/report.xml

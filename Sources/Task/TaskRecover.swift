@@ -50,24 +50,15 @@ extension Task {
 
     public func recoverWithNewTask(upon executor: Executor, start startNextTask: @escaping(Error) -> Task<SuccessValue>) -> Task<SuccessValue> {
         
-        let deferred = Deferred<TaskResult<SuccessValue>>()
-        upon(executor) { result in
-            switch result {
-            case .success(let value):
-                deferred.fill(with: .success(value))
-            case .failure(let error):
-                let recoverTask = startNextTask(error)
-                recoverTask.upon(executor, execute: { (recoverResult) in
-                    switch recoverResult {
-                    case .success(let value):
-                        deferred.fill(with: .success(value))
-                    case .failure(let error):
-                        deferred.fill(with: .failure(error))
-                    }
-                })
+        let future: Future<TaskResult<SuccessValue>> = andThen(upon: executor) { (result) -> Task<SuccessValue> in
+            do {
+                let value = try result.extract()
+                return Task<SuccessValue>(success: value)
+            } catch let error {
+                return startNextTask(error)
             }
         }
         
-        return Task<SuccessValue>(future: Future(deferred))
+        return Task<SuccessValue>(future: future)
     }
 }

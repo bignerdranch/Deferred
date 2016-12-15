@@ -11,7 +11,7 @@ import Foundation
 
 #if SWIFT_PACKAGE
 import Atomics
-#else
+#elseif XCODE
 import Deferred.Atomics
 #endif
 
@@ -84,7 +84,7 @@ public final class NativeLock: Locking, MaybeLocking {
     }
 
     public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
-        guard lock.tryLock() else { return nil }
+        guard lock.try() else { return nil }
         defer { lock.unlock() }
         return body()
     }

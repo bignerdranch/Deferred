@@ -10,7 +10,7 @@ import Dispatch
 
 #if SWIFT_PACKAGE
 import Atomics
-#else
+#elseif XCODE
 import Deferred.Atomics
 #endif
 

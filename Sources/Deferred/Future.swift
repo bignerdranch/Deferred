@@ -157,6 +157,6 @@ extension FutureProtocol {
 
     /// A custom playground Quick Look for this instance.
     public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: value)
+        return PlaygroundQuickLook(reflecting: peek() as Any)
     }
 }

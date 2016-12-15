@@ -12,7 +12,7 @@ import Foundation
 import Atomics
 import Deferred
 import Result
-#else
+#elseif XCODE
 import Deferred.Atomics
 #endif
 

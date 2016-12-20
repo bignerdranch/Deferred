@@ -34,7 +34,7 @@
 		DB524CE91D85205400DDF16D /* TaskAndThen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAF1D85200C00DDF16D /* TaskAndThen.swift */; };
 		DB524CEA1D85205400DDF16D /* TaskMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB01D85200C00DDF16D /* TaskMap.swift */; };
 		DB524CEB1D85205400DDF16D /* TaskProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB11D85200C00DDF16D /* TaskProgress.swift */; };
-		DB524CEC1D85205400DDF16D /* TaskRecover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB21D85200C00DDF16D /* TaskRecover.swift */; };
+		DB524CEC1D85205400DDF16D /* TaskRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CB21D85200C00DDF16D /* TaskRecovery.swift */; };
 		DB55F1FE1D96968E00FC1439 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1EE1D96968E00FC1439 /* Fixtures.swift */; };
 		DB55F1FF1D96968E00FC1439 /* DeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F01D96968E00FC1439 /* DeferredTests.swift */; };
 		DB55F2001D96968E00FC1439 /* ExistentialFutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */; };
@@ -98,7 +98,7 @@
 		DB524CAF1D85200C00DDF16D /* TaskAndThen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAndThen.swift; sourceTree = "<group>"; };
 		DB524CB01D85200C00DDF16D /* TaskMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskMap.swift; sourceTree = "<group>"; };
 		DB524CB11D85200C00DDF16D /* TaskProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskProgress.swift; sourceTree = "<group>"; };
-		DB524CB21D85200C00DDF16D /* TaskRecover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRecover.swift; sourceTree = "<group>"; };
+		DB524CB21D85200C00DDF16D /* TaskRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRecovery.swift; sourceTree = "<group>"; };
 		DB524CBA1D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DB524CFD1D85489500DDF16D /* Atomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Atomics.h; path = include/Atomics.h; sourceTree = "<group>"; };
 		DB55F1EE1D96968E00FC1439 /* Fixtures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fixtures.swift; path = Sources/TestSupport/Fixtures.swift; sourceTree = SOURCE_ROOT; };
@@ -223,7 +223,7 @@
 				DB524CAA1D85200C00DDF16D /* TaskIgnore.swift */,
 				DB524CB01D85200C00DDF16D /* TaskMap.swift */,
 				DB524CB11D85200C00DDF16D /* TaskProgress.swift */,
-				DB524CB21D85200C00DDF16D /* TaskRecover.swift */,
+				DB524CB21D85200C00DDF16D /* TaskRecovery.swift */,
 				DB524CA81D85200C00DDF16D /* TaskWorkItem.swift */,
 			);
 			path = Task;
@@ -417,7 +417,7 @@
 				DB524CE71D85205400DDF16D /* TaskGroup.swift in Sources */,
 				DB524CE01D85205200DDF16D /* Either.swift in Sources */,
 				DB524CE81D85205400DDF16D /* TaskCollections.swift in Sources */,
-				DB524CEC1D85205400DDF16D /* TaskRecover.swift in Sources */,
+				DB524CEC1D85205400DDF16D /* TaskRecovery.swift in Sources */,
 				DB524CD51D85204B00DDF16D /* FutureComposition.swift in Sources */,
 				DB524CE61D85205400DDF16D /* ResultPromise.swift in Sources */,
 				DB524CE21D85205400DDF16D /* TaskWorkItem.swift in Sources */,

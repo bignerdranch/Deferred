@@ -131,6 +131,8 @@ extension FutureProtocol {
     }
 }
 
+// MARK: - Default implementations
+
 extension FutureProtocol {
     /// A textual representation of this instance, suitable for debugging.
     public var debugDescription: String {
@@ -158,5 +160,35 @@ extension FutureProtocol {
     /// A custom playground Quick Look for this instance.
     public var customPlaygroundQuickLook: PlaygroundQuickLook {
         return PlaygroundQuickLook(reflecting: peek() as Any)
+    }
+}
+
+extension FutureProtocol {
+    public func map<NewValue>(upon executor: PreferredExecutor, transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
+        return map(upon: executor as Executor, transform: transform)
+    }
+
+    public func map<NewValue>(upon executor: Executor, transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
+        let d = Deferred<NewValue>()
+        upon(executor) {
+            d.fill(with: transform($0))
+        }
+        return Future(d)
+    }
+}
+
+extension FutureProtocol {
+    public func andThen<NewFuture: FutureProtocol>(upon executor: PreferredExecutor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
+        return andThen(upon: executor as Executor, start: requestNextValue)
+    }
+
+    public func andThen<NewFuture: FutureProtocol>(upon executor: Executor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
+        let d = Deferred<NewFuture.Value>()
+        upon(executor) {
+            requestNextValue($0).upon(executor) {
+                d.fill(with: $0)
+            }
+        }
+        return Future(d)
     }
 }

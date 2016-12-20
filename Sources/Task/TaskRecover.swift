@@ -32,7 +32,7 @@ extension Task {
 
         let future: Future<TaskResult<SuccessValue>> = map(upon: executor) { (result) in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            self.progress.becomeCurrent(withPendingUnitCount: 1)
+            progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
             #endif
 

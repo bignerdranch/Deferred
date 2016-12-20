@@ -58,4 +58,18 @@ extension Task {
         return Task<SuccessValue>(future: future, cancellation: cancel)
         #endif
     }
+
+    public func recoverWithNewTask(upon executor: Executor, start startNextTask: @escaping(Error) -> Task<SuccessValue>) -> Task<SuccessValue> {
+        
+        let future: Future<TaskResult<SuccessValue>> = andThen(upon: executor) { (result) -> Task<SuccessValue> in
+            do {
+                let value = try result.extract()
+                return Task<SuccessValue>(success: value)
+            } catch let error {
+                return startNextTask(error)
+            }
+        }
+        
+        return Task<SuccessValue>(future: future)
+    }
 }

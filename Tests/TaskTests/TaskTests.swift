@@ -266,5 +266,21 @@ class TaskTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
     }
+    
+    func testThatRecoverAlsoProducesANewTask() {
+        let expectation = self.expectation(description: "recover produces a new task")
+        let task: Task<Int> = anyFailedTask.recoverWithNewTask(upon: executor) { _ in
+            return self.anyFinishedTask
+        }
+        
+        task.upon {
+            XCTAssertEqual($0.value, 42)
+            expectation.fulfill()
+        }
+        
+        waitForExpectations()
+        assertExecutorCalled(2)
+    }
+
     #endif
 }

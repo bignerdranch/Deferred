@@ -20,7 +20,7 @@ extension Task {
     /// Chaining a task appends a unit of progress to the root task. A root task
     /// is the earliest, or parent-most, task in a tree of tasks.
     ///
-    /// Cancelling the resulting task will attempt to cancel both the recieving
+    /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
     public func andThen<NewTask: FutureProtocol>(upon executor: PreferredExecutor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.Value.Right>
         where NewTask.Value: Either, NewTask.Value.Left == Error {
@@ -33,7 +33,7 @@ extension Task {
     /// Chaining a task appends a unit of progress to the root task. A root task
     /// is the earliest, or parent-most, task in a tree of tasks.
     ///
-    /// Cancelling the resulting task will attempt to cancel both the recieving
+    /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
     ///
     /// - note: It is important to keep in mind the thread safety of the

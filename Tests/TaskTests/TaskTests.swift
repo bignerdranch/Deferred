@@ -56,6 +56,7 @@ class TaskTests: CustomExecutorTestCase {
             ("testThatRecoverMapsFailures", testThatRecoverMapsFailures),
             ("testThatMapPassesThroughErrors", testThatMapPassesThroughErrors),
             ("testThatRecoverPassesThroughValues", testThatRecoverPassesThroughValues),
+            ("testThatFallbackAlsoProducesANewTask", testThatFallbackAlsoProducesANewTask)
         ]
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
@@ -266,5 +267,21 @@ class TaskTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
     }
+    
     #endif
+    
+    func testThatFallbackAlsoProducesANewTask() {
+        let expectation = self.expectation(description: "recover produces a new task")
+        let task: Task<Int> = anyFailedTask.fallback(upon: executor) { _ in
+            return self.anyFinishedTask
+        }
+        
+        task.upon {
+            XCTAssertEqual($0.value, 42)
+            expectation.fulfill()
+        }
+        
+        waitForExpectations()
+        assertExecutorCalled(2)
+    }
 }

@@ -94,7 +94,7 @@ void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
     pthread_mutex_lock(&address->__impl.legacy);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.tryLock(self:))
+OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.try(self:))
 bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {

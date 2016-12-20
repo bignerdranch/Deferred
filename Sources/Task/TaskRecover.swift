@@ -16,6 +16,17 @@ extension Task {
     /// Returns a `Task` containing the result of mapping `substitution` over
     /// the failed task's error.
     ///
+    /// Recovering from a failed task appends a unit of progress to the root
+    /// task. A root task is the earliest, or parent-most, task in a tree.
+    ///
+    /// The resulting task is cancellable in the same way the recieving task is.
+    public func recover(upon executor: PreferredExecutor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
+        return recover(upon: executor as Executor, substituting: substitution)
+    }
+    
+    /// Returns a `Task` containing the result of mapping `substitution` over
+    /// the failed task's error.
+    ///
     /// `recover` submits the `substitution` to the `executor` once the task
     /// fails.
     ///

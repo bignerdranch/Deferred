@@ -20,7 +20,7 @@ extension Task {
     ///
     /// But behaves more efficiently.
     ///
-    /// The resulting task is cancellable in the same way the recieving task is.
+    /// The resulting task is cancellable in the same way the receiving task is.
     ///
     /// - see: map(transform:)
     public func ignored() -> Task<Void> {

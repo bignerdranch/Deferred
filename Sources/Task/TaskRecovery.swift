@@ -19,7 +19,7 @@ extension Task {
     /// Recovering from a failed task appends a unit of progress to the root
     /// task. A root task is the earliest, or parent-most, task in a tree.
     ///
-    /// The resulting task is cancellable in the same way the recieving task is.
+    /// The resulting task is cancellable in the same way the receiving task is.
     public func recover(upon executor: PreferredExecutor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         return recover(upon: executor as Executor, substituting: substitution)
     }
@@ -33,7 +33,7 @@ extension Task {
     /// Recovering from a failed task appends a unit of progress to the root
     /// task. A root task is the earliest, or parent-most, task in a tree.
     ///
-    /// The resulting task is cancellable in the same way the recieving task is.
+    /// The resulting task is cancellable in the same way the receiving task is.
     ///
     /// - see: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
@@ -65,7 +65,7 @@ extension Task {
     /// Chaining a task appends a unit of progress to the root task. A root task
     /// is the earliest, or parent-most, task in a tree of tasks.
     ///
-    /// Cancelling the resulting task will attempt to cancel both the recieving
+    /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
     public func fallback<NewTask: FutureProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue> where NewTask.Value: Either, NewTask.Value.Left == Error, NewTask.Value.Right == SuccessValue {
         return fallback(upon: executor as Executor, to: restartTask)
@@ -77,7 +77,7 @@ extension Task {
     /// Chaining a task appends a unit of progress to the root task. A root task
     /// is the earliest, or parent-most, task in a tree of tasks.
     ///
-    /// Cancelling the resulting task will attempt to cancel both the recieving
+    /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
     ///
     /// - note: It is important to keep in mind the thread safety of the

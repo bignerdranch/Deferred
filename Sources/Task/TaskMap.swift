@@ -18,7 +18,7 @@ extension Task {
     /// Mapping a task appends a unit of progress to the root task. A root task
     /// is the earliest, or parent-most, task in a tree of tasks.
     ///
-    /// The resulting task is cancellable in the same way the recieving task is.
+    /// The resulting task is cancellable in the same way the receiving task is.
     public func map<NewSuccessValue>(upon queue: PreferredExecutor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         return map(upon: queue as Executor, transform: transform)
     }
@@ -31,7 +31,7 @@ extension Task {
     /// Mapping a task appends a unit of progress to the root task. A root task
     /// is the earliest, or parent-most, task in a tree of tasks.
     ///
-    /// The resulting task is cancellable in the same way the recieving task is.
+    /// The resulting task is cancellable in the same way the receiving task is.
     ///
     /// - see: FutureProtocol.map(upon:transform:)
     public func map<NewSuccessValue>(upon executor: Executor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {

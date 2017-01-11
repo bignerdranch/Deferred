@@ -36,5 +36,6 @@ Pod::Spec.new do |s|
   s.preserve_path = "Sources/**/*.modulemap"
   s.module_name   = "Deferred"
   s.module_map    = "Sources/module.modulemap"
+  s.pod_target_xcconfig = { "SWIFT_ACTIVE_COMPILATION_CONDITIONS"  => "XCODE" }
 
 end

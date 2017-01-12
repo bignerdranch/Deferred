@@ -53,7 +53,7 @@ import PackageDescription
 let package = Package(
     name: "My Extremely Nerdy App",
     dependencies: [
-        .Package(url: "https://github.com/bignerdranch/Deferred.git", majorVersion: 3),
+        .Package(url: "https://github.com/bignerdranch/Deferred.git", Version(3, 0, 0, prereleaseIdentifiers: ["rc", "2"])),
     ]
 )
 ```

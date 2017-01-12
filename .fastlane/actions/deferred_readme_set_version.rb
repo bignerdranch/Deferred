@@ -23,7 +23,7 @@ module Fastlane
         cocoapods_replacement = semver.pre ? "~> #{semver.major}.#{semver.minor}-beta" : "~> #{semver.major}.0"
         readme_content = readme_content.gsub(/(```ruby\npod 'BNRDeferred', ')\S* \S*('\n```)/, "\\1#{cocoapods_replacement}\\2")
 
-        swiftpm_replacement = "majorVersion: #{semver.major}"
+        swiftpm_replacement = semver.pre ? "Version(#{semver.major}, #{semver.minor}, #{semver.patch}, prereleaseIdentifiers: #{semver.pre.split(".")})" : "majorVersion: #{semver.major}"
         readme_content = readme_content.gsub(/(\.Package\(url: \"\S*Deferred\S*\", ).*(\),)/, "\\1#{swiftpm_replacement}\\2")
 
         File.write(readme_path, readme_content)

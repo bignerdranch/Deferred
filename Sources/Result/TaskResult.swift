@@ -27,10 +27,26 @@ extension TaskResult: Either {
         self = .failure(error)
     }
 
+    public init(value: Value?, error: Error?) {
+        switch (value, error) {
+        case (let v?, _):
+            // Ignore error if value is non-nil
+            self = .success(v)
+        case (nil, let e?):
+            self = .failure(e)
+        case (nil, nil):
+            self = .failure(TaskResultInitializerError.invalidInput)
+        }
+    }
+
     public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
         switch self {
         case let .success(value): return try right(value)
         case let .failure(error): return try left(error)
         }
     }
+}
+
+private enum TaskResultInitializerError: Error {
+    case invalidInput
 }

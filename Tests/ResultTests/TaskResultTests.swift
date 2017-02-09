@@ -27,7 +27,10 @@ class TaskResultTests: XCTestCase {
             ("testCoalesceSuccessValue", testCoalesceSuccessValue),
             ("testCoalesceFailureValue", testCoalesceFailureValue),
             ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
-            ("testFlatCoalesceFailure", testFlatCoalesceFailure)
+            ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
+            ("testInitializeWithBlockSuccess", testInitializeWithBlockSuccess),
+            ("testInitializeWithBlockError", testInitializeWithBlockError),
+            ("testInitializeWithBlockInitFailure", testInitializeWithBlockInitFailure)
         ]
     }
 
@@ -80,5 +83,24 @@ class TaskResultTests: XCTestCase {
         let x = aFailureResult ?? Result(success: 84)
         XCTAssertEqual(x.value, 84)
         XCTAssertNil(x.error)
+    }
+    
+    func testInitializeWithBlockSuccess() {
+        let result = Result(value: 42, error: nil)
+        XCTAssertEqual(try? result.extract(), 42)
+    }
+
+    func testInitializeWithBlockError() {
+        let result = Result(value: nil, error: TestError.first)
+        guard let error = result.error as? TestError else {
+            XCTFail()
+            return
+        }
+        XCTAssert(error == TestError.first)
+    }
+
+    func testInitializeWithBlockInitFailure() {
+        let result = Result(value: nil, error: nil)
+        XCTAssertNil(try? result.extract())
     }
 }

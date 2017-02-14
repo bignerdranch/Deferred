@@ -36,6 +36,12 @@ public final class Task<SuccessValue>: NSObject {
         self.progress = .taskRoot(for: progress)
     }
 
+    /// Create a task that will never complete.
+    public override init() {
+        self.future = Future()
+        self.progress = .indefinite()
+    }
+
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
     /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
@@ -64,17 +70,13 @@ public final class Task<SuccessValue>: NSObject {
         self.future = future
         self.cancellation = cancellation ?? {}
     }
-    #endif
 
     /// Create a task that will never complete.
     public override init() {
         self.future = Future()
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.progress = .indefinite()
-        #else
         self.cancellation = {}
-        #endif
     }
+    #endif
 
     private typealias _Self = Task<SuccessValue>
 

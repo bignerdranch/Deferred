@@ -13,7 +13,7 @@ There are a few different options to install Deferred.
 Add the following to your Cartfile:
 
 ```
-github "bignerdranch/Deferred" "3.0.0-rc.2"
+github "bignerdranch/Deferred" ~> 3.0
 ```
 
 Then run `carthage update`.
@@ -30,7 +30,7 @@ for up to date installation instructions.
 Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
 
 ```ruby
-pod 'BNRDeferred', '~> 3.0-beta'
+pod 'BNRDeferred', '~> 3.0'
 ```
 
 You will also need to make sure you're opting into using frameworks:
@@ -53,7 +53,7 @@ import PackageDescription
 let package = Package(
     name: "My Extremely Nerdy App",
     dependencies: [
-        .Package(url: "https://github.com/bignerdranch/Deferred.git", Version(3, 0, 0, prereleaseIdentifiers: ["rc", "2"])),
+        .Package(url: "https://github.com/bignerdranch/Deferred.git", majorVersion: 3),
     ]
 )
 ```

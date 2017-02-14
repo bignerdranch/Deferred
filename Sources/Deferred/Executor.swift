@@ -82,7 +82,7 @@ extension DispatchQueue: Executor {
     /// work onto the concurrent pile. As an alternative to the `.utility` QoS
     /// global queue, work dispatched onto this queue on platforms with support
     /// for QoS will match the QoS of the caller.
-    public static func any() -> DispatchQueue {
+    @nonobjc public static func any() -> DispatchQueue {
         // The technique is described and used in Core Foundation:
         // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
         // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
@@ -95,15 +95,15 @@ extension DispatchQueue: Executor {
         return .global(qos: qosClass)
     }
 
-    public func submit(_ body: @escaping() -> Void) {
+    @nonobjc public func submit(_ body: @escaping() -> Void) {
         async(execute: body)
     }
 
-    public func submit(_ workItem: DispatchWorkItem) {
+    @nonobjc public func submit(_ workItem: DispatchWorkItem) {
         async(execute: workItem)
     }
 
-    public var underlyingQueue: DispatchQueue? {
+    @nonobjc public var underlyingQueue: DispatchQueue? {
         return self
     }
 }

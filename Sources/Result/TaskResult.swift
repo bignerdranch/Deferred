@@ -27,6 +27,15 @@ extension TaskResult: Either {
         self = .failure(error)
     }
 
+    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
+        switch self {
+        case let .success(value): return try right(value)
+        case let .failure(error): return try left(error)
+        }
+    }
+
+    /// Create an exclusive success/failure state derived from two optionals,
+    /// in the style of Cocoa completion handlers.
     public init(value: Value?, error: Error?) {
         switch (value, error) {
         case (let v?, _):
@@ -36,13 +45,6 @@ extension TaskResult: Either {
             self = .failure(e)
         case (nil, nil):
             self = .failure(TaskResultInitializerError.invalidInput)
-        }
-    }
-
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
-        switch self {
-        case let .success(value): return try right(value)
-        case let .failure(error): return try left(error)
         }
     }
 }

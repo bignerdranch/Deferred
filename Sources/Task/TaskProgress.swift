@@ -167,8 +167,9 @@ extension Progress {
     /// progress handling. It's not perfect; this is a best effort of proxying
     /// an external progress tree.
     ///
-    /// Send `isOrphaned: false` if the iOS 9 behavior cannot be trusted (i.e.,
-    /// `progress` is not understood to have no parent).
+    /// If `progress` may possibly already have a parent,
+    /// send `orphaned: false`, using similar behavior to the backwards-
+    /// compatible path.
     @discardableResult
     @nonobjc func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
         if #available(OSX 10.11, iOS 9.0, *), canAdopt {

@@ -22,12 +22,17 @@ import Deferred.Atomics
 /// Forwards operations to an arbitrary underlying future having the same result
 /// type, optionally combined with some `cancellation`.
 public final class Task<SuccessValue>: NSObject {
+
+    /// An enum for returning and propogating recoverable errors.
     public typealias Result = TaskResult<SuccessValue>
 
     fileprivate let future: Future<Result>
 
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-    /// The progress of the task, which is updated as work is completed.
+    /// The progress of the task, which may be updated as work is completed.
+    ///
+    /// If the task does not report progress, this progress is indeterminate,
+    /// and becomes determinate and completed when the task is finished.
     public let progress: Progress
 
     /// Creates a task given a `future` and its `progress`.
@@ -44,15 +49,14 @@ public final class Task<SuccessValue>: NSObject {
 
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
-    /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
-    /// but not on any specific queue. If you must do work on a specific queue,
-    /// schedule work on it.
+    /// `cancellation` will be called asynchronously, but not on any specific
+    /// queue. If you must do work on a specific queue, schedule work on it.
     public convenience init(future base: Future<Result>, cancellation: ((Void) -> Void)? = nil) {
         let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: base, progress: progress)
     }
 
-    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
+    /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
     public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress)
         where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
@@ -63,9 +67,8 @@ public final class Task<SuccessValue>: NSObject {
 
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
-    /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
-    /// but not on any specific queue. If you must do work on a specific queue,
-    /// schedule work on it.
+    /// `cancellation` will be called asynchronously, but not on any specific
+    /// queue. If you must do work on a specific queue, schedule work on it.
     public init(future: Future<Result>, cancellation: ((Void) -> Void)? = nil) {
         self.future = future
         self.cancellation = cancellation ?? {}

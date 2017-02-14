@@ -93,7 +93,7 @@ private final class Never<Value>: FutureBox<Value> {
 /// Forwards operations to an arbitrary underlying future having the same
 /// `Value` type, hiding the specifics of the underlying `FutureProtocol`.
 ///
-/// Authors can use this type to:
+/// This type may be used to:
 ///
 /// - Prevent clients from coupling to the specific kind of `FutureProtocol` your
 ///   implementation is currently using.
@@ -128,28 +128,14 @@ public struct Future<Value>: FutureProtocol {
         self.box = other.box
     }
 
-    /// Call some `body` closure once the underlying future's value is
-    /// determined.
-    ///
-    /// If the value is determined, the closure will be submitted to the
-    /// `executor` immediately.
     public func upon(_ queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         return box.upon(queue, execute: body)
     }
 
-    /// Call some `body` closure once the underlying future's value is
-    /// determined.
-    ///
-    /// If the value is determined, the closure will be submitted to the
-    /// `executor` immediately.
     public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
         return box.upon(executor, execute: body)
     }
 
-    /// Waits synchronously for the underlying future to become determined.
-    ///
-    /// - parameter time: A length of time to wait for the value to be determined.
-    /// - returns: The determined value, if filled within the timeout, or `nil`.
     public func wait(until time: DispatchTime) -> Value? {
         return box.wait(until: time)
     }

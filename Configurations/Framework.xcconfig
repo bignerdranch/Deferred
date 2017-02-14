@@ -30,11 +30,12 @@ LD_RUNPATH_SEARCH_PATHS[sdk=appletvsimulator*] = $(inherited) '@executable_path/
 DEFINES_MODULE = YES
 FRAMEWORK_VERSION[sdk=macosx*] = A
 INFOPLIST_FILE = Sources/Info.plist
-MODULEMAP_FILE = $(SRCROOT)/Sources/module.modulemap
+MODULEMAP_FILE = $(PROJECT_DIR)/Sources/module.modulemap
 PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.$(TARGET_NAME)
 PRODUCT_NAME = Deferred
 
 // Signing
+CODE_SIGN_IDENTITY = -
 DEVELOPMENT_TEAM = 439592V3LM
 
 // Swift Compiler - Custom Flags

@@ -1,5 +1,8 @@
 #include "Base.xcconfig"
 
+// Build Options
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+
 // Deployment (macOS)
 COMBINE_HIDPI_IMAGES = YES
 

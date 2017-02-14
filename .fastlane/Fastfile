@@ -51,13 +51,13 @@ end
 platform :ios do
   desc "Test using Xcode for iOS"
   lane :test do
-    scan(scheme: "Deferred", device: "iPhone 6s (10.0)")
+    scan(scheme: "MobileDeferred", device: "iPhone 6s (10.0)")
   end
 
   desc "Build using Xcode for tvOS and watchOS"
   private_lane :build_for_other_platforms do
-    xcodebuild(scheme: "Deferred", destination: "platform=tvOS Simulator,name=Apple TV 1080p")
-    xcodebuild(scheme: "Deferred", destination: "platform=watchOS Simulator,name=Apple Watch - 42mm")
+    xcodebuild(scheme: "TVDeferred", destination: "platform=tvOS Simulator,name=Apple TV 1080p")
+    xcodebuild(scheme: "NanoDeferred", destination: "platform=watchOS Simulator,name=Apple Watch - 42mm")
   end
 
   desc "Execute tests and ensure that auxiliary platforms build"

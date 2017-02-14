@@ -77,29 +77,6 @@ public final class Task<SuccessValue>: NSObject {
         self.cancellation = {}
     }
     #endif
-
-    private typealias _Self = Task<SuccessValue>
-
-    /// Creates a task whose `upon(_:execute:)` methods use the result of `base`.
-    ///
-    /// If `base` is not a `Task`, `cancellation` will be called asynchronously,
-    /// but not on any specific queue. If you must do work on a specific queue,
-    /// schedule work on it.
-    public convenience init<Task: FutureProtocol>(_ base: Task, cancellation: ((Void) -> Void)? = nil)
-        where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
-        let asTask = base as? _Self
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let underlying = asTask?.progress ?? .wrapped(base, cancellation: cancellation)
-        self.init(future: Future(task: base), progress: underlying)
-        #else
-        let underlying = asTask?.cancellation ?? cancellation
-        self.init(future: Future(task: base), cancellation: underlying)
-        if asTask?.isCancelled == true {
-            cancel()
-        }
-        #endif
-    }
-
 }
 
 extension Task: FutureProtocol {
@@ -154,6 +131,28 @@ extension Task {
 }
 
 extension Task {
+    /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
+    ///
+    /// `cancellation` will be called asynchronously, but not on any specific
+    /// queue. If you must do work on a specific queue, schedule work on it.
+    public convenience init<OtherFuture: FutureProtocol>(_ base: OtherFuture, cancellation: ((Void) -> Void)? = nil)
+        where OtherFuture.Value: Either, OtherFuture.Value.Left == Error, OtherFuture.Value.Right == SuccessValue {
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        self.init(future: Future(task: base), progress: .wrapped(base, cancellation: cancellation))
+#else
+        let asTask = (base as? Task<SuccessValue>)
+
+        self.init(future: Future(task: base)) { [oldCancellation = asTask?.cancellation] in
+            oldCancellation?()
+            cancellation?()
+        }
+
+        if asTask?.isCancelled == true {
+            cancel()
+        }
+#endif
+    }
+
     /// Creates an operation that has already completed with `value`.
     public convenience init(success value: @autoclosure() throws -> SuccessValue) {
         let future = Future<Result>(value: TaskResult(from: value))

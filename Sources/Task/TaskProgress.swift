@@ -216,22 +216,32 @@ extension Progress {
 
     /// A simple indeterminate progress with a cancellation function.
     @nonobjc static func wrapped<Future: FutureProtocol>(_ future: Future, cancellation: ((Void) -> Void)?) -> Progress where Future.Value: Either {
-        let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
-
-        if let cancellation = cancellation {
-            progress.cancellationHandler = cancellation
-        } else {
-            progress.isCancellable = false
-        }
-
-        let queue = DispatchQueue.global(qos: .utility)
-        future.upon(queue) { _ in
+        switch (future as? Task<Future.Value.Right>, cancellation) {
+        case (let task?, nil):
+            return task.progress
+        case (let task?, let cancellation?):
+            let progress = Progress(parent: nil, userInfo: nil)
             progress.totalUnitCount = 1
-            progress.completedUnitCount = 1
-        }
+            progress.cancellationHandler = cancellation
+            progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+            return progress
+        default:
+            let progress = Progress(parent: nil, userInfo: nil)
+            progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
 
-        return progress
+            if let cancellation = cancellation {
+                progress.cancellationHandler = cancellation
+            } else {
+                progress.isCancellable = false
+            }
+
+            future.upon(.global(qos: .utility)) { _ in
+                progress.totalUnitCount = 1
+                progress.completedUnitCount = 1
+            }
+            
+            return progress
+        }
     }
 }
 

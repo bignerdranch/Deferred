@@ -1,11 +1,10 @@
-language: generic
+language: objective-c
 os: osx
 osx_image: xcode8.2
+before_install:
+  - rvm use 2.2.5
 install:
   - gem install fastlane --no-rdoc --no-ri --no-document --quiet
-  - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
-  - gem install jazzy --no-rdoc --no-ri --no-document --quiet
-  - gem install semantic --no-rdoc --no-ri --no-document --quiet
 env:
   matrix:
     - JOB=macOS
@@ -13,7 +12,8 @@ matrix:
   include:
     - script: fastlane ios ci
       env: JOB=iOS
-    - os: linux
+    - language: generic
+      os: linux
       dist: trusty
       sudo: required
       env: JOB=Linux
@@ -23,10 +23,5 @@ matrix:
         - swift test
 script:
   - fastlane mac ci
-after_failure:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    cat ~/Library/Logs/DiagnosticReports/xctest_*.crash;
-    cat ~/Library/Logs/scan/*;
-  fi
 notifications:
   email: false

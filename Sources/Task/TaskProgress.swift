@@ -167,8 +167,9 @@ extension Progress {
     /// progress handling. It's not perfect; this is a best effort of proxying
     /// an external progress tree.
     ///
-    /// Send `isOrphaned: false` if the iOS 9 behavior cannot be trusted (i.e.,
-    /// `progress` is not understood to have no parent).
+    /// If `progress` may possibly already have a parent,
+    /// send `orphaned: false`, using similar behavior to the backwards-
+    /// compatible path.
     @discardableResult
     @nonobjc func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
         if #available(OSX 10.11, iOS 9.0, *), canAdopt {
@@ -216,22 +217,32 @@ extension Progress {
 
     /// A simple indeterminate progress with a cancellation function.
     @nonobjc static func wrapped<Future: FutureProtocol>(_ future: Future, cancellation: ((Void) -> Void)?) -> Progress where Future.Value: Either {
-        let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
-
-        if let cancellation = cancellation {
-            progress.cancellationHandler = cancellation
-        } else {
-            progress.isCancellable = false
-        }
-
-        let queue = DispatchQueue.global(qos: .utility)
-        future.upon(queue) { _ in
+        switch (future as? Task<Future.Value.Right>, cancellation) {
+        case (let task?, nil):
+            return task.progress
+        case (let task?, let cancellation?):
+            let progress = Progress(parent: nil, userInfo: nil)
             progress.totalUnitCount = 1
-            progress.completedUnitCount = 1
-        }
+            progress.cancellationHandler = cancellation
+            progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+            return progress
+        default:
+            let progress = Progress(parent: nil, userInfo: nil)
+            progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
 
-        return progress
+            if let cancellation = cancellation {
+                progress.cancellationHandler = cancellation
+            } else {
+                progress.isCancellable = false
+            }
+
+            future.upon(.global(qos: .utility)) { _ in
+                progress.totalUnitCount = 1
+                progress.completedUnitCount = 1
+            }
+            
+            return progress
+        }
     }
 }
 

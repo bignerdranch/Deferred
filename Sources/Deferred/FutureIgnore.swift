@@ -13,7 +13,7 @@ extension FutureProtocol {
     ///
     ///     myFuture.map { _ in }
     ///
-    /// But behaves more efficiently.
+    /// But may behave more efficiently.
     ///
     /// - see: map(upon:transform:)
     public func ignored() -> Future<Void> {

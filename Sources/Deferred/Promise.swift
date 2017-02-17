@@ -13,9 +13,8 @@
 /// provides consistent sharing of the determined value.
 ///
 /// An implementing type should discourage race conditions around filling.
-/// However, certain use cases inherently race (such as cancellation), and any
+/// However, certain use cases inherently race (such as cancellation). Any
 /// attempts to check for programmer error should be active by default.
-///
 public protocol PromiseProtocol {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value

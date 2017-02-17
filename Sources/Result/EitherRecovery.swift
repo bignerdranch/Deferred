@@ -16,9 +16,9 @@ extension Either {
 extension Either where Left == Error {
     /// Returns the success value or throws the error.
     public func extract() throws -> Right {
-
         return try withValues(ifLeft: { throw $0 }, ifRight: { $0 })
     }
+
 }
 
 /// Performs a coalescing operation, returning the wrapped success value of

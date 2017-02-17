@@ -12,26 +12,25 @@ import Foundation
 import CoreFoundation
 #endif
 
-/// An executor calls closures submitted to it in first-in, first-out order,
-/// typically on some other thread. An executor may also be used to model locks
-/// or atomicity.
+/// An executor calls closures submitted to it, typically in first-in, first-out
+/// order on some other thread. An executor may also model locks or atomicity.
 ///
 /// Throughout the Deferred module, `upon` methods (or parameters to methods
 /// built around `upon`, such as `map`) are overloaded to take an `Executor`
-/// as well as the standard `dispatch_queue_t`.
+/// as well as the standard `DispatchQueue`.
 ///
 /// A custom executor is a customization point into the asynchronous semantics
 /// of a future, and may be important for ensuring the thread safety of an
 /// `upon` closure.
 ///
 /// For instance, the concurrency model of Apple's Core Data framework requires
-/// that objects be accessed on other threads with the `performBlock(_:)` method
-/// of a managed object context. We may want to connect that to Deferred:
+/// that objects be accessed from other threads using the `perform(_:)`
+/// method, and not just thread isolation. Here, we connect that to Deferred:
 ///
 ///     extension NSManagedObjectContext: Executor {
 ///
-///          func submit(body: () -> Void) {
-///              performBlock(body)
+///          func submit(body: @escaping() -> Void) {
+///              perform(body)
 ///          }
 ///
 ///     }
@@ -40,8 +39,8 @@ import CoreFoundation
 ///
 ///     let context: NSManagedObjectContext = ...
 ///     let personJSON: Future<JSON> = ...
-///     let person: Future<Person> = personJSON.map(upon: context) { JSON in
-///         Person(JSON: JSON, inContext: context)
+///     let person: Future<Person> = personJSON.map(upon: context) { json in
+///         Person(json: json, inContext: context)
 ///     }
 ///
 public protocol Executor {
@@ -68,7 +67,7 @@ extension Executor {
         }
     }
 
-    /// By default, `nil`; the executor's `submit(_:)` is used instead.
+    /// By default, `nil`; the executor's `submit(_:)` is used unconditionally.
     public var underlyingQueue: DispatchQueue? {
         return nil
     }
@@ -82,7 +81,7 @@ extension DispatchQueue: Executor {
     /// work onto the concurrent pile. As an alternative to the `.utility` QoS
     /// global queue, work dispatched onto this queue on platforms with support
     /// for QoS will match the QoS of the caller.
-    public static func any() -> DispatchQueue {
+    @nonobjc public static func any() -> DispatchQueue {
         // The technique is described and used in Core Foundation:
         // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
         // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
@@ -95,15 +94,15 @@ extension DispatchQueue: Executor {
         return .global(qos: qosClass)
     }
 
-    public func submit(_ body: @escaping() -> Void) {
+    @nonobjc public func submit(_ body: @escaping() -> Void) {
         async(execute: body)
     }
 
-    public func submit(_ workItem: DispatchWorkItem) {
+    @nonobjc public func submit(_ workItem: DispatchWorkItem) {
         async(execute: workItem)
     }
 
-    public var underlyingQueue: DispatchQueue? {
+    @nonobjc public var underlyingQueue: DispatchQueue? {
         return self
     }
 }

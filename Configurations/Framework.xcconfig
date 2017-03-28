@@ -35,7 +35,7 @@ PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.$(TARGET_NAME)
 PRODUCT_NAME = Deferred
 
 // Signing
-CODE_SIGN_IDENTITY = -
+CODE_SIGN_IDENTITY =
 DEVELOPMENT_TEAM = 439592V3LM
 
 // Swift Compiler - Custom Flags

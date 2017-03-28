@@ -1,3 +1,0 @@
-module Atomics {
-    header "include/Atomics.h"
-}

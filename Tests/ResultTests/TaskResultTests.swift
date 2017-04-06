@@ -9,7 +9,7 @@
 import XCTest
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Result
+@testable import Task
 @testable import TestSupport
 #else
 @testable import Deferred

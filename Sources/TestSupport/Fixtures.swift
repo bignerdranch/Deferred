@@ -9,7 +9,6 @@
 import XCTest
 import Deferred
 #if SWIFT_PACKAGE
-import Result
 import Task
 #endif
 

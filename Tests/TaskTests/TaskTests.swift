@@ -10,7 +10,6 @@ import XCTest
 import class Foundation.RunLoop
 
 #if SWIFT_PACKAGE
-import Result
 import Deferred
 @testable import Task
 @testable import TestSupport

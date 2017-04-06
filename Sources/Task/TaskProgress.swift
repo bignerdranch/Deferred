@@ -11,7 +11,6 @@ import Foundation
 #if SWIFT_PACKAGE
 import Atomics
 import Deferred
-import Result
 #elseif XCODE
 import Deferred.Atomics
 #endif

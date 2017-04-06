@@ -15,15 +15,12 @@ let package = Package(
         Target(name: "Deferred", dependencies: [
 			.Target(name: "Atomics")
         ]),
-        Target(name: "Result"),
         Target(name: "Task", dependencies: [
             .Target(name: "Deferred"),
-            .Target(name: "Result")
         ]),
 
         Target(name: "TestSupport", dependencies: [
             .Target(name: "Deferred"),
-            .Target(name: "Result"),
             .Target(name: "Task"),
         ]),
 
@@ -33,7 +30,6 @@ let package = Package(
         ]),
         Target(name: "ResultTests", dependencies: [
             .Target(name: "TestSupport"),
-            .Target(name: "Result"),
         ]),
         Target(name: "TaskTests", dependencies: [
             .Target(name: "TestSupport"),
@@ -42,5 +38,5 @@ let package = Package(
     ]
 )
 
-let dylib = Product(name: "Deferred", type: .Library(.Dynamic), modules: "Deferred", "Result", "Task")
+let dylib = Product(name: "Deferred", type: .Library(.Dynamic), modules: "Deferred", "Task")
 products.append(dylib)

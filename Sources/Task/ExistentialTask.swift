@@ -22,8 +22,17 @@ import Deferred.Atomics
 /// type, optionally combined with some `cancellation`.
 public final class Task<SuccessValue>: NSObject {
 
+    #if swift(>=3.1)
     /// An enum for returning and propogating recoverable errors.
+    public enum Result {
+        /// Contains the success value
+        case success(SuccessValue)
+        /// Contains the error value
+        case failure(Error)
+    }
+    #else
     public typealias Result = TaskResult<SuccessValue>
+    #endif
 
     fileprivate let future: Future<Result>
 

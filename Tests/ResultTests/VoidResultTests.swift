@@ -26,7 +26,7 @@ class VoidResultTests: XCTestCase {
         ]
     }
 
-    private typealias Result = TaskResult<Void>
+    private typealias Result = Task<Void>.Result
 
     private let aSuccessResult = Result.success(())
     private let aFailureResult = Result.failure(TestError.first)

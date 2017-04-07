@@ -34,7 +34,7 @@ class TaskResultTests: XCTestCase {
         ]
     }
 
-    private typealias Result = TaskResult<Int>
+    private typealias Result = Task<Int>.Result
 
     private let aSuccessResult = Result.success(42)
     private let aFailureResult = Result.failure(TestError.first)

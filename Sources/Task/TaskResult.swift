@@ -8,11 +8,12 @@
 
 /// An enum for returning and propogating recoverable errors.
 #if swift(>=3.1)
-public typealias TaskResult<Value> = Task<Value>.Result
+@available(*, deprecated, message: "Use Task.Result instead.")
+public typealias TaskResult<SuccessValue> = Task<SuccessValue>.Result
 #else
-public enum TaskResult<Value> {
+public enum TaskResult<SuccessValue> {
     /// Contains the success value
-    case success(Value)
+    case success(SuccessValue)
     /// Contains the error value
     case failure(Error)
 }
@@ -20,9 +21,7 @@ public enum TaskResult<Value> {
 
 extension TaskResult: Either {
 
-    #if swift(>=3.1)
     public typealias Value = SuccessValue
-    #endif
 
     public init(from body: () throws -> Value) {
         do {

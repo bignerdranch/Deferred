@@ -189,7 +189,7 @@ class TaskTests: CustomExecutorTestCase {
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     func testThatCancellationIsAppliedImmediatelyWhenMapping() {
         let beforeExpectation = expectation(description: "original task cancelled")
-        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>()) {
+        let beforeTask = Task<Int>(Deferred<Task<Int>.Result>()) {
             beforeExpectation.fulfill()
         }
 

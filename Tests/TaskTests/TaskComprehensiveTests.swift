@@ -107,7 +107,7 @@ private final class TaskProducer {
     }
 
     static private func sync(file: File) -> Task<()> {
-        let deferred = Deferred<TaskResult<()>>()
+        let deferred = Deferred<Task<Void>.Result>()
 
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.3) {

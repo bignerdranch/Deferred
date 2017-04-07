@@ -22,9 +22,10 @@ public enum TaskResult<SuccessValue> {
 #if swift(>=3.1)
 extension Task.Result: Either {
 
+    @available(*, deprecated, renamed: "SuccessValue")
     public typealias Value = SuccessValue
 
-    public init(from body: () throws -> Value) {
+    public init(from body: () throws -> SuccessValue) {
         do {
             self = try .success(body())
         } catch {
@@ -36,7 +37,7 @@ extension Task.Result: Either {
         self = .failure(error)
     }
 
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
+    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (SuccessValue) throws -> Return) rethrows -> Return {
         switch self {
         case let .success(value): return try right(value)
         case let .failure(error): return try left(error)
@@ -45,7 +46,7 @@ extension Task.Result: Either {
 
     /// Create an exclusive success/failure state derived from two optionals,
     /// in the style of Cocoa completion handlers.
-    public init(value: Value?, error: Error?) {
+    public init(value: SuccessValue?, error: Error?) {
         switch (value, error) {
         case (let v?, _):
             // Ignore error if value is non-nil
@@ -60,9 +61,10 @@ extension Task.Result: Either {
 #else
 extension TaskResult: Either {
     
+    @available(*, deprecated, renamed: "SuccessValue")
     public typealias Value = SuccessValue
     
-    public init(from body: () throws -> Value) {
+    public init(from body: () throws -> SuccessValue) {
         do {
             self = try .success(body())
         } catch {
@@ -74,7 +76,7 @@ extension TaskResult: Either {
         self = .failure(error)
     }
     
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
+    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (SuccessValue) throws -> Return) rethrows -> Return {
         switch self {
         case let .success(value): return try right(value)
         case let .failure(error): return try left(error)
@@ -83,7 +85,7 @@ extension TaskResult: Either {
     
     /// Create an exclusive success/failure state derived from two optionals,
     /// in the style of Cocoa completion handlers.
-    public init(value: Value?, error: Error?) {
+    public init(value: SuccessValue?, error: Error?) {
         switch (value, error) {
         case (let v?, _):
             // Ignore error if value is non-nil

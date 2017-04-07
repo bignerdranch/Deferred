@@ -6,11 +6,11 @@
 //  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
 //
 
-/// An enum for returning and propogating recoverable errors.
 #if swift(>=3.1)
 @available(*, deprecated, message: "Use Task.Result instead.")
 public typealias TaskResult<SuccessValue> = Task<SuccessValue>.Result
 #else
+/// An enum for returning and propogating recoverable errors.
 public enum TaskResult<SuccessValue> {
     /// Contains the success value
     case success(SuccessValue)

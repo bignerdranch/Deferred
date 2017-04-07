@@ -120,7 +120,7 @@ private final class TaskProducer {
     }
 
     static private func fetchFolderInfo(folderID: String) -> Task<[Item]> {
-        let deferred = Deferred<TaskResult<[Item]>>()
+        let deferred = Deferred<Task<[Item]>.Result>()
 
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.5) {

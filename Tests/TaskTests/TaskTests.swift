@@ -212,7 +212,7 @@ class TaskTests: CustomExecutorTestCase {
         progress.setUserInfoObject(true, forKey: key)
         progress.isCancellable = false
 
-        let task = Task<Int>(Deferred<TaskResult<Int>>(), progress: progress)
+        let task = Task<Int>(Deferred<Task<Int>.Result>(), progress: progress)
 
         XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0, accuracy: 0.001)
         XCTAssertEqual(progress.userInfo[key] as? Bool, true)

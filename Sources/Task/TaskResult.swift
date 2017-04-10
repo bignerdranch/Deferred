@@ -10,7 +10,7 @@
 @available(*, deprecated, message: "Use Task.Result instead.")
 public typealias TaskResult<SuccessValue> = Task<SuccessValue>.Result
 #else
-/// An enum for returning and propogating recoverable errors.
+/// An enum for returning and propagating recoverable errors.
 public enum TaskResult<SuccessValue> {
     /// Contains the success value
     case success(SuccessValue)

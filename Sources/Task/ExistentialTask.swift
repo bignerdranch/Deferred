@@ -23,7 +23,7 @@ import Deferred.Atomics
 public final class Task<SuccessValue>: NSObject {
 
     #if swift(>=3.1)
-    /// An enum for returning and propogating recoverable errors.
+    /// An enum for returning and propagating recoverable errors.
     public enum Result {
         /// Contains the success value
         case success(SuccessValue)

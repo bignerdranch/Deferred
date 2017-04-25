@@ -12,7 +12,6 @@ import Foundation
 #if SWIFT_PACKAGE
 import Atomics
 import Deferred
-import Result
 #elseif XCODE
 import Deferred.Atomics
 #endif
@@ -23,8 +22,17 @@ import Deferred.Atomics
 /// type, optionally combined with some `cancellation`.
 public final class Task<SuccessValue>: NSObject {
 
-    /// An enum for returning and propogating recoverable errors.
+    #if swift(>=3.1)
+    /// An enum for returning and propagating recoverable errors.
+    public enum Result {
+        /// Contains the success value
+        case success(SuccessValue)
+        /// Contains the error value
+        case failure(Error)
+    }
+    #else
     public typealias Result = TaskResult<SuccessValue>
+    #endif
 
     fileprivate let future: Future<Result>
 
@@ -158,7 +166,7 @@ extension Task {
 
     /// Creates an operation that has already completed with `value`.
     public convenience init(success value: @autoclosure() throws -> SuccessValue) {
-        let future = Future<Result>(value: TaskResult(from: value))
+        let future = Future<Result>(value: Result(from: value))
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.init(future: future, progress: .noWork())
 #else
@@ -168,7 +176,7 @@ extension Task {
 
     /// Creates an operation that has already failed with `error`.
     public convenience init(failure error: Error) {
-        let future = Future<Result>(value: TaskResult(failure: error))
+        let future = Future<Result>(value: Result(failure: error))
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.init(future: future, progress: .noWork())
 #else

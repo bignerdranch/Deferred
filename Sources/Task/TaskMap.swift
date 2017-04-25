@@ -8,7 +8,6 @@
 
 #if SWIFT_PACKAGE
 import Deferred
-import Result
 #endif
 
 extension Task {
@@ -39,13 +38,13 @@ extension Task {
         let progress = extendedProgress(byUnitCount: 1)
         #endif
 
-        let future: Future<TaskResult<NewSuccessValue>> = map(upon: executor) { (result) in
+        let future: Future<Task<NewSuccessValue>.Result> = map(upon: executor) { (result) in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             self.progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
             #endif
 
-            return TaskResult {
+            return Task<NewSuccessValue>.Result {
                 try transform(result.extract())
             }
         }

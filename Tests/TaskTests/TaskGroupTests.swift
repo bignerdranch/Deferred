@@ -10,7 +10,6 @@ import XCTest
 import Dispatch
 
 #if SWIFT_PACKAGE
-import Result
 import Deferred
 @testable import Task
 @testable import TestSupport
@@ -42,7 +41,7 @@ class TaskGroupTests: XCTestCase {
         let numTasks = 20
         var tasks = [Task<Void>]()
         for i in 0 ..< numTasks {
-            let deferred = Deferred<TaskResult<Void>>()
+            let deferred = Deferred<Task<Void>.Result>()
             let task = Task<Void>(deferred, cancellation: { _ in })
             tasks.append(task)
             accumulator.include(task)

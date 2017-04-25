@@ -9,7 +9,7 @@
 import XCTest
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Result
+@testable import Task
 @testable import TestSupport
 #else
 @testable import Deferred
@@ -23,7 +23,7 @@ class ResultRecoveryTests: XCTestCase {
         ]
     }
 
-    private typealias Result = TaskResult<String>
+    private typealias Result = Task<String>.Result
 
     private func tryIsSuccess(_ text: String?) throws -> String {
         guard let text = text, text == "success" else {

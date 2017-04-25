@@ -8,7 +8,6 @@
 
 #if SWIFT_PACKAGE
 import Deferred
-import Result
 #endif
 
 extension PromiseProtocol where Value: Either {

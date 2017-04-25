@@ -8,7 +8,6 @@
 
 #if SWIFT_PACKAGE
 import Deferred
-import Result
 #endif
 
 import Dispatch
@@ -48,7 +47,7 @@ extension Task {
         let cancellationToken = Deferred<Void>()
         #endif
 
-        let future: Future<TaskResult<NewTask.Value.Right>> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Right> in
+        let future: Future<Task<NewTask.Value.Right>.Result> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Right> in
             do {
                 let value = try result.extract()
 

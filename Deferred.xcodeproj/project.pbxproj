@@ -353,7 +353,6 @@
 				DB524CA11D85200C00DDF16D /* Deferred.h */,
 				DB524CA21D85200C00DDF16D /* Info.plist */,
 				DB39B2D01DDE194C00DDE4C0 /* module.modulemap */,
-				DB524CA31D85200C00DDF16D /* Result */,
 				DB524CA71D85200C00DDF16D /* Task */,
 			);
 			path = Sources;
@@ -377,19 +376,12 @@
 			path = Deferred;
 			sourceTree = "<group>";
 		};
-		DB524CA31D85200C00DDF16D /* Result */ = {
+		DB524CA71D85200C00DDF16D /* Task */ = {
 			isa = PBXGroup;
 			children = (
 				DB524CA51D85200C00DDF16D /* Either.swift */,
 				DB524CA41D85200C00DDF16D /* EitherRecovery.swift */,
 				DB524CA61D85200C00DDF16D /* TaskResult.swift */,
-			);
-			path = Result;
-			sourceTree = "<group>";
-		};
-		DB524CA71D85200C00DDF16D /* Task */ = {
-			isa = PBXGroup;
-			children = (
 				DB524CA91D85200C00DDF16D /* ExistentialTask.swift */,
 				DB524CAB1D85200C00DDF16D /* ResultFuture.swift */,
 				DB524CAC1D85200C00DDF16D /* ResultPromise.swift */,

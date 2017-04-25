@@ -9,7 +9,6 @@
 import XCTest
 import Deferred
 #if SWIFT_PACKAGE
-import Result
 import Task
 #endif
 
@@ -42,9 +41,9 @@ func sleep(_ duration: DispatchTimeInterval) {
 }
 
 extension XCTestCase {
-    func waitForTaskToComplete<T>(_ task: Task<T>, file: StaticString = #file, line: UInt = #line) -> TaskResult<T> {
+    func waitForTaskToComplete<T>(_ task: Task<T>, file: StaticString = #file, line: UInt = #line) -> Task<T>.Result {
         let expectation = self.expectation(description: "task completed")
-        var result: TaskResult<T>?
+        var result: Task<T>.Result?
         task.upon(.main) { [weak expectation] in
             result = $0
             expectation?.fulfill()

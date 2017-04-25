@@ -15,7 +15,6 @@ import XCTest
 import Dispatch
 
 #if SWIFT_PACKAGE
-    import Result
     import Deferred
     @testable import Task
     @testable import TestSupport
@@ -108,7 +107,7 @@ private final class TaskProducer {
     }
 
     static private func sync(file: File) -> Task<()> {
-        let deferred = Deferred<TaskResult<()>>()
+        let deferred = Deferred<Task<Void>.Result>()
 
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.3) {
@@ -121,7 +120,7 @@ private final class TaskProducer {
     }
 
     static private func fetchFolderInfo(folderID: String) -> Task<[Item]> {
-        let deferred = Deferred<TaskResult<[Item]>>()
+        let deferred = Deferred<Task<[Item]>.Result>()
 
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.5) {

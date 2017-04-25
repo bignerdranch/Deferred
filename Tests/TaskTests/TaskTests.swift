@@ -10,7 +10,6 @@ import XCTest
 import class Foundation.RunLoop
 
 #if SWIFT_PACKAGE
-import Result
 import Deferred
 @testable import Task
 @testable import TestSupport
@@ -190,7 +189,7 @@ class TaskTests: CustomExecutorTestCase {
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     func testThatCancellationIsAppliedImmediatelyWhenMapping() {
         let beforeExpectation = expectation(description: "original task cancelled")
-        let beforeTask = Task<Int>(Deferred<TaskResult<Int>>()) {
+        let beforeTask = Task<Int>(Deferred<Task<Int>.Result>()) {
             beforeExpectation.fulfill()
         }
 
@@ -213,7 +212,7 @@ class TaskTests: CustomExecutorTestCase {
         progress.setUserInfoObject(true, forKey: key)
         progress.isCancellable = false
 
-        let task = Task<Int>(Deferred<TaskResult<Int>>(), progress: progress)
+        let task = Task<Int>(Deferred<Task<Int>.Result>(), progress: progress)
 
         XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0, accuracy: 0.001)
         XCTAssertEqual(progress.userInfo[key] as? Bool, true)

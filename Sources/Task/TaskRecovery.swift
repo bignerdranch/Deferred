@@ -8,7 +8,6 @@
 
 #if SWIFT_PACKAGE
 import Deferred
-import Result
 #endif
 import Foundation
 
@@ -41,13 +40,13 @@ extension Task {
         let progress = extendedProgress(byUnitCount: 1)
         #endif
 
-        let future: Future<TaskResult<SuccessValue>> = map(upon: executor) { (result) in
+        let future: Future<Result> = map(upon: executor) { (result) in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
             #endif
 
-            return TaskResult {
+            return Result {
                 try result.withValues(ifLeft: { try substitution($0) }, ifRight: { $0 })
             }
         }
@@ -89,7 +88,7 @@ extension Task {
         let progress = extendedProgress(byUnitCount: 1)
         #endif
         
-        let future: Future<TaskResult<SuccessValue>> = andThen(upon: executor) { (result) -> Task<SuccessValue> in
+        let future: Future<Result> = andThen(upon: executor) { (result) -> Task<SuccessValue> in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }

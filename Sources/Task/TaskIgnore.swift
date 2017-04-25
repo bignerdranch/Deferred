@@ -8,7 +8,6 @@
 
 #if SWIFT_PACKAGE
 import Deferred
-import Result
 #endif
 
 extension Task {
@@ -24,8 +23,8 @@ extension Task {
     ///
     /// - see: map(transform:)
     public func ignored() -> Task<Void> {
-        let future = every { (result) -> TaskResult<Void> in
-            result.withValues(ifLeft: TaskResult.failure, ifRight: { _ in TaskResult.success() })
+        let future = every { (result) -> Task<Void>.Result in
+            result.withValues(ifLeft: Task<Void>.Result.failure, ifRight: { _ in Task<Void>.Result.success() })
         }
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

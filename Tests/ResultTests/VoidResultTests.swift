@@ -9,7 +9,7 @@
 import XCTest
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Result
+@testable import Task
 @testable import TestSupport
 #else
 @testable import Deferred
@@ -26,7 +26,7 @@ class VoidResultTests: XCTestCase {
         ]
     }
 
-    private typealias Result = TaskResult<Void>
+    private typealias Result = Task<Void>.Result
 
     private let aSuccessResult = Result.success(())
     private let aFailureResult = Result.failure(TestError.first)

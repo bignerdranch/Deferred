@@ -8,9 +8,6 @@
 
 import XCTest
 @testable import Deferred
-#if SWIFT_PACKAGE
-@testable import TestSupport
-#endif
 
 class FutureCustomExecutorTests: CustomExecutorTestCase {
     static var allTests: [(String, (FutureCustomExecutorTests) -> () throws -> Void)] {

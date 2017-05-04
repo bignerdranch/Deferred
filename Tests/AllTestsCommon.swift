@@ -1,23 +1,19 @@
 //
-//  Fixtures.swift
+//  AllTestsCommon.swift
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 6/10/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2017 Big Nerd Ranch. All rights reserved.
 //
 
 import XCTest
-import Deferred
-#if SWIFT_PACKAGE
-import Task
-#endif
-
-import Dispatch
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import Darwin
 #else
 import Glibc
 #endif
+import Dispatch
+import Deferred
 
 enum TestError: Error {
     case first
@@ -41,18 +37,6 @@ func sleep(_ duration: DispatchTimeInterval) {
 }
 
 extension XCTestCase {
-    func waitForTaskToComplete<T>(_ task: Task<T>, file: StaticString = #file, line: UInt = #line) -> Task<T>.Result {
-        let expectation = self.expectation(description: "task completed")
-        var result: Task<T>.Result?
-        task.upon(.main) { [weak expectation] in
-            result = $0
-            expectation?.fulfill()
-        }
-        waitForExpectations(file: file, line: line)
-
-        return result!
-    }
-
     func waitForExpectations(file: StaticString = #file, line: UInt = #line) {
         let timeout: Double = 10
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
@@ -79,16 +63,6 @@ extension XCTestCase {
 extension FutureProtocol {
     func waitShort() -> Value? {
         return wait(until: .now() + 0.05)
-    }
-}
-
-extension Either {
-    var value: Right? {
-        return withValues(ifLeft: { _ in nil }, ifRight: { $0 })
-    }
-
-    var error: Left? {
-        return withValues(ifLeft: { $0 }, ifRight: { _ in nil })
     }
 }
 

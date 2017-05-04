@@ -8,9 +8,6 @@
 
 import XCTest
 @testable import Deferred
-#if SWIFT_PACKAGE
-@testable import TestSupport
-#endif
 
 import Dispatch
 #if os(Linux)

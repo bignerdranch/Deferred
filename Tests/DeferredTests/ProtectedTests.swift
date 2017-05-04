@@ -11,9 +11,6 @@ import Dispatch
 import Foundation
 
 @testable import Deferred
-#if SWIFT_PACKAGE
-@testable import TestSupport
-#endif
 
 class ProtectedTests: XCTestCase {
     static var allTests: [(String, (ProtectedTests) -> () throws -> Void)] {

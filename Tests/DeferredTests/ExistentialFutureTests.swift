@@ -8,9 +8,6 @@
 
 import XCTest
 @testable import Deferred
-#if SWIFT_PACKAGE
-@testable import TestSupport
-#endif
 
 class ExistentialFutureTests: XCTestCase {
     static var allTests: [(String, (ExistentialFutureTests) -> () throws -> Void)] {

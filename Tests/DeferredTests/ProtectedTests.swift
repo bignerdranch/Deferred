@@ -46,7 +46,7 @@ class ProtectedTests: XCTestCase {
                     } else if items.count == 5 && date == lastWriterDate {
                         // OK - we're after the writer has added items
                     } else {
-                        XCTFail("invalid count (\(items.count)) or date (\(date))")
+                        XCTFail("invalid count (\(items.count)) or date (\(String(describing: date)))")
                     }
                 }
                 expectation.fulfill()

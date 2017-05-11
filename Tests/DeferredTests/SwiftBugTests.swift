@@ -1,6 +1,6 @@
 //
 //  SwiftBugTests.swift
-//  Deferred
+//  DeferredTests
 //
 //  Created by Zachary Waldowski on 11/16/16.
 //  Copyright © 2016 Big Nerd Ranch. All rights reserved.
@@ -9,9 +9,6 @@
 import XCTest
 
 @testable import Deferred
-#if SWIFT_PACKAGE
-@testable import TestSupport
-#endif
 
 class SwiftBugTests: XCTestCase {
     static var allTests: [(String, (SwiftBugTests) -> () throws -> Void)] {

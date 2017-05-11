@@ -16,25 +16,10 @@ let package = Package(
 			.Target(name: "Atomics")
         ]),
         Target(name: "Task", dependencies: [
-            .Target(name: "Deferred"),
-        ]),
-
-        Target(name: "TestSupport", dependencies: [
-            .Target(name: "Deferred"),
-            .Target(name: "Task"),
-        ]),
-
-        Target(name: "DeferredTests", dependencies: [
-            .Target(name: "TestSupport"),
-            .Target(name: "Deferred"),
-        ]),
-        Target(name: "ResultTests", dependencies: [
-            .Target(name: "TestSupport"),
-        ]),
-        Target(name: "TaskTests", dependencies: [
-            .Target(name: "TestSupport"),
-            .Target(name: "Task"),
-        ]),
+            .Target(name: "Deferred")
+        ])
+    ], exclude: [
+        "Tests/AllTestsCommon.swift"
     ]
 )
 

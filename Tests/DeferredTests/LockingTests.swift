@@ -13,7 +13,6 @@ import Foundation
 @testable import Deferred
 #if SWIFT_PACKAGE
 import Atomics
-@testable import TestSupport
 #else
 import Deferred.Atomics
 #endif

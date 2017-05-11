@@ -8,25 +8,23 @@
 
 import XCTest
 @testable import DeferredTests
-@testable import ResultTests
 @testable import TaskTests
 
 XCTMain([
     testCase(DeferredTests.allTests),
-    testCase(SwiftBugTests.allTests),
     testCase(ExistentialFutureTests.allTests),
     testCase(FutureCustomExecutorTests.allTests),
     testCase(FutureIgnoreTests.allTests),
     testCase(FutureTests.allTests),
     testCase(LockingTests.allTests),
     testCase(ProtectedTests.allTests),
+    testCase(SwiftBugTests.allTests),
 
     testCase(ResultRecoveryTests.allTests),
-    testCase(TaskResultTests.allTests),
-    testCase(VoidResultTests.allTests),
-
     testCase(TaskComprehensiveTests.allTests),
     testCase(TaskGroupTests.allTests),
+    testCase(TaskResultTests.allTests),
     testCase(TaskTests.allTests),
     testCase(TaskWorkItemTests.allTests),
+    testCase(VoidResultTests.allTests)
 ])

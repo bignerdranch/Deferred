@@ -1,6 +1,6 @@
 //
 //  FutureTests.swift
-//  Deferred
+//  DeferredTests
 //
 //  Created by Zachary Waldowski on 9/24/16.
 //  Copyright © 2016 Big Nerd Ranch. All rights reserved.
@@ -12,7 +12,6 @@ import Dispatch
 @testable import Deferred
 #if SWIFT_PACKAGE
 import Atomics
-@testable import TestSupport
 #else
 import Deferred.Atomics
 #endif

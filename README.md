@@ -6,7 +6,7 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 
 |                                                                                              |
 |----------------------------------------------------------------------------------------------|
-|[![Swift 3.0](https://img.shields.io/badge/swift-3.0.x-EF5138.svg)][Swift]                    |
+|[![Swift 3.x](https://img.shields.io/badge/swift-3.x-EF5138.svg)][Swift]                      |
 |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]                |
 |![Multiplatform](https://img.shields.io/badge/platforms-macOS,_iOS,_linux,_bsd-lightgrey.svg) |
 |[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred.svg)][CI]                   |

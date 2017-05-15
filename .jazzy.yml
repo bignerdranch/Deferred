@@ -56,3 +56,4 @@ hide_documentation_coverage: true
 module: Deferred
 root_url: "https://bignerdranch.github.io/Deferred/"
 theme: fullwidth
+use_safe_filenames: true

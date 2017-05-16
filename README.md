@@ -25,6 +25,6 @@ See Deferred's comprehensive programming guide and documentation at the [Deferre
 
 If you have a question not answered by there or the module comments, please open an issue!
 
-## Premium Support
+## Need Some Help?
 
-Deferred, as open source projects, is free to use and always will be. [Big Nerd Ranch](https://bignerdranch.com/) offers premium Deferred support, Code Audits and general mobile app design/development services. Email us at [sales@bignerdranch.com](mailto:sales@bignerdranch.com) to get in touch with us for more details.
+Deferred, as open source projects, is free to use and always will be. [Big Nerd Ranch](https://bignerdranch.com/) offers help for Deferred, Code Audits and general mobile app design/development services. Email us at [sales@bignerdranch.com](mailto:sales@bignerdranch.com) to get in touch with us for more details.

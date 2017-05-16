@@ -24,3 +24,7 @@ Deferred lets you work with values that haven't been determined yet, like an arr
 See Deferred's comprehensive programming guide and documentation at the [Deferred Reference](https://bignerdranch.github.io/Deferred/).
 
 If you have a question not answered by there or the module comments, please open an issue!
+
+## Premium Support
+
+Deferred, as open source projects, is free to use and always will be. [Big Nerd Ranch](https://bignerdranch.com/) offers premium Deferred support, Code Audits and general mobile app design/development services. Email us at [sales@bignerdranch.com](mailto:sales@bignerdranch.com) to get in touch with us for more details.

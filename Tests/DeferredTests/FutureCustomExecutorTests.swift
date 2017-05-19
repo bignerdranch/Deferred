@@ -50,7 +50,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     }
 
     // Should this be promoted to an initializer on Future?
-    private func delay<Value>(_ value: @autoclosure @escaping(Void) -> Value) -> Future<Value> {
+    private func delay<Value>(_ value: @autoclosure @escaping() -> Value) -> Future<Value> {
         let d = Deferred<Value>()
         afterDelay {
             d.fill(with: value())

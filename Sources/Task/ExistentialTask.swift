@@ -59,7 +59,7 @@ public final class Task<SuccessValue>: NSObject {
     ///
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
-    public convenience init(future base: Future<Result>, cancellation: ((Void) -> Void)? = nil) {
+    public convenience init(future base: Future<Result>, cancellation: (() -> Void)? = nil) {
         let progress = Progress.wrapped(base, cancellation: cancellation)
         self.init(future: base, progress: progress)
     }
@@ -77,7 +77,7 @@ public final class Task<SuccessValue>: NSObject {
     ///
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
-    public init(future: Future<Result>, cancellation: ((Void) -> Void)? = nil) {
+    public init(future: Future<Result>, cancellation: (() -> Void)? = nil) {
         self.future = future
         self.cancellation = cancellation ?? {}
     }
@@ -146,7 +146,7 @@ extension Task {
     ///
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
-    public convenience init<OtherFuture: FutureProtocol>(_ base: OtherFuture, cancellation: ((Void) -> Void)? = nil)
+    public convenience init<OtherFuture: FutureProtocol>(_ base: OtherFuture, cancellation: (() -> Void)? = nil)
         where OtherFuture.Value: Either, OtherFuture.Value.Left == Error, OtherFuture.Value.Right == SuccessValue {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.init(future: Future(task: base), progress: .wrapped(base, cancellation: cancellation))

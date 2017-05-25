@@ -47,7 +47,7 @@ class FutureIgnoreTests: XCTestCase {
 
         for _ in 0 ..< 10 {
             let expect = expectation(description: "upon blocks not called while deferred is unfilled")
-            future.upon {
+            future.upon { _ in
                 XCTAssertEqual(d.value, 1)
                 expect.fulfill()
             }

@@ -35,7 +35,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     func testMap() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let mapped = marker.map(upon: executor) { testValue }
+        let mapped = marker.map(upon: executor) { _ in testValue }
 
         let expect = expectation(description: "upon block called when deferred is filled")
         mapped.upon(executor) {

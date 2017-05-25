@@ -40,7 +40,8 @@ class ProtectedTests: XCTestCase {
         let startReader: (Int) -> () = { iteration in
             let expectation = self.expectation(description: "reader \(iteration)")
             self.queue.async {
-                self.protected.withReadLock { (date, items) -> () in
+                self.protected.withReadLock { (arg) -> () in
+                    let (date, items) = arg
                     if items.isEmpty && date == nil {
                         // OK - we're before the writer has added items
                     } else if items.count == 5 && date == lastWriterDate {

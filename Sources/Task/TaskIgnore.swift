@@ -24,7 +24,7 @@ extension Task {
     /// - see: map(transform:)
     public func ignored() -> Task<Void> {
         let future = every { (result) -> Task<Void>.Result in
-            result.withValues(ifLeft: Task<Void>.Result.failure, ifRight: { _ in Task<Void>.Result.success() })
+            result.withValues(ifLeft: Task<Void>.Result.failure, ifRight: { _ in Task<Void>.Result.success(()) })
         }
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

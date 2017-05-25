@@ -62,7 +62,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         }
 
         group.notify(queue: queue) {
-            _ = coalescingDeferred.fill(with: .success())
+            _ = coalescingDeferred.fill(with: .success(()))
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

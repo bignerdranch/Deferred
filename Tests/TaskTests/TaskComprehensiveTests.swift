@@ -110,7 +110,7 @@ private final class TaskProducer {
 
         let queue = DispatchQueue(label: String.random())
         queue.asyncAfter(deadline: .now() + 0.3) {
-            deferred.fill(with: .success())
+            deferred.fill(with: .success(()))
         }
 
         return Task(future: Future(deferred), cancellation: {

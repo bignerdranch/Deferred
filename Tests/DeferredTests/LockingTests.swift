@@ -114,9 +114,9 @@ class LockingTests: XCTestCase {
                     lock.withWriteLock {
                         // ... and make sure each runs in order by checking that
                         // no two blocks increment x at the same time
-                        XCTAssertEqual(x.increment(), 1)
+                        XCTAssertEqual(bnr_atomic_counter_increment(&x), 1)
                         sleep(.milliseconds(50))
-                        XCTAssertEqual(x.decrement(), 0)
+                        XCTAssertEqual(bnr_atomic_counter_decrement(&x), 0)
                         expectation.fulfill()
                     }
                 }
@@ -135,7 +135,7 @@ class LockingTests: XCTestCase {
                     lock.withReadLock {
                         // make sure we get the value of x either before or after
                         // the writer runs, never a partway-through value
-                        let result = x.load()
+                        let result = bnr_atomic_counter_load(&x)
                         XCTAssertTrue(result == 0 || result == 5)
                         expectation.fulfill()
                     }
@@ -151,7 +151,7 @@ class LockingTests: XCTestCase {
             queue.async {
                 lock.withWriteLock {
                     for _ in 0 ..< 5 {
-                        x.increment()
+                        bnr_atomic_counter_increment(&x)
                         sleep(.milliseconds(100))
                     }
                     expectation.fulfill()

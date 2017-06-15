@@ -34,7 +34,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         let progress = Progress(parent: nil, userInfo: nil)
         progress.totalUnitCount = numericCast(count)
         #else
-        var cancellations = Array<(Void) -> Void>()
+        var cancellations = Array<() -> Void>()
         cancellations.reserveCapacity(numericCast(underestimatedCount))
         #endif
 
@@ -62,7 +62,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         }
 
         group.notify(queue: queue) {
-            _ = coalescingDeferred.fill(with: .success())
+            _ = coalescingDeferred.fill(with: .success(()))
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

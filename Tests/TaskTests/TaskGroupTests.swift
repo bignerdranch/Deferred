@@ -41,7 +41,7 @@ class TaskGroupTests: XCTestCase {
         var tasks = [Task<Void>]()
         for i in 0 ..< numTasks {
             let deferred = Deferred<Task<Void>.Result>()
-            let task = Task<Void>(deferred, cancellation: { _ in })
+            let task = Task<Void>(deferred, cancellation: nil)
             tasks.append(task)
             accumulator.include(task)
 

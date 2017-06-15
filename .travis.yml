@@ -1,7 +1,10 @@
 language: objective-c
 os: osx
 osx_image: xcode8.3
+rvm:
+  - 2.2.5
 before_install:
+  - rvm install ruby-2.2.5
   - rvm use 2.2.5
 install:
   - gem install fastlane --no-rdoc --no-ri --no-document --quiet

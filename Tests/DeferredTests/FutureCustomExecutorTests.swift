@@ -35,7 +35,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     func testMap() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let mapped = marker.map(upon: executor) { testValue }
+        let mapped = marker.map(upon: executor) { _ in testValue }
 
         let expect = expectation(description: "upon block called when deferred is filled")
         mapped.upon(executor) {
@@ -50,7 +50,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     }
 
     // Should this be promoted to an initializer on Future?
-    private func delay<Value>(_ value: @autoclosure @escaping(Void) -> Value) -> Future<Value> {
+    private func delay<Value>(_ value: @autoclosure @escaping() -> Value) -> Future<Value> {
         let d = Deferred<Value>()
         afterDelay {
             d.fill(with: value())

@@ -127,7 +127,7 @@ extension Task {
 
 #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
     fileprivate func markCancelled() {
-        _ = rawIsCancelled.testAndSet()
+        _ = bnr_atomic_flag_test_and_set(&rawIsCancelled)
     }
 #endif
 
@@ -136,7 +136,7 @@ extension Task {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return progress.isCancelled
 #else
-        return rawIsCancelled.test()
+        return bnr_atomic_flag_test(&rawIsCancelled)
 #endif
     }
 }

@@ -15,6 +15,9 @@ matrix:
   include:
     - script: fastlane ios ci
       env: JOB=iOS
+      after_failure:
+        - cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-MobileDeferredTests-*.log | true
+        - cat ~/Library/Logs/scan/Deferred-*.log | true
     - language: generic
       os: linux
       dist: trusty

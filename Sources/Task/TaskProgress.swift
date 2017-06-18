@@ -117,7 +117,7 @@ private final class ProxyProgress: Progress {
 
         init(observing observee: Progress, observer: ProxyProgress) {
             self.observer = observer
-            state.setInitialValue(State.ready.rawValue)
+            bnr_atomic_bitmask_init(&state, State.ready.rawValue)
             super.init()
 
             for key in Observation.attributes {
@@ -126,13 +126,13 @@ private final class ProxyProgress: Progress {
             observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: Observation.options, context: &Observation.cancelledContext)
             observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: Observation.options, context: &Observation.pausedContext)
 
-            state.or(with: State.observing.rawValue, order: .write)
+            bnr_atomic_bitmask_or(&state, State.observing.rawValue, .write)
         }
 
         func cancel(observing observee: Progress) {
-            let oldState = State(rawValue: state.and(with: ~State.ready.rawValue, order: .none))
+            let oldState = State(rawValue: bnr_atomic_bitmask_and(&state, ~State.ready.rawValue, .none))
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
-            state.or(with: State.cancelled.rawValue, order: .none)
+            bnr_atomic_bitmask_or(&state, State.cancelled.rawValue, .none)
 
             for key in Observation.attributes {
                 observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
@@ -142,7 +142,7 @@ private final class ProxyProgress: Progress {
         }
 
         override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-            guard let keyPath = keyPath, object != nil, state.test(for: State.ready.rawValue), let observer = observer, let newValue = change?[.newKey] else { return }
+            guard let keyPath = keyPath, object != nil, bnr_atomic_bitmask_test(&state, State.ready.rawValue), let observer = observer, let newValue = change?[.newKey] else { return }
             switch context {
             case (&Observation.cancelledContext)?:
                 // Gotta trust KVO a little
@@ -239,7 +239,7 @@ extension Progress {
                 progress.totalUnitCount = 1
                 progress.completedUnitCount = 1
             }
-            
+
             return progress
         }
     }
@@ -317,3 +317,4 @@ extension Task {
 }
 
 #endif
+

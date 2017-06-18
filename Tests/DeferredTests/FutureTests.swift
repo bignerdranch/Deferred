@@ -112,7 +112,7 @@ class FutureTests: XCTestCase {
         var counter = UnsafeAtomicCounter()
 
         let mapped = d.every { (value) -> (Int) in
-            counter.increment()
+            bnr_atomic_counter_increment(&counter)
             return value * 2
         }
 
@@ -125,6 +125,6 @@ class FutureTests: XCTestCase {
 
         XCTAssertEqual(mapped.waitShort(), 2)
 
-        XCTAssertEqual(counter.load(), 2)
+        XCTAssertEqual(bnr_atomic_counter_load(&counter), 2)
     }
 }

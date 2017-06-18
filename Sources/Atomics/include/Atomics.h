@@ -18,14 +18,6 @@
 #endif // !__APPLE__
 #include <pthread.h>
 
-#if !defined(OS_INLINE)
-#if __GNUC__
-#define OS_INLINE static __inline__
-#else
-#define OS_INLINE
-#endif // !__GNUC__
-#endif // !OS_INLINE
-
 #if !defined(OS_ALWAYS_INLINE)
 #if __GNUC__
 #define OS_ALWAYS_INLINE __attribute__((__always_inline__))
@@ -60,8 +52,8 @@ typedef struct {
     } __impl;
 } bnr_spinlock_t;
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.setup(self:))
-void bnr_native_lock_create(bnr_spinlock_t *_Nonnull address) {
+OS_ALWAYS_INLINE
+static inline void bnr_native_lock_init(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {
         address->__impl.modern = OS_UNFAIR_LOCK_INIT;
@@ -72,8 +64,8 @@ void bnr_native_lock_create(bnr_spinlock_t *_Nonnull address) {
     pthread_mutex_init(&address->__impl.legacy, NULL);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.invalidate(self:))
-void bnr_native_lock_destroy(bnr_spinlock_t *_Nonnull address) {
+OS_ALWAYS_INLINE
+static inline void bnr_native_lock_destroy(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {
         return;
@@ -83,8 +75,8 @@ void bnr_native_lock_destroy(bnr_spinlock_t *_Nonnull address) {
     pthread_mutex_destroy(&address->__impl.legacy);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.lock(self:))
-void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
+OS_ALWAYS_INLINE
+static inline void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_lock != NULL) {
         return os_unfair_lock_lock(&address->__impl.modern);
@@ -94,8 +86,8 @@ void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
     pthread_mutex_lock(&address->__impl.legacy);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.try(self:))
-bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
+OS_ALWAYS_INLINE
+static inline bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {
         return os_unfair_lock_trylock(&address->__impl.modern);
@@ -105,8 +97,8 @@ bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
     return pthread_mutex_trylock(&address->__impl.legacy) == 0;
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeNativeLock.unlock(self:))
-void bnr_native_lock_unlock(bnr_spinlock_t *_Nonnull address) {
+OS_ALWAYS_INLINE
+static inline void bnr_native_lock_unlock(bnr_spinlock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_unlock != NULL) {
         return os_unfair_lock_unlock(&address->__impl.modern);
@@ -121,13 +113,13 @@ typedef struct {
     _Atomic(void *_Nullable) value;
 } bnr_atomic_ptr_t;
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.load(self:order:))
-void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_Nonnull target, bnr_atomic_memory_order_t order) {
+OS_ALWAYS_INLINE
+static inline void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_Nonnull target, bnr_atomic_memory_order_t order) {
     return __c11_atomic_load(&target->value, order);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicRawPointer.compareAndSwap(self:from:to:order:))
-bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable expected, void *_Nullable desired, bnr_atomic_memory_order_t order) {
+OS_ALWAYS_INLINE
+static inline bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable expected, void *_Nullable desired, bnr_atomic_memory_order_t order) {
     return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
 }
 
@@ -136,13 +128,13 @@ typedef struct {
     _Atomic(bool) value;
 } bnr_atomic_flag_t;
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBool.testAndSet(self:))
-bool bnr_atomic_flag_test_and_set(volatile bnr_atomic_flag_t *_Nonnull target) {
+OS_ALWAYS_INLINE
+static inline bool bnr_atomic_flag_test_and_set(volatile bnr_atomic_flag_t *_Nonnull target) {
     return __c11_atomic_exchange(&target->value, 1, __ATOMIC_RELAXED);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBool.test(self:))
-bool bnr_atomic_flag_test(volatile bnr_atomic_flag_t *_Nonnull target) {
+OS_ALWAYS_INLINE
+static inline bool bnr_atomic_flag_test(volatile bnr_atomic_flag_t *_Nonnull target) {
     return __c11_atomic_load(&target->value, __ATOMIC_RELAXED);
 }
 
@@ -151,23 +143,23 @@ typedef struct {
     _Atomic(uint_fast8_t) value;
 } bnr_atomic_bitmask_t;
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.setInitialValue(self:_:))
-void bnr_atomic_bitmask_init(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
+OS_ALWAYS_INLINE
+static inline void bnr_atomic_bitmask_init(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
     __c11_atomic_init(&target->value, value);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.or(self:with:order:))
-uint_fast8_t bnr_atomic_bitmask_or(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
+OS_ALWAYS_INLINE
+static inline uint_fast8_t bnr_atomic_bitmask_or(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
     return __c11_atomic_fetch_or(&target->value, value, order);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.and(self:with:order:))
-uint_fast8_t bnr_atomic_bitmask_and(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
+OS_ALWAYS_INLINE
+static inline uint_fast8_t bnr_atomic_bitmask_and(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value, bnr_atomic_memory_order_t order) {
     return __c11_atomic_fetch_and(&target->value, value, order);
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicBitmask.test(self:for:))
-bool bnr_atomic_bitmask_test(const bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
+OS_ALWAYS_INLINE
+static inline bool bnr_atomic_bitmask_test(const bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
     return (__c11_atomic_load((_Atomic(uint_fast8_t) *)&target->value, __ATOMIC_RELAXED) & value) != 0;
 }
 
@@ -176,18 +168,18 @@ typedef struct {
     _Atomic(int_fast32_t) value;
 } bnr_atomic_counter_t;
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicCounter.increment(self:))
-int_fast32_t bnr_atomic_counter_increment(volatile bnr_atomic_counter_t *_Nonnull target) {
+OS_ALWAYS_INLINE
+static inline int_fast32_t bnr_atomic_counter_increment(volatile bnr_atomic_counter_t *_Nonnull target) {
     return __c11_atomic_fetch_add(&target->value, 1, __ATOMIC_SEQ_CST) + 1;
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicCounter.decrement(self:))
-int_fast32_t bnr_atomic_counter_decrement(volatile bnr_atomic_counter_t *_Nonnull target) {
+OS_ALWAYS_INLINE
+static inline int_fast32_t bnr_atomic_counter_decrement(volatile bnr_atomic_counter_t *_Nonnull target) {
     return __c11_atomic_fetch_sub(&target->value, 1, __ATOMIC_SEQ_CST) - 1;
 }
 
-OS_INLINE OS_ALWAYS_INLINE OS_SWIFT_NAME(UnsafeAtomicCounter.load(self:))
-int_fast32_t bnr_atomic_counter_load(volatile bnr_atomic_counter_t *_Nonnull target) {
+OS_ALWAYS_INLINE
+static inline int_fast32_t bnr_atomic_counter_load(volatile bnr_atomic_counter_t *_Nonnull target) {
     return __c11_atomic_load(&target->value, __ATOMIC_SEQ_CST);
 }
 

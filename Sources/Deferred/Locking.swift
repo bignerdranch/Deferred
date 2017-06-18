@@ -70,22 +70,22 @@ public final class NativeLock: Locking, MaybeLocking {
 
     /// Creates a standard platform lock.
     public init() {
-        lock.setup()
+        bnr_native_lock_init(&lock)
     }
 
     deinit {
-        lock.invalidate()
+        bnr_native_lock_destroy(&lock)
     }
 
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        lock.lock()
-        defer { lock.unlock() }
+        bnr_native_lock_lock(&lock)
+        defer { bnr_native_lock_unlock(&lock) }
         return try body()
     }
 
     public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
-        guard lock.try() else { return nil }
-        defer { lock.unlock() }
+        guard bnr_native_lock_trylock(&lock) else { return nil }
+        defer { bnr_native_lock_unlock(&lock) }
         return body()
     }
 

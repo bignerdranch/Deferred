@@ -65,8 +65,4 @@ platform :ios do
     test
     build_for_other_platforms
   end
-
-  error do |lane, exception|
-    sh "cat ~/Library/Logs/DiagnosticReports/xctest*.crash | true"
-  end
 end

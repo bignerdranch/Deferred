@@ -630,14 +630,18 @@
 				TargetAttributes = {
 					DB126C9F1E53685300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 439592V3LM;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CA71E53685300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CBB1E53685C00054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 439592V3LM;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -648,6 +652,7 @@
 					};
 					DB126CD71E53686900054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 439592V3LM;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CDF1E53686900054E95 = {
@@ -656,6 +661,7 @@
 					};
 					DB126CF31E53687300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 439592V3LM;
 						ProvisioningStyle = Automatic;
 					};
 				};

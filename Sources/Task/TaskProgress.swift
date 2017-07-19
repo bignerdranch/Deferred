@@ -24,18 +24,8 @@ private final class ProxyProgress: Progress {
     private var token: Observation?
 
     init(attachingTo observee: Progress) {
-        let current = Progress.current()
         self.observee = observee
-        super.init(parent: current, userInfo: nil)
-
-        if current?.isCancelled == true {
-            observee.cancel()
-        }
-
-        if current?.isPaused == true {
-            observee.pause()
-        }
-
+        super.init(parent: .current(), userInfo: nil)
         token = Observation(observing: observee, observer: self)
     }
 
@@ -46,31 +36,35 @@ private final class ProxyProgress: Progress {
 
     @objc private func inheritCancelled(_ value: Bool) {
         if value {
-            cancellationHandler = nil
-            cancel()
-        } else {
-            cancellationHandler = observee.cancel
+            super.cancel()
         }
     }
 
     @objc private func inheritPaused(_ value: Bool) {
         if value {
-            pausingHandler = nil
-            pause()
-            if #available(OSX 10.11, iOS 9.0, *) {
-                resumingHandler = observee.resume
-            }
-        } else if #available(OSX 10.11, iOS 9.0, *) {
-            resumingHandler = nil
-            resume()
-            pausingHandler = observee.pause
+            super.pause()
+        } else if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
+            super.resume()
         }
+    }
+
+    @objc private func inheritValue(_ value: Any, forKeyPath keyPath: String) {
+        setValue(value, forKeyPath: keyPath)
     }
 
     // MARK: - Derived values
 
-    @objc private func inheritValue(_ value: Any, forKeyPath keyPath: String) {
-        setValue(value, forKeyPath: keyPath)
+    override func cancel() {
+        observee.cancel()
+    }
+
+    override func pause() {
+        observee.pause()
+    }
+
+    @available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *)
+    override func resume() {
+        observee.resume()
     }
 
     @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
@@ -172,7 +166,7 @@ extension Progress {
     /// compatible path.
     @discardableResult
     @nonobjc func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
-        if #available(OSX 10.11, iOS 9.0, *), canAdopt {
+        if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *), canAdopt {
             addChild(progress, withPendingUnitCount: pendingUnitCount)
             return progress
         } else {

@@ -102,3 +102,15 @@ extension TaskResult: Either {
 private enum TaskResultInitializerError: Error {
     case invalidInput
 }
+
+#if swift(>=3.2)
+extension Task.Result where SuccessValue == Void {
+
+    /// Creates the success value.
+    @available(swift 4)
+    public init() {
+        self = .success(())
+    }
+
+}
+#endif

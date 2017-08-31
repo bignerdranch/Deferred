@@ -27,3 +27,13 @@ extension PromiseProtocol where Value: Either {
         return fill(with: Value(failure: error))
     }
 }
+
+#if swift(>=3.2)
+extension PromiseProtocol where Value: Either, Value.Right == Void {
+    /// Notes the completion of the event with a success.
+    @discardableResult @available(swift 4)
+    public func succeed() -> Bool {
+        return succeed(with: ())
+    }
+}
+#endif

@@ -57,3 +57,17 @@ extension PromiseProtocol {
         }
     }
 }
+
+#if swift(>=3.2)
+extension PromiseProtocol where Value == Void {
+    /// Determines the promised event.
+    ///
+    /// Filling a deferred event should usually be attempted only once.
+    ///
+    /// - returns: Whether the promise was fulfilled.
+    @discardableResult @available(swift 4)
+    func fill() -> Bool {
+        return fill(with: ())
+    }
+}
+#endif

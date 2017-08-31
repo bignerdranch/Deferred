@@ -41,6 +41,7 @@ public final class Task<SuccessValue>: NSObject {
     ///
     /// If the task does not report progress, this progress is indeterminate,
     /// and becomes determinate and completed when the task is finished.
+    @objc dynamic
     public let progress: Progress
 
     /// Creates a task given a `future` and its `progress`.

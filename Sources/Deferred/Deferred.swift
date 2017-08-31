@@ -64,9 +64,9 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     }
 
     public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
-        if let queue = executor.underlyingQueue {
+        if let queue = executor as? DispatchQueue {
             return upon(queue, execute: body)
-        } else if let queue = executor as? DispatchQueue {
+        } else if let queue = executor.underlyingQueue {
             return upon(queue, execute: body)
         }
 

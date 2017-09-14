@@ -43,7 +43,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
             if let task = future as? Task<Iterator.Element.Value.Right> {
                 progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             } else {
-                progress.adoptChild(.wrapped(future, cancellation: nil), orphaned: true, pendingUnitCount: 1)
+                progress.adoptChild(.wrappingSuccess(of: future, cancellation: nil), orphaned: true, pendingUnitCount: 1)
             }
             #else
             if let task = future as? Task<Iterator.Element.Value.Right> {

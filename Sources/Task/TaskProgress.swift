@@ -210,8 +210,28 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    @nonobjc static func wrapped<Future: FutureProtocol>(_ future: Future, cancellation: (() -> Void)?) -> Progress where Future.Value: Either {
-        switch (future as? Task<Future.Value.Right>, cancellation) {
+    @nonobjc static func wrappingCompletion<OtherFuture: FutureProtocol>(of base: OtherFuture, cancellation: (() -> Void)?) -> Progress {
+        let progress = Progress(parent: nil, userInfo: nil)
+        progress.totalUnitCount = base.wait(until: .now()) != nil ? 0 : -1
+
+        if let cancellation = cancellation {
+            progress.cancellationHandler = cancellation
+        } else {
+            progress.isCancellable = false
+        }
+
+        base.upon(.global(qos: .utility)) { _ in
+            progress.totalUnitCount = 1
+            progress.completedUnitCount = 1
+        }
+
+        return progress
+    }
+
+    /// A simple indeterminate progress with a cancellation function.
+    @nonobjc static func wrappingSuccess<OtherTask: FutureProtocol>(of base: OtherTask, cancellation: (() -> Void)?) -> Progress
+        where OtherTask.Value: Either {
+        switch (base as? Task<OtherTask.Value.Right>, cancellation) {
         case (let task?, nil):
             return task.progress
         case (let task?, let cancellation?):
@@ -221,21 +241,7 @@ extension Progress {
             progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             return progress
         default:
-            let progress = Progress(parent: nil, userInfo: nil)
-            progress.totalUnitCount = future.wait(until: .now()) != nil ? 0 : -1
-
-            if let cancellation = cancellation {
-                progress.cancellationHandler = cancellation
-            } else {
-                progress.isCancellable = false
-            }
-
-            future.upon(.global(qos: .utility)) { _ in
-                progress.totalUnitCount = 1
-                progress.completedUnitCount = 1
-            }
-
-            return progress
+            return .wrappingCompletion(of: base, cancellation: cancellation)
         }
     }
 }

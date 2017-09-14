@@ -61,10 +61,10 @@ extension FutureProtocol where Value: Either {
     }
 }
 
-extension Future where Value: Either {
+extension Future where Value: Either, Value.Left == Error {
     /// Create a future having the same underlying task as `other`.
     public init<Other: FutureProtocol>(task other: Other)
-        where Other.Value: Either, Other.Value.Left == Error, Other.Value.Right == Value.Right {
+        where Other.Value: Either, Other.Value.Left == Value.Left, Other.Value.Right == Value.Right {
         if let asSelf = other as? Future<Value> {
             self.init(asSelf)
         } else {
@@ -72,5 +72,13 @@ extension Future where Value: Either {
                 Value(from: $0.extract)
             })
         }
+    }
+
+    /// Create a future having the same underlying task as `other`.
+    public init<Other: FutureProtocol>(success other: Other)
+        where Other.Value == Value.Right {
+        self.init(other.every {
+            Value(success: $0)
+        })
     }
 }

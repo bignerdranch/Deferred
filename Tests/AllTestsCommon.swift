@@ -56,25 +56,23 @@ func sleep(_ duration: DispatchTimeInterval) {
 #endif
 
 extension XCTestCase {
-    func waitForExpectations(file: StaticString = #file, line: UInt = #line) {
-        let timeout: Double = 10
+    func waitForExpectations(file: StaticString = #file, line: Int = #line) {
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-            waitForExpectations(timeout: timeout, handler: nil)
+            waitForExpectations(timeout: 10, handler: nil)
         #else
-            waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
+            waitForExpectations(timeout: 10, file: file, line: numericCast(line), handler: nil)
         #endif
     }
 
-    func waitForExpectationsShort(file: StaticString = #file, line: UInt = #line) {
-        let timeout: Double = 3
+    func waitForExpectationsShort(file: StaticString = #file, line: Int = #line) {
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-            waitForExpectations(timeout: timeout, handler: nil)
+            waitForExpectations(timeout: 3, handler: nil)
         #else
-            waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
+            waitForExpectations(timeout: 3, file: file, line: numericCast(line), handler: nil)
         #endif
     }
 
-    func afterDelay(upon queue: DispatchQueue = .main, execute body: @escaping() -> ()) {
+    func afterDelay(upon queue: DispatchQueue = .main, execute body: @escaping() -> Void) {
         queue.asyncAfter(deadline: .now() + 0.15, execute: body)
     }
 }
@@ -105,16 +103,16 @@ class CustomExecutorTestCase: XCTestCase {
         return CountingExecutor(owner: self)
     }
 
-    func assertExecutorCalled(_ times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 == times }), "Executor was not called exactly \(times) times")
+    func assertExecutorCalled(_ times: Int, inFile file: StaticString = #file, atLine line: Int = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 == times }), "Executor was not called exactly \(times) times", file: file, line: numericCast(line))
     }
 
-    func assertExecutorCalled(atLeast times: Int, inFile file: StaticString = #file, atLine line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 >= times }), "Executor was never called", file: file, line: line)
+    func assertExecutorCalled(atLeast times: Int, inFile file: StaticString = #file, atLine line: Int = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 >= times }), "Executor was never called", file: file, line: numericCast(line))
     }
 }
 
-extension RandomAccessCollection {
+extension Collection {
 
     func random() -> Iterator.Element {
         precondition(!isEmpty, "Should not be called on empty collection")

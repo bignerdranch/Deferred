@@ -15,14 +15,14 @@ import XCTest
 #endif
 
 extension XCTestCase {
-    func waitForTaskToComplete<T>(_ task: Task<T>, file: StaticString = #file, line: UInt = #line) -> Task<T>.Result {
+    func waitForTaskToComplete<T>(_ task: Task<T>, file: StaticString = #file, line: Int = #line) -> Task<T>.Result {
         let expectation = self.expectation(description: "task completed")
         var result: Task<T>.Result?
         task.upon(.main) { [weak expectation] in
             result = $0
             expectation?.fulfill()
         }
-        waitForExpectations(file: file, line: line)
+        waitForExpectations(file: file, line: numericCast(line))
 
         return result!
     }

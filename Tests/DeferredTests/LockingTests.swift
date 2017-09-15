@@ -157,7 +157,7 @@ class LockingTests: XCTestCase {
         }
     }
 
-    func measureReadsSingleThread(lock: Locking, iterations: Int, file: StaticString = #file, line: UInt = #line) {
+    func measureReadsSingleThread(lock: Locking, iterations: Int, file: StaticString = #file, line: Int = #line) {
         let doNothing: () -> () = {}
         func body() {
             for _ in 0 ..< iterations {
@@ -168,11 +168,11 @@ class LockingTests: XCTestCase {
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
             measure(body)
         #else
-            measure(file: file, line: line, block: body)
+            measure(file: file, line: numericCast(line), block: body)
         #endif
     }
 
-    func measureWritesSingleThread(lock: Locking, iterations: Int, file: StaticString = #file, line: UInt = #line) {
+    func measureWritesSingleThread(lock: Locking, iterations: Int, file: StaticString = #file, line: Int = #line) {
         let doNothing: () -> () = {}
         func body() {
             for _ in 0 ..< iterations {
@@ -183,7 +183,7 @@ class LockingTests: XCTestCase {
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
             measure(body)
         #else
-            measure(file: file, line: line, block: body)
+            measure(file: file, line: numericCast(line), block: body)
         #endif
     }
 
@@ -215,7 +215,7 @@ class LockingTests: XCTestCase {
         measureWritesSingleThread(lock: nsLock, iterations: 250_000)
     }
 
-    func measure90PercentReads(lock: Locking, iterations: Int, numberOfThreads: Int = max(ProcessInfo.processInfo.processorCount, 2), file: StaticString = #file, line: UInt = #line) {
+    func measure90PercentReads(lock: Locking, iterations: Int, numberOfThreads: Int = max(ProcessInfo.processInfo.processorCount, 2), file: StaticString = #file, line: Int = #line) {
         let group = DispatchGroup()
         let queue = DispatchQueue(label: String(#function), attributes: .concurrent)
         func doNothing() {}
@@ -239,7 +239,7 @@ class LockingTests: XCTestCase {
         #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
             measure(body)
         #else
-            measure(file: file, line: line, block: body)
+            measure(file: file, line: numericCast(line), block: body)
         #endif
     }
 

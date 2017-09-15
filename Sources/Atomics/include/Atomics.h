@@ -120,7 +120,7 @@ static inline void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_No
 
 OS_ALWAYS_INLINE
 static inline bool bnr_atomic_ptr_compare_and_swap(volatile bnr_atomic_ptr_t *_Nonnull target, void *_Nullable expected, void *_Nullable desired, bnr_atomic_memory_order_t order) {
-    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+    return __c11_atomic_compare_exchange_strong(&target->value, &expected, desired, order, __ATOMIC_RELAXED);
 }
 
 OS_SWIFT_NAME(UnsafeAtomicBool)

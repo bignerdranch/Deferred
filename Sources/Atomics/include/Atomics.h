@@ -159,7 +159,7 @@ static inline uint_fast8_t bnr_atomic_bitmask_and(volatile bnr_atomic_bitmask_t 
 }
 
 OS_ALWAYS_INLINE
-static inline bool bnr_atomic_bitmask_test(const bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
+static inline bool bnr_atomic_bitmask_test(volatile bnr_atomic_bitmask_t *_Nonnull target, uint_fast8_t value) {
     return (__c11_atomic_load((_Atomic(uint_fast8_t) *)&target->value, __ATOMIC_RELAXED) & value) != 0;
 }
 

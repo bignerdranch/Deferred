@@ -61,7 +61,7 @@ public final class Task<SuccessValue>: NSObject {
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
     public convenience init(future base: Future<Result>, cancellation: (() -> Void)? = nil) {
-        let progress = Progress.wrapped(base, cancellation: cancellation)
+        let progress = Progress.wrappingSuccess(of: base, cancellation: cancellation)
         self.init(future: base, progress: progress)
     }
 
@@ -69,6 +69,12 @@ public final class Task<SuccessValue>: NSObject {
     public convenience init<Task: FutureProtocol>(_ base: Task, progress: Progress)
         where Task.Value: Either, Task.Value.Left == Error, Task.Value.Right == SuccessValue {
         self.init(future: Future(task: base), progress: progress)
+    }
+
+    /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
+    public convenience init<OtherFuture: FutureProtocol>(success base: OtherFuture, progress: Progress)
+        where OtherFuture.Value == SuccessValue {
+        self.init(future: Future(success: base), progress: progress)
     }
     #else
     fileprivate let cancellation: (() -> Void)
@@ -150,7 +156,8 @@ extension Task {
     public convenience init<OtherFuture: FutureProtocol>(_ base: OtherFuture, cancellation: (() -> Void)? = nil)
         where OtherFuture.Value: Either, OtherFuture.Value.Left == Error, OtherFuture.Value.Right == SuccessValue {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.init(future: Future(task: base), progress: .wrapped(base, cancellation: cancellation))
+        let progress = Progress.wrappingSuccess(of: base, cancellation: cancellation)
+        self.init(future: Future(task: base), progress: progress)
 #else
         let asTask = (base as? Task<SuccessValue>)
 
@@ -162,6 +169,20 @@ extension Task {
         if asTask?.isCancelled == true {
             cancel()
         }
+#endif
+    }
+
+    /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
+    ///
+    /// `cancellation` will be called asynchronously, but not on any specific
+    /// queue. If you must do work on a specific queue, schedule work on it.
+    public convenience init<OtherFuture: FutureProtocol>(success base: OtherFuture, cancellation: (() -> Void)? = nil)
+        where OtherFuture.Value == SuccessValue {
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let progress = Progress.wrappingCompletion(of: base, cancellation: cancellation)
+        self.init(future: Future<Value>(success: base), progress: progress)
+#else
+        self.init(future: Future<Value>(success: base))
 #endif
     }
 

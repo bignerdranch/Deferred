@@ -290,4 +290,19 @@ class TaskTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(2)
     }
+
+    func testSimpleFutureCanBeUpgradedToTask() {
+        let expectation = self.expectation(description: "original future filled")
+        let deferred = Deferred<Int>()
+        let task = Task<Int>(success: deferred, cancellation: nil)
+
+        task.uponSuccess { (value) in
+            XCTAssertEqual(value, 42)
+            expectation.fulfill()
+        }
+
+        deferred.fill(with: 42)
+        waitForExpectations()
+    }
+
 }

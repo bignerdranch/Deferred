@@ -625,12 +625,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0820;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Big Nerd Ranch";
 				TargetAttributes = {
 					DB126C9F1E53685300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 439592V3LM;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -641,7 +640,6 @@
 					};
 					DB126CBB1E53685C00054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 439592V3LM;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
@@ -652,16 +650,17 @@
 					};
 					DB126CD71E53686900054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 439592V3LM;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CDF1E53686900054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CF31E53687300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 439592V3LM;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -1000,6 +999,7 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1008,6 +1008,7 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1032,6 +1033,7 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
 			};
 			name = Debug;
 		};
@@ -1040,6 +1042,7 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
 			};
 			name = Release;
 		};
@@ -1064,6 +1067,7 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = watchos;
+				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Debug;
 		};
@@ -1072,6 +1076,7 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = watchos;
+				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Release;
 		};

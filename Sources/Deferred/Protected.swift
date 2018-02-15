@@ -9,15 +9,12 @@
 /// A protected value only allows access from within a locking statement. This
 /// prevents accidental unsafe access when thread safety is desired.
 public final class Protected<T> {
-    // FIXME: These can be made `private` again by re-introducing a
-    // `fileprivate var synchronizedValue` when a version of Swift is released
-    // with a fix for SR-2623: https://bugs.swift.org/browse/SR-2623
-    fileprivate var lock: Locking
-    fileprivate var value: T
+    private var lock: Locking
+    private var unsafeValue: T
 
     /// Creates a protected `value` with a type implementing a `lock`.
     public init(initialValue value: T, lock: Locking = NativeLock()) {
-        self.value = value
+        self.unsafeValue = value
         self.lock = lock
     }
 
@@ -26,7 +23,7 @@ public final class Protected<T> {
     /// - returns: The value returned from the given function.
     public func withReadLock<Return>(_ body: (T) throws -> Return) rethrows -> Return {
         return try lock.withReadLock {
-            try body(value)
+            try body(unsafeValue)
         }
     }
 
@@ -35,33 +32,25 @@ public final class Protected<T> {
     /// - returns: The value returned from the given function.
     public func withWriteLock<Return>(_ body: (inout T) throws -> Return) rethrows -> Return {
         return try lock.withWriteLock {
-            try body(&value)
+            try body(&unsafeValue)
         }
     }
 }
 
 extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
     public var debugDescription: String {
-        guard let lock = lock as? MaybeLocking else {
-            return "\(type(of: self))"
-        }
-
         return lock.withAttemptedReadLock {
-            "\(type(of: self))(\(String(reflecting: value)))"
+            "\(type(of: self))(\(String(reflecting: unsafeValue)))"
         } ?? "\(type(of: self)) (lock contended)"
     }
 
     public var customMirror: Mirror {
-        guard let lock = lock as? MaybeLocking else {
-            return Mirror(self, children: [ "locked": "unknown" ], displayStyle: .tuple)
-        }
-
         return lock.withAttemptedReadLock {
-            Mirror(self, children: [ "item": value ], displayStyle: .optional)
+            Mirror(self, children: [ "item": unsafeValue ], displayStyle: .optional)
         } ?? Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
     }
 
     public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: (lock as? MaybeLocking).flatMap({ $0.withAttemptedReadLock { value } }) as Any)
+        return PlaygroundQuickLook(reflecting: lock.withAttemptedReadLock({ unsafeValue }) as Any)
     }
 }

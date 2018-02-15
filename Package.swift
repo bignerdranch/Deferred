@@ -32,4 +32,4 @@ let package = Package(
             dependencies: [ "Deferred", "Task" ],
             exclude: [ "Tests/AllTestsCommon.swift" ])
     ],
-    swiftLanguageVersions: [ 3, 4 ])
+    swiftLanguageVersions: [ 4 ])

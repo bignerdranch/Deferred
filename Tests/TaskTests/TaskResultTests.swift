@@ -91,11 +91,7 @@ class TaskResultTests: XCTestCase {
 
     func testInitializeWithBlockError() {
         let result = Result(value: nil, error: TestError.first)
-        guard let error = result.error as? TestError else {
-            XCTFail()
-            return
-        }
-        XCTAssert(error == TestError.first)
+        XCTAssertEqual(result.error as? TestError, .first)
     }
 
     func testInitializeWithBlockInitFailure() {

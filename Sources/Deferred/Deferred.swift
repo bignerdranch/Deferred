@@ -40,7 +40,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     /// Creates an instance resolved with `value`.
     public init(filledWith value: Value) {
         storage.withUnsafeMutablePointerToElements { (pointerToElement) in
-            pointerToElement.initialize(to: Storage.box(value))
+            pointerToElement.initialize(to: Storage.convertToReference(value))
         }
     }
 
@@ -55,7 +55,8 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         group.notify(flags: flags, queue: queue) { [storage] in
             guard let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .none) }) else { return }
-            body(Storage.unbox(from: ptr))
+            let reference = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
+            body(Storage.convertFromReference(reference))
         }
     }
 
@@ -81,7 +82,8 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         guard case .success = group.wait(timeout: time),
             let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .none) }) else { return nil }
 
-        return Storage.unbox(from: ptr)
+        let reference = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
+        return Storage.convertFromReference(reference)
     }
 
     // MARK: PromiseProtocol
@@ -94,7 +96,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     @discardableResult
     public func fill(with value: Value) -> Bool {
-        let box = Storage.box(value)
+        let box = Unmanaged.passRetained(Storage.convertToReference(value))
 
         let wonRace = storage.withAtomicPointerToElement {
             bnr_atomic_ptr_compare_and_swap($0, nil, box.toOpaque(), .thread)
@@ -110,29 +112,12 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     }
 }
 
-#if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
-private typealias DeferredRaw<T> = Unmanaged<AnyObject>
-#else
-// In order to assign the value of a scalar in a Deferred using atomics, we must
-// box it up into something word-sized. See `atomicInitialize` above.
-private final class Box<T> {
-    let contents: T
+private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
 
-    init(_ contents: T) {
-        self.contents = contents
-    }
-}
+    private typealias My = DeferredStorage<Value>
 
-private typealias DeferredRaw<T> = Unmanaged<Box<T>>
-#endif
-
-private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Value>?> {
-
-    typealias _Self = DeferredStorage<Value>
-    typealias Element = DeferredRaw<Value>
-
-    static func create() -> _Self {
-        return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: _Self.self)
+    static func create() -> DeferredStorage<Value> {
+        return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: My.self)
     }
 
     func withAtomicPointerToElement<Return>(_ body: (UnsafeMutablePointer<UnsafeAtomicRawPointer>) throws -> Return) rethrows -> Return {
@@ -141,28 +126,33 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, DeferredRaw<Valu
         }
     }
 
-    deinit {
-        guard let ptr = withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .global) }) else { return }
-        Element.fromOpaque(ptr).release()
-    }
-
-    static func unbox(from ptr: UnsafeMutableRawPointer) -> Value {
-        let raw = Element.fromOpaque(ptr)
-        #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+    static func convertFromReference(_ value: AnyObject) -> Value {
         // Contract of using box(_:) counterpart
         // swiftlint:disable:next force_cast
-        return raw.takeUnretainedValue() as! Value
-        #else
-        return raw.takeUnretainedValue().contents
-        #endif
+        return value as! Value
     }
 
-    static func box(_ value: Value) -> Element {
-        #if swift(>=3.1) && (os(macOS) || os(iOS) || os(tvOS) || os(watchOS))
-        return Unmanaged.passRetained(value as AnyObject)
-        #else
-        return Unmanaged.passRetained(Box(value))
-        #endif
+    static func convertToReference(_ value: Value) -> AnyObject {
+        return value as AnyObject
     }
+    #else
+    // In order to assign the value in a Deferred using atomics, we must
+    // box it up into something word-sized. See `fill(with:)` above.
+    private final class Box {
+        let wrapped: Value
+        init(_ wrapped: Value) {
+            self.wrapped = wrapped
+        }
+    }
+
+    static func convertToReference(_ value: Value) -> AnyObject {
+        return Box(value)
+    }
+
+    static func convertFromReference(_ value: AnyObject) -> Value {
+        return unsafeDowncast(value, to: Box.self).wrapped
+    }
+    #endif
 
 }

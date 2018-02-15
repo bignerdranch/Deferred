@@ -213,20 +213,12 @@ class TaskTests: CustomExecutorTestCase {
 
         let task = Task<Int>(Deferred<Task<Int>.Result>(), progress: progress)
 
-        #if swift(>=3.2)
         XCTAssertEqual(task.progress.fractionCompleted, 0, accuracy: 0.001)
-        #else
-        XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0, accuracy: 0.001)
-        #endif
         XCTAssertEqual(progress.userInfo[key] as? Bool, true)
         XCTAssert(task.progress.isCancellable)
 
         progress.completedUnitCount = 5
-        #if swift(>=3.2)
         XCTAssertEqual(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
-        #else
-        XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
-        #endif
     }
 
     func testTaskCreatedUnfilledIs100PercentCompleted() {

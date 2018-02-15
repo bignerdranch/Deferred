@@ -68,10 +68,8 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task(coalescingDeferred, progress: progress)
         #else
-        let capturePromotionWorkaround = cancellations
         return Task(coalescingDeferred) {
-            // https://bugs.swift.org/browse/SR-293
-            for cancellation in capturePromotionWorkaround {
+            for cancellation in cancellations {
                 cancellation()
             }
         }

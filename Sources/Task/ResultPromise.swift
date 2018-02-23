@@ -35,4 +35,3 @@ extension PromiseProtocol where Value: Either, Value.Right == Void {
         return succeed(with: ())
     }
 }
-

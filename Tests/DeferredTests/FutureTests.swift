@@ -22,7 +22,7 @@ class FutureTests: XCTestCase {
             ("testAnd", testAnd),
             ("testAllFilled", testAllFilled),
             ("testAllFilledEmptyCollection", testAllFilledEmptyCollection),
-            ("testFirstFilled", testFirstFilled),
+            ("testFirstFilled", testFirstFilled)
         ]
     }
 

@@ -9,9 +9,9 @@
 import Dispatch
 
 #if SWIFT_PACKAGE
-import Atomics
+    import Atomics
 #elseif XCODE
-import Deferred.Atomics
+    import Deferred.Atomics
 #endif
 
 /// A deferred is a value that may become determined (or "filled") at some point

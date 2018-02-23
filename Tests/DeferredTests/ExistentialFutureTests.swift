@@ -16,7 +16,7 @@ class ExistentialFutureTests: XCTestCase {
             ("testAnyWaitWithTimeout", testAnyWaitWithTimeout),
             ("testFilledAnyFutureUpon", testFilledAnyFutureUpon),
             ("testUnfilledAnyUponCalledWhenFilled", testUnfilledAnyUponCalledWhenFilled),
-            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition),
+            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition)
         ]
     }
 

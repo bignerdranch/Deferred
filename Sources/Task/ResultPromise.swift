@@ -28,7 +28,6 @@ extension PromiseProtocol where Value: Either {
     }
 }
 
-#if swift(>=3.2)
 extension PromiseProtocol where Value: Either, Value.Right == Void {
     /// Notes the completion of the event with a success.
     @discardableResult @available(swift 4)
@@ -36,4 +35,3 @@ extension PromiseProtocol where Value: Either, Value.Right == Void {
         return succeed(with: ())
     }
 }
-#endif

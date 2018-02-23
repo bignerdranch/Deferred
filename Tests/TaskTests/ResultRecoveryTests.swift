@@ -18,7 +18,7 @@ class ResultRecoveryTests: XCTestCase {
     static var allTests: [(String, (ResultRecoveryTests) -> () throws -> Void)] {
         return [
             ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
-            ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures),
+            ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures)
         ]
     }
 

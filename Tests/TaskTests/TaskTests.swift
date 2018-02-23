@@ -213,20 +213,12 @@ class TaskTests: CustomExecutorTestCase {
 
         let task = Task<Int>(Deferred<Task<Int>.Result>(), progress: progress)
 
-        #if swift(>=3.2)
         XCTAssertEqual(task.progress.fractionCompleted, 0, accuracy: 0.001)
-        #else
-        XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0, accuracy: 0.001)
-        #endif
         XCTAssertEqual(progress.userInfo[key] as? Bool, true)
         XCTAssert(task.progress.isCancellable)
 
         progress.completedUnitCount = 5
-        #if swift(>=3.2)
         XCTAssertEqual(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
-        #else
-        XCTAssertEqualWithAccuracy(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
-        #endif
     }
 
     func testTaskCreatedUnfilledIs100PercentCompleted() {
@@ -273,20 +265,20 @@ class TaskTests: CustomExecutorTestCase {
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
     }
-    
+
     #endif
-    
+
     func testThatFallbackAlsoProducesANewTask() {
         let expectation = self.expectation(description: "recover produces a new task")
         let task: Task<Int> = anyFailedTask.fallback(upon: executor) { _ in
             return self.anyFinishedTask
         }
-        
+
         task.upon {
             XCTAssertEqual($0.value, 42)
             expectation.fulfill()
         }
-        
+
         waitForExpectations()
         assertExecutorCalled(2)
     }

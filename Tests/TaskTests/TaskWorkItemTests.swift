@@ -20,7 +20,7 @@ class TaskWorkItemTests: XCTestCase {
     static var allTests: [(String, (TaskWorkItemTests) -> () throws -> Void)] {
         return [
             ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
-            ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError),
+            ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError)
         ]
     }
 

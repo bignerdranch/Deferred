@@ -19,7 +19,7 @@ import Deferred
 class TaskGroupTests: XCTestCase {
     static var allTests: [(String, (TaskGroupTests) -> () throws -> Void)] {
         return [
-            ("testThatAllCompleteTaskWaitsForAllAccumulatedTasks", testThatAllCompleteTaskWaitsForAllAccumulatedTasks),
+            ("testThatAllCompleteTaskWaitsForAllAccumulatedTasks", testThatAllCompleteTaskWaitsForAllAccumulatedTasks)
         ]
     }
 

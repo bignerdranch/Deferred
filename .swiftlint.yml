@@ -1,7 +1,10 @@
 disabled_rules:
+  - block_based_kvo
   - nesting
   - todo
 opt_in_rules:
   - empty_count
   - vertical_whitespace
 line_length: 220
+type_name:
+  excluded: My

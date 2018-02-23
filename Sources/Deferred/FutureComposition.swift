@@ -10,6 +10,7 @@ import Dispatch
 
 // swiftlint:disable force_cast
 // swiftlint:disable function_parameter_count
+// swiftlint:disable large_tuple
 // swiftlint:disable line_length
 // We darn well know what unholiness we are pulling
 
@@ -123,7 +124,3 @@ extension FutureProtocol {
         }
     }
 }
-
-// swiftlint:enable line_length
-// swiftlint:enable function_parameter_count
-// swiftlint:enable force_cast

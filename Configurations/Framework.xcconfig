@@ -30,3 +30,6 @@ PRODUCT_NAME = Deferred
 
 // Swift Compiler - Custom Flags
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) XCODE
+
+// Swift Compiler - General
+SWIFT_INSTALL_OBJC_HEADER = NO

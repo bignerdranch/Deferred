@@ -9,7 +9,7 @@
 import Dispatch
 import Foundation
 #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
-import CoreFoundation
+    import CoreFoundation
 #endif
 
 /// An executor calls closures submitted to it, typically in first-in, first-out
@@ -127,9 +127,9 @@ extension OperationQueue: Executor {
 extension CFRunLoop: Executor {
     @nonobjc public func submit(_ body: @escaping() -> Void) {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        CFRunLoopPerformBlock(self, CFRunLoopMode.defaultMode.rawValue, body)
+            CFRunLoopPerformBlock(self, CFRunLoopMode.defaultMode.rawValue, body)
         #else
-        CFRunLoopPerformBlock(self, kCFRunLoopDefaultMode, body)
+            CFRunLoopPerformBlock(self, kCFRunLoopDefaultMode, body)
         #endif
         CFRunLoopWakeUp(self)
     }

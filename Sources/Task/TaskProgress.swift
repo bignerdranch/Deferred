@@ -30,26 +30,26 @@ private final class ProxyProgress: Progress {
     }
 
     deinit {
-        token?.cancel(observing: observee)
-        token = nil
+        token?.invalidate(observing: observee)
     }
 
-    @objc private func inheritCancelled(_ value: Bool) {
-        if value {
+    private func inheritCancelled() {
+        if observee.isCancelled {
             super.cancel()
         }
     }
 
-    @objc private func inheritPaused(_ value: Bool) {
-        if value {
+    private func inheritPaused() {
+        if observee.isPaused {
             super.pause()
         } else if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
             super.resume()
         }
     }
 
-    @objc private func inheritValue(_ value: Any, forKeyPath keyPath: String) {
-        setValue(value, forKeyPath: keyPath)
+    private func inheritValue(forKeyPath keyPath: String?) {
+        guard let keyPath = keyPath else { return }
+        setValue(observee.value(forKeyPath: keyPath), forKeyPath: keyPath)
     }
 
     // MARK: - Derived values
@@ -84,11 +84,9 @@ private final class ProxyProgress: Progress {
     /// A side-table object to weakify the progress observer and prevent
     /// delivery of notifications after deinit.
     private final class Observation: NSObject {
-        private static let options: NSKeyValueObservingOptions = [.initial, .new]
-        // `static var`s can no longer have a pointer be taken safely as of Swift 3.2.
-        private static let cancelledContext = unsafeBitCast(#selector(ProxyProgress.inheritCancelled), to: UnsafeMutableRawPointer.self)
-        private static let pausedContext = unsafeBitCast(#selector(ProxyProgress.inheritPaused), to: UnsafeMutableRawPointer.self)
-        private static let attributesContext = unsafeBitCast(#selector(ProxyProgress.inheritValue), to: UnsafeMutableRawPointer.self)
+        private static var cancelledContext = false
+        private static var pausedContext = false
+        private static var attributesContext = false
         private static let attributes = [
             #keyPath(Progress.completedUnitCount),
             #keyPath(Progress.totalUnitCount),
@@ -107,48 +105,47 @@ private final class ProxyProgress: Progress {
             static let cancelled = State(rawValue: 1 << 2)
         }
 
-        private weak var observer: ProxyProgress?
         private var state = UnsafeAtomicBitmask() // see State
+        private weak var observer: ProxyProgress?
 
         init(observing observee: Progress, observer: ProxyProgress) {
             self.observer = observer
             bnr_atomic_bitmask_init(&state, State.ready.rawValue)
             super.init()
+            activate(observing: observee)
+        }
 
+        func activate(observing observee: Progress) {
             for key in Observation.attributes {
-                observee.addObserver(self, forKeyPath: key, options: Observation.options, context: Observation.attributesContext)
+                observee.addObserver(self, forKeyPath: key, options: .initial, context: &Observation.attributesContext)
             }
-            observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: Observation.options, context: Observation.cancelledContext)
-            observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: Observation.options, context: Observation.pausedContext)
+            observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: .initial, context: &Observation.cancelledContext)
+            observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: .initial, context: &Observation.pausedContext)
 
             bnr_atomic_bitmask_or(&state, State.observing.rawValue, .release)
         }
 
-        func cancel(observing observee: Progress) {
+        func invalidate(observing observee: Progress) {
             let oldState = State(rawValue: bnr_atomic_bitmask_and(&state, ~State.ready.rawValue, .relaxed))
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
             bnr_atomic_bitmask_or(&state, State.cancelled.rawValue, .relaxed)
 
             for key in Observation.attributes {
-                observee.removeObserver(self, forKeyPath: key, context: Observation.attributesContext)
+                observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
             }
-            observee.removeObserver(self, forKeyPath: #keyPath(Progress.cancelled), context: Observation.cancelledContext)
-            observee.removeObserver(self, forKeyPath: #keyPath(Progress.paused), context: Observation.pausedContext)
+            observee.removeObserver(self, forKeyPath: #keyPath(Progress.cancelled), context: &Observation.cancelledContext)
+            observee.removeObserver(self, forKeyPath: #keyPath(Progress.paused), context: &Observation.pausedContext)
         }
 
-        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            guard let keyPath = keyPath, object != nil, bnr_atomic_bitmask_test(&state, State.ready.rawValue), let observer = observer, let newValue = change?[.newKey] else { return }
+        override func observeValue(forKeyPath keyPath: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+            guard bnr_atomic_bitmask_test(&state, State.ready.rawValue), let observer = observer else { return }
             switch context {
-            case Observation.cancelledContext?:
-                // Gotta trust KVO a little
-                // swiftlint:disable:next force_cast
-                observer.inheritCancelled(newValue as! Bool)
-            case Observation.pausedContext?:
-                // Gotta trust KVO a little
-                // swiftlint:disable:next force_cast
-                observer.inheritPaused(newValue as! Bool)
-            case Observation.attributesContext?:
-                observer.inheritValue(newValue, forKeyPath: keyPath)
+            case (&Observation.cancelledContext)?:
+                observer.inheritCancelled()
+            case (&Observation.pausedContext)?:
+                observer.inheritPaused()
+            case (&Observation.attributesContext)?:
+                observer.inheritValue(forKeyPath: keyPath)
             default:
                 preconditionFailure("Unexpected KVO context for private object")
             }

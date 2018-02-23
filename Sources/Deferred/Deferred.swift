@@ -54,7 +54,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         group.notify(flags: flags, queue: queue) { [storage] in
-            guard let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .none) }) else { return }
+            guard let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .relaxed) }) else { return }
             let reference = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
             body(Storage.convertFromReference(reference))
         }
@@ -80,7 +80,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     public func wait(until time: DispatchTime) -> Value? {
         guard case .success = group.wait(timeout: time),
-            let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .none) }) else { return nil }
+            let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .relaxed) }) else { return nil }
 
         let reference = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
         return Storage.convertFromReference(reference)
@@ -90,7 +90,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     public var isFilled: Bool {
         return storage.withAtomicPointerToElement {
-            bnr_atomic_ptr_load($0, .none) != nil
+            bnr_atomic_ptr_load($0, .relaxed) != nil
         }
     }
 
@@ -99,7 +99,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
         let box = Unmanaged.passRetained(Storage.convertToReference(value))
 
         let wonRace = storage.withAtomicPointerToElement {
-            bnr_atomic_ptr_compare_and_swap($0, nil, box.toOpaque(), .thread)
+            bnr_atomic_ptr_compare_and_swap($0, nil, box.toOpaque(), .acquireRelease)
         }
 
         if wonRace {

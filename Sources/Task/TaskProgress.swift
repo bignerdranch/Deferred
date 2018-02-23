@@ -121,13 +121,13 @@ private final class ProxyProgress: Progress {
             observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: Observation.options, context: Observation.cancelledContext)
             observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: Observation.options, context: Observation.pausedContext)
 
-            bnr_atomic_bitmask_or(&state, State.observing.rawValue, .write)
+            bnr_atomic_bitmask_or(&state, State.observing.rawValue, .release)
         }
 
         func cancel(observing observee: Progress) {
-            let oldState = State(rawValue: bnr_atomic_bitmask_and(&state, ~State.ready.rawValue, .none))
+            let oldState = State(rawValue: bnr_atomic_bitmask_and(&state, ~State.ready.rawValue, .relaxed))
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
-            bnr_atomic_bitmask_or(&state, State.cancelled.rawValue, .none)
+            bnr_atomic_bitmask_or(&state, State.cancelled.rawValue, .relaxed)
 
             for key in Observation.attributes {
                 observee.removeObserver(self, forKeyPath: key, context: Observation.attributesContext)

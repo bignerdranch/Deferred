@@ -28,7 +28,7 @@ class SwiftBugTests: XCTestCase {
         let toBeFilledWith: [SomeMultipayloadEnum: SomeMultipayloadEnum] = [
             keys[0]: .two("one"),
             keys[1]: .two("two"),
-            keys[2]: .two("three"),
+            keys[2]: .two("three")
         ]
 
         let expect = expectation(description: "upon is called with correct values")

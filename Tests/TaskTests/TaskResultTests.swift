@@ -83,7 +83,7 @@ class TaskResultTests: XCTestCase {
         XCTAssertEqual(x.value, 84)
         XCTAssertNil(x.error)
     }
-    
+
     func testInitializeWithBlockSuccess() {
         let result = Result(value: 42, error: nil)
         XCTAssertEqual(try? result.extract(), 42)

@@ -34,7 +34,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         let progress = Progress(parent: nil, userInfo: nil)
         progress.totalUnitCount = numericCast(count)
         #else
-        var cancellations = Array<() -> Void>()
+        var cancellations = [() -> Void]()
         cancellations.reserveCapacity(numericCast(underestimatedCount))
         #endif
 

@@ -120,9 +120,9 @@ class LockingTests: XCTestCase {
         for lock in allLocks {
             var x = UnsafeAtomicCounter()
 
-            let startReader: (Int) -> () = { i in
-                let expectation = self.expectation(description: "reader \(i)")
-                self.queue.async {
+            func startReader(forIteration iteration: Int) {
+                let expectation = self.expectation(description: "reader \(iteration)")
+                queue.async {
                     lock.withReadLock {
                         // make sure we get the value of x either before or after
                         // the writer runs, never a partway-through value
@@ -135,8 +135,9 @@ class LockingTests: XCTestCase {
 
             // spin up 32 readers before a writer
             for i in 0 ..< 32 {
-                startReader(i)
+                startReader(forIteration: i)
             }
+
             // spin up a writer that (slowly) increments x from 0 to 5
             let expectation = self.expectation(description: "writer")
             queue.async {
@@ -150,7 +151,7 @@ class LockingTests: XCTestCase {
             }
             // and spin up 32 more readers after
             for i in 32 ..< 64 {
-                startReader(i)
+                startReader(forIteration: i)
             }
 
             waitForExpectationsShort()
@@ -158,7 +159,7 @@ class LockingTests: XCTestCase {
     }
 
     func measureReadsSingleThread(lock: Locking, iterations: Int, file: StaticString = #file, line: Int = #line) {
-        let doNothing: () -> () = {}
+        let doNothing: () -> Void = {}
         func body() {
             for _ in 0 ..< iterations {
                 lock.withReadLock(doNothing)
@@ -173,7 +174,7 @@ class LockingTests: XCTestCase {
     }
 
     func measureWritesSingleThread(lock: Locking, iterations: Int, file: StaticString = #file, line: Int = #line) {
-        let doNothing: () -> () = {}
+        let doNothing: () -> Void = {}
         func body() {
             for _ in 0 ..< iterations {
                 lock.withWriteLock(doNothing)

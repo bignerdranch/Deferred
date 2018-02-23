@@ -96,11 +96,11 @@ public final class Task<SuccessValue>: NSObject {
 extension Task: FutureProtocol {
     public typealias Value = Result
 
-    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> ()) {
+    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> Void) {
         future.upon(queue, execute: body)
     }
 
-    public func upon(_ executor: Executor, execute body: @escaping(Result) -> ()) {
+    public func upon(_ executor: Executor, execute body: @escaping(Result) -> Void) {
         future.upon(executor, execute: body)
     }
 

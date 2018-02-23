@@ -71,7 +71,7 @@ private final class ProxyProgress: Progress {
         return [ #keyPath(observee.userInfo) ]
     }
 
-    override var userInfo: [ProgressUserInfoKey : Any] {
+    override var userInfo: [ProgressUserInfoKey: Any] {
         return observee.userInfo
     }
 
@@ -136,7 +136,7 @@ private final class ProxyProgress: Progress {
             observee.removeObserver(self, forKeyPath: #keyPath(Progress.paused), context: Observation.pausedContext)
         }
 
-        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
             guard let keyPath = keyPath, object != nil, bnr_atomic_bitmask_test(&state, State.ready.rawValue), let observer = observer, let newValue = change?[.newKey] else { return }
             switch context {
             case Observation.cancelledContext?:
@@ -318,4 +318,3 @@ extension Task {
 }
 
 #endif
-

@@ -14,7 +14,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         return [
             ("testUpon", testUpon),
             ("testMap", testMap),
-            ("testAndThen", testAndThen),
+            ("testAndThen", testAndThen)
         ]
     }
 

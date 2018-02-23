@@ -39,14 +39,19 @@ public final class Protected<T> {
 
 extension Protected: CustomDebugStringConvertible, CustomReflectable {
     public var debugDescription: String {
-        return lock.withAttemptedReadLock {
-            "\(type(of: self))(\(String(reflecting: unsafeValue)))"
-        } ?? "\(type(of: self)) (lock contended)"
+        var ret = "Protected("
+        if lock.withAttemptedReadLock({
+            debugPrint(unsafeValue, terminator: "", to: &ret)
+        }) == nil {
+            ret.append("locked")
+        }
+        ret.append(")")
+        return ret
     }
 
     public var customMirror: Mirror {
         return lock.withAttemptedReadLock {
-            Mirror(self, children: [ "item": unsafeValue ], displayStyle: .optional)
-        } ?? Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
+            Mirror(self, unlabeledChildren: [ unsafeValue ], displayStyle: .optional)
+        } ?? Mirror(self, children: [ "locked": true ], displayStyle: .tuple)
     }
 }

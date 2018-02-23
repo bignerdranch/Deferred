@@ -60,11 +60,7 @@ public typealias DefaultExecutor = DispatchQueue
 extension Executor {
     /// By default, submits the closure contents of the work item.
     public func submit(_ workItem: DispatchWorkItem) {
-        // This is ideally `submit(workItem.perform)`, but Swift 3.0.1 seems to
-        // have issues reabstracting it.
-        submit {
-            workItem.perform()
-        }
+        submit(workItem.perform)
     }
 
     /// By default, `nil`; the executor's `submit(_:)` is used unconditionally.
@@ -142,6 +138,10 @@ extension CFRunLoop: Executor {
 /// of the run loop.
 extension RunLoop: Executor {
     @nonobjc public func submit(_ body: @escaping() -> Void) {
-        getCFRunLoop().submit(body)
+        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
+            perform(body)
+        } else {
+            getCFRunLoop().submit(body)
+        }
     }
 }

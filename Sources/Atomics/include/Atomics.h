@@ -3,43 +3,39 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/7/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2017 Big Nerd Ranch. Licensed under MIT.
 //
 
 #ifndef __BNR_DEFERRED_ATOMIC_SHIMS__
 #define __BNR_DEFERRED_ATOMIC_SHIMS__
 
-#if defined(__APPLE__)
-#include <os/lock.h>
-#else
-#include <stdint.h>
-#include <stdbool.h>
-#include <os/linux_base.h>
-#endif // !__APPLE__
 #include <pthread.h>
+#include <os/object.h>
+#if defined(__APPLE__)
+# include <os/lock.h>
+#endif // !__APPLE__
+#include <dispatch/dispatch.h>
 
 #if !defined(OS_ALWAYS_INLINE)
-#if __GNUC__
-#define OS_ALWAYS_INLINE __attribute__((__always_inline__))
-#else
-#define OS_ALWAYS_INLINE
-#endif // !__GNUC__
+# if __GNUC__
+#  define OS_ALWAYS_INLINE __attribute__((__always_inline__))
+# else
+#  define OS_ALWAYS_INLINE
+# endif // !__GNUC__
 #endif // !OS_ALWAYS_INLINE
 
 // We should be using OS_ENUM, but Swift looks for particular macro patterns.
 #if !defined(SWIFT_ENUM)
-#define SWIFT_ENUM(_name, ...) enum { __VA_ARGS__ } _name##_t
+# define SWIFT_ENUM(_name, ...) enum { __VA_ARGS__ } _name##_t
 #endif
-
-OS_ASSUME_NONNULL_BEGIN
 
 OS_SWIFT_NAME(AtomicMemoryOrder)
 typedef SWIFT_ENUM(bnr_atomic_memory_order,
-    bnr_atomic_memory_order_relaxed OS_SWIFT_NAME(none) = __ATOMIC_RELAXED,
-    bnr_atomic_memory_order_acquire OS_SWIFT_NAME(read) = __ATOMIC_ACQUIRE,
-    bnr_atomic_memory_order_release OS_SWIFT_NAME(write) = __ATOMIC_RELEASE,
-    bnr_atomic_memory_order_acq_rel OS_SWIFT_NAME(thread) = __ATOMIC_ACQ_REL,
-    bnr_atomic_memory_order_seq_cst OS_SWIFT_NAME(global) = __ATOMIC_SEQ_CST
+    bnr_atomic_memory_order_relaxed OS_SWIFT_NAME(relaxed) = __ATOMIC_RELAXED,
+    bnr_atomic_memory_order_acquire OS_SWIFT_NAME(acquire) = __ATOMIC_ACQUIRE,
+    bnr_atomic_memory_order_release OS_SWIFT_NAME(release) = __ATOMIC_RELEASE,
+    bnr_atomic_memory_order_acq_rel OS_SWIFT_NAME(acquireRelease) = __ATOMIC_ACQ_REL,
+    bnr_atomic_memory_order_seq_cst OS_SWIFT_NAME(ordered) = __ATOMIC_SEQ_CST
 );
 
 OS_SWIFT_NAME(UnsafeNativeLock)
@@ -50,10 +46,10 @@ typedef struct {
         os_unfair_lock modern;
 #endif
     } __impl;
-} bnr_spinlock_t;
+} bnr_native_lock_t;
 
 OS_ALWAYS_INLINE
-static inline void bnr_native_lock_init(bnr_spinlock_t *_Nonnull address) {
+static inline void bnr_native_lock_init(bnr_native_lock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {
         address->__impl.modern = OS_UNFAIR_LOCK_INIT;
@@ -65,7 +61,7 @@ static inline void bnr_native_lock_init(bnr_spinlock_t *_Nonnull address) {
 }
 
 OS_ALWAYS_INLINE
-static inline void bnr_native_lock_destroy(bnr_spinlock_t *_Nonnull address) {
+static inline void bnr_native_lock_destroy(bnr_native_lock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {
         return;
@@ -76,7 +72,7 @@ static inline void bnr_native_lock_destroy(bnr_spinlock_t *_Nonnull address) {
 }
 
 OS_ALWAYS_INLINE
-static inline void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
+static inline void bnr_native_lock_lock(bnr_native_lock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_lock != NULL) {
         return os_unfair_lock_lock(&address->__impl.modern);
@@ -87,7 +83,7 @@ static inline void bnr_native_lock_lock(bnr_spinlock_t *_Nonnull address) {
 }
 
 OS_ALWAYS_INLINE
-static inline bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
+static inline bool bnr_native_lock_trylock(bnr_native_lock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_trylock != NULL) {
         return os_unfair_lock_trylock(&address->__impl.modern);
@@ -98,7 +94,7 @@ static inline bool bnr_native_lock_trylock(bnr_spinlock_t *_Nonnull address) {
 }
 
 OS_ALWAYS_INLINE
-static inline void bnr_native_lock_unlock(bnr_spinlock_t *_Nonnull address) {
+static inline void bnr_native_lock_unlock(bnr_native_lock_t *_Nonnull address) {
 #if defined(__APPLE__)
     if (&os_unfair_lock_unlock != NULL) {
         return os_unfair_lock_unlock(&address->__impl.modern);
@@ -114,7 +110,7 @@ typedef struct {
 } bnr_atomic_ptr_t;
 
 OS_ALWAYS_INLINE
-static inline void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_Nonnull target, bnr_atomic_memory_order_t order) {
+static inline const void *_Nullable bnr_atomic_ptr_load(volatile bnr_atomic_ptr_t *_Nonnull target, bnr_atomic_memory_order_t order) {
     return __c11_atomic_load(&target->value, order);
 }
 
@@ -183,6 +179,6 @@ static inline int_fast32_t bnr_atomic_counter_load(volatile bnr_atomic_counter_t
     return __c11_atomic_load(&target->value, __ATOMIC_SEQ_CST);
 }
 
-OS_ASSUME_NONNULL_END
+#undef SWIFT_ENUM
 
 #endif // __BNR_DEFERRED_ATOMIC_SHIMS__

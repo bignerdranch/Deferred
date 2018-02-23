@@ -21,7 +21,6 @@ enum TestError: Error {
     case third
 }
 
-#if swift(>=3.2)
 func sleep(_ duration: DispatchTimeInterval) {
     var t = timespec(tv_sec: 0, tv_nsec: 0)
     switch duration {
@@ -38,22 +37,6 @@ func sleep(_ duration: DispatchTimeInterval) {
     }
     nanosleep(&t, nil)
 }
-#else
-func sleep(_ duration: DispatchTimeInterval) {
-    var t = timespec(tv_sec: 0, tv_nsec: 0)
-    switch duration {
-    case .microseconds(let micro):
-        t.tv_nsec = micro * 1_000
-    case .nanoseconds(let nano):
-        t.tv_nsec = nano
-    case .milliseconds(let millo):
-        t.tv_nsec = millo * 1_000
-    case .seconds(let sec):
-        t.tv_sec = sec
-    }
-    nanosleep(&t, nil)
-}
-#endif
 
 extension XCTestCase {
     func waitForExpectations(file: StaticString = #file, line: Int = #line) {

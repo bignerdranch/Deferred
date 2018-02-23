@@ -34,7 +34,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         let progress = Progress(parent: nil, userInfo: nil)
         progress.totalUnitCount = numericCast(count)
         #else
-        var cancellations = Array<() -> Void>()
+        var cancellations = [() -> Void]()
         cancellations.reserveCapacity(numericCast(underestimatedCount))
         #endif
 
@@ -68,10 +68,8 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task(coalescingDeferred, progress: progress)
         #else
-        let capturePromotionWorkaround = cancellations
         return Task(coalescingDeferred) {
-            // https://bugs.swift.org/browse/SR-293
-            for cancellation in capturePromotionWorkaround {
+            for cancellation in cancellations {
                 cancellation()
             }
         }

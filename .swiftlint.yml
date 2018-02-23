@@ -1,4 +1,5 @@
 disabled_rules:
+  - block_based_kvo
   - nesting
   - todo
 opt_in_rules:

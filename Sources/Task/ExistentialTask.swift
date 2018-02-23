@@ -22,7 +22,6 @@ import Deferred.Atomics
 /// type, optionally combined with some `cancellation`.
 public final class Task<SuccessValue>: NSObject {
 
-    #if swift(>=3.1)
     /// An enum for returning and propagating recoverable errors.
     public enum Result {
         /// Contains the success value
@@ -30,9 +29,6 @@ public final class Task<SuccessValue>: NSObject {
         /// Contains the error value
         case failure(Error)
     }
-    #else
-    public typealias Result = TaskResult<SuccessValue>
-    #endif
 
     fileprivate let future: Future<Result>
 
@@ -100,11 +96,11 @@ public final class Task<SuccessValue>: NSObject {
 extension Task: FutureProtocol {
     public typealias Value = Result
 
-    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> ()) {
+    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Result) -> Void) {
         future.upon(queue, execute: body)
     }
 
-    public func upon(_ executor: Executor, execute body: @escaping(Result) -> ()) {
+    public func upon(_ executor: Executor, execute body: @escaping(Result) -> Void) {
         future.upon(executor, execute: body)
     }
 

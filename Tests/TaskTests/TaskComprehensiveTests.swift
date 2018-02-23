@@ -25,7 +25,7 @@ class TaskComprehensiveTests: XCTestCase {
     static var allTests: [(String, (TaskComprehensiveTests) -> () throws -> Void)] {
         return [
             ("testThatSeveralIterationsRunCorrectly", testThatSeveralIterationsRunCorrectly),
-            ("testThatCancellingATaskPropagatesTheCancellation", testThatCancellingATaskPropagatesTheCancellation),
+            ("testThatCancellingATaskPropagatesTheCancellation", testThatCancellingATaskPropagatesTheCancellation)
         ]
     }
 

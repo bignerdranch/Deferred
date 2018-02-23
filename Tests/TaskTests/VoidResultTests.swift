@@ -21,7 +21,7 @@ class VoidResultTests: XCTestCase {
             ("testDescriptionFailure", testDescriptionFailure),
             ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
             ("testDebugDescriptionFailure", testDebugDescriptionFailure),
-            ("testExtract", testExtract),
+            ("testExtract", testExtract)
         ]
     }
 

@@ -13,7 +13,7 @@ class FutureIgnoreTests: XCTestCase {
     static var allTests: [(String, (FutureIgnoreTests) -> () throws -> Void)] {
         return [
             ("testWaitWithTimeout", testWaitWithTimeout),
-            ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled),
+            ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled)
         ]
     }
 

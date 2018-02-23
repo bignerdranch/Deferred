@@ -29,6 +29,15 @@ public protocol Locking {
     /// - returns: The value returned from the given function.
     func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return
 
+    /// Attempt to call `body` with a reading lock.
+    ///
+    /// If the lock cannot immediately be taken, return `nil` instead of
+    /// executing `body`.
+    ///
+    /// - returns: The value returned from the given function, or `nil`.
+    /// - see: withReadLock(_:)
+    func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return?
+
     /// Call `body` with a writing lock.
     ///
     /// If the implementing type models a readers-writer lock, this function may
@@ -43,17 +52,10 @@ extension Locking {
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withReadLock(body)
     }
-}
 
-protocol MaybeLocking: Locking {
-    /// Attempt to call `body` with a reading lock.
-    ///
-    /// If the lock cannot immediately be taken, return `nil` instead of
-    /// executing `body`.
-    ///
-    /// - returns: The value returned from the given function, or `nil`.
-    /// - see: withReadLock(_:)
-    func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return?
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
+        return try withReadLock(body)
+    }
 }
 
 /// A variant lock backed by a platform type that attempts to allow waiters to
@@ -64,8 +66,7 @@ protocol MaybeLocking: Locking {
 ///   or better), this efficiency is a guarantee.
 /// - On Linux, BSD, or Android, waiters perform comparably to a kernel lock
 ///   under contention.
-public final class NativeLock: Locking, MaybeLocking {
-
+public final class NativeLock: Locking {
     private var lock = UnsafeNativeLock()
 
     /// Creates a standard platform lock.
@@ -83,17 +84,16 @@ public final class NativeLock: Locking, MaybeLocking {
         return try body()
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard bnr_native_lock_trylock(&lock) else { return nil }
         defer { bnr_native_lock_unlock(&lock) }
-        return body()
+        return try body()
     }
-
 }
 
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads
-public final class POSIXReadWriteLock: Locking, MaybeLocking {
+public final class POSIXReadWriteLock: Locking {
     private var lock = pthread_rwlock_t()
 
     /// Create the standard platform lock.
@@ -115,12 +115,12 @@ public final class POSIXReadWriteLock: Locking, MaybeLocking {
         return try body()
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
         defer {
             pthread_rwlock_unlock(&lock)
         }
-        return body()
+        return try body()
     }
 
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
@@ -137,28 +137,27 @@ public final class POSIXReadWriteLock: Locking, MaybeLocking {
 ///
 /// The semaphore lock performs comparably to a spinlock under little lock
 /// contention, and comparably to a platform lock under contention.
-extension DispatchSemaphore: Locking, MaybeLocking {
-    private func withLock<Return>(before time: DispatchTime, body: () throws -> Return) rethrows -> Return? {
-        guard case .success = wait(timeout: time) else { return nil }
+extension DispatchSemaphore: Locking {
+    public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
+        _ = wait(timeout: .distantFuture)
         defer {
             signal()
         }
         return try body()
-
     }
 
-    public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        return try withLock(before: .distantFuture, body: body)!
-    }
-
-    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
-        return withLock(before: .now(), body: body)
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
+        guard case .success = wait(timeout: .now()) else { return nil }
+        defer {
+            signal()
+        }
+        return try body()
     }
 }
 
 /// A lock object from the Foundation Kit used to coordinate the operation of
 /// multiple threads of execution within the same application.
-extension NSLock: Locking, MaybeLocking {
+extension NSLock: Locking {
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         lock()
         defer {
@@ -167,11 +166,11 @@ extension NSLock: Locking, MaybeLocking {
         return try body()
     }
 
-    public func withAttemptedReadLock<Return>(_ body: () -> Return) -> Return? {
+    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         guard `try`() else { return nil }
         defer {
             unlock()
         }
-        return body()
+        return try body()
     }
 }

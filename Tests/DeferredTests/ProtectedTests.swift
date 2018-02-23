@@ -37,10 +37,10 @@ class ProtectedTests: XCTestCase {
     func testConcurrentReadingWriting() {
         var lastWriterDate: Date?
 
-        let startReader: (Int) -> () = { iteration in
+        let startReader: (Int) -> Void = { iteration in
             let expectation = self.expectation(description: "reader \(iteration)")
             self.queue.async {
-                self.protected.withReadLock { (arg) -> () in
+                self.protected.withReadLock { (arg) -> Void in
                     let (date, items) = arg
                     if items.isEmpty && date == nil {
                         // OK - we're before the writer has added items
@@ -59,7 +59,7 @@ class ProtectedTests: XCTestCase {
         }
         let expectation = self.expectation(description: "writer")
         self.queue.async {
-            self.protected.withWriteLock { dateItemsTuple -> () in
+            self.protected.withWriteLock { dateItemsTuple -> Void in
                 for i in 0 ..< 5 {
                     dateItemsTuple.0 = Date()
                     dateItemsTuple.1.append(i)

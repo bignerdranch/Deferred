@@ -58,7 +58,6 @@ extension PromiseProtocol {
     }
 }
 
-#if swift(>=3.2)
 extension PromiseProtocol where Value == Void {
     /// Determines the promised event.
     ///
@@ -70,4 +69,3 @@ extension PromiseProtocol where Value == Void {
         return fill(with: ())
     }
 }
-#endif

@@ -246,8 +246,7 @@ class DeferredTests: XCTestCase {
         let expectedValues = [Int](repeating: anyValue, count: allDeferreds.count)
 
         let allShouldBeFulfilled = expectation(description: "filling any copy fulfills all")
-        allDeferreds.allFilled().upon {
-            [weak allShouldBeFulfilled] allValues in
+        allDeferreds.allFilled().upon { [weak allShouldBeFulfilled] allValues in
             allShouldBeFulfilled?.fulfill()
 
             XCTAssertEqual(allValues, expectedValues, "all deferreds are the same value")
@@ -259,7 +258,7 @@ class DeferredTests: XCTestCase {
     }
 
     func testDeferredOptionalBehavesCorrectly() {
-        let d = Deferred<Optional<Int>>(filledWith: .none)
+        let d = Deferred<Int?>(filledWith: .none)
 
         let beforeExpectation = expectation(description: "already filled with nil optional")
         d.upon {

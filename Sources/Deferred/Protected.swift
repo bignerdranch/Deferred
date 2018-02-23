@@ -37,7 +37,7 @@ public final class Protected<T> {
     }
 }
 
-extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
+extension Protected: CustomDebugStringConvertible, CustomReflectable {
     public var debugDescription: String {
         return lock.withAttemptedReadLock {
             "\(type(of: self))(\(String(reflecting: unsafeValue)))"
@@ -48,9 +48,5 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlay
         return lock.withAttemptedReadLock {
             Mirror(self, children: [ "item": unsafeValue ], displayStyle: .optional)
         } ?? Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
-    }
-
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: lock.withAttemptedReadLock({ unsafeValue }) as Any)
     }
 }

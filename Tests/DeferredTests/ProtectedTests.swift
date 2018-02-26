@@ -15,7 +15,11 @@ import Foundation
 class ProtectedTests: XCTestCase {
     static var allTests: [(String, (ProtectedTests) -> () throws -> Void)] {
         return [
-            ("testConcurrentReadingWriting", testConcurrentReadingWriting)
+            ("testConcurrentReadingWriting", testConcurrentReadingWriting),
+            ("testDebugDescription", testDebugDescription),
+            ("testDebugDescriptionWhenLocked", testDebugDescriptionWhenLocked),
+            ("testReflection", testReflection),
+            ("testReflectionWhenLocked", testReflectionWhenLocked)
         ]
     }
 
@@ -75,4 +79,42 @@ class ProtectedTests: XCTestCase {
 
         waitForExpectationsShort()
     }
+
+    func testDebugDescription() {
+        let protected = Protected<Int>(initialValue: 42)
+        XCTAssertEqual("\(protected)", "Protected(42)")
+    }
+
+    func testDebugDescriptionWhenLocked() {
+        let customLock = NSLock()
+        let protected = Protected<Int>(initialValue: 42, lock: customLock)
+
+        customLock.lock()
+        defer { customLock.unlock() }
+
+        XCTAssertEqual("\(protected)", "Protected(locked)")
+    }
+
+    func testReflection() {
+        let protected = Protected<Int>(initialValue: 42)
+
+        let magicMirror = Mirror(reflecting: protected)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant(0) as? Int, 42)
+    }
+
+    func testReflectionWhenLocked() {
+        let customLock = NSLock()
+        let protected = Protected<Int>(initialValue: 42, lock: customLock)
+
+        customLock.lock()
+        defer { customLock.unlock() }
+
+        let magicMirror = Mirror(reflecting: protected)
+        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant("locked") as? Bool, true)
+    }
+
 }

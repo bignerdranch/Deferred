@@ -10,15 +10,19 @@ import XCTest
 @testable import Deferred
 
 class ExistentialFutureTests: XCTestCase {
-    static var allTests: [(String, (ExistentialFutureTests) -> () throws -> Void)] {
-        return [
-            ("testFilledAnyFutureWaitAlwaysReturns", testFilledAnyFutureWaitAlwaysReturns),
-            ("testAnyWaitWithTimeout", testAnyWaitWithTimeout),
-            ("testFilledAnyFutureUpon", testFilledAnyFutureUpon),
-            ("testUnfilledAnyUponCalledWhenFilled", testUnfilledAnyUponCalledWhenFilled),
-            ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition)
-        ]
-    }
+    static let allTests: [(String, (ExistentialFutureTests) -> () throws -> Void)] = [
+        ("testFilledAnyFutureWaitAlwaysReturns", testFilledAnyFutureWaitAlwaysReturns),
+        ("testAnyWaitWithTimeout", testAnyWaitWithTimeout),
+        ("testFilledAnyFutureUpon", testFilledAnyFutureUpon),
+        ("testUnfilledAnyUponCalledWhenFilled", testUnfilledAnyUponCalledWhenFilled),
+        ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition),
+        ("testDebugDescriptionUnfilled", testDebugDescriptionUnfilled),
+        ("testDebugDescriptionFilled", testDebugDescriptionFilled),
+        ("testDebugDescriptionFilledWhenValueIsVoid", testDebugDescriptionFilledWhenValueIsVoid),
+        ("testReflectionUnfilled", testReflectionUnfilled),
+        ("testReflectionFilled", testReflectionFilled),
+        ("testReflectionFilledWhenValueIsVoid", testReflectionFilledWhenValueIsVoid)
+    ]
 
     var anyFuture: Future<Int>!
 
@@ -91,5 +95,47 @@ class ExistentialFutureTests: XCTestCase {
         XCTAssertTrue(anyFuture.isFilled)
         XCTAssertNotNil(anyFuture.wait(until: .now()))
         XCTAssertNotNil(anyFuture.waitShort())  // pass
+    }
+
+    func testDebugDescriptionUnfilled() {
+        let future = Future<Int>()
+        XCTAssertEqual("\(future)", "Future(not filled)")
+    }
+
+    func testDebugDescriptionFilled() {
+        let future = Future<Int>(value: 42)
+        XCTAssertEqual("\(future)", "Future(42)")
+    }
+
+    func testDebugDescriptionFilledWhenValueIsVoid() {
+        let future = Future<Void>(value: ())
+        XCTAssertEqual("\(future)", "Future(filled)")
+    }
+
+    func testReflectionUnfilled() {
+        let future = Future<Int>()
+
+        let magicMirror = Mirror(reflecting: future)
+        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, false)
+    }
+
+    func testReflectionFilled() {
+        let future = Future<Int>(value: 42)
+
+        let magicMirror = Mirror(reflecting: future)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant(0) as? Int, 42)
+    }
+
+    func testReflectionFilledWhenValueIsVoid() {
+        let future = Future<Void>(value: ())
+
+        let magicMirror = Mirror(reflecting: future)
+        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, true)
     }
 }

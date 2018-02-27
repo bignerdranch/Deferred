@@ -30,7 +30,7 @@ public typealias PreferredExecutor = DispatchQueue
 /// access, though ideally all members of the future could be called from any
 /// thread.
 ///
-public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
+public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
@@ -136,30 +136,27 @@ extension FutureProtocol {
 extension FutureProtocol {
     /// A textual representation of this instance, suitable for debugging.
     public var debugDescription: String {
-        var ret = "\(Self.self)"
-        if Value.self == Void.self && isFilled {
-            ret += " (filled)"
+        var ret = ""
+        ret.append(contentsOf: "\(Self.self)".prefix(while: { $0 != "<" }))
+        ret.append("(")
+        if Value.self == Void.self, isFilled {
+            ret.append("filled")
         } else if let value = peek() {
-            ret += "(\(String(reflecting: value)))"
+            debugPrint(value, terminator: "", to: &ret)
         } else {
-            ret += " (not filled)"
+            ret.append("not filled")
         }
+        ret.append(")")
         return ret
     }
 
     /// Return the `Mirror` for `self`.
     public var customMirror: Mirror {
-        switch peek() {
-        case let value? where Value.self != Void.self:
+        if Value.self != Void.self, let value = peek() {
             return Mirror(self, children: [ "value": value ], displayStyle: .optional)
-        case let value:
-            return Mirror(self, children: [ "isFilled": value != nil ], displayStyle: .tuple)
+        } else {
+            return Mirror(self, children: [ "isFilled": peek() != nil ], displayStyle: .tuple)
         }
-    }
-
-    /// A custom playground Quick Look for this instance.
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: peek() as Any)
     }
 }
 

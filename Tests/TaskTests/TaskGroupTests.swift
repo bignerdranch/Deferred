@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 8/18/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -11,17 +11,15 @@ import Dispatch
 
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Task
+import Task
 #else
-@testable import Deferred
+import Deferred
 #endif
 
 class TaskGroupTests: XCTestCase {
-    static var allTests: [(String, (TaskGroupTests) -> () throws -> Void)] {
-        return [
-            ("testThatAllCompleteTaskWaitsForAllAccumulatedTasks", testThatAllCompleteTaskWaitsForAllAccumulatedTasks)
-        ]
-    }
+    static let allTests: [(String, (TaskGroupTests) -> () throws -> Void)] = [
+        ("testThatAllCompleteTaskWaitsForAllAccumulatedTasks", testThatAllCompleteTaskWaitsForAllAccumulatedTasks)
+    ]
 
     private let queue = DispatchQueue(label: "TaskGroupTests", attributes: .concurrent)
     private var accumulator: TaskGroup!
@@ -55,13 +53,13 @@ class TaskGroupTests: XCTestCase {
             }
         }
 
-        let expectation = self.expectation(description: "allCompleteTask finished")
-        accumulator.completed().upon(queue) { [weak expectation] _ in
+        let expect = expectation(description: "allCompleteTask finished")
+        accumulator.completed().upon(queue) { _ in
             for task in tasks {
                 XCTAssertNotNil(task.wait(until: .distantFuture))
             }
 
-            expectation?.fulfill()
+            expect.fulfill()
         }
 
         waitForExpectations()

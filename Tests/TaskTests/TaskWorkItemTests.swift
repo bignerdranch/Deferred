@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/15/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -11,18 +11,16 @@ import Dispatch
 
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Task
+import Task
 #else
-@testable import Deferred
+import Deferred
 #endif
 
 class TaskWorkItemTests: XCTestCase {
-    static var allTests: [(String, (TaskWorkItemTests) -> () throws -> Void)] {
-        return [
-            ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
-            ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError)
-        ]
-    }
+    static let allTests: [(String, (TaskWorkItemTests) -> () throws -> Void)] = [
+        ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
+        ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError)
+    ]
 
     private var queue: DispatchQueue!
 
@@ -52,8 +50,13 @@ class TaskWorkItemTests: XCTestCase {
         task.cancel()
         finishSemaphore.signal()
 
-        let result = waitForTaskToComplete(task)
-        XCTAssertEqual(try? result.extract(), 1)
+        let expect = expectation(description: "task completed")
+        task.uponSuccess(on: .main) { (value) in
+            XCTAssertEqual(value, 1)
+            expect.fulfill()
+        }
+
+        shortWait(for: [ expect ])
     }
 
     func testThatCancellingBeforeATaskStartsProducesTheCancellationError() {
@@ -68,8 +71,12 @@ class TaskWorkItemTests: XCTestCase {
 
         task.cancel()
 
-        let result = waitForTaskToComplete(task)
-        semaphore.signal()
-        XCTAssertEqual(result.error as? TestError, .second)
+        let expect = expectation(description: "task completed")
+        task.uponFailure(on: .main) { (error) in
+            XCTAssertEqual(error as? TestError, .second)
+            expect.fulfill()
+        }
+
+        shortWait(for: [ expect ])
     }
 }

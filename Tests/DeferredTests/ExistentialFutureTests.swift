@@ -3,10 +3,11 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 9/3/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
+
 @testable import Deferred
 
 class ExistentialFutureTests: XCTestCase {
@@ -43,58 +44,55 @@ class ExistentialFutureTests: XCTestCase {
         anyFuture = Future(deferred)
 
         let expect = expectation(description: "value blocks while unfilled")
-        afterDelay(upon: .global()) {
+        afterShortDelay {
             deferred.fill(with: 42)
             expect.fulfill()
         }
 
-        let peek = anyFuture.waitShort()
-        XCTAssertNil(peek)
+        XCTAssertNil(anyFuture.shortWait())
 
-        waitForExpectations()
+        shortWait(for: [ expect ])
     }
 
     func testFilledAnyFutureUpon() {
-        let d = Future(value: 1)
-
-        for _ in 0 ..< 10 {
+        let future = Future(value: 1)
+        let allExpectations = (0 ..< 10).map { _ -> XCTestExpectation in
             let expect = expectation(description: "upon blocks called with correct value")
-            d.upon { value in
+            future.upon { value in
                 XCTAssertEqual(value, 1)
                 expect.fulfill()
             }
+            return expect
         }
-
-        waitForExpectations(timeout: 1, handler: nil)
+        shortWait(for: allExpectations)
     }
 
     func testUnfilledAnyUponCalledWhenFilled() {
-        let d = Deferred<Int>()
-        anyFuture = Future(d)
+        let deferred = Deferred<Int>()
+        anyFuture = Future(deferred)
 
-        for _ in 0 ..< 10 {
+        let allExpectations = (0 ..< 10).map { _ -> XCTestExpectation in
             let expect = expectation(description: "upon blocks not called while deferred is unfilled")
             anyFuture.upon { value in
                 XCTAssertEqual(value, 1)
-                XCTAssertEqual(d.value, value)
+                XCTAssertEqual(deferred.value, value)
                 expect.fulfill()
             }
+            return expect
         }
 
-        d.fill(with: 1)
-
-        waitForExpectations(timeout: 1, handler: nil)
+        deferred.fill(with: 1)
+        shortWait(for: allExpectations)
     }
 
     func testFillAndIsFilledPostcondition() {
         let deferred = Deferred<Int>()
         anyFuture = Future(deferred)
+        XCTAssertNil(anyFuture.peek())
         XCTAssertFalse(anyFuture.isFilled)
         deferred.fill(with: 42)
         XCTAssertNotNil(anyFuture.peek())
         XCTAssertTrue(anyFuture.isFilled)
-        XCTAssertNotNil(anyFuture.wait(until: .now()))
-        XCTAssertNotNil(anyFuture.waitShort())  // pass
     }
 
     func testDebugDescriptionUnfilled() {

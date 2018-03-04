@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 6/10/15.
-//  Copyright © 2014-2017 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -13,6 +13,7 @@ import Darwin
 import Glibc
 #endif
 import Dispatch
+
 import Deferred
 
 enum TestError: Error {
@@ -21,54 +22,40 @@ enum TestError: Error {
     case third
 }
 
-func sleep(_ duration: DispatchTimeInterval) {
-    var t = timespec(tv_sec: 0, tv_nsec: 0)
-    switch duration {
-    case .microseconds(let micro):
-        t.tv_nsec = micro * 1_000
-    case .nanoseconds(let nano):
-        t.tv_nsec = nano
-    case .milliseconds(let millo):
-        t.tv_nsec = millo * 1_000
-    case .seconds(let sec):
-        t.tv_sec = sec
-    case .never:
-        return
-    }
-    nanosleep(&t, nil)
-}
-
 extension XCTestCase {
-    func waitForExpectations(file: StaticString = #file, line: Int = #line) {
-        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-            waitForExpectations(timeout: 10, handler: nil)
-        #else
-            waitForExpectations(timeout: 10, file: file, line: numericCast(line), handler: nil)
-        #endif
+    func expectation(deallocationOf object: AnyObject) -> XCTestExpectation {
+        return expectation(for: NSPredicate(block: { [weak object] (_, _) -> Bool in
+            object == nil
+        }), evaluatedWith: NSNull(), handler: nil)
     }
 
-    func waitForExpectationsShort(file: StaticString = #file, line: Int = #line) {
-        #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-            waitForExpectations(timeout: 3, handler: nil)
-        #else
-            waitForExpectations(timeout: 3, file: file, line: numericCast(line), handler: nil)
-        #endif
+#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
+    func shortWait(for expectations: [XCTestExpectation]) {
+        let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? 0.5 : expectations.count > 10 ? 10 : 3
+        wait(for: expectations, timeout: timeout)
     }
+#else
+    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: UInt = #line) {
+        let timeout: TimeInterval = expectations.count > 10 ? 10 : 3
+        waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
+    }
+#endif
 
-    func afterDelay(upon queue: DispatchQueue = .main, execute body: @escaping() -> Void) {
+    func afterShortDelay(upon queue: DispatchQueue = .global(), execute body: @escaping() -> Void) {
         queue.asyncAfter(deadline: .now() + 0.15, execute: body)
     }
 }
 
 extension FutureProtocol {
-    func waitShort() -> Value? {
+    func shortWait() -> Value? {
         return wait(until: .now() + 0.05)
     }
 }
 
 class CustomExecutorTestCase: XCTestCase {
-    private struct CountingExecutor: Executor {
+    private var submitCount = Protected(initialValue: 0)
 
+    private struct CountingExecutor: Executor {
         unowned let owner: CustomExecutorTestCase
 
         func submit(_ body: @escaping() -> Void) {
@@ -78,20 +65,18 @@ class CustomExecutorTestCase: XCTestCase {
 
             body()
         }
-
     }
 
-    private var submitCount = Protected(initialValue: 0)
     final var executor: Executor {
         return CountingExecutor(owner: self)
     }
 
-    func assertExecutorCalled(_ times: Int, inFile file: StaticString = #file, atLine line: Int = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 == times }), "Executor was not called exactly \(times) times", file: file, line: numericCast(line))
+    final func assertExecutorNeverCalled(file: StaticString = #file, line: UInt = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 == 0 }), "Executor was called unexpectedly", file: file, line: line)
     }
 
-    func assertExecutorCalled(atLeast times: Int, inFile file: StaticString = #file, atLine line: Int = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 >= times }), "Executor was never called", file: file, line: numericCast(line))
+    final func assertExecutorCalled(atLeast times: Int, file: StaticString = #file, line: UInt = #line) {
+        XCTAssert(submitCount.withReadLock({ $0 >= times }), "Executor was not called enough times", file: file, line: line)
     }
 }
 
@@ -108,34 +93,4 @@ extension Collection {
         return self[i]
     }
 
-}
-
-enum SomeMultipayloadEnum: Hashable {
-    case one
-    case two(String)
-    case three(Double)
-
-    var hashValue: Int {
-        switch self {
-        case .one:
-            return 1
-        case .two(let str):
-            return str.hashValue
-        case .three(let obj):
-            return obj.hashValue
-        }
-    }
-
-    static func == (lhs: SomeMultipayloadEnum, rhs: SomeMultipayloadEnum) -> Bool {
-        switch (lhs, rhs) {
-        case (.one, .one):
-            return true
-        case let (.two(lhs), .two(rhs)):
-            return lhs == rhs
-        case let (.three(lhs), .three(rhs)):
-            return lhs == rhs
-        default:
-            return false
-        }
-    }
 }

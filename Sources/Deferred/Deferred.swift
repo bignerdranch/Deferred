@@ -114,10 +114,8 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
 private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
 
-    private typealias My = DeferredStorage<Value>
-
     static func create() -> DeferredStorage<Value> {
-        return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: My.self)
+        return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: DeferredStorage<Value>.self)
     }
 
     func withAtomicPointerToElement<Return>(_ body: (UnsafeMutablePointer<UnsafeAtomicRawPointer>) throws -> Return) rethrows -> Return {

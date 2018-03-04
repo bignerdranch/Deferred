@@ -37,7 +37,7 @@ class TaskGroupTests: XCTestCase {
     func testThatAllCompleteTaskWaitsForAllAccumulatedTasks() {
         let numTasks = 20
         var tasks = [Task<Void>]()
-        for i in 0 ..< numTasks {
+        for iteration in 0 ..< numTasks {
             let deferred = Deferred<Task<Void>.Result>()
             let task = Task<Void>(deferred, cancellation: nil)
             tasks.append(task)
@@ -45,7 +45,7 @@ class TaskGroupTests: XCTestCase {
 
             afterShortDelay {
                 // success/failure should be ignored by TaskGroup, so try both!
-                if i % 2 == 0 {
+                if iteration % 2 == 0 {
                     deferred.fill(with: .success(()))
                 } else {
                     deferred.fill(with: .failure(TestError.first))

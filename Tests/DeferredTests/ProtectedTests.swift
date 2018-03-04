@@ -64,9 +64,9 @@ class ProtectedTests: XCTestCase {
         let expectWrite = expectation(description: "writer")
         queue.async {
             self.protected.withWriteLock { dateItemsTuple -> Void in
-                for i in 0 ..< 5 {
+                for iteration in 0 ..< 5 {
                     dateItemsTuple.0 = Date()
-                    dateItemsTuple.1.append(i)
+                    dateItemsTuple.1.append(iteration)
                     Thread.sleep(forTimeInterval: 0.1)
                 }
                 lastWriterDate = dateItemsTuple.0

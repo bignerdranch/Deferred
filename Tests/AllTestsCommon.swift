@@ -53,30 +53,29 @@ extension FutureProtocol {
 }
 
 class CustomExecutorTestCase: XCTestCase {
-    private var submitCount = Protected(initialValue: 0)
+    private class CountingExecutor: Executor {
+        let submitCount = Protected(initialValue: 0)
 
-    private struct CountingExecutor: Executor {
-        unowned let owner: CustomExecutorTestCase
+        init() {}
 
         func submit(_ body: @escaping() -> Void) {
-            owner.submitCount.withWriteLock { (count: inout Int) in
-                count += 1
-            }
-
+            submitCount.withWriteLock { $0 += 1 }
             body()
         }
     }
 
+    private let _executor = CountingExecutor()
+
     final var executor: Executor {
-        return CountingExecutor(owner: self)
+        return _executor
     }
 
     final func assertExecutorNeverCalled(file: StaticString = #file, line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 == 0 }), "Executor was called unexpectedly", file: file, line: line)
+        XCTAssert(_executor.submitCount.withReadLock({ $0 == 0 }), "Executor was called unexpectedly", file: file, line: line)
     }
 
     final func assertExecutorCalled(atLeast times: Int, file: StaticString = #file, line: UInt = #line) {
-        XCTAssert(submitCount.withReadLock({ $0 >= times }), "Executor was not called enough times", file: file, line: line)
+        XCTAssert(_executor.submitCount.withReadLock({ $0 >= times }), "Executor was not called enough times", file: file, line: line)
     }
 }
 

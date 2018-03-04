@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by John Gallagher on 8/18/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -19,7 +19,9 @@ import Dispatch
 /// The success or failure of the accumulated tasks is ignored - this type is
 /// only interested in completion.
 public struct TaskGroup {
+
     private let group = DispatchGroup()
+    public init() {}
 
     private var queue: DispatchQueue {
         return .global(qos: .utility)

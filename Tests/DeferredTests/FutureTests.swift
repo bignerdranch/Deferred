@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 9/24/16.
-//  Copyright © 2016 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2016-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -17,25 +17,23 @@ import Deferred.Atomics
 #endif
 
 class FutureTests: XCTestCase {
-    static var allTests: [(String, (FutureTests) -> () throws -> Void)] {
-        return [
-            ("testAnd", testAnd),
-            ("testAllFilled", testAllFilled),
-            ("testAllFilledEmptyCollection", testAllFilledEmptyCollection),
-            ("testFirstFilled", testFirstFilled)
-        ]
-    }
+    static let allTests: [(String, (FutureTests) -> () throws -> Void)] = [
+        ("testAnd", testAnd),
+        ("testAllFilled", testAllFilled),
+        ("testAllFilledEmptyCollection", testAllFilledEmptyCollection),
+        ("testFirstFilled", testFirstFilled)
+    ]
 
     func testAnd() {
         let d1 = Deferred<Int>()
         let d2 = Deferred<String>()
         let both = d1.and(d2)
 
-        let expectation = self.expectation(description: "paired deferred should be filled")
+        let expect = expectation(description: "paired deferred should be filled")
         both.upon(.main) { (value) in
             XCTAssertEqual(value.0, 1)
             XCTAssertEqual(value.1, "foo")
-            expectation.fulfill()
+            expect.fulfill()
         }
 
         XCTAssertFalse(both.isFilled)
@@ -44,7 +42,7 @@ class FutureTests: XCTestCase {
         XCTAssertFalse(both.isFilled)
         d2.fill(with: "foo")
 
-        waitForExpectations()
+        shortWait(for: [ expect ])
     }
 
     func testAllFilled() {
@@ -55,63 +53,63 @@ class FutureTests: XCTestCase {
         }
 
         let w = d.allFilled()
-        let outerExpectation = expectation(description: "all results filled in")
-        let innerExpectation = expectation(description: "paired deferred should be filled")
+        let outerExpect = expectation(description: "all results filled in")
+        let innerExpect = expectation(description: "paired deferred should be filled")
 
         // skip first
         for i in 1 ..< d.count {
             d[i].fill(with: i)
         }
 
-        afterDelay {
+        self.afterShortDelay {
             XCTAssertFalse(w.isFilled) // unfilled because d[0] is still unfilled
             d[0].fill(with: 0)
 
-            self.afterDelay {
+            self.afterShortDelay {
                 XCTAssertTrue(w.value == [Int](0 ..< d.count))
-                innerExpectation.fulfill()
+                innerExpect.fulfill()
             }
-            outerExpectation.fulfill()
+            outerExpect.fulfill()
         }
 
-        waitForExpectations()
+        shortWait(for: [ outerExpect, innerExpect ])
     }
 
     func testAllFilledEmptyCollection() {
-        let d = EmptyCollection<Deferred<Int>>().allFilled()
-        XCTAssert(d.isFilled)
+        let deferred = EmptyCollection<Deferred<Int>>().allFilled()
+        XCTAssert(deferred.isFilled)
     }
 
     func testFirstFilled() {
-        let d = (0 ..< 10).map { _ in Deferred<Int>() }
-        let w = d.firstFilled()
+        let allDeferreds = (0 ..< 10).map { _ in Deferred<Int>() }
+        let winner = allDeferreds.firstFilled()
 
-        d[3].fill(with: 3)
+        allDeferreds[3].fill(with: 3)
 
-        let outerExpectation = expectation(description: "any is filled")
-        let innerExpectation = expectation(description: "any is not changed")
+        let outerExpect = expectation(description: "any is filled")
+        let innerExpect = expectation(description: "any is not changed")
 
-        afterDelay {
-            XCTAssertEqual(w.value, 3)
+        self.afterShortDelay {
+            XCTAssertEqual(winner.value, 3)
 
-            d[4].fill(with: 4)
+            allDeferreds[4].fill(with: 4)
 
-            self.afterDelay {
-                XCTAssertEqual(w.value, 3)
-                innerExpectation.fulfill()
+            self.afterShortDelay {
+                XCTAssertEqual(winner.value, 3)
+                innerExpect.fulfill()
             }
 
-            outerExpectation.fulfill()
+            outerExpect.fulfill()
         }
 
-        waitForExpectations()
+        shortWait(for: [ outerExpect, innerExpect ])
     }
 
     func testEveryMapTransformerIsCalledMultipleTimes() {
-        let d = Deferred(filledWith: 1)
+        let deferred = Deferred(filledWith: 1)
         var counter = UnsafeAtomicCounter()
 
-        let mapped = d.every { (value) -> (Int) in
+        let mapped = deferred.every { (value) -> (Int) in
             bnr_atomic_counter_increment(&counter)
             return value * 2
         }
@@ -121,10 +119,9 @@ class FutureTests: XCTestCase {
             XCTAssertEqual(value, 2)
             expect.fulfill()
         }
-        waitForExpectationsShort()
+        shortWait(for: [ expect ])
 
-        XCTAssertEqual(mapped.waitShort(), 2)
-
+        XCTAssertEqual(mapped.value, 2)
         XCTAssertEqual(bnr_atomic_counter_load(&counter), 2)
     }
 }

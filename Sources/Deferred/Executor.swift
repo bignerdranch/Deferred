@@ -43,7 +43,7 @@ import Foundation
 ///         Person(json: json, inContext: context)
 ///     }
 ///
-public protocol Executor {
+public protocol Executor: class {
     /// Execute the `body` closure.
     func submit(_ body: @escaping() -> Void)
 
@@ -54,8 +54,6 @@ public protocol Executor {
     /// may be used instead of `submit(_:)` for more efficient execution.
     var underlyingQueue: DispatchQueue? { get }
 }
-
-public typealias DefaultExecutor = DispatchQueue
 
 extension Executor {
     /// By default, submits the closure contents of the work item.
@@ -102,6 +100,8 @@ extension DispatchQueue: Executor {
         return self
     }
 }
+
+public typealias DefaultExecutor = DispatchQueue
 
 /// An operation queue manages a number of operation objects, making high
 /// level features like cancellation and dependencies simple.

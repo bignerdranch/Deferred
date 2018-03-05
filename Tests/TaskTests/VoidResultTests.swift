@@ -3,27 +3,25 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 3/27/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Task
+import Task
 #else
-@testable import Deferred
+import Deferred
 #endif
 
 class VoidResultTests: XCTestCase {
-    static var allTests: [(String, (VoidResultTests) -> () throws -> Void)] {
-        return [
-            ("testDescriptionSuccess", testDescriptionSuccess),
-            ("testDescriptionFailure", testDescriptionFailure),
-            ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
-            ("testDebugDescriptionFailure", testDebugDescriptionFailure),
-            ("testExtract", testExtract)
-        ]
-    }
+    static let allTests: [(String, (VoidResultTests) -> () throws -> Void)] = [
+        ("testDescriptionSuccess", testDescriptionSuccess),
+        ("testDescriptionFailure", testDescriptionFailure),
+        ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
+        ("testDebugDescriptionFailure", testDebugDescriptionFailure),
+        ("testExtract", testExtract)
+    ]
 
     private typealias Result = Task<Void>.Result
 
@@ -49,7 +47,7 @@ class VoidResultTests: XCTestCase {
     }
 
     func testExtract() {
-        XCTAssertNotNil(try? aSuccessResult.extract())
-        XCTAssertNil(try? aFailureResult.extract())
+        XCTAssertNoThrow(try aSuccessResult.extract())
+        XCTAssertThrowsError(try aFailureResult.extract())
     }
 }

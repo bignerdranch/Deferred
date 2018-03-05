@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by Pierluigi Cifani on 29/10/2016.
-//  Copyright © 2016 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2016-2018 Big Nerd Ranch. Licensed under MIT.
 //
 //  The following test case aggressively exercises a few features of Task and
 //  Deferred. It is not a unit test, per se, but has reliably uncovered several
@@ -15,41 +15,30 @@ import XCTest
 import Dispatch
 
 #if SWIFT_PACKAGE
-    import Deferred
-    @testable import Task
+import Deferred
+import Task
 #else
-    @testable import Deferred
+import Deferred
 #endif
 
 class TaskComprehensiveTests: XCTestCase {
-    static var allTests: [(String, (TaskComprehensiveTests) -> () throws -> Void)] {
-        return [
-            ("testThatSeveralIterationsRunCorrectly", testThatSeveralIterationsRunCorrectly),
-            ("testThatCancellingATaskPropagatesTheCancellation", testThatCancellingATaskPropagatesTheCancellation)
-        ]
-    }
+    static let allTests: [(String, (TaskComprehensiveTests) -> () throws -> Void)] = [
+        ("testThatSeveralIterationsRunCorrectly", testThatSeveralIterationsRunCorrectly),
+        ("testThatCancellingATaskPropagatesTheCancellation", testThatCancellingATaskPropagatesTheCancellation)
+    ]
 
     func testThatCancellingATaskPropagatesTheCancellation() {
         let semaphore = DispatchSemaphore(value: 0)
-        var cancellationWasPropagated = false
 
         let task1 = TaskProducer.produceTask()
         let task2 = TaskProducer.produceTask()
         let task = [task1, task2].allSucceeded()
-        task.upon(DispatchQueue.any()) { result in
-
-            defer { semaphore.signal() }
-
-            guard let error = result.error, let taskError = error as? TaskProducerError else {
-                return
-            }
-
-            cancellationWasPropagated = (taskError == TaskProducerError.userCancelled)
+        task.uponFailure(on: .any()) { (error) in
+            XCTAssertEqual(error as? TaskProducerError, .userCancelled)
+            semaphore.signal()
         }
         task.cancel()
         _ = semaphore.wait(timeout: .now() + .seconds(5))
-
-        XCTAssert(cancellationWasPropagated)
     }
 
     func testThatSeveralIterationsRunCorrectly() {
@@ -108,8 +97,7 @@ private final class TaskProducer {
     static private func sync(file: File) -> Task<()> {
         let deferred = Deferred<Task<Void>.Result>()
 
-        let queue = DispatchQueue(label: String.random())
-        queue.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) {
             deferred.fill(with: .success(()))
         }
 
@@ -121,8 +109,7 @@ private final class TaskProducer {
     static private func fetchFolderInfo(folderID: String) -> Task<[Item]> {
         let deferred = Deferred<Task<[Item]>.Result>()
 
-        let queue = DispatchQueue(label: String.random())
-        queue.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
             let items = (0 ..< 25).map { _ in File() }
             deferred.fill(with: .success((items)))
         }
@@ -142,26 +129,13 @@ private protocol Item {
 }
 
 private struct File: Item {
-    var modelID: String = String.random()
+    var modelID: String = UUID().uuidString
     let isFolder: Bool = false
     let isFile: Bool = true
 }
 
 private struct Folder: Item {
-    var modelID: String = String.random()
+    var modelID: String = UUID().uuidString
     let isFolder: Bool = true
     let isFile: Bool = false
-}
-
-extension String {
-
-    static func random(length: Int = 20) -> String {
-        let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        var randomString: String = ""
-
-        for _ in 0 ..< length {
-            randomString.unicodeScalars.append(UnicodeScalar(base.utf16.random())!)
-        }
-        return randomString
-    }
 }

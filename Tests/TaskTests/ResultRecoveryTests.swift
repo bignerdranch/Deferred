@@ -3,24 +3,23 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 12/16/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
+
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Task
+import Task
 #else
-@testable import Deferred
+import Deferred
 #endif
 
 class ResultRecoveryTests: XCTestCase {
-    static var allTests: [(String, (ResultRecoveryTests) -> () throws -> Void)] {
-        return [
-            ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
-            ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures)
-        ]
-    }
+    static let allTests: [(String, (ResultRecoveryTests) -> () throws -> Void)] = [
+        ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
+        ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures)
+    ]
 
     private typealias Result = Task<String>.Result
 
@@ -42,13 +41,13 @@ class ResultRecoveryTests: XCTestCase {
 
     func testInitWithFunctionProducesSuccesses() {
         let result = Result(from: successFunction)
-        XCTAssertEqual(result.value, "success")
-        XCTAssertNil(result.error)
+        XCTAssertEqual(try result.extract(), "success")
     }
 
     func testInitWithFunctionProducesFailures() {
         let result = Result(from: failureFunction)
-        XCTAssertNil(result.value)
-        XCTAssertEqual(result.error as? TestError, .first)
+        XCTAssertThrowsError(try result.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
     }
 }

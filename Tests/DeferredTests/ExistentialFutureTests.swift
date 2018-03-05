@@ -56,8 +56,8 @@ class ExistentialFutureTests: XCTestCase {
 
     func testFilledAnyFutureUpon() {
         let future = Future(value: 1)
-        let allExpectations = (0 ..< 10).map { _ -> XCTestExpectation in
-            let expect = expectation(description: "upon blocks called with correct value")
+        let allExpectations = (0 ..< 10).map { (iteration) -> XCTestExpectation in
+            let expect = expectation(description: "upon block #\(iteration) called with correct value")
             future.upon { value in
                 XCTAssertEqual(value, 1)
                 expect.fulfill()
@@ -71,8 +71,8 @@ class ExistentialFutureTests: XCTestCase {
         let deferred = Deferred<Int>()
         anyFuture = Future(deferred)
 
-        let allExpectations = (0 ..< 10).map { _ -> XCTestExpectation in
-            let expect = expectation(description: "upon blocks not called while deferred is unfilled")
+        let allExpectations = (0 ..< 10).map { (iteration) -> XCTestExpectation in
+            let expect = expectation(description: "upon block #\(iteration) not called while deferred is unfilled")
             anyFuture.upon { value in
                 XCTAssertEqual(value, 1)
                 XCTAssertEqual(deferred.value, value)

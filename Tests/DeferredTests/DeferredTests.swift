@@ -140,8 +140,8 @@ class DeferredTests: XCTestCase {
 
     func testUponWithFilled() {
         let deferred = Deferred(filledWith: 1)
-        let allExpectations = (0 ..< 10).map { _ -> XCTestExpectation in
-            let expect = expectation(description: "upon blocks called with correct value")
+        let allExpectations = (0 ..< 10).map { (iteration) -> XCTestExpectation in
+            let expect = expectation(description: "upon block #\(iteration) called with correct value")
             deferred.upon { value in
                 XCTAssertEqual(value, 1)
                 expect.fulfill()
@@ -168,8 +168,8 @@ class DeferredTests: XCTestCase {
 
     func testUponCalledWhenFilled() {
         let deferred = Deferred<Int>()
-        let allExpectations = (0 ..< 10).map { _ -> XCTestExpectation in
-            let expect = expectation(description: "upon blocks not called while deferred is unfilled")
+        let allExpectations = (0 ..< 10).map { (iteration) -> XCTestExpectation in
+            let expect = expectation(description: "upon block #\(iteration) not called while deferred is unfilled")
             deferred.upon { value in
                 XCTAssertEqual(value, 1)
                 expect.fulfill()

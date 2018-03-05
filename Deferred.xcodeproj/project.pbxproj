@@ -166,9 +166,6 @@
 		DB126D951E5369E200054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB126D961E5369E300054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB126D971E5369E300054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB4E0D0A1EBACDBD00F07CD9 /* TaskTestsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4E0D091EBACDBD00F07CD9 /* TaskTestsCommon.swift */; };
-		DB4E0D0B1EBACDBD00F07CD9 /* TaskTestsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4E0D091EBACDBD00F07CD9 /* TaskTestsCommon.swift */; };
-		DB4E0D0C1EBACDBD00F07CD9 /* TaskTestsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4E0D091EBACDBD00F07CD9 /* TaskTestsCommon.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -205,7 +202,6 @@
 		DB126CF41E53687300054E95 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB39B2D01DDE194C00DDE4C0 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		DB4002691DDC21B300382BAE /* SwiftBugTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftBugTests.swift; sourceTree = "<group>"; };
-		DB4E0D091EBACDBD00F07CD9 /* TaskTestsCommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTestsCommon.swift; sourceTree = "<group>"; };
 		DB524C8C1D851E5B00DDF16D /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Framework.xcconfig; sourceTree = "<group>"; };
 		DB524C8E1D851E5B00DDF16D /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
@@ -443,7 +439,6 @@
 				DB55F1FB1D96968E00FC1439 /* TaskGroupTests.swift */,
 				DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */,
 				DB55F1FC1D96968E00FC1439 /* TaskTests.swift */,
-				DB4E0D091EBACDBD00F07CD9 /* TaskTestsCommon.swift */,
 				DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */,
 				DB55F1F91D96968E00FC1439 /* VoidResultTests.swift */,
 			);
@@ -777,7 +772,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB4E0D0A1EBACDBD00F07CD9 /* TaskTestsCommon.swift in Sources */,
 				DB126D671E5368B900054E95 /* SwiftBugTests.swift in Sources */,
 				DB126D601E5368B900054E95 /* DeferredTests.swift in Sources */,
 				DB126D651E5368B900054E95 /* LockingTests.swift in Sources */,
@@ -833,7 +827,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB4E0D0B1EBACDBD00F07CD9 /* TaskTestsCommon.swift in Sources */,
 				DB126D771E5368B900054E95 /* SwiftBugTests.swift in Sources */,
 				DB126D701E5368B900054E95 /* DeferredTests.swift in Sources */,
 				DB126D751E5368B900054E95 /* LockingTests.swift in Sources */,
@@ -889,7 +882,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB4E0D0C1EBACDBD00F07CD9 /* TaskTestsCommon.swift in Sources */,
 				DB126D871E5368BA00054E95 /* SwiftBugTests.swift in Sources */,
 				DB126D801E5368BA00054E95 /* DeferredTests.swift in Sources */,
 				DB126D851E5368BA00054E95 /* LockingTests.swift in Sources */,

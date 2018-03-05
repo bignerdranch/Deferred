@@ -43,7 +43,7 @@ class TaskGroupTests: XCTestCase {
             tasks.append(task)
             accumulator.include(task)
 
-            afterDelay {
+            afterShortDelay {
                 // success/failure should be ignored by TaskGroup, so try both!
                 if i % 2 == 0 {
                     deferred.fill(with: .success(()))
@@ -61,7 +61,6 @@ class TaskGroupTests: XCTestCase {
 
             expect.fulfill()
         }
-
-        waitForExpectations()
+        shortWait(for: [ expect ])
     }
 }

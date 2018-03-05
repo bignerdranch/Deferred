@@ -3,25 +3,22 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/19/14.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
 import Dispatch
-import Foundation
 
-@testable import Deferred
+import Deferred
 
 class ProtectedTests: XCTestCase {
-    static var allTests: [(String, (ProtectedTests) -> () throws -> Void)] {
-        return [
-            ("testConcurrentReadingWriting", testConcurrentReadingWriting),
-            ("testDebugDescription", testDebugDescription),
-            ("testDebugDescriptionWhenLocked", testDebugDescriptionWhenLocked),
-            ("testReflection", testReflection),
-            ("testReflectionWhenLocked", testReflectionWhenLocked)
-        ]
-    }
+    static let allTests: [(String, (ProtectedTests) -> () throws -> Void)] = [
+        ("testConcurrentReadingWriting", testConcurrentReadingWriting),
+        ("testDebugDescription", testDebugDescription),
+        ("testDebugDescriptionWhenLocked", testDebugDescriptionWhenLocked),
+        ("testReflection", testReflection),
+        ("testReflectionWhenLocked", testReflectionWhenLocked)
+    ]
 
     var protected: Protected<(Date?, [Int])>!
     var queue: DispatchQueue!
@@ -34,17 +31,20 @@ class ProtectedTests: XCTestCase {
     }
 
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        queue = nil
+        protected = nil
+
         super.tearDown()
     }
 
     func testConcurrentReadingWriting() {
         var lastWriterDate: Date?
+        var allExpectations = [XCTestExpectation]()
 
-        let startReader: (Int) -> Void = { iteration in
-            let expectation = self.expectation(description: "reader \(iteration)")
-            self.queue.async {
-                self.protected.withReadLock { (arg) -> Void in
+        func startReader(forIteration iteration: Int) -> XCTestExpectation {
+            let expect = expectation(description: "reader \(iteration)")
+            queue.async {
+                self.protected.withReadLock { (arg) in
                     let (date, items) = arg
                     if items.isEmpty && date == nil {
                         // OK - we're before the writer has added items
@@ -54,30 +54,30 @@ class ProtectedTests: XCTestCase {
                         XCTFail("invalid count (\(items.count)) or date (\(String(describing: date)))")
                     }
                 }
-                expectation.fulfill()
+                expect.fulfill()
             }
+            return expect
         }
 
-        for i in 0 ..< 64 {
-            startReader(i)
-        }
-        let expectation = self.expectation(description: "writer")
-        self.queue.async {
+        allExpectations += (0 ..< 64).map(startReader)
+
+        let expectWrite = expectation(description: "writer")
+        queue.async {
             self.protected.withWriteLock { dateItemsTuple -> Void in
                 for i in 0 ..< 5 {
                     dateItemsTuple.0 = Date()
                     dateItemsTuple.1.append(i)
-                    sleep(.milliseconds(100))
+                    Thread.sleep(forTimeInterval: 0.1)
                 }
                 lastWriterDate = dateItemsTuple.0
             }
-            expectation.fulfill()
+            expectWrite.fulfill()
         }
-        for i in 64 ..< 128 {
-            startReader(i)
-        }
+        allExpectations.append(expectWrite)
 
-        waitForExpectationsShort()
+        allExpectations += (64 ..< 128).map(startReader)
+
+        shortWait(for: allExpectations)
     }
 
     func testDebugDescription() {

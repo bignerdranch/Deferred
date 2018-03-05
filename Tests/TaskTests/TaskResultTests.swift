@@ -3,35 +3,34 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 2/7/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
+
 #if SWIFT_PACKAGE
 import Deferred
-@testable import Task
+import Task
 #else
-@testable import Deferred
+import Deferred
 #endif
 
 class TaskResultTests: XCTestCase {
-    static var allTests: [(String, (TaskResultTests) -> () throws -> Void)] {
-        return [
-            ("testDescriptionSuccess", testDescriptionSuccess),
-            ("testDescriptionFailure", testDescriptionFailure),
-            ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
-            ("testDebugDescriptionFailure", testDebugDescriptionFailure),
-            ("testSuccessExtract", testSuccessExtract),
-            ("testFailureExtract", testFailureExtract),
-            ("testCoalesceSuccessValue", testCoalesceSuccessValue),
-            ("testCoalesceFailureValue", testCoalesceFailureValue),
-            ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
-            ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
-            ("testInitializeWithBlockSuccess", testInitializeWithBlockSuccess),
-            ("testInitializeWithBlockError", testInitializeWithBlockError),
-            ("testInitializeWithBlockInitFailure", testInitializeWithBlockInitFailure)
-        ]
-    }
+    static let allTests: [(String, (TaskResultTests) -> () throws -> Void)] = [
+        ("testDescriptionSuccess", testDescriptionSuccess),
+        ("testDescriptionFailure", testDescriptionFailure),
+        ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
+        ("testDebugDescriptionFailure", testDebugDescriptionFailure),
+        ("testSuccessExtract", testSuccessExtract),
+        ("testFailureExtract", testFailureExtract),
+        ("testCoalesceSuccessValue", testCoalesceSuccessValue),
+        ("testCoalesceFailureValue", testCoalesceFailureValue),
+        ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
+        ("testFlatCoalesceSuccess", testFlatCoalesceSuccess),
+        ("testInitializeWithBlockSuccess", testInitializeWithBlockSuccess),
+        ("testInitializeWithBlockError", testInitializeWithBlockError),
+        ("testInitializeWithBlockInitFailure", testInitializeWithBlockInitFailure)
+    ]
 
     private typealias Result = Task<Int>.Result
 
@@ -57,11 +56,11 @@ class TaskResultTests: XCTestCase {
     }
 
     func testSuccessExtract() {
-        XCTAssertEqual(try? aSuccessResult.extract(), 42)
+        XCTAssertEqual(try aSuccessResult.extract(), 42)
     }
 
     func testFailureExtract() {
-        XCTAssertNil(try? aFailureResult.extract())
+        XCTAssertThrowsError(try aFailureResult.extract())
     }
 
     func testCoalesceSuccessValue() {
@@ -73,29 +72,29 @@ class TaskResultTests: XCTestCase {
     }
 
     func testFlatCoalesceSuccess() {
-        let x = aSuccessResult ?? Result.success(84)
-        XCTAssertEqual(x.value, 42)
-        XCTAssertNil(x.error)
+        let result = aSuccessResult ?? Result.success(84)
+        XCTAssertEqual(try result.extract(), 42)
     }
 
     func testFlatCoalesceFailure() {
-        let x = aFailureResult ?? Result(success: 84)
-        XCTAssertEqual(x.value, 84)
-        XCTAssertNil(x.error)
+        let result = aFailureResult ?? Result(success: 84)
+        XCTAssertEqual(try result.extract(), 84)
     }
 
     func testInitializeWithBlockSuccess() {
         let result = Result(value: 42, error: nil)
-        XCTAssertEqual(try? result.extract(), 42)
+        XCTAssertEqual(try result.extract(), 42)
     }
 
     func testInitializeWithBlockError() {
         let result = Result(value: nil, error: TestError.first)
-        XCTAssertEqual(result.error as? TestError, .first)
+        XCTAssertThrowsError(try result.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
     }
 
     func testInitializeWithBlockInitFailure() {
         let result = Result(value: nil, error: nil)
-        XCTAssertNil(try? result.extract())
+        XCTAssertThrowsError(try result.extract())
     }
 }

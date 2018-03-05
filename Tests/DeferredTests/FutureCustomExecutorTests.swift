@@ -3,33 +3,32 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 4/10/16.
-//  Copyright © 2016 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2016-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
-@testable import Deferred
+
+import Deferred
 
 class FutureCustomExecutorTests: CustomExecutorTestCase {
-    static var allTests: [(String, (FutureCustomExecutorTests) -> () throws -> Void)] {
-        return [
-            ("testUpon", testUpon),
-            ("testMap", testMap),
-            ("testAndThen", testAndThen)
-        ]
-    }
+    static let allTests: [(String, (FutureCustomExecutorTests) -> () throws -> Void)] = [
+        ("testUpon", testUpon),
+        ("testMap", testMap),
+        ("testAndThen", testAndThen)
+    ]
 
     func testUpon() {
-        let d = Deferred<Void>()
+        let deferred = Deferred<Void>()
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        d.upon(executor) { _ in
+        deferred.upon(executor) { _ in
             expect.fulfill()
         }
 
-        d.fill(with: ())
+        deferred.fill(with: ())
 
-        waitForExpectations()
-        assertExecutorCalled(1)
+        shortWait(for: [ expect ])
+        assertExecutorCalled(atLeast: 1)
     }
 
     func testMap() {
@@ -45,17 +44,17 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         marker.fill(with: ())
 
-        waitForExpectations()
-        assertExecutorCalled(2)
+        shortWait(for: [ expect ])
+        assertExecutorCalled(atLeast: 2)
     }
 
     // Should this be promoted to an initializer on Future?
     private func delay<Value>(_ value: @autoclosure @escaping() -> Value) -> Future<Value> {
-        let d = Deferred<Value>()
-        afterDelay {
-            d.fill(with: value())
+        let deferred = Deferred<Value>()
+        afterShortDelay {
+            deferred.fill(with: value())
         }
-        return Future(d)
+        return Future(deferred)
     }
 
     func testAndThen() {
@@ -71,7 +70,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         marker.fill(with: ())
 
-        waitForExpectations()
-        assertExecutorCalled(3)
+        shortWait(for: [ expect ])
+        assertExecutorCalled(atLeast: 3)
     }
 }

@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/29/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
@@ -152,11 +152,11 @@ extension FutureProtocol {
 
     /// Return the `Mirror` for `self`.
     public var customMirror: Mirror {
-        if Value.self != Void.self, let value = peek() {
-            return Mirror(self, children: [ "value": value ], displayStyle: .optional)
-        } else {
+        guard Value.self != Void.self, let value = peek() else {
             return Mirror(self, children: [ "isFilled": peek() != nil ], displayStyle: .tuple)
         }
+
+        return Mirror(self, unlabeledChildren: [ value ], displayStyle: .optional)
     }
 }
 
@@ -166,11 +166,11 @@ extension FutureProtocol {
     }
 
     public func map<NewValue>(upon executor: Executor, transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
-        let d = Deferred<NewValue>()
+        let deferred = Deferred<NewValue>()
         upon(executor) {
-            d.fill(with: transform($0))
+            deferred.fill(with: transform($0))
         }
-        return Future(d)
+        return Future(deferred)
     }
 }
 
@@ -180,12 +180,12 @@ extension FutureProtocol {
     }
 
     public func andThen<NewFuture: FutureProtocol>(upon executor: Executor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
-        let d = Deferred<NewFuture.Value>()
+        let deferred = Deferred<NewFuture.Value>()
         upon(executor) {
             requestNextValue($0).upon(executor) {
-                d.fill(with: $0)
+                deferred.fill(with: $0)
             }
         }
-        return Future(d)
+        return Future(deferred)
     }
 }

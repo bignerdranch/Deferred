@@ -3,19 +3,18 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 9/3/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
+
 @testable import Deferred
 
 class FutureIgnoreTests: XCTestCase {
-    static var allTests: [(String, (FutureIgnoreTests) -> () throws -> Void)] {
-        return [
-            ("testWaitWithTimeout", testWaitWithTimeout),
-            ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled)
-        ]
-    }
+    static let allTests: [(String, (FutureIgnoreTests) -> () throws -> Void)] = [
+        ("testWaitWithTimeout", testWaitWithTimeout),
+        ("testIgnoredUponCalledWhenFilled", testIgnoredUponCalledWhenFilled)
+    ]
 
     var future: Future<Void>!
 
@@ -30,31 +29,30 @@ class FutureIgnoreTests: XCTestCase {
         future = deferred.ignored()
 
         let expect = expectation(description: "value blocks while unfilled")
-        afterDelay(upon: .global()) {
+        afterShortDelay {
             deferred.fill(with: 42)
             expect.fulfill()
         }
 
-        let peek: ()? = future.waitShort()
-        XCTAssertNil(peek)
+        XCTAssertNil(future.shortWait())
 
-        waitForExpectations()
+        shortWait(for: [ expect ])
     }
 
     func testIgnoredUponCalledWhenFilled() {
-        let d = Deferred<Int>()
-        future = d.ignored()
+        let deferred = Deferred<Int>()
+        future = deferred.ignored()
 
-        for _ in 0 ..< 10 {
-            let expect = expectation(description: "upon blocks not called while deferred is unfilled")
+        let allExpectations = (0 ..< 10).map { (iteration) -> XCTestExpectation in
+            let expect = expectation(description: "upon block \(iteration) not called while deferred is unfilled")
             future.upon { _ in
-                XCTAssertEqual(d.value, 1)
+                XCTAssertEqual(deferred.value, 1)
                 expect.fulfill()
             }
+            return expect
         }
 
-        d.fill(with: 1)
-
-        waitForExpectations()
+        deferred.fill(with: 1)
+        shortWait(for: allExpectations)
     }
 }

@@ -113,7 +113,7 @@ class LockingTests: XCTestCase {
     }
 
     func testSingleThreadPerformanceRead() {
-        let iterations = 250_000
+        let iterations = 100_000
         func doNothing() {}
 
         measure {
@@ -124,7 +124,7 @@ class LockingTests: XCTestCase {
     }
 
     func testSingleThreadPerformanceWrite() {
-        let iterations = 250_000
+        let iterations = 100_000
         func doNothing() {}
 
         measure {
@@ -135,7 +135,7 @@ class LockingTests: XCTestCase {
     }
 
     func test90PercentReads4ThreadsLock() {
-        let iterations = 5000
+        let iterations = 100_000
         let numberOfThreads = max(ProcessInfo.processInfo.processorCount, 2)
         let group = DispatchGroup()
         func doNothing() {}

@@ -9,11 +9,6 @@ lane :bump_version do |options|
   puts version
 end
 
-desc "Run CocoaPods linter"
-lane :pod_lint do
-  pod_lib_lint(quick: true)
-end
-
 desc "Output documentation using Jazzy into docs/"
 lane :build_docs do
   jazzy(config: ".jazzy.yml")
@@ -26,13 +21,9 @@ end
 
 desc "Common actions for quality assurance"
 private_lane :audit do
-  pod_lint
+  swiftlint(strict: true)
+  pod_lib_lint(quick: true)
   build_docs
-
-  # Note: Coupling to Travis here is not great!
-  if is_ci && ENV['TRAVIS_PULL_REQUEST'] == "false" && git_branch == "master"
-    publish_docs
-  end
 end
 
 platform :mac do
@@ -43,8 +34,13 @@ platform :mac do
 
   desc "Execute tests, perform CocoaPods linting, publish documentation"
   lane :ci do
-    test
     audit
+    test
+
+    # Note: Coupling to Travis here is not great!
+    if is_ci && ENV['TRAVIS_PULL_REQUEST'] == "false" && git_branch == "master"
+      publish_docs
+    end
   end
 end
 

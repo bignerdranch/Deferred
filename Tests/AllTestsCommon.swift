@@ -88,8 +88,8 @@ extension Collection {
         #else // arc4random_uniform is also available on BSD and Bionic
             let offset = arc4random_uniform(numericCast(count))
         #endif
-        let i = index(startIndex, offsetBy: numericCast(offset))
-        return self[i]
+        let index = self.index(startIndex, offsetBy: numericCast(offset))
+        return self[index]
     }
 
 }

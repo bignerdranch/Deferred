@@ -25,48 +25,48 @@ class FutureTests: XCTestCase {
     ]
 
     func testAnd() {
-        let d1 = Deferred<Int>()
-        let d2 = Deferred<String>()
-        let both = d1.and(d2)
+        let toBeCombined1 = Deferred<Int>()
+        let toBeCombined2 = Deferred<String>()
+        let combined = toBeCombined1.and(toBeCombined2)
 
         let expect = expectation(description: "paired deferred should be filled")
-        both.upon(.main) { (value) in
+        combined.upon(.main) { (value) in
             XCTAssertEqual(value.0, 1)
             XCTAssertEqual(value.1, "foo")
             expect.fulfill()
         }
 
-        XCTAssertFalse(both.isFilled)
-        d1.fill(with: 1)
+        XCTAssertFalse(combined.isFilled)
+        toBeCombined1.fill(with: 1)
 
-        XCTAssertFalse(both.isFilled)
-        d2.fill(with: "foo")
+        XCTAssertFalse(combined.isFilled)
+        toBeCombined2.fill(with: "foo")
 
         shortWait(for: [ expect ])
     }
 
     func testAllFilled() {
-        var d = [Deferred<Int>]()
+        var toBeCombined = [Deferred<Int>]()
 
         for _ in 0 ..< 10 {
-            d.append(Deferred())
+            toBeCombined.append(Deferred())
         }
 
-        let w = d.allFilled()
+        let combined = toBeCombined.allFilled()
         let outerExpect = expectation(description: "all results filled in")
         let innerExpect = expectation(description: "paired deferred should be filled")
 
         // skip first
-        for i in 1 ..< d.count {
-            d[i].fill(with: i)
+        for (value, toFill) in toBeCombined.enumerated().dropFirst() {
+            toFill.fill(with: value)
         }
 
         self.afterShortDelay {
-            XCTAssertFalse(w.isFilled) // unfilled because d[0] is still unfilled
-            d[0].fill(with: 0)
+            XCTAssertFalse(combined.isFilled) // unfilled because d[0] is still unfilled
+            toBeCombined[0].fill(with: 0)
 
             self.afterShortDelay {
-                XCTAssertTrue(w.value == [Int](0 ..< d.count))
+                XCTAssertTrue(combined.value == [Int](0 ..< toBeCombined.count))
                 innerExpect.fulfill()
             }
             outerExpect.fulfill()

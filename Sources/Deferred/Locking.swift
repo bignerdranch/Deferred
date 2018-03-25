@@ -9,9 +9,11 @@
 import Dispatch
 import Foundation
 
+// This #if is over-complex because there is no compilation condition associated
+// with Playgrounds. <rdar://38865726>
 #if SWIFT_PACKAGE
 import Atomics
-#elseif XCODE
+#elseif (XCODE && !FORCE_PLAYGROUND_COMPATIBILITY) || COCOAPODS
 import Deferred.Atomics
 #endif
 
@@ -58,6 +60,9 @@ extension Locking {
     }
 }
 
+// This #if is over-complex because there is no compilation condition associated
+// with Playgrounds. <rdar://38865726>
+#if SWIFT_PACKAGE || (XCODE && !FORCE_PLAYGROUND_COMPATIBILITY) || COCOAPODS
 /// A variant lock backed by a platform type that attempts to allow waiters to
 /// block efficiently on contention. This locking type behaves the same for both
 /// read and write locks.
@@ -67,7 +72,7 @@ extension Locking {
 /// - On Linux, BSD, or Android, waiters perform comparably to a kernel lock
 ///   under contention.
 public final class NativeLock: Locking {
-    private var lock = UnsafeNativeLock()
+    private var lock = bnr_native_lock()
 
     /// Creates a standard platform lock.
     public init() {
@@ -75,7 +80,7 @@ public final class NativeLock: Locking {
     }
 
     deinit {
-        bnr_native_lock_destroy(&lock)
+        bnr_native_lock_deinit(&lock)
     }
 
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
@@ -90,6 +95,9 @@ public final class NativeLock: Locking {
         return try body()
     }
 }
+#else
+public typealias NativeLock = NSLock
+#endif
 
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads

@@ -8,12 +8,9 @@
 
 import Dispatch
 import Foundation
-
 #if SWIFT_PACKAGE
 import Atomics
 import Deferred
-#elseif XCODE
-import Deferred.Atomics
 #endif
 
 /// A wrapper over any task.
@@ -30,7 +27,7 @@ public final class Task<SuccessValue>: NSObject {
         case failure(Error)
     }
 
-    fileprivate let future: Future<Result>
+    private let future: Future<Result>
 
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     /// The progress of the task, which may be updated as work is completed.
@@ -73,8 +70,8 @@ public final class Task<SuccessValue>: NSObject {
         self.init(future: Future(success: base), progress: progress)
     }
     #else
-    fileprivate let cancellation: (() -> Void)
-    fileprivate var rawIsCancelled = UnsafeAtomicBool()
+    private let cancellation: (() -> Void)
+    private var rawIsCancelled = bnr_atomic_flag()
 
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
@@ -129,8 +126,8 @@ extension Task {
     }
 
 #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
-    fileprivate func markCancelled() {
-        _ = bnr_atomic_flag_test_and_set(&rawIsCancelled)
+    private func markCancelled() {
+        _ = bnr_atomic_flag_test_and_set(&rawIsCancelled, .relaxed)
     }
 #endif
 
@@ -139,7 +136,7 @@ extension Task {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return progress.isCancelled
 #else
-        return bnr_atomic_flag_test(&rawIsCancelled)
+        return bnr_atomic_flag_load(&rawIsCancelled, .relaxed)
 #endif
     }
 }

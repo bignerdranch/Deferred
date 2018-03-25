@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/7/15.
-//  Copyright © 2015-2017 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 #ifndef __BNR_DEFERRED_ATOMIC_SHIMS__

@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 3/28/16.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch

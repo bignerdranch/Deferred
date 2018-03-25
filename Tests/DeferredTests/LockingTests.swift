@@ -51,7 +51,7 @@ class LockingTests: XCTestCase {
     func testMultipleConcurrentReaders() {}
 
     func testMultipleConcurrentWriters() {
-        var counter = UnsafeAtomicCounter()
+        var counter  = bnr_atomic_counter()
 
         // spin up 5 writers concurrently...
         let expectations = (0 ..< 5).map { (iteration) -> XCTestExpectation in
@@ -73,7 +73,7 @@ class LockingTests: XCTestCase {
     }
 
     func testSimultaneousReadersAndWriters() {
-        var counter = UnsafeAtomicCounter()
+        var counter = bnr_atomic_counter()
         var allExpectations = [XCTestExpectation]()
 
         func startReader(forIteration iteration: Int) -> XCTestExpectation {

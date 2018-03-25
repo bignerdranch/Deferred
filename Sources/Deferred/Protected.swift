@@ -50,8 +50,10 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable {
     }
 
     public var customMirror: Mirror {
-        return lock.withAttemptedReadLock {
-            Mirror(self, unlabeledChildren: [ unsafeValue ], displayStyle: .optional)
-        } ?? Mirror(self, children: [ "locked": true ], displayStyle: .tuple)
+        let child: Mirror.Child = lock.withAttemptedReadLock {
+            (label: "value", value: unsafeValue)
+        } ?? (label: "isLocked", value: true)
+        return Mirror(self, children: CollectionOfOne(child), displayStyle: .optional)
+
     }
 }

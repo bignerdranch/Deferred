@@ -112,9 +112,9 @@ class ProtectedTests: XCTestCase {
         defer { customLock.unlock() }
 
         let magicMirror = Mirror(reflecting: protected)
-        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
         XCTAssertNil(magicMirror.superclassMirror)
-        XCTAssertEqual(magicMirror.descendant("locked") as? Bool, true)
+        XCTAssertEqual(magicMirror.descendant("isLocked") as? Bool, true)
     }
 
 }

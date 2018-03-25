@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/29/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 /// A promise models writing the result of some asynchronous operation.
@@ -51,9 +51,9 @@ extension PromiseProtocol {
     ///   is a serious programming error. The optimizer may assume that it is
     ///   not possible.
     @_transparent
-    public func mustFill(with value: Value) {
+    public func mustFill(with value: Value, file: StaticString = #file, line: UInt = #line) {
         if !fill(with: value) {
-            preconditionFailure("Cannot fill an already-filled \(type(of: self))")
+            preconditionFailure("Cannot fill an already-filled \(type(of: self))", file: file, line: line)
         }
     }
 }

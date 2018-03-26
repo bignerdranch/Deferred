@@ -114,7 +114,7 @@ class ExistentialFutureTests: XCTestCase {
         let future = Future<Int>()
 
         let magicMirror = Mirror(reflecting: future)
-        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
         XCTAssertNil(magicMirror.superclassMirror)
         XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, false)
     }
@@ -132,7 +132,7 @@ class ExistentialFutureTests: XCTestCase {
         let future = Future<Void>(value: ())
 
         let magicMirror = Mirror(reflecting: future)
-        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
         XCTAssertNil(magicMirror.superclassMirror)
         XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, true)
     }

@@ -20,11 +20,6 @@ or alternatively using `brew cask install fastlane`
 fastlane bump_version
 ```
 Increment (with 'bump' option) or set (with 'pre' option) the framework version
-### pod_lint
-```
-fastlane pod_lint
-```
-Run CocoaPods linter
 ### build_docs
 ```
 fastlane build_docs

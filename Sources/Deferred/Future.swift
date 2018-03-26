@@ -152,11 +152,14 @@ extension FutureProtocol {
 
     /// Return the `Mirror` for `self`.
     public var customMirror: Mirror {
-        guard Value.self != Void.self, let value = peek() else {
-            return Mirror(self, children: [ "isFilled": peek() != nil ], displayStyle: .tuple)
+        let child: Mirror.Child
+        switch peek() {
+        case let value? where Value.self != Void.self:
+            child = (label: "value", value: value)
+        case let other:
+            child = (label: "isFilled", value: other != nil)
         }
-
-        return Mirror(self, unlabeledChildren: [ value ], displayStyle: .optional)
+        return Mirror(self, children: CollectionOfOne(child), displayStyle: .optional, ancestorRepresentation: .suppressed)
     }
 }
 

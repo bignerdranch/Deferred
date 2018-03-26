@@ -376,7 +376,7 @@ class DeferredTests: XCTestCase {
         let deferred = Deferred<Int>()
 
         let magicMirror = Mirror(reflecting: deferred)
-        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
         XCTAssertNil(magicMirror.superclassMirror)
         XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, false)
     }
@@ -394,7 +394,7 @@ class DeferredTests: XCTestCase {
         let deferred = Deferred<Void>(filledWith: ())
 
         let magicMirror = Mirror(reflecting: deferred)
-        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
         XCTAssertNil(magicMirror.superclassMirror)
         XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, true)
     }

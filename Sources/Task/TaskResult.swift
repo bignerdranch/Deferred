@@ -31,11 +31,11 @@ extension Task.Result: Either {
     /// in the style of Cocoa completion handlers.
     public init(value: SuccessValue?, error: Error?) {
         switch (value, error) {
-        case (let v?, _):
+        case (let value?, _):
             // Ignore error if value is non-nil
-            self = .success(v)
-        case (nil, let e?):
-            self = .failure(e)
+            self = .success(value)
+        case (nil, let error?):
+            self = .failure(error)
         case (nil, nil):
             self = .failure(TaskResultInitializerError.invalidInput)
         }

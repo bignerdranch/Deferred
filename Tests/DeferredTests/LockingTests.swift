@@ -51,7 +51,7 @@ class LockingTests: XCTestCase {
     func testMultipleConcurrentReaders() {}
 
     func testMultipleConcurrentWriters() {
-        var x = UnsafeAtomicCounter()
+        var counter = UnsafeAtomicCounter()
 
         // spin up 5 writers concurrently...
         let expectations = (0 ..< 5).map { (iteration) -> XCTestExpectation in
@@ -60,9 +60,9 @@ class LockingTests: XCTestCase {
                 self.lock.withWriteLock {
                     // ... and make sure each runs in order by checking that
                     // no two blocks increment x at the same time
-                    XCTAssertEqual(bnr_atomic_counter_increment(&x), 1)
+                    XCTAssertEqual(bnr_atomic_counter_increment(&counter), 1)
                     Thread.sleep(forTimeInterval: 0.05)
-                    XCTAssertEqual(bnr_atomic_counter_decrement(&x), 0)
+                    XCTAssertEqual(bnr_atomic_counter_decrement(&counter), 0)
                     expect.fulfill()
                 }
             }
@@ -73,7 +73,7 @@ class LockingTests: XCTestCase {
     }
 
     func testSimultaneousReadersAndWriters() {
-        var x = UnsafeAtomicCounter()
+        var counter = UnsafeAtomicCounter()
         var allExpectations = [XCTestExpectation]()
 
         func startReader(forIteration iteration: Int) -> XCTestExpectation {
@@ -82,7 +82,7 @@ class LockingTests: XCTestCase {
                 self.lock.withReadLock {
                     // make sure we get the value of x either before or after
                     // the writer runs, never a partway-through value
-                    let result = bnr_atomic_counter_load(&x)
+                    let result = bnr_atomic_counter_load(&counter)
                     XCTAssertTrue(result == 0 || result == 5)
                     expect.fulfill()
                 }
@@ -98,7 +98,7 @@ class LockingTests: XCTestCase {
         queue.async {
             self.lock.withWriteLock {
                 for _ in 0 ..< 5 {
-                    bnr_atomic_counter_increment(&x)
+                    bnr_atomic_counter_increment(&counter)
                     Thread.sleep(forTimeInterval: 0.1)
                 }
                 expectWrite.fulfill()
@@ -143,8 +143,8 @@ class LockingTests: XCTestCase {
         measure {
             for _ in 0 ..< numberOfThreads {
                 queue.async(group: group) {
-                    for i in 0 ..< iterations {
-                        if (i % 10) == 0 {
+                    for iteration in 0 ..< iterations {
+                        if (iteration % 10) == 0 {
                             self.lock.withWriteLock(doNothing)
                         } else {
                             self.lock.withReadLock(doNothing)

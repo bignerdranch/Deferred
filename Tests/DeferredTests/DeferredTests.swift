@@ -70,10 +70,10 @@ class DeferredTests: XCTestCase {
     }
 
     func testPeek() {
-        let d1 = Deferred<Int>()
-        let d2 = Deferred(filledWith: 1)
-        XCTAssertNil(d1.peek())
-        XCTAssertEqual(d2.peek(), 1)
+        let unfilled = Deferred<Int>()
+        let filled = Deferred(filledWith: 1)
+        XCTAssertNil(unfilled.peek())
+        XCTAssertEqual(filled.peek(), 1)
     }
 
     func testValueOnFilled() {
@@ -113,28 +113,28 @@ class DeferredTests: XCTestCase {
     }
 
     func testFill() {
-        let d = Deferred<Int>()
-        d.fill(with: 1)
-        XCTAssertEqual(d.value, 1)
+        let toBeFilled = Deferred<Int>()
+        toBeFilled.fill(with: 1)
+        XCTAssertEqual(toBeFilled.value, 1)
     }
 
     func testFillMultipleTimes() {
-        let d = Deferred(filledWith: 1)
-        XCTAssertEqual(d.value, 1)
-        XCTAssertFalse(d.fill(with: 2))
-        XCTAssertEqual(d.value, 1)
+        let toBeFilledRepeatedly = Deferred(filledWith: 1)
+        XCTAssertEqual(toBeFilledRepeatedly.value, 1)
+        XCTAssertFalse(toBeFilledRepeatedly.fill(with: 2))
+        XCTAssertEqual(toBeFilledRepeatedly.value, 1)
     }
 
     func testIsFilled() {
-        let d = Deferred<Int>()
-        XCTAssertFalse(d.isFilled)
+        let toBeFilled = Deferred<Int>()
+        XCTAssertFalse(toBeFilled.isFilled)
 
         let expect = expectation(description: "isFilled is true when filled")
-        d.upon { _ in
-            XCTAssertTrue(d.isFilled)
+        toBeFilled.upon { _ in
+            XCTAssertTrue(toBeFilled.isFilled)
             expect.fulfill()
         }
-        d.fill(with: 1)
+        toBeFilled.fill(with: 1)
         shortWait(for: [ expect ])
     }
 
@@ -345,10 +345,10 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        for i in 0 ..< (3 ..< 10).random() {
+        for randomValue in 0 ..< (3 ..< 10).random() {
             DispatchQueue.global().async(group: finishGroup) {
                 XCTAssertEqual(startGroup.wait(timeout: .distantFuture), .success)
-                deferred.fill(with: i)
+                deferred.fill(with: randomValue)
             }
         }
 

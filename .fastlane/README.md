@@ -43,7 +43,7 @@ Test using Swift Package Manager for macOS and Linux
 ```
 fastlane mac ci
 ```
-Execute tests, perform CocoaPods linting, publish documentation
+Perform linting and publish documentation
 
 ----
 

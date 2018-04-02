@@ -148,33 +148,3 @@ extension FutureProtocol {
         return Mirror(self, children: CollectionOfOne(child), displayStyle: .optional, ancestorRepresentation: .suppressed)
     }
 }
-
-extension FutureProtocol {
-    public func map<NewValue>(upon executor: PreferredExecutor, transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
-        return map(upon: executor as Executor, transform: transform)
-    }
-
-    public func map<NewValue>(upon executor: Executor, transform: @escaping(Value) -> NewValue) -> Future<NewValue> {
-        let deferred = Deferred<NewValue>()
-        upon(executor) {
-            deferred.fill(with: transform($0))
-        }
-        return Future(deferred)
-    }
-}
-
-extension FutureProtocol {
-    public func andThen<NewFuture: FutureProtocol>(upon executor: PreferredExecutor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
-        return andThen(upon: executor as Executor, start: requestNextValue)
-    }
-
-    public func andThen<NewFuture: FutureProtocol>(upon executor: Executor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value> {
-        let deferred = Deferred<NewFuture.Value>()
-        upon(executor) {
-            requestNextValue($0).upon(executor) {
-                deferred.fill(with: $0)
-            }
-        }
-        return Future(deferred)
-    }
-}

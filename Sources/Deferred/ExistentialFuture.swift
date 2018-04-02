@@ -17,12 +17,12 @@ in a playground, the following post, and the Swift standard library:
 */
 
 // Abstract class that fake-conforms to `FutureProtocol` for use by `Future`.
-private class FutureBox<Value> {
-    func upon(_: Executor, execute _: @escaping(Value) -> Void) {
+private class Box<Value> {
+    func upon(_: Future<Value>.PreferredExecutor, execute _: @escaping(Value) -> Void) {
         fatalError()
     }
 
-    func upon(_: DispatchQueue, execute _: @escaping(Value) -> Void) {
+    func upon(_: Executor, execute _: @escaping(Value) -> Void) {
         fatalError()
     }
 
@@ -36,13 +36,13 @@ private class FutureBox<Value> {
 }
 
 // Concrete future wrapper given an instance of a `FutureProtocol`.
-private final class ForwardedTo<Future: FutureProtocol>: FutureBox<Future.Value> {
+private final class ForwardedTo<Future: FutureProtocol>: Box<Future.Value> {
     let base: Future
     init(base: Future) {
         self.base = base
     }
 
-    override func upon(_ executor: DispatchQueue, execute body: @escaping(Future.Value) -> Void) {
+    override func upon(_ executor: Future.PreferredExecutor, execute body: @escaping(Future.Value) -> Void) {
         return base.upon(executor, execute: body)
     }
 
@@ -60,13 +60,13 @@ private final class ForwardedTo<Future: FutureProtocol>: FutureBox<Future.Value>
 }
 
 // Concrete future wrapper for an always-filled future.
-private final class Always<Value>: FutureBox<Value> {
+private final class Always<Value>: Box<Value> {
     let value: Value
     init(value: Value) {
         self.value = value
     }
 
-    override func upon(_ queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
+    override func upon(_ queue: Future<Value>.PreferredExecutor, execute body: @escaping(Value) -> Void) {
         queue.async { [value] in
             body(value)
         }
@@ -88,10 +88,10 @@ private final class Always<Value>: FutureBox<Value> {
 }
 
 // Concrete future wrapper that will never get filled.
-private final class Never<Value>: FutureBox<Value> {
+private final class Never<Value>: Box<Value> {
     override init() {}
 
-    override func upon(_: DispatchQueue, execute _: @escaping(Value) -> Void) {}
+    override func upon(_: Future<Value>.PreferredExecutor, execute _: @escaping(Value) -> Void) {}
 
     override func upon(_: Executor, execute _: @escaping(Value) -> Void) {}
 
@@ -117,7 +117,7 @@ private final class Never<Value>: FutureBox<Value> {
 ///   ensuring that only your implementation can fill the deferred value
 ///   using the `PromiseProtocol` aspect.
 public struct Future<Value>: FutureProtocol {
-    private let box: FutureBox<Value>
+    private let box: Box<Value>
 
     /// Create a future whose `upon(_:execute:)` methods forward to `base`.
     public init<OtherFuture: FutureProtocol>(_ base: OtherFuture)
@@ -144,7 +144,7 @@ public struct Future<Value>: FutureProtocol {
         self.box = other.box
     }
 
-    public func upon(_ queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
+    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Value) -> Void) {
         return box.upon(queue, execute: body)
     }
 

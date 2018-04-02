@@ -107,7 +107,7 @@ class FutureTests: XCTestCase {
 
     func testEveryMapTransformerIsCalledMultipleTimes() {
         let deferred = Deferred(filledWith: 1)
-        var counter = UnsafeAtomicCounter()
+        var counter = bnr_atomic_counter()
 
         let mapped = deferred.every { (value) -> (Int) in
             bnr_atomic_counter_increment(&counter)

@@ -7,12 +7,9 @@
 //
 
 import Foundation
-
 #if SWIFT_PACKAGE
 import Atomics
 import Deferred
-#elseif XCODE
-import Deferred.Atomics
 #endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
@@ -105,7 +102,7 @@ private final class ProxyProgress: Progress {
             static let cancelled = State(rawValue: 1 << 2)
         }
 
-        private var state = UnsafeAtomicBitmask() // see State
+        private var state = bnr_atomic_bitmask() // see State
         private weak var observer: ProxyProgress?
 
         init(observing observee: Progress, observer: ProxyProgress) {
@@ -122,13 +119,13 @@ private final class ProxyProgress: Progress {
             observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: .initial, context: &Observation.cancelledContext)
             observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: .initial, context: &Observation.pausedContext)
 
-            bnr_atomic_bitmask_or(&state, State.observing.rawValue, .release)
+            _ = bnr_atomic_bitmask_add(&state, State.observing.rawValue, .release)
         }
 
         func invalidate(observing observee: Progress) {
-            let oldState = State(rawValue: bnr_atomic_bitmask_and(&state, ~State.ready.rawValue, .relaxed))
+            let oldState = State(rawValue: bnr_atomic_bitmask_remove(&state, State.ready.rawValue, .relaxed))
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
-            bnr_atomic_bitmask_or(&state, State.cancelled.rawValue, .relaxed)
+            _ = bnr_atomic_bitmask_add(&state, State.cancelled.rawValue, .relaxed)
 
             for key in Observation.attributes {
                 observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
@@ -138,7 +135,7 @@ private final class ProxyProgress: Progress {
         }
 
         override func observeValue(forKeyPath keyPath: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            guard bnr_atomic_bitmask_test(&state, State.ready.rawValue), let observer = observer else { return }
+            guard bnr_atomic_bitmask_test(&state, State.ready.rawValue, .relaxed), let observer = observer else { return }
             switch context {
             case (&Observation.cancelledContext)?:
                 observer.inheritCancelled()

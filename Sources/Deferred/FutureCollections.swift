@@ -37,7 +37,9 @@ private struct AllFilledFuture<Value>: FutureProtocol {
         }
 
         group.notify(queue: queue) { [combined] in
-            combined.fill(with: array.map { $0.value })
+            // Expect each to be filled right now.
+            // swiftlint:disable:next force_unwrapping
+            combined.fill(with: array.map({ $0.peek()! }))
         }
     }
 

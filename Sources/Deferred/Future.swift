@@ -57,26 +57,6 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
     func wait(until time: DispatchTime) -> Value?
 }
 
-extension FutureProtocol {
-    /// Waits for the value to become determined, then returns it.
-    ///
-    /// This is equivalent to unwrapping the value of calling `wait(.Forever)`,
-    /// but may be more efficient.
-    ///
-    /// This getter will unnecessarily block execution. It might be useful for
-    /// testing, but otherwise it should be strictly avoided.
-    ///
-    /// - returns: The determined value.
-    var value: Value {
-        return wait(until: .distantFuture).unsafelyUnwrapped
-    }
-
-    /// Check whether or not the receiver is filled.
-    var isFilled: Bool {
-        return wait(until: .now()) != nil
-    }
-}
-
 // MARK: - Default implementations
 
 extension FutureProtocol {
@@ -85,11 +65,12 @@ extension FutureProtocol {
         var ret = ""
         ret.append(contentsOf: "\(Self.self)".prefix(while: { $0 != "<" }))
         ret.append("(")
-        if Value.self == Void.self, isFilled {
+        switch peek() {
+        case _? where Value.self == Void.self:
             ret.append("filled")
-        } else if let value = peek() {
+        case let value?:
             debugPrint(value, terminator: "", to: &ret)
-        } else {
+        case nil:
             ret.append("not filled")
         }
         ret.append(")")

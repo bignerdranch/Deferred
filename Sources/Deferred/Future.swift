@@ -39,6 +39,14 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
     /// `executor` immediately.
     func upon(_ executor: Executor, execute body: @escaping(Value) -> Void)
 
+    /// Checks for and returns a determined value.
+    ///
+    /// An implementation should use a "best effort" to return this value and
+    /// not unnecessarily block in order to to return.
+    ///
+    /// - returns: The determined value, if already filled, or `nil`.
+    func peek() -> Value?
+
     /// Waits synchronously for the value to become determined.
     ///
     /// If the value is already determined, the call returns immediately with
@@ -50,13 +58,6 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
 }
 
 extension FutureProtocol {
-    /// Checks for and returns a determined value.
-    ///
-    /// - returns: The determined value, if already filled, or `nil`.
-    public func peek() -> Value? {
-        return wait(until: .now())
-    }
-
     /// Waits for the value to become determined, then returns it.
     ///
     /// This is equivalent to unwrapping the value of calling `wait(.Forever)`,

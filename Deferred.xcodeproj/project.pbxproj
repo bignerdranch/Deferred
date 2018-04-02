@@ -181,6 +181,10 @@
 		DBA01B092071E69100083CD0 /* FutureAndThen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B032071E68F00083CD0 /* FutureAndThen.swift */; };
 		DBA01B0A2071E69100083CD0 /* FutureAndThen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B032071E68F00083CD0 /* FutureAndThen.swift */; };
 		DBA01B0B2071E69100083CD0 /* FutureAndThen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B032071E68F00083CD0 /* FutureAndThen.swift */; };
+		DBA01B0D2071E6FF00083CD0 /* FuturePeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */; };
+		DBA01B0E2071E6FF00083CD0 /* FuturePeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */; };
+		DBA01B0F2071E6FF00083CD0 /* FuturePeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */; };
+		DBA01B102071E6FF00083CD0 /* FuturePeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */; };
 		DBABD0BB203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
 		DBABD0BC203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
 		DBABD0BD203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
@@ -272,6 +276,7 @@
 		DBA01AFD2071E5D300083CD0 /* FutureUpon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureUpon.swift; sourceTree = "<group>"; };
 		DBA01B022071E68F00083CD0 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
 		DBA01B032071E68F00083CD0 /* FutureAndThen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureAndThen.swift; sourceTree = "<group>"; };
+		DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FuturePeek.swift; sourceTree = "<group>"; };
 		DBABD0BA203F2E3E00C50896 /* Atomics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomics.swift; sourceTree = "<group>"; };
 		DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureEveryMap.swift; sourceTree = "<group>"; };
 		EBEB828C1DC4A79A00B7E089 /* TaskComprehensiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskComprehensiveTests.swift; sourceTree = "<group>"; };
@@ -396,6 +401,7 @@
 				DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */,
 				DB524C9B1D85200C00DDF16D /* FutureIgnore.swift */,
 				DBA01B022071E68F00083CD0 /* FutureMap.swift */,
+				DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */,
 				DBA01AFD2071E5D300083CD0 /* FutureUpon.swift */,
 				DB524C9F1D85200C00DDF16D /* Locking.swift */,
 				DB524C9E1D85200C00DDF16D /* Promise.swift */,
@@ -774,6 +780,7 @@
 				DB126D2A1E5368A700054E95 /* TaskResult.swift in Sources */,
 				DB126D021E5368A100054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B082071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DBA01B0D2071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126CFE1E5368A100054E95 /* ExistentialFuture.swift in Sources */,
 				DBABD0BB203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D341E5368AD00054E95 /* ExistentialTask.swift in Sources */,
@@ -834,6 +841,7 @@
 				DB126D2D1E5368A700054E95 /* TaskResult.swift in Sources */,
 				DB126D0D1E5368A100054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B092071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DBA01B0E2071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126D091E5368A100054E95 /* ExistentialFuture.swift in Sources */,
 				DB126D3F1E5368AD00054E95 /* ExistentialTask.swift in Sources */,
 				DB126D111E5368A100054E95 /* Protected.swift in Sources */,
@@ -894,6 +902,7 @@
 				DB126D301E5368A800054E95 /* TaskResult.swift in Sources */,
 				DB126D181E5368A200054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B0A2071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DBA01B0F2071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126D141E5368A200054E95 /* ExistentialFuture.swift in Sources */,
 				DB126D4A1E5368AE00054E95 /* ExistentialTask.swift in Sources */,
 				DB126D1C1E5368A200054E95 /* Protected.swift in Sources */,
@@ -954,6 +963,7 @@
 				DB126D331E5368A900054E95 /* TaskResult.swift in Sources */,
 				DB126D231E5368A200054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B0B2071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DBA01B102071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126D1F1E5368A200054E95 /* ExistentialFuture.swift in Sources */,
 				DB126D551E5368AE00054E95 /* ExistentialTask.swift in Sources */,
 				DB126D271E5368A200054E95 /* Protected.swift in Sources */,

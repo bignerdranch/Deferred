@@ -101,6 +101,10 @@ extension Task: FutureProtocol {
         future.upon(executor, execute: body)
     }
 
+    public func peek() -> Result? {
+        return future.peek()
+    }
+
     public func wait(until timeout: DispatchTime) -> Result? {
         return future.wait(until: timeout)
     }

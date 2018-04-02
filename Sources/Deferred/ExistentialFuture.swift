@@ -26,6 +26,10 @@ private class FutureBox<Value> {
         fatalError()
     }
 
+    func peek() -> Value? {
+        fatalError()
+    }
+
     func wait(until _: DispatchTime) -> Value? {
         fatalError()
     }
@@ -44,6 +48,10 @@ private final class ForwardedTo<Future: FutureProtocol>: FutureBox<Future.Value>
 
     override func upon(_ executor: Executor, execute body: @escaping(Future.Value) -> Void) {
         return base.upon(executor, execute: body)
+    }
+
+    override func peek() -> Future.Value? {
+        return base.peek()
     }
 
     override func wait(until time: DispatchTime) -> Future.Value? {
@@ -70,6 +78,10 @@ private final class Always<Value>: FutureBox<Value> {
         }
     }
 
+    override func peek() -> Value? {
+        return value
+    }
+
     override func wait(until _: DispatchTime) -> Value? {
         return value
     }
@@ -82,6 +94,10 @@ private final class Never<Value>: FutureBox<Value> {
     override func upon(_: DispatchQueue, execute _: @escaping(Value) -> Void) {}
 
     override func upon(_: Executor, execute _: @escaping(Value) -> Void) {}
+
+    override func peek() -> Value? {
+        return nil
+    }
 
     override func wait(until _: DispatchTime) -> Value? {
         return nil
@@ -134,6 +150,10 @@ public struct Future<Value>: FutureProtocol {
 
     public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
         return box.upon(executor, execute: body)
+    }
+
+    public func peek() -> Value? {
+        return box.peek()
     }
 
     public func wait(until time: DispatchTime) -> Value? {

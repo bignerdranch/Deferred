@@ -80,12 +80,6 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     // MARK: PromiseProtocol
 
-    public var isFilled: Bool {
-        return storage.withUnsafeMutablePointers { (_, pointerToReference) in
-            bnr_atomic_load_relaxed(pointerToReference) != nil
-        }
-    }
-
     @discardableResult
     public func fill(with value: Value) -> Bool {
         let reference = Storage.convertToReference(value)

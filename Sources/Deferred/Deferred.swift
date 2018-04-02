@@ -8,12 +8,6 @@
 
 import Dispatch
 
-#if SWIFT_PACKAGE
-    import Atomics
-#elseif XCODE
-    import Deferred.Atomics
-#endif
-
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
 public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
@@ -30,7 +24,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
     private let group = DispatchGroup()
 
     public init() {
-        storage.withUnsafeMutablePointerToElements { (pointerToElement) in
+        storage.withUnsafeMutablePointers { (_, pointerToElement) in
             pointerToElement.initialize(to: nil)
         }
 
@@ -54,8 +48,7 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
         group.notify(flags: flags, queue: queue) { [storage] in
-            guard let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .relaxed) }) else { return }
-            let reference = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
+            guard let reference = storage.withUnsafeMutablePointers({ bnr_atomic_load($1, .relaxed) }) else { return }
             body(Storage.convertFromReference(reference))
         }
     }
@@ -80,32 +73,29 @@ public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
 
     public func wait(until time: DispatchTime) -> Value? {
         guard case .success = group.wait(timeout: time),
-            let ptr = storage.withAtomicPointerToElement({ bnr_atomic_ptr_load($0, .relaxed) }) else { return nil }
+            let reference = storage.withUnsafeMutablePointers({ bnr_atomic_load($1, .relaxed) }) else { return nil }
 
-        let reference = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
         return Storage.convertFromReference(reference)
     }
 
     // MARK: PromiseProtocol
 
     public var isFilled: Bool {
-        return storage.withAtomicPointerToElement {
-            bnr_atomic_ptr_load($0, .relaxed) != nil
+        return storage.withUnsafeMutablePointers { (_, pointerToReference) in
+            bnr_atomic_load(pointerToReference, .relaxed) != nil
         }
     }
 
     @discardableResult
     public func fill(with value: Value) -> Bool {
-        let box = Unmanaged.passRetained(Storage.convertToReference(value))
+        let reference = Storage.convertToReference(value)
 
-        let wonRace = storage.withAtomicPointerToElement {
-            bnr_atomic_ptr_compare_and_swap($0, nil, box.toOpaque(), .acquireRelease)
+        let wonRace = storage.withUnsafeMutablePointers { (_, pointerToReference) in
+            bnr_atomic_initialize_once(pointerToReference, reference)
         }
 
         if wonRace {
             group.leave()
-        } else {
-            box.release()
         }
 
         return wonRace
@@ -121,12 +111,6 @@ private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
     deinit {
         _ = withUnsafeMutablePointers { (_, pointerToReference) in
             pointerToReference.deinitialize(count: 1)
-        }
-    }
-
-    func withAtomicPointerToElement<Return>(_ body: (UnsafeMutablePointer<UnsafeAtomicRawPointer>) throws -> Return) rethrows -> Return {
-        return try withUnsafeMutablePointerToElements { target in
-            try target.withMemoryRebound(to: UnsafeAtomicRawPointer.self, capacity: 1, body)
         }
     }
 

@@ -169,6 +169,10 @@
 		DB8A071C2060D38C00639AB3 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */; };
 		DB8A071D2060D38C00639AB3 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */; };
 		DB8A071E2060D38C00639AB3 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */; };
+		DBABD0BB203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
+		DBABD0BC203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
+		DBABD0BD203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
+		DBABD0BE203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -253,6 +257,7 @@
 		DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskWorkItemTests.swift; sourceTree = "<group>"; };
 		DB55F20B1D969A1B00FC1439 /* FutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTests.swift; sourceTree = "<group>"; };
 		DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
+		DBABD0BA203F2E3E00C50896 /* Atomics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomics.swift; sourceTree = "<group>"; };
 		DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureEveryMap.swift; sourceTree = "<group>"; };
 		EBEB828C1DC4A79A00B7E089 /* TaskComprehensiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskComprehensiveTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -365,6 +370,7 @@
 		DB524C921D85200C00DDF16D /* Deferred */ = {
 			isa = PBXGroup;
 			children = (
+				DBABD0BA203F2E3E00C50896 /* Atomics.swift */,
 				DB524C931D85200C00DDF16D /* Deferred.swift */,
 				DB524C941D85200C00DDF16D /* Executor.swift */,
 				DB524C951D85200C00DDF16D /* ExistentialFuture.swift */,
@@ -750,6 +756,7 @@
 				DB126D2A1E5368A700054E95 /* TaskResult.swift in Sources */,
 				DB126D021E5368A100054E95 /* FutureEveryMap.swift in Sources */,
 				DB126CFE1E5368A100054E95 /* ExistentialFuture.swift in Sources */,
+				DBABD0BB203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D341E5368AD00054E95 /* ExistentialTask.swift in Sources */,
 				DB126D061E5368A100054E95 /* Protected.swift in Sources */,
 				DB126D281E5368A700054E95 /* Either.swift in Sources */,
@@ -821,6 +828,7 @@
 				DB126D451E5368AD00054E95 /* TaskIgnore.swift in Sources */,
 				DB126D441E5368AD00054E95 /* TaskGroup.swift in Sources */,
 				DB126D071E5368A100054E95 /* Deferred.swift in Sources */,
+				DBABD0BC203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D101E5368A100054E95 /* Promise.swift in Sources */,
 				DB126D0B1E5368A100054E95 /* FutureCollections.swift in Sources */,
 				DB126D0C1E5368A100054E95 /* FutureComposition.swift in Sources */,
@@ -877,6 +885,7 @@
 				DB126D501E5368AE00054E95 /* TaskIgnore.swift in Sources */,
 				DB126D4F1E5368AE00054E95 /* TaskGroup.swift in Sources */,
 				DB126D121E5368A200054E95 /* Deferred.swift in Sources */,
+				DBABD0BD203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D1B1E5368A200054E95 /* Promise.swift in Sources */,
 				DB126D161E5368A200054E95 /* FutureCollections.swift in Sources */,
 				DB126D171E5368A200054E95 /* FutureComposition.swift in Sources */,
@@ -933,6 +942,7 @@
 				DB126D5B1E5368AE00054E95 /* TaskIgnore.swift in Sources */,
 				DB126D5A1E5368AE00054E95 /* TaskGroup.swift in Sources */,
 				DB126D1D1E5368A200054E95 /* Deferred.swift in Sources */,
+				DBABD0BE203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D261E5368A200054E95 /* Promise.swift in Sources */,
 				DB126D211E5368A200054E95 /* FutureCollections.swift in Sources */,
 				DB126D221E5368A200054E95 /* FutureComposition.swift in Sources */,

@@ -32,10 +32,18 @@ platform :mac do
     sh "swift test"
   end
 
-  desc "Execute tests, perform CocoaPods linting, publish documentation"
+  desc "Validate we can build with Playgrounds compatibility code"
+  private_lane :build_for_playgrounds do
+    xcodebuild(scheme: "Deferred", build_settings: {
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "XCODE FORCE_PLAYGROUND_COMPATIBILITY"
+    })
+  end
+
+  desc "Perform linting and publish documentation"
   lane :ci do
     audit
     test
+    build_for_playgrounds
 
     # Note: Coupling to Travis here is not great!
     if is_ci && ENV['TRAVIS_PULL_REQUEST'] == "false" && git_branch == "master"

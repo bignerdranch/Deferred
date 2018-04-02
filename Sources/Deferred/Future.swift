@@ -8,10 +8,6 @@
 
 import Dispatch
 
-/// The natural executor for use with Futures; a policy of the framework to
-/// allow for shorthand syntax with `Future.upon(_:execute:)` and others.
-public typealias PreferredExecutor = DispatchQueue
-
 /// A future models reading a value which may become available at some point.
 ///
 /// A `FutureProtocol` may be preferable to an architecture using completion
@@ -92,16 +88,6 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
     /// - parameter requestNextValue: Start a new operation with the future value.
     /// - returns: The new deferred value returned by the `transform`.
     func andThen<NewFuture: FutureProtocol>(upon executor: Executor, start requestNextValue: @escaping(Value) -> NewFuture) -> Future<NewFuture.Value>
-}
-
-extension FutureProtocol {
-    /// Call some `body` closure in the background once the value is determined.
-    ///
-    /// If the value is determined, the closure will be enqueued immediately,
-    /// but this call is always asynchronous.
-    public func upon(_ executor: PreferredExecutor = .any(), execute body: @escaping(Value) -> Void) {
-        upon(executor as Executor, execute: body)
-    }
 }
 
 extension FutureProtocol {

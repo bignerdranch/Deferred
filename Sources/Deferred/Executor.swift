@@ -101,8 +101,6 @@ extension DispatchQueue: Executor {
     }
 }
 
-public typealias DefaultExecutor = DispatchQueue
-
 /// An operation queue manages a number of operation objects, making high
 /// level features like cancellation and dependencies simple.
 ///

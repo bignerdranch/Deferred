@@ -17,8 +17,9 @@ import Foundation
 
 class DeferredTests: XCTestCase {
     static let universalTests: [(String, (DeferredTests) -> () throws -> Void)] = [
+        ("testPeekWhenUnfilled", testPeekWhenUnfilled),
+        ("testPeekWhenFilled", testPeekWhenFilled),
         ("testWaitWithTimeout", testWaitWithTimeout),
-        ("testPeek", testPeek),
         ("testValueOnFilled", testValueOnFilled),
         ("testValueBlocksWhileUnfilled", testValueBlocksWhileUnfilled),
         ("testValueUnblocksWhenUnfilledIsFilled", testValueUnblocksWhenUnfilledIsFilled),
@@ -55,6 +56,16 @@ class DeferredTests: XCTestCase {
         #endif
     }
 
+    func testPeekWhenUnfilled() {
+        let unfilled = Deferred<Int>()
+        XCTAssertNil(unfilled.peek())
+    }
+
+    func testPeekWhenFilled() {
+        let filled = Deferred(filledWith: 1)
+        XCTAssertEqual(filled.peek(), 1)
+    }
+
     func testWaitWithTimeout() {
         let deferred = Deferred<Int>()
 
@@ -67,13 +78,6 @@ class DeferredTests: XCTestCase {
         XCTAssertNil(deferred.shortWait())
 
         shortWait(for: [ expect ])
-    }
-
-    func testPeek() {
-        let unfilled = Deferred<Int>()
-        let filled = Deferred(filledWith: 1)
-        XCTAssertNil(unfilled.peek())
-        XCTAssertEqual(filled.peek(), 1)
     }
 
     func testValueOnFilled() {

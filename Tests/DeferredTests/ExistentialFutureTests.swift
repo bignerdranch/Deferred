@@ -12,7 +12,8 @@ import XCTest
 
 class ExistentialFutureTests: XCTestCase {
     static let allTests: [(String, (ExistentialFutureTests) -> () throws -> Void)] = [
-        ("testFilledAnyFutureWaitAlwaysReturns", testFilledAnyFutureWaitAlwaysReturns),
+        ("testPeekWhenFilled", testPeekWhenFilled),
+        ("testPeekWhenUnfilled", testPeekWhenUnfilled),
         ("testAnyWaitWithTimeout", testAnyWaitWithTimeout),
         ("testFilledAnyFutureUpon", testFilledAnyFutureUpon),
         ("testUnfilledAnyUponCalledWhenFilled", testUnfilledAnyUponCalledWhenFilled),
@@ -33,10 +34,16 @@ class ExistentialFutureTests: XCTestCase {
         super.tearDown()
     }
 
-    func testFilledAnyFutureWaitAlwaysReturns() {
+    func testPeekWhenFilled() {
         anyFuture = Future(value: 42)
-        let peek = anyFuture.wait(until: .distantFuture)
+        let peek = anyFuture.peek()
         XCTAssertNotNil(peek)
+    }
+
+    func testPeekWhenUnfilled() {
+        anyFuture = Future<Int>()
+        let peek = anyFuture.peek()
+        XCTAssertNil(peek)
     }
 
     func testAnyWaitWithTimeout() {

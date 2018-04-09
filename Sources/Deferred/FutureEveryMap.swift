@@ -25,6 +25,10 @@ private struct LazyMapFuture<Base: FutureProtocol, NewValue>: FutureProtocol {
         }
     }
 
+    func peek() -> NewValue? {
+        return base.peek().map(transform)
+    }
+
     func wait(until time: DispatchTime) -> NewValue? {
         return base.wait(until: time).map(transform)
     }

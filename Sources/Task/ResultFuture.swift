@@ -48,7 +48,7 @@ extension FutureProtocol where Value: Either {
     ///
     /// - see: uponSuccess(on:execute:)
     /// - see: upon(_:execute:)
-    public func uponSuccess(on executor: PreferredExecutor = .any(), execute body: @escaping(Value.Right) -> Void) {
+    public func uponSuccess(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(Value.Right) -> Void) {
         upon(executor, execute: commonSuccessBody(body))
     }
 
@@ -56,7 +56,7 @@ extension FutureProtocol where Value: Either {
     ///
     /// - see: uponFailure(on:execute:)
     /// - see: upon(_:body:)
-    public func uponFailure(on executor: PreferredExecutor = .any(), execute body: @escaping(Value.Left) -> Void) {
+    public func uponFailure(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(Value.Left) -> Void) {
         upon(executor, execute: commonFailureBody(body))
     }
 }

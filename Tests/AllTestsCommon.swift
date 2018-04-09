@@ -47,6 +47,24 @@ extension XCTestCase {
 }
 
 extension FutureProtocol {
+    /// Waits for the value to become determined, then returns it.
+    ///
+    /// This is equivalent to unwrapping the value of calling
+    /// `wait(until: .distantFuture)`, but may be more efficient.
+    ///
+    /// This getter will unnecessarily block execution. It might be useful for
+    /// testing, but otherwise it should be strictly avoided.
+    ///
+    /// - returns: The determined value.
+    var value: Value {
+        return wait(until: .distantFuture).unsafelyUnwrapped
+    }
+
+    /// Check whether or not the receiver is filled.
+    var isFilled: Bool {
+        return peek() != nil
+    }
+
     func shortWait() -> Value? {
         return wait(until: .now() + 0.05)
     }

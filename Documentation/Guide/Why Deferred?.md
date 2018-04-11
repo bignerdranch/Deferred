@@ -12,7 +12,7 @@ you're transforming your program into what amounts to a series of
 gotos. This is hard to understand, hard to reason about, and hard to
 debug.
 
-### Enter Deferred
+### How Deferred is Different
 
 When you're writing synchronous code,
 you call a function, you get a return value,

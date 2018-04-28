@@ -19,20 +19,17 @@ custom_categories:
     - Future
     - Collection
     - Sequence
-    - IgnoringFuture
   - name: Controlling Where Callbacks Execute
     children:
     - Executor
     - DispatchQueue
-    - PreferredExecutor
     - OperationQueue
     - RunLoop
     - CFRunLoop
-  - name: Task
+  - name: Futures Than Can Fail
     children:
-    - Either
     - Task
-    - TaskResult
+    - Either
     - TaskGroup
   - name: Coordinating Access to Data
     children:

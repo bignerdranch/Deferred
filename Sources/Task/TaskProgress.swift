@@ -17,7 +17,7 @@ import Deferred
 /// tree.
 private final class ProxyProgress: Progress {
 
-    @objc private let observee: Progress
+    @objc dynamic private let observee: Progress
     private var token: Observation?
 
     init(attachingTo observee: Progress) {
@@ -64,7 +64,7 @@ private final class ProxyProgress: Progress {
         observee.resume()
     }
 
-    @objc static func keyPathsForValuesAffectingUserInfo() -> Set<String> {
+    @objc static var keyPathsForValuesAffectingUserInfo: Set<String> {
         return [ #keyPath(observee.userInfo) ]
     }
 
@@ -159,7 +159,7 @@ extension Progress {
     /// send `orphaned: false`, using similar behavior to the backwards-
     /// compatible path.
     @discardableResult
-    @nonobjc func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
+    func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
         if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *), canAdopt {
             addChild(progress, withPendingUnitCount: pendingUnitCount)
             return progress
@@ -186,7 +186,7 @@ extension Progress {
 
 extension Progress {
     /// Indeterminate progress which will likely not change.
-    @nonobjc static func indefinite() -> Self {
+    static func indefinite() -> Self {
         let progress = self.init(parent: nil, userInfo: nil)
         progress.totalUnitCount = -1
         progress.isCancellable = false
@@ -194,7 +194,7 @@ extension Progress {
     }
 
     /// Progress for which no work actually needs to be done.
-    @nonobjc static func noWork() -> Self {
+    static func noWork() -> Self {
         let progress = self.init(parent: nil, userInfo: nil)
         progress.totalUnitCount = 0
         progress.completedUnitCount = 1
@@ -204,7 +204,7 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    @nonobjc static func wrappingCompletion<OtherFuture: FutureProtocol>(of base: OtherFuture, cancellation: (() -> Void)?) -> Progress {
+    static func wrappingCompletion<OtherFuture: FutureProtocol>(of base: OtherFuture, cancellation: (() -> Void)?) -> Progress {
         let progress = Progress(parent: nil, userInfo: nil)
         progress.totalUnitCount = base.wait(until: .now()) != nil ? 0 : -1
 
@@ -223,7 +223,7 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    @nonobjc static func wrappingSuccess<OtherTask: FutureProtocol>(of base: OtherTask, cancellation: (() -> Void)?) -> Progress
+    static func wrappingSuccess<OtherTask: FutureProtocol>(of base: OtherTask, cancellation: (() -> Void)?) -> Progress
         where OtherTask.Value: Either {
         switch (base as? Task<OtherTask.Value.Right>, cancellation) {
         case (let task?, nil):
@@ -272,7 +272,7 @@ private extension Progress {
 extension Progress {
     /// Wrap or re-wrap `progress` if necessary, suitable for becoming the
     /// progress of a Task node.
-    @nonobjc static func taskRoot(for progress: Progress) -> Progress {
+    static func taskRoot(for progress: Progress) -> Progress {
         if progress.isTaskRoot || progress === Progress.current() {
             // Task<Value> has already taken care of this at a deeper level.
             return progress

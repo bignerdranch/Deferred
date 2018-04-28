@@ -9,8 +9,10 @@
 /// A protected value only allows access from within a locking statement. This
 /// prevents accidental unsafe access when thread safety is desired.
 public final class Protected<T> {
-    private var lock: Locking
-    private var unsafeValue: T
+    @_versioned
+    internal final var lock: Locking
+    @_versioned
+    internal final var unsafeValue: T
 
     /// Creates a protected `value` with a type implementing a `lock`.
     public init(initialValue value: T, lock: Locking = NativeLock()) {
@@ -21,6 +23,7 @@ public final class Protected<T> {
     /// Give read access to the item within `body`.
     /// - parameter body: A function that reads from the contained item.
     /// - returns: The value returned from the given function.
+    @_inlineable
     public func withReadLock<Return>(_ body: (T) throws -> Return) rethrows -> Return {
         return try lock.withReadLock {
             try body(unsafeValue)
@@ -30,6 +33,7 @@ public final class Protected<T> {
     /// Give write access to the item within the given function.
     /// - parameter body: A function that writes to the contained item, and returns some value.
     /// - returns: The value returned from the given function.
+    @_inlineable
     public func withWriteLock<Return>(_ body: (inout T) throws -> Return) rethrows -> Return {
         return try lock.withWriteLock {
             try body(&unsafeValue)
@@ -54,6 +58,5 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable {
             (label: "value", value: unsafeValue)
         } ?? (label: "isLocked", value: true)
         return Mirror(self, children: CollectionOfOne(child), displayStyle: .optional)
-
     }
 }

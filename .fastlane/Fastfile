@@ -29,7 +29,7 @@ end
 platform :mac do
   desc "Test using Swift Package Manager for macOS and Linux"
   lane :test do
-    sh "swift test"
+    sh "swift test --parallel"
   end
 
   desc "Validate we can build with Playgrounds compatibility code"
@@ -60,7 +60,7 @@ platform :ios do
 
   desc "Build using Xcode for tvOS and watchOS"
   private_lane :build_for_other_platforms do
-    xcodebuild(scheme: "TVDeferred", destination: "platform=tvOS Simulator,name=Apple TV 1080p")
+    xcodebuild(scheme: "TVDeferred", destination: "platform=tvOS Simulator,name=Apple TV")
     xcodebuild(scheme: "NanoDeferred", destination: "platform=watchOS Simulator,name=Apple Watch - 42mm")
   end
 

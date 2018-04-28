@@ -1,25 +1,41 @@
-language: objective-c
-os: osx
-osx_image: xcode9
-rvm:
-  - 2.4.2
-install:
-  - bundle install --quiet
 matrix:
   include:
     - env: JOB=macOS
+      os: osx
+      osx_image: xcode9.2
+      language: objective-c
+      install: bundle install --quiet
       script: bundle exec fastlane mac ci
     - env: JOB=iOS
+      os: osx
+      osx_image: xcode9.3
+      language: objective-c
+      install: bundle install --quiet
       script: bundle exec fastlane ios ci
       after_failure:
         - cat ~/Library/Developer/Xcode/DerivedData/Deferred-*/Logs/Test/*/Session-MobileDeferredTests-*.log | true
         - cat ~/Library/Logs/scan/Deferred-*.log | true
-    - language: generic
+    - env: JOB=Linux SWIFT=4.0
       os: linux
       dist: trusty
       sudo: required
-      env: JOB=Linux
-      install: eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-      script: swift test
+      language: generic
+      install:
+        - echo "4.0" > .swift-version
+        - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
+      script:
+        - swift --version
+        - swift test --parallel
+    - env: JOB=Linux SWIFT=4.1
+      os: linux
+      dist: trusty
+      sudo: required
+      language: generic
+      install:
+        - echo "4.1" > .swift-version
+        - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
+      script:
+        - swift --version
+        - swift test --parallel
 notifications:
   email: false

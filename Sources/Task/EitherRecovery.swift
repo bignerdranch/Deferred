@@ -11,6 +11,18 @@ extension Either {
     public init(success getValue: @autoclosure() throws -> Right) {
         self.init { try getValue() }
     }
+
+    /// Performs a coalescing operation, returning the wrapped success value of
+    /// `left` or a default value on the `right`.
+    public static func ?? (left: Self, right: @autoclosure() throws -> Right) rethrows -> Right {
+        return try left.withValues(ifLeft: { _ in try right() }, ifRight: { $0 })
+    }
+
+    /// Performs a coalescing operation, returning the success value of `lhs`
+    /// or a default value on the `rhs`.
+    public static func ?? <NewEither: Either>(lhs: Self, rhs: @autoclosure() throws -> NewEither) rethrows -> NewEither where NewEither.Right == Right {
+        return try lhs.withValues(ifLeft: { _ in try rhs() }, ifRight: { NewEither(success: $0) })
+    }
 }
 
 extension Either where Left == Error {
@@ -18,23 +30,12 @@ extension Either where Left == Error {
     public func extract() throws -> Right {
         return try withValues(ifLeft: { throw $0 }, ifRight: { $0 })
     }
-
 }
 
-/// Performs a coalescing operation, returning the wrapped success value of
-/// `left` or a default value on the `right`.
-public func ?? <Left: Either>(left: Left, right: @autoclosure() throws -> Left.Right) rethrows -> Left.Right {
-    return try left.withValues(ifLeft: { _ in try right() }, ifRight: { $0 })
-}
-
-/// Performs a coalescing operation, returning the wrapped success value of
-/// `left` or a default value on the `right`.
-public func ?? <Left: Either, Right: Either>(left: Left, right: @autoclosure() throws -> Right) rethrows -> Right where Right.Right == Left.Right {
-    return try left.withValues(ifLeft: { _ in try right() }, ifRight: { Right(success: $0) })
-}
-
-/// This is an optional you probably don't want.
-@available(*, unavailable, message: "Unexpected optional promotion. Please unwrap the Result first.")
-public func ?? <Left: Either>(left: Left?, right: @autoclosure() throws -> Left.Right) rethrows -> Left.Right {
-    fatalError("Cannot call unavailable methods")
+extension Optional where Wrapped: Either {
+    /// This is an optional conversion you probably don't want.
+    @available(*, unavailable, message: "Unexpected optional promotion. Please unwrap the Result first.")
+    public static func ?? (lhs: Wrapped?, rhs: @autoclosure() throws -> Wrapped.Right) rethrows -> Wrapped.Right {
+        fatalError("Cannot call unavailable methods")
+    }
 }

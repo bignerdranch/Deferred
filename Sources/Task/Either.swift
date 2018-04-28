@@ -9,7 +9,14 @@
 /// A type that can exclusively represent either some result value of a
 /// successful computation or a failure with an error.
 public protocol Either: CustomStringConvertible, CustomDebugStringConvertible {
+    /// One of the two possible results.
+    ///
+    /// By convention, the left side is used to hold an error value.
     associatedtype Left = Error
+
+    /// One of the two possible results.
+    ///
+    /// By convention, the right side is used to hold a correct value.
     associatedtype Right
 
     /// Derive a result from a failable function.

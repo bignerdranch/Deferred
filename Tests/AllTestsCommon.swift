@@ -34,6 +34,11 @@ extension XCTestCase {
         let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? 0.5 : expectations.count > 10 ? 10 : 3
         wait(for: expectations, timeout: timeout)
     }
+#elseif swift(>=4.1)
+    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: Int = #line) {
+        let timeout: TimeInterval = expectations.count > 10 ? 10 : 3
+        waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
+    }
 #else
     func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: UInt = #line) {
         let timeout: TimeInterval = expectations.count > 10 ? 10 : 3

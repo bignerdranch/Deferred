@@ -21,6 +21,8 @@ import Dispatch
 public struct TaskGroup {
 
     private let group = DispatchGroup()
+
+    /// Creates the empty task group.
     public init() {}
 
     private var queue: DispatchQueue {

@@ -75,7 +75,7 @@ extension DispatchQueue: Executor {
     /// work onto the concurrent pile. As an alternative to the `.utility` QoS
     /// global queue, work dispatched onto this queue on platforms with support
     /// for QoS will match the QoS of the caller.
-    @nonobjc public static func any() -> DispatchQueue {
+    public static func any() -> DispatchQueue {
         // The technique is described and used in Core Foundation:
         // http://opensource.apple.com/source/CF/CF-1153.18/CFInternal.h
         // https://github.com/apple/swift-corelibs-foundation/blob/master/CoreFoundation/Base.subproj/CFInternal.h#L869-L889
@@ -88,15 +88,15 @@ extension DispatchQueue: Executor {
         return .global(qos: qosClass)
     }
 
-    @nonobjc public func submit(_ body: @escaping() -> Void) {
+    public func submit(_ body: @escaping() -> Void) {
         async(execute: body)
     }
 
-    @nonobjc public func submit(_ workItem: DispatchWorkItem) {
+    public func submit(_ workItem: DispatchWorkItem) {
         async(execute: workItem)
     }
 
-    @nonobjc public var underlyingQueue: DispatchQueue? {
+    public var underlyingQueue: DispatchQueue? {
         return self
     }
 }
@@ -108,7 +108,7 @@ extension DispatchQueue: Executor {
 /// operations. This is ideal for regulating the call relative to other
 /// operations in the queue.
 extension OperationQueue: Executor {
-    @nonobjc public func submit(_ body: @escaping() -> Void) {
+    public func submit(_ body: @escaping() -> Void) {
         addOperation(body)
     }
 }
@@ -119,7 +119,7 @@ extension OperationQueue: Executor {
 /// As an `Executor`, submitted functions are invoked on the next iteration
 /// of the run loop.
 extension CFRunLoop: Executor {
-    @nonobjc public func submit(_ body: @escaping() -> Void) {
+    public func submit(_ body: @escaping() -> Void) {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             CFRunLoopPerformBlock(self, CFRunLoopMode.defaultMode.rawValue, body)
         #else
@@ -135,7 +135,7 @@ extension CFRunLoop: Executor {
 /// As an `Executor`, submitted functions are invoked on the next iteration
 /// of the run loop.
 extension RunLoop: Executor {
-    @nonobjc public func submit(_ body: @escaping() -> Void) {
+    public func submit(_ body: @escaping() -> Void) {
         if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
             perform(body)
         } else {

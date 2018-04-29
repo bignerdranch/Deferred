@@ -8,8 +8,17 @@
 
 import Dispatch
 
-/// A deferred is a value that may become determined (or "filled") at some point
-/// in the future. Once a deferred value is determined, it cannot change.
+/// A value that may become determined (or "filled") at some point in the
+/// future. Once determined, it cannot change.
+///
+/// You may subscribe to be notified once the value becomes determined.
+///
+/// Handlers and their captures are strongly referenced until:
+/// - they are executed when the value is determined
+/// - the last copy to this type escapes without the value becoming determined
+///
+/// If the value never becomes determined, a handler submitted to it will never
+/// be executed.
 public struct Deferred<Value> {
     /// The primary storage, initialized with a value once-and-only-once (at
     /// init or later).

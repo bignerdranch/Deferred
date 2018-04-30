@@ -51,7 +51,7 @@ class LockingTests: XCTestCase {
     func testMultipleConcurrentReaders() {}
 
     func testMultipleConcurrentWriters() {
-        var counter  = bnr_atomic_counter()
+        var counter = 0
 
         // spin up 5 writers concurrently...
         let expectations = (0 ..< 5).map { (iteration) -> XCTestExpectation in
@@ -60,9 +60,9 @@ class LockingTests: XCTestCase {
                 self.lock.withWriteLock {
                     // ... and make sure each runs in order by checking that
                     // no two blocks increment x at the same time
-                    XCTAssertEqual(bnr_atomic_counter_increment(&counter), 1)
+                    XCTAssertEqual(bnr_atomic_fetch_add(&counter, 1), 0)
                     Thread.sleep(forTimeInterval: 0.05)
-                    XCTAssertEqual(bnr_atomic_counter_decrement(&counter), 0)
+                    XCTAssertEqual(bnr_atomic_fetch_subtract(&counter, 1), 1)
                     expect.fulfill()
                 }
             }
@@ -73,7 +73,7 @@ class LockingTests: XCTestCase {
     }
 
     func testSimultaneousReadersAndWriters() {
-        var counter = bnr_atomic_counter()
+        var counter = 0
         var allExpectations = [XCTestExpectation]()
 
         func startReader(forIteration iteration: Int) -> XCTestExpectation {
@@ -82,7 +82,7 @@ class LockingTests: XCTestCase {
                 self.lock.withReadLock {
                     // make sure we get the value of x either before or after
                     // the writer runs, never a partway-through value
-                    let result = bnr_atomic_counter_load(&counter)
+                    let result = bnr_atomic_load(&counter)
                     XCTAssertTrue(result == 0 || result == 5)
                     expect.fulfill()
                 }
@@ -98,7 +98,7 @@ class LockingTests: XCTestCase {
         queue.async {
             self.lock.withWriteLock {
                 for _ in 0 ..< 5 {
-                    bnr_atomic_counter_increment(&counter)
+                    bnr_atomic_fetch_add(&counter, 1)
                     Thread.sleep(forTimeInterval: 0.1)
                 }
                 expectWrite.fulfill()

@@ -13,11 +13,10 @@
 // with Playgrounds. <rdar://38865726>
 #if SWIFT_PACKAGE || COCOAPODS
 import Atomics
-#elseif (XCODE && !FORCE_PLAYGROUND_COMPATIBILITY)
+#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
 import Deferred.Atomics
 #else
 import Darwin.C.stdatomic
-import Darwin.POSIX.pthread
 
 typealias bnr_atomic_memory_order_t = memory_order
 
@@ -59,84 +58,99 @@ private struct DarwinAtomics {
     }()
 }
 
-typealias bnr_atomic_ptr = UnsafeRawPointer?
-typealias bnr_atomic_ptr_t = UnsafeMutablePointer<bnr_atomic_ptr>
+typealias bnr_atomic_ptr_t = UnsafeMutablePointer<UnsafeRawPointer?>
 
-func bnr_atomic_ptr_load(_ target: bnr_atomic_ptr_t, _ order: bnr_atomic_memory_order_t) -> UnsafeRawPointer? {
+func bnr_atomic_init(_ target: bnr_atomic_ptr_t, _ initial: UnsafeRawPointer?) {
+    target.pointee = initial
+}
+
+func bnr_atomic_load(_ target: bnr_atomic_ptr_t, _ order: bnr_atomic_memory_order_t) -> UnsafeRawPointer? {
     var result: UnsafeRawPointer?
-    DarwinAtomics.shared.load(MemoryLayout<UnsafeRawPointer>.size, target, &result, order)
+    DarwinAtomics.shared.load(MemoryLayout<UnsafeRawPointer?>.size, target, &result, order)
     return result
 }
 
-func bnr_atomic_ptr_exchange(_ target: bnr_atomic_ptr_t, _ desired: UnsafeRawPointer?, _ order: bnr_atomic_memory_order_t) -> UnsafeRawPointer? {
+func bnr_atomic_exchange(_ target: bnr_atomic_ptr_t, _ desired: UnsafeRawPointer?, _ order: bnr_atomic_memory_order_t) -> UnsafeRawPointer? {
     var new = desired
     var old: UnsafeRawPointer?
-    DarwinAtomics.shared.exchange(MemoryLayout<UnsafeRawPointer>.size, target, &new, &old, order)
+    DarwinAtomics.shared.exchange(MemoryLayout<UnsafeRawPointer?>.size, target, &new, &old, order)
     return old
 }
 
-func bnr_atomic_ptr_compare_and_swap(_ target: bnr_atomic_ptr_t, _ expected: UnsafeRawPointer?, _ desired: UnsafeRawPointer?, _ order: bnr_atomic_memory_order_t) -> Bool {
+func bnr_atomic_compare_and_swap(_ target: bnr_atomic_ptr_t, _ expected: UnsafeRawPointer?, _ desired: UnsafeRawPointer?, _ order: bnr_atomic_memory_order_t) -> Bool {
     var expected = expected
     var desired = desired
-    return DarwinAtomics.shared.compareExchange(MemoryLayout<UnsafeRawPointer>.size, target, &expected, &desired, order, .relaxed)
+    return DarwinAtomics.shared.compareExchange(MemoryLayout<UnsafeRawPointer?>.size, target, &expected, &desired, order, .relaxed)
 }
 
-typealias bnr_atomic_flag = Bool
-typealias bnr_atomic_flag_t = UnsafeMutablePointer<bnr_atomic_flag>
+typealias bnr_atomic_flag_t = UnsafeMutablePointer<Bool>
 
-func bnr_atomic_flag_load(_ target: bnr_atomic_flag_t, _ order: bnr_atomic_memory_order_t) -> Bool {
+func bnr_atomic_init(_ target: bnr_atomic_flag_t, _ initial: Bool) {
+    target.pointee = initial
+}
+
+func bnr_atomic_load(_ target: bnr_atomic_flag_t, _ order: bnr_atomic_memory_order_t) -> Bool {
     var result: Bool = false
     DarwinAtomics.shared.load(MemoryLayout<Bool>.size, target, &result, order)
     return result
 }
 
-func bnr_atomic_flag_test_and_set(_ target: bnr_atomic_flag_t, _ order: bnr_atomic_memory_order_t) -> Bool {
-    var new = true
-    var old = false
-    DarwinAtomics.shared.exchange(MemoryLayout<Bool>.size, target, &new, &old, order)
-    return old
+func bnr_atomic_store(_ target: bnr_atomic_flag_t, _ desired: Bool, _ order: bnr_atomic_memory_order_t) {
+    var desired = desired
+    DarwinAtomics.shared.store(MemoryLayout<Bool>.size, target, &desired, order)
 }
 
-typealias bnr_atomic_bitmask = UInt8
-typealias bnr_atomic_bitmask_t = UnsafeMutablePointer<bnr_atomic_bitmask>
-
-func bnr_atomic_bitmask_init(_ target: bnr_atomic_bitmask_t, _ mask: UInt8) {
+func bnr_atomic_init(_ target: bnr_atomic_bitmask_t, _ mask: UInt8) {
     target.pointee = mask
 }
 
-func bnr_atomic_bitmask_add(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
+typealias bnr_atomic_bitmask_t = UnsafeMutablePointer<UInt8>
+
+func bnr_atomic_load(_ target: bnr_atomic_bitmask_t, _ order: bnr_atomic_memory_order_t) -> UInt8 {
+    var result: UInt8 = 0
+    DarwinAtomics.shared.load(MemoryLayout<UInt8>.size, target, &result, order)
+    return result
+}
+
+func bnr_atomic_fetch_or(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
     return DarwinAtomics.shared.or8(target, mask, order)
 }
 
-func bnr_atomic_bitmask_remove(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
-    return DarwinAtomics.shared.and8(target, ~mask, order)
-}
-
-func bnr_atomic_bitmask_test(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> Bool {
-    var result: UInt8 = 0
-    DarwinAtomics.shared.load(MemoryLayout<UInt8>.size, target, &result, order)
-    return (result & mask) != 0
+func bnr_atomic_fetch_and(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
+    return DarwinAtomics.shared.and8(target, mask, order)
 }
 #endif
 
+func bnr_atomic_init<T: AnyObject>(_ target: UnsafeMutablePointer<T?>) {
+    let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
+    bnr_atomic_init(rawTarget, nil)
+}
+
 func bnr_atomic_load<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, _ order: bnr_atomic_memory_order_t) -> T? {
-    let atomicTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: bnr_atomic_ptr.self)
-    guard let opaqueResult = bnr_atomic_ptr_load(atomicTarget, order) else { return nil }
+    let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
+    guard let opaqueResult = bnr_atomic_load(rawTarget, order) else { return nil }
     return Unmanaged<T>.fromOpaque(opaqueResult).takeUnretainedValue()
 }
 
 @discardableResult
 func bnr_atomic_store<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, _ desired: T?, _ order: bnr_atomic_memory_order_t) -> T? {
-    let atomicTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: bnr_atomic_ptr.self)
-    let retainedDesired = desired.map(Unmanaged.passRetained)
-    guard let opaquePrevious = bnr_atomic_ptr_exchange(atomicTarget, retainedDesired?.toOpaque(), order) else { return nil }
+    let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
+    let opaqueDesired: UnsafeMutableRawPointer?
+    if let desired = desired {
+        opaqueDesired = Unmanaged.passRetained(desired).toOpaque()
+    } else {
+        opaqueDesired = nil
+    }
+    guard let opaquePrevious = bnr_atomic_exchange(rawTarget, opaqueDesired, order) else { return nil }
     return Unmanaged<T>.fromOpaque(opaquePrevious).takeRetainedValue()
 }
 
 func bnr_atomic_initialize_once<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, _ desired: T) -> Bool {
-    let atomicTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: bnr_atomic_ptr.self)
+    let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
     let retainedDesired = Unmanaged.passRetained(desired)
-    let wonRace = bnr_atomic_ptr_compare_and_swap(atomicTarget, nil, retainedDesired.toOpaque(), .acq_rel)
-    if !wonRace { retainedDesired.release() }
+    let wonRace = bnr_atomic_compare_and_swap(rawTarget, nil, retainedDesired.toOpaque(), .acq_rel)
+    if !wonRace {
+        retainedDesired.release()
+    }
     return wonRace
 }

@@ -10,7 +10,7 @@ import Dispatch
 
 /// A deferred is a value that may become determined (or "filled") at some point
 /// in the future. Once a deferred value is determined, it cannot change.
-public struct Deferred<Value>: FutureProtocol, PromiseProtocol {
+public struct Deferred<Value> {
     /// The primary storage, initialized with a value once-and-only-once (at
     /// init or later).
     private let variant: Variant
@@ -23,9 +23,9 @@ public struct Deferred<Value>: FutureProtocol, PromiseProtocol {
     public init(filledWith value: Value) {
         variant = Variant(for: value)
     }
+}
 
-    // MARK: FutureProtocol
-
+extension Deferred: FutureProtocol {
     /// An enqueued handler.
     struct Continuation {
         let target: Executor?
@@ -55,13 +55,6 @@ public struct Deferred<Value>: FutureProtocol, PromiseProtocol {
         guard case .success = semaphore.wait(timeout: time) else { return nil }
         return result
     }
-
-    // MARK: PromiseProtocol
-
-    @discardableResult
-    public func fill(with value: Value) -> Bool {
-        return variant.store(value)
-    }
 }
 
 extension Deferred.Continuation {
@@ -71,5 +64,12 @@ extension Deferred.Continuation {
         target?.submit {
             self.handler(value)
         } ?? handler(value)
+    }
+}
+
+extension Deferred: PromiseProtocol {
+    @discardableResult
+    public func fill(with value: Value) -> Bool {
+        return variant.store(value)
     }
 }

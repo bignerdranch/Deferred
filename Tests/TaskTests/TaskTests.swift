@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/1/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -67,7 +67,8 @@ class TaskTests: CustomExecutorTestCase {
             ("testThatTaskWrappingUnfilledIsIndeterminate", testThatTaskWrappingUnfilledIsIndeterminate),
             ("testThatTaskWrappingFilledIsDeterminate", testThatTaskWrappingFilledIsDeterminate),
             ("testThatMapIncrementsParentProgressFraction", testThatMapIncrementsParentProgressFraction),
-            ("testThatAndThenIncrementsParentProgressFraction", testThatAndThenIncrementsParentProgressFraction)
+            ("testThatAndThenIncrementsParentProgressFraction", testThatAndThenIncrementsParentProgressFraction),
+            ("testImplicitProgressCanBeCreatedFromAndThen", testImplicitProgressCanBeCreatedFromAndThen)
         ]
 
             return universalTests + appleTests
@@ -272,6 +273,46 @@ class TaskTests: CustomExecutorTestCase {
         _ = expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task.progress, handler: nil)
         waitForExpectations()
         assertExecutorCalled(atLeast: 1)
+    }
+
+    func testImplicitProgressCanBeCreatedFromAndThen() {
+        let firstTask = Task<Void>(success: ())
+        let secondTask = firstTask.andThen(upon: DispatchQueue.any()) { _ -> Task<Int> in
+            let deferred = Deferred<Task<Int>.Result>()
+            let progress = Progress(totalUnitCount: 80)
+
+            func afterDelay(upon queue: DispatchQueue = .main, execute body: @escaping() -> Void) {
+                queue.asyncAfter(deadline: .now() + 0.15, execute: body)
+            }
+
+            DispatchQueue.any().asyncAfter(deadline: .now() + 0.15) {
+                progress.completedUnitCount = 20
+            }
+
+            DispatchQueue.any().asyncAfter(deadline: .now() + 0.30) {
+                progress.completedUnitCount = 60
+            }
+
+            DispatchQueue.any().asyncAfter(deadline: .now() + 0.45) {
+                progress.completedUnitCount = 80
+                deferred.succeed(with: 42)
+            }
+
+            return Task(deferred, progress: progress)
+        }
+
+        let expectCompletion = expectation(description: "upon is called")
+        secondTask.uponSuccess { (result) in
+            XCTAssertEqual(result, 42)
+            expectCompletion.fulfill()
+        }
+
+        let expectProgressChange = keyValueObservingExpectation(for: secondTask.progress, keyPath: #keyPath(Progress.fractionCompleted)) { (_, change) -> Bool in
+            guard let fractionCompleted = change["new"] as? Double else { return false }
+            return abs(fractionCompleted - 1) < 0.1
+        }
+
+        wait(for: [ expectCompletion, expectProgressChange ], timeout: 10)
     }
     
     #endif

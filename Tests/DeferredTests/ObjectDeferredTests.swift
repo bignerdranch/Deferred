@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 4/30/18.
-//  Copyright © 2018 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest

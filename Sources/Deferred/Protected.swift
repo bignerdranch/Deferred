@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by John Gallagher on 7/17/14.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 /// A protected value only allows access from within a locking statement. This
@@ -40,7 +40,7 @@ public final class Protected<T> {
     }
 }
 
-extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
+extension Protected: CustomDebugStringConvertible, CustomReflectable {
     public var debugDescription: String {
         guard let lock = lock as? MaybeLocking else {
             return "\(type(of: self))"
@@ -59,9 +59,5 @@ extension Protected: CustomDebugStringConvertible, CustomReflectable, CustomPlay
         return lock.withAttemptedReadLock {
             Mirror(self, children: [ "item": value ], displayStyle: .optional)
         } ?? Mirror(self, children: [ "lockContended": true ], displayStyle: .tuple)
-    }
-
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: (lock as? MaybeLocking).flatMap({ $0.withAttemptedReadLock { value } }) as Any)
     }
 }

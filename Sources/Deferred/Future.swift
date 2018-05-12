@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 8/29/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
@@ -30,7 +30,7 @@ public typealias PreferredExecutor = DispatchQueue
 /// access, though ideally all members of the future could be called from any
 /// thread.
 ///
-public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable, CustomPlaygroundQuickLookable {
+public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable {
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
@@ -155,11 +155,6 @@ extension FutureProtocol {
         case let value:
             return Mirror(self, children: [ "isFilled": value != nil ], displayStyle: .tuple)
         }
-    }
-
-    /// A custom playground Quick Look for this instance.
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook(reflecting: peek() as Any)
     }
 }
 

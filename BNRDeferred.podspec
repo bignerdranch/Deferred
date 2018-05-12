@@ -31,11 +31,9 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "#{s.version}" }
 
   # ――― Source Settings ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source_files  = "Sources/**/*.{h,swift}"
-  s.exclude_files = "Sources/TestSupport"
-  s.preserve_path = "Sources/**/*.modulemap"
+  s.source_files  = "Sources/**/*.swift"
+  s.preserve_path = "Sources/Atomics"
   s.module_name   = "Deferred"
-  s.module_map    = "Sources/module.modulemap"
-  s.pod_target_xcconfig = { "SWIFT_ACTIVE_COMPILATION_CONDITIONS"  => "XCODE" }
+  s.pod_target_xcconfig = { "SWIFT_INCLUDE_PATHS": "$(PODS_TARGET_SRCROOT)/Sources/Atomics/include" }
 
 end

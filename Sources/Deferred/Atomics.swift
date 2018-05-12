@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 2/22/18.
-//  Copyright © 2018 Big Nerd Ranch. All rights reserved.
+//  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 // swiftlint:disable type_name

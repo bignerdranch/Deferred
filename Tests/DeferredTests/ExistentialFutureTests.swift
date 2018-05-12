@@ -8,7 +8,7 @@
 
 import XCTest
 
-@testable import Deferred
+import Deferred
 
 class ExistentialFutureTests: XCTestCase {
     static let allTests: [(String, (ExistentialFutureTests) -> () throws -> Void)] = [

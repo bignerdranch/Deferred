@@ -21,6 +21,6 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2014-2016 Big Nerd Ranch. All rights reserved.</string>
+	<string>Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.</string>
 </dict>
 </plist>

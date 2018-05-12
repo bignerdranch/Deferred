@@ -9,7 +9,7 @@
 import XCTest
 import Dispatch
 
-@testable import Deferred
+import Deferred
 #if SWIFT_PACKAGE
 import Atomics
 #else

@@ -154,3 +154,11 @@ func bnr_atomic_initialize_once<T: AnyObject>(_ target: UnsafeMutablePointer<T?>
     }
     return wonRace
 }
+
+@discardableResult
+func bnr_atomic_initialize_once(_ target: UnsafeMutablePointer<Bool>, _ handler: () -> Void) -> Bool {
+    guard !bnr_atomic_load(target, .acquire) else { return false }
+    handler()
+    bnr_atomic_store(target, true, .release)
+    return true
+}

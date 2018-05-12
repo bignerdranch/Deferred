@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 11/18/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -31,8 +31,7 @@ extension Collection where Iterator.Element: FutureProtocol, Iterator.Element.Va
         let queue = DispatchQueue.global(qos: .utility)
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = numericCast(count)
+        let progress = Progress(totalUnitCount: numericCast(count))
         #else
         var cancellations = [() -> Void]()
         cancellations.reserveCapacity(numericCast(underestimatedCount))

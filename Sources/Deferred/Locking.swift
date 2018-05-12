@@ -11,9 +11,9 @@ import Foundation
 
 // This #if is over-complex because there is no compilation condition associated
 // with Playgrounds. <rdar://38865726>
-#if SWIFT_PACKAGE
+#if SWIFT_PACKAGE || COCOAPODS
 import Atomics
-#elseif (XCODE && !FORCE_PLAYGROUND_COMPATIBILITY) || COCOAPODS
+#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
 import Deferred.Atomics
 #endif
 

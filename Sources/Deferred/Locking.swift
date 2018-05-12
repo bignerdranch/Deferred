@@ -9,7 +9,7 @@
 import Dispatch
 import Foundation
 
-#if SWIFT_PACKAGE
+#if SWIFT_PACKAGE || COCOAPODS
 import Atomics
 #elseif XCODE
 import Deferred.Atomics

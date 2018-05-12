@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/19/14.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -39,7 +39,13 @@ class DeferredTests: XCTestCase {
             ("testIsFilledCanBeCalledMultipleTimesNotFilled", testIsFilledCanBeCalledMultipleTimesNotFilled),
             ("testIsFilledCanBeCalledMultipleTimesWhenFilled", testIsFilledCanBeCalledMultipleTimesWhenFilled),
             ("testFillAndIsFilledPostcondition", testFillAndIsFilledPostcondition),
-            ("testSimultaneousFill", testSimultaneousFill)
+            ("testSimultaneousFill", testSimultaneousFill),
+            ("testDebugDescriptionUnfilled", testDebugDescriptionUnfilled),
+            ("testDebugDescriptionFilled", testDebugDescriptionFilled),
+            ("testDebugDescriptionFilledWhenValueIsVoid", testDebugDescriptionFilledWhenValueIsVoid),
+            ("testReflectionUnfilled", testReflectionUnfilled),
+            ("testReflectionFilled", testReflectionFilled),
+            ("testReflectionFilledWhenValueIsVoid", testReflectionFilledWhenValueIsVoid)
         ]
 
         #if os(OSX) || (os(iOS) && !(arch(i386) || arch(x86_64))) || (os(watchOS) && !(arch(i386) || arch(x86_64))) || (os(tvOS) && !arch(x86_64))
@@ -371,6 +377,48 @@ class DeferredTests: XCTestCase {
         startGroup.leave()
         XCTAssertEqual(finishGroup.wait(timeout: .distantFuture), .success)
         waitForExpectationsShort()
+    }
+
+    func testDebugDescriptionUnfilled() {
+        let deferred = Deferred<Int>()
+        XCTAssertEqual("\(deferred)", "Deferred<Int> (not filled)")
+    }
+
+    func testDebugDescriptionFilled() {
+        let deferred = Deferred<Int>(filledWith: 42)
+        XCTAssertEqual("\(deferred)", "Deferred<Int>(42)")
+    }
+
+    func testDebugDescriptionFilledWhenValueIsVoid() {
+        let deferred = Deferred<Void>(filledWith: ())
+        XCTAssertEqual("\(deferred)", "Deferred<()> (filled)")
+    }
+
+    func testReflectionUnfilled() {
+        let deferred = Deferred<Int>()
+
+        let magicMirror = Mirror(reflecting: deferred)
+        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, false)
+    }
+
+    func testReflectionFilled() {
+        let deferred = Deferred<Int>(filledWith: 42)
+
+        let magicMirror = Mirror(reflecting: deferred)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant(0) as? Int, 42)
+    }
+
+    func testReflectionFilledWhenValueIsVoid() {
+        let deferred = Deferred<Void>(filledWith: ())
+
+        let magicMirror = Mirror(reflecting: deferred)
+        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant("isFilled") as? Bool, true)
     }
 }
 

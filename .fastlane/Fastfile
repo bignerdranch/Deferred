@@ -11,7 +11,8 @@ end
 
 desc "Run CocoaPods linter"
 lane :pod_lint do
-  pod_lib_lint(quick: true)
+  pod_lib_lint(fail_fast: true, use_libraries: true)
+  pod_lib_lint(fail_fast: true, use_libraries: false)
 end
 
 desc "Output documentation using Jazzy into docs/"

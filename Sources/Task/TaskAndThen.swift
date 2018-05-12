@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 10/27/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -48,17 +48,16 @@ extension Task {
         #endif
 
         let future: Future<Task<NewTask.Value.Right>.Result> = andThen(upon: executor) { (result) -> Task<NewTask.Value.Right> in
+            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+            // We want to become the thread-local progress, but we don't
+            // want to consume units; we may not attach newTask.progress to
+            // the root progress until after the scope ends.
+            progress.becomeCurrent(withPendingUnitCount: 1)
+            defer { progress.resignCurrent() }
+            #endif
+
             do {
                 let value = try result.extract()
-
-                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-                // We want to become the thread-local progress, but we don't
-                // want to consume units; we may not attach newTask.progress to
-                // the root progress until after the scope ends.
-                progress.becomeCurrent(withPendingUnitCount: 0)
-                defer { progress.resignCurrent() }
-                #endif
-
                 // Attempt to create and wrap the next task. Task's own progress
                 // wrapper logic takes over at this point.
                 let newTask = try startNextTask(value)
@@ -69,12 +68,6 @@ extension Task {
                 #endif
                 return Task<NewTask.Value.Right>(newTask)
             } catch {
-                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-                // Failure case behaves just like map: just error passthrough.
-                progress.becomeCurrent(withPendingUnitCount: 1)
-                defer { progress.resignCurrent() }
-                #endif
-
                 return Task<NewTask.Value.Right>(failure: error)
             }
         }

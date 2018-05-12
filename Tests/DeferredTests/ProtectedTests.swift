@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/19/14.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -15,7 +15,11 @@ import Foundation
 class ProtectedTests: XCTestCase {
     static var allTests: [(String, (ProtectedTests) -> () throws -> Void)] {
         return [
-            ("testConcurrentReadingWriting", testConcurrentReadingWriting)
+            ("testConcurrentReadingWriting", testConcurrentReadingWriting),
+            ("testDebugDescription", testDebugDescription),
+            ("testDebugDescriptionWhenLocked", testDebugDescriptionWhenLocked),
+            ("testReflection", testReflection),
+            ("testReflectionWhenLocked", testReflectionWhenLocked)
         ]
     }
 
@@ -74,5 +78,42 @@ class ProtectedTests: XCTestCase {
         }
 
         waitForExpectationsShort()
+    }
+
+    func testDebugDescription() {
+        let protected = Protected<Int>(initialValue: 42)
+        XCTAssertEqual("\(protected)", "Protected<Int>(42)")
+    }
+
+    func testDebugDescriptionWhenLocked() {
+        let customLock = NSLock()
+        let protected = Protected<Int>(initialValue: 42, lock: customLock)
+
+        customLock.lock()
+        defer { customLock.unlock() }
+
+        XCTAssertEqual("\(protected)", "Protected<Int> (lock contended)")
+    }
+
+    func testReflection() {
+        let protected = Protected<Int>(initialValue: 42)
+
+        let magicMirror = Mirror(reflecting: protected)
+        XCTAssertEqual(magicMirror.displayStyle, .optional)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant(0) as? Int, 42)
+    }
+
+    func testReflectionWhenLocked() {
+        let customLock = NSLock()
+        let protected = Protected<Int>(initialValue: 42, lock: customLock)
+
+        customLock.lock()
+        defer { customLock.unlock() }
+
+        let magicMirror = Mirror(reflecting: protected)
+        XCTAssertEqual(magicMirror.displayStyle, .tuple)
+        XCTAssertNil(magicMirror.superclassMirror)
+        XCTAssertEqual(magicMirror.descendant("lockContended") as? Bool, true)
     }
 }

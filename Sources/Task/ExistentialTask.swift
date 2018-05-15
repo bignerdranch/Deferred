@@ -11,6 +11,10 @@ import Foundation
 #if SWIFT_PACKAGE
 import Atomics
 import Deferred
+#elseif COCOAPODS
+import Atomics
+#elseif XCODE
+import Deferred.Atomics
 #endif
 
 /// A wrapper over any task.

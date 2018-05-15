@@ -10,6 +10,10 @@ import Foundation
 #if SWIFT_PACKAGE
 import Atomics
 import Deferred
+#elseif COCOAPODS
+import Atomics
+#elseif XCODE
+import Deferred.Atomics
 #endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
@@ -186,17 +190,15 @@ extension Progress {
 
 extension Progress {
     /// Indeterminate progress which will likely not change.
-    static func indefinite() -> Self {
-        let progress = self.init(parent: nil, userInfo: nil)
-        progress.totalUnitCount = -1
+    static func indefinite() -> Progress {
+        let progress = Progress(totalUnitCount: -1)
         progress.isCancellable = false
         return progress
     }
 
     /// Progress for which no work actually needs to be done.
-    static func noWork() -> Self {
-        let progress = self.init(parent: nil, userInfo: nil)
-        progress.totalUnitCount = 0
+    static func noWork() -> Progress {
+        let progress = Progress(totalUnitCount: 0)
         progress.completedUnitCount = 1
         progress.isCancellable = false
         progress.isPausable = false
@@ -205,8 +207,8 @@ extension Progress {
 
     /// A simple indeterminate progress with a cancellation function.
     static func wrappingCompletion<OtherFuture: FutureProtocol>(of base: OtherFuture, cancellation: (() -> Void)?) -> Progress {
-        let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = base.wait(until: .now()) != nil ? 0 : -1
+        let totalUnitCount: Int64 = base.wait(until: .now()) != nil ? 0 : -1
+        let progress = Progress(totalUnitCount: totalUnitCount)
 
         if let cancellation = cancellation {
             progress.cancellationHandler = cancellation
@@ -229,8 +231,7 @@ extension Progress {
         case (let task?, nil):
             return task.progress
         case (let task?, let cancellation?):
-            let progress = Progress(parent: nil, userInfo: nil)
-            progress.totalUnitCount = 1
+            let progress = Progress(totalUnitCount: 1)
             progress.cancellationHandler = cancellation
             progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             return progress
@@ -262,8 +263,7 @@ private extension Progress {
 
     /// Create a progress for the root of an implicit chain of tasks.
     convenience init(taskRootFor progress: Progress, orphaned: Bool) {
-        self.init(parent: nil, userInfo: nil)
-        totalUnitCount = 1
+        self.init(totalUnitCount: 1)
         setUserInfoObject(NSLock(), forKey: .taskRootLock)
         adoptChild(progress, orphaned: orphaned, pendingUnitCount: 1)
     }
@@ -276,12 +276,7 @@ extension Progress {
         if progress.isTaskRoot || progress === Progress.current() {
             // Task<Value> has already taken care of this at a deeper level.
             return progress
-        } else if let root = Progress.current(), let lock = root.userInfo[.taskRootLock] as? NSLock {
-            // We're in a `extendingTask(unitCount:body:)` block, append it.
-            lock.lock()
-            defer { lock.unlock() }
-
-            root.adoptChild(progress, orphaned: true, pendingUnitCount: 1)
+        } else if let root = Progress.current(), root.isTaskRoot {
             return root
         } else {
             // Otherwise, wrap it up as a Task<Value>-marked progress.

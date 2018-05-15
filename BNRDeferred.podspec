@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.name         = "BNRDeferred"
-  s.version      = "3.3.0"
+  s.version      = "3.3.1"
   s.summary      = "Work with values that haven't been determined yet."
 
   s.description  = <<-DESC
@@ -31,9 +31,9 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "#{s.version}" }
 
   # ――― Source Settings ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.source_files        = "Sources/**/*.{h,swift}"
-  s.preserve_path       = "Sources/**/*.modulemap"
-  s.module_name         = "Deferred"
-  s.module_map          = "Sources/module.modulemap"
+  s.source_files  = "Sources/**/*.swift"
+  s.preserve_path = "Sources/Atomics"
+  s.module_name   = "Deferred"
+  s.pod_target_xcconfig = { "SWIFT_INCLUDE_PATHS": "$(PODS_TARGET_SRCROOT)/Sources/Atomics/include" }
 
 end

@@ -22,7 +22,8 @@ end
 desc "Common actions for quality assurance"
 private_lane :audit do
   swiftlint(strict: true)
-  pod_lib_lint(quick: true)
+  pod_lib_lint(fail_fast: true, use_libraries: true)
+  pod_lib_lint(fail_fast: true, use_libraries: false)
   build_docs
 end
 

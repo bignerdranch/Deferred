@@ -83,6 +83,16 @@ func bnr_atomic_compare_and_swap(_ target: bnr_atomic_ptr_t, _ expected: UnsafeR
     return DarwinAtomics.shared.compareExchange(MemoryLayout<UnsafeRawPointer?>.size, target, &expected, &desired, order, .relaxed)
 }
 
+func bnr_atomic_load_and_wait(_ target: bnr_atomic_ptr_t) -> UnsafeRawPointer {
+    repeat {
+        guard let result = bnr_atomic_load(target, .acquire) else {
+            pthread_yield_np()
+            continue
+        }
+        return result
+    } while true
+}
+
 typealias bnr_atomic_flag_t = UnsafeMutablePointer<Bool>
 
 func bnr_atomic_init(_ target: bnr_atomic_flag_t, _ initial: Bool) {
@@ -153,6 +163,12 @@ func bnr_atomic_initialize_once<T: AnyObject>(_ target: UnsafeMutablePointer<T?>
         retainedDesired.release()
     }
     return wonRace
+}
+
+func bnr_atomic_load_and_wait<T: AnyObject>(_ target: UnsafeMutablePointer<T?>) -> T {
+    let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
+    let opaqueResult = bnr_atomic_load_and_wait(rawTarget)
+    return Unmanaged<T>.fromOpaque(opaqueResult).takeUnretainedValue()
 }
 
 @discardableResult

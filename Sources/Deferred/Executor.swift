@@ -49,21 +49,12 @@ public protocol Executor: class {
 
     /// Execute the `workItem`.
     func submit(_ workItem: DispatchWorkItem)
-
-    /// If the executor is a higher-level wrapper around a dispatch queue,
-    /// may be used instead of `submit(_:)` for more efficient execution.
-    var underlyingQueue: DispatchQueue? { get }
 }
 
 extension Executor {
     /// By default, submits the closure contents of the work item.
     public func submit(_ workItem: DispatchWorkItem) {
         submit(workItem.perform)
-    }
-
-    /// By default, `nil`; the executor's `submit(_:)` is used unconditionally.
-    public var underlyingQueue: DispatchQueue? {
-        return nil
     }
 }
 
@@ -94,10 +85,6 @@ extension DispatchQueue: Executor {
 
     public func submit(_ workItem: DispatchWorkItem) {
         async(execute: workItem)
-    }
-
-    public var underlyingQueue: DispatchQueue? {
-        return self
     }
 }
 

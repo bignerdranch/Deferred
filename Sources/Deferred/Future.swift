@@ -30,9 +30,6 @@ public protocol FutureProtocol: CustomDebugStringConvertible, CustomReflectable 
     /// A type that represents the result of some asynchronous operation.
     associatedtype Value
 
-    /// Calls some `body` closure once the value is determined.
-    func upon(_ executor: PreferredExecutor, execute body: @escaping(Value) -> Void)
-
     /// Call some `body` closure once the value is determined.
     ///
     /// If the value is determined, the closure should be submitted to the

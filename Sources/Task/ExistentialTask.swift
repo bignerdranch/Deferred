@@ -13,7 +13,7 @@ import Atomics
 import Deferred
 #elseif COCOAPODS
 import Atomics
-#elseif XCODE
+#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
 import Deferred.Atomics
 #endif
 
@@ -74,8 +74,8 @@ public final class Task<SuccessValue>: NSObject {
         self.init(future: Future(success: base), progress: progress)
     }
     #else
-    private let cancellation: (() -> Void)
-    private var rawIsCancelled = bnr_atomic_flag()
+    private let cancellation: () -> Void
+    private var rawIsCancelled = false
 
     /// Creates a task given a `future` and an optional `cancellation`.
     ///
@@ -135,7 +135,7 @@ extension Task {
 
 #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
     private func markCancelled() {
-        _ = bnr_atomic_flag_test_and_set(&rawIsCancelled, .relaxed)
+        bnr_atomic_store(&rawIsCancelled, true, .relaxed)
     }
 #endif
 
@@ -144,7 +144,7 @@ extension Task {
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return progress.isCancelled
 #else
-        return bnr_atomic_flag_load(&rawIsCancelled, .relaxed)
+        return bnr_atomic_load(&rawIsCancelled, .relaxed)
 #endif
     }
 }

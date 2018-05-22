@@ -8,133 +8,77 @@
 
 import Dispatch
 
-/// A deferred is a value that may become determined (or "filled") at some point
-/// in the future. Once a deferred value is determined, it cannot change.
-public final class Deferred<Value>: FutureProtocol, PromiseProtocol {
-    // Using `ManagedBuffer` has advantages:
-    //  - The buffer has a stable pointer when locked to a single element.
-    //  - The buffer is appropriately aligned for atomic access.
-    //  - Better `holdsUniqueReference` support allows for future optimization.
-    private typealias Storage =
-        DeferredStorage<Value>
-
-    // Heap storage that is initialized with a value once-and-only-once.
-    private let storage = Storage.create()
-    // A semaphore that keeps efficiently keeps track of a callbacks list.
-    private let group = DispatchGroup()
+/// A value that may become determined (or "filled") at some point in the
+/// future. Once determined, it cannot change.
+///
+/// You may subscribe to be notified once the value becomes determined.
+///
+/// Handlers and their captures are strongly referenced until:
+/// - they are executed when the value is determined
+/// - the last copy to this type escapes without the value becoming determined
+///
+/// If the value never becomes determined, a handler submitted to it will never
+/// be executed.
+public struct Deferred<Value> {
+    /// The primary storage, initialized with a value once-and-only-once (at
+    /// init or later).
+    private let variant: Variant
 
     public init() {
-        storage.withUnsafeMutablePointers { (_, pointerToElement) in
-            pointerToElement.initialize(to: nil)
-        }
-
-        group.enter()
+        variant = Variant()
     }
 
     /// Creates an instance resolved with `value`.
     public init(filledWith value: Value) {
-        storage.withUnsafeMutablePointerToElements { (pointerToElement) in
-            pointerToElement.initialize(to: Storage.convertToReference(value))
-        }
-    }
-
-    deinit {
-        if !isFilled {
-            group.leave()
-        }
-    }
-
-    // MARK: FutureProtocol
-
-    private func notify(flags: DispatchWorkItemFlags, upon queue: DispatchQueue, execute body: @escaping(Value) -> Void) {
-        group.notify(flags: flags, queue: queue) { [storage] in
-            guard let reference = storage.withUnsafeMutablePointers({ bnr_atomic_load($1, .relaxed) }) else { return }
-            body(Storage.convertFromReference(reference))
-        }
-    }
-
-    public func upon(_ queue: DispatchQueue, execute body: @escaping (Value) -> Void) {
-        notify(flags: [ .assignCurrentContext, .inheritQoS ], upon: queue, execute: body)
-    }
-
-    public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
-        if let queue = executor as? DispatchQueue {
-            return upon(queue, execute: body)
-        } else if let queue = executor.underlyingQueue {
-            return upon(queue, execute: body)
-        }
-
-        notify(flags: .assignCurrentContext, upon: .any()) { (value) in
-            executor.submit {
-                body(value)
-            }
-        }
-    }
-
-    public func wait(until time: DispatchTime) -> Value? {
-        guard case .success = group.wait(timeout: time),
-            let reference = storage.withUnsafeMutablePointers({ bnr_atomic_load($1, .relaxed) }) else { return nil }
-
-        return Storage.convertFromReference(reference)
-    }
-
-    // MARK: PromiseProtocol
-
-    @discardableResult
-    public func fill(with value: Value) -> Bool {
-        let reference = Storage.convertToReference(value)
-
-        let wonRace = storage.withUnsafeMutablePointers { (_, pointerToReference) in
-            bnr_atomic_initialize_once(pointerToReference, reference)
-        }
-
-        if wonRace {
-            group.leave()
-        }
-
-        return wonRace
+        variant = Variant(for: value)
     }
 }
 
-private final class DeferredStorage<Value>: ManagedBuffer<Void, AnyObject?> {
-
-    static func create() -> DeferredStorage<Value> {
-        return unsafeDowncast(super.create(minimumCapacity: 1, makingHeaderWith: { _ in }), to: DeferredStorage<Value>.self)
+extension Deferred: FutureProtocol {
+    /// An enqueued handler.
+    struct Continuation {
+        let target: Executor?
+        let handler: (Value) -> Void
     }
 
-    deinit {
-        _ = withUnsafeMutablePointers { (_, pointerToReference) in
-            pointerToReference.deinitialize(count: 1)
+    public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
+        let continuation = Continuation(target: executor, handler: body)
+        variant.notify(continuation)
+    }
+
+    public func peek() -> Value? {
+        return variant.load()
+    }
+
+    public func wait(until time: DispatchTime) -> Value? {
+        let semaphore = DispatchSemaphore(value: 0)
+        var result: Value?
+
+        let continuation = Continuation(target: nil) { (value) in
+            result = value
+            semaphore.signal()
         }
-    }
 
-    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-    static func convertFromReference(_ value: AnyObject) -> Value {
-        // Contract of using box(_:) counterpart
-        // swiftlint:disable:next force_cast
-        return value as! Value
-    }
+        variant.notify(continuation)
 
-    static func convertToReference(_ value: Value) -> AnyObject {
-        return value as AnyObject
+        guard case .success = semaphore.wait(timeout: time) else { return nil }
+        return result
     }
-    #else
-    // In order to assign the value in a Deferred using atomics, we must
-    // box it up into something word-sized. See `fill(with:)` above.
-    private final class Box {
-        let wrapped: Value
-        init(_ wrapped: Value) {
-            self.wrapped = wrapped
-        }
-    }
+}
 
-    static func convertToReference(_ value: Value) -> AnyObject {
-        return Box(value)
+extension Deferred.Continuation {
+    /// A continuation can be submitted to its passed-in executor or executed
+    /// in the current context.
+    func execute(with value: Value) {
+        target?.submit {
+            self.handler(value)
+        } ?? handler(value)
     }
+}
 
-    static func convertFromReference(_ value: AnyObject) -> Value {
-        return unsafeDowncast(value, to: Box.self).wrapped
+extension Deferred: PromiseProtocol {
+    @discardableResult
+    public func fill(with value: Value) -> Bool {
+        return variant.store(value)
     }
-    #endif
-
 }

@@ -107,10 +107,10 @@ class FutureTests: XCTestCase {
 
     func testEveryMapTransformerIsCalledMultipleTimes() {
         let deferred = Deferred(filledWith: 1)
-        var counter = bnr_atomic_counter()
+        var counter = 0
 
         let mapped = deferred.every { (value) -> (Int) in
-            bnr_atomic_counter_increment(&counter)
+            bnr_atomic_fetch_add(&counter, 1)
             return value * 2
         }
 
@@ -122,6 +122,6 @@ class FutureTests: XCTestCase {
         shortWait(for: [ expect ])
 
         XCTAssertEqual(mapped.value, 2)
-        XCTAssertEqual(bnr_atomic_counter_load(&counter), 2)
+        XCTAssertEqual(bnr_atomic_load(&counter), 2)
     }
 }

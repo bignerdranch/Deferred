@@ -12,7 +12,7 @@ import Atomics
 import Deferred
 #elseif COCOAPODS
 import Atomics
-#elseif XCODE
+#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
 import Deferred.Atomics
 #endif
 
@@ -106,12 +106,12 @@ private final class ProxyProgress: Progress {
             static let cancelled = State(rawValue: 1 << 2)
         }
 
-        private var state = bnr_atomic_bitmask() // see State
+        private var state = UInt8() // see State
         private weak var observer: ProxyProgress?
 
         init(observing observee: Progress, observer: ProxyProgress) {
             self.observer = observer
-            bnr_atomic_bitmask_init(&state, State.ready.rawValue)
+            bnr_atomic_init(&state, State.ready.rawValue)
             super.init()
             activate(observing: observee)
         }
@@ -123,13 +123,13 @@ private final class ProxyProgress: Progress {
             observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: .initial, context: &Observation.cancelledContext)
             observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: .initial, context: &Observation.pausedContext)
 
-            _ = bnr_atomic_bitmask_add(&state, State.observing.rawValue, .release)
+            bnr_atomic_fetch_or(&state, State.observing.rawValue, .release)
         }
 
         func invalidate(observing observee: Progress) {
-            let oldState = State(rawValue: bnr_atomic_bitmask_remove(&state, State.ready.rawValue, .relaxed))
+            let oldState = State(rawValue: bnr_atomic_fetch_and(&state, ~State.ready.rawValue, .relaxed))
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
-            _ = bnr_atomic_bitmask_add(&state, State.cancelled.rawValue, .relaxed)
+            bnr_atomic_fetch_or(&state, State.cancelled.rawValue, .relaxed)
 
             for key in Observation.attributes {
                 observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
@@ -139,7 +139,8 @@ private final class ProxyProgress: Progress {
         }
 
         override func observeValue(forKeyPath keyPath: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-            guard bnr_atomic_bitmask_test(&state, State.ready.rawValue, .relaxed), let observer = observer else { return }
+            let state = State(rawValue: bnr_atomic_load(&self.state, .relaxed))
+            guard state.contains(.ready), let observer = observer else { return }
             switch context {
             case (&Observation.cancelledContext)?:
                 observer.inheritCancelled()

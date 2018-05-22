@@ -172,6 +172,14 @@
 		DB34FC942096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */; };
 		DB34FC952096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */; };
 		DB34FC962096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */; };
+		DB3E3C4620964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
+		DB3E3C4720964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
+		DB3E3C4820964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
+		DB3E3C4920964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
+		DB647573209652DC00F67EA1 /* DeferredQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB647572209652DC00F67EA1 /* DeferredQueue.swift */; };
+		DB647574209652DC00F67EA1 /* DeferredQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB647572209652DC00F67EA1 /* DeferredQueue.swift */; };
+		DB647575209652DC00F67EA1 /* DeferredQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB647572209652DC00F67EA1 /* DeferredQueue.swift */; };
+		DB647576209652DC00F67EA1 /* DeferredQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB647572209652DC00F67EA1 /* DeferredQueue.swift */; };
 		DB8A071C2060D38C00639AB3 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */; };
 		DB8A071D2060D38C00639AB3 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */; };
 		DB8A071E2060D38C00639AB3 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */; };
@@ -232,6 +240,7 @@
 		DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDeferredTests.swift; sourceTree = "<group>"; };
 		DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilledDeferredTests.swift; sourceTree = "<group>"; };
 		DB39B2D01DDE194C00DDE4C0 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
+		DB3E3C4520964B2A001F648A /* DeferredVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredVariant.swift; sourceTree = "<group>"; };
 		DB4002691DDC21B300382BAE /* SwiftBugTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftBugTests.swift; sourceTree = "<group>"; };
 		DB524C8C1D851E5B00DDF16D /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Framework.xcconfig; sourceTree = "<group>"; };
@@ -280,6 +289,7 @@
 		DB55F1FC1D96968E00FC1439 /* TaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
 		DB55F1FD1D96968E00FC1439 /* TaskWorkItemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskWorkItemTests.swift; sourceTree = "<group>"; };
 		DB55F20B1D969A1B00FC1439 /* FutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTests.swift; sourceTree = "<group>"; };
+		DB647572209652DC00F67EA1 /* DeferredQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredQueue.swift; sourceTree = "<group>"; };
 		DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
 		DBA01AFD2071E5D300083CD0 /* FutureUpon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureUpon.swift; sourceTree = "<group>"; };
 		DBA01B022071E68F00083CD0 /* FutureMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureMap.swift; sourceTree = "<group>"; };
@@ -400,6 +410,8 @@
 			children = (
 				DBABD0BA203F2E3E00C50896 /* Atomics.swift */,
 				DB524C931D85200C00DDF16D /* Deferred.swift */,
+				DB647572209652DC00F67EA1 /* DeferredQueue.swift */,
+				DB3E3C4520964B2A001F648A /* DeferredVariant.swift */,
 				DB524C941D85200C00DDF16D /* Executor.swift */,
 				DB524C951D85200C00DDF16D /* ExistentialFuture.swift */,
 				DB524C9A1D85200C00DDF16D /* Future.swift */,
@@ -800,6 +812,7 @@
 				DB126D291E5368A700054E95 /* EitherRecovery.swift in Sources */,
 				DB126CFF1E5368A100054E95 /* Future.swift in Sources */,
 				DB126D3E1E5368AD00054E95 /* TaskWorkItem.swift in Sources */,
+				DB3E3C4620964B2A001F648A /* DeferredVariant.swift in Sources */,
 				DB126D031E5368A100054E95 /* FutureIgnore.swift in Sources */,
 				DB126D041E5368A100054E95 /* Locking.swift in Sources */,
 				DB126D361E5368AD00054E95 /* ResultPromise.swift in Sources */,
@@ -810,6 +823,7 @@
 				DB126D391E5368AD00054E95 /* TaskGroup.swift in Sources */,
 				DB126CFC1E5368A100054E95 /* Deferred.swift in Sources */,
 				DB126D051E5368A100054E95 /* Promise.swift in Sources */,
+				DB647573209652DC00F67EA1 /* DeferredQueue.swift in Sources */,
 				DBA01B042071E69100083CD0 /* FutureMap.swift in Sources */,
 				DB126D001E5368A100054E95 /* FutureCollections.swift in Sources */,
 				DB126D011E5368A100054E95 /* FutureComposition.swift in Sources */,
@@ -863,6 +877,7 @@
 				DB126D0A1E5368A100054E95 /* Future.swift in Sources */,
 				DB126D491E5368AD00054E95 /* TaskWorkItem.swift in Sources */,
 				DB126D0E1E5368A100054E95 /* FutureIgnore.swift in Sources */,
+				DB3E3C4720964B2A001F648A /* DeferredVariant.swift in Sources */,
 				DB126D0F1E5368A100054E95 /* Locking.swift in Sources */,
 				DB126D411E5368AD00054E95 /* ResultPromise.swift in Sources */,
 				DB126D461E5368AD00054E95 /* TaskMap.swift in Sources */,
@@ -873,6 +888,7 @@
 				DB126D071E5368A100054E95 /* Deferred.swift in Sources */,
 				DBABD0BC203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D101E5368A100054E95 /* Promise.swift in Sources */,
+				DB647574209652DC00F67EA1 /* DeferredQueue.swift in Sources */,
 				DBA01B052071E69100083CD0 /* FutureMap.swift in Sources */,
 				DB126D0B1E5368A100054E95 /* FutureCollections.swift in Sources */,
 				DB126D0C1E5368A100054E95 /* FutureComposition.swift in Sources */,
@@ -926,6 +942,7 @@
 				DB126D151E5368A200054E95 /* Future.swift in Sources */,
 				DB126D541E5368AE00054E95 /* TaskWorkItem.swift in Sources */,
 				DB126D191E5368A200054E95 /* FutureIgnore.swift in Sources */,
+				DB3E3C4820964B2A001F648A /* DeferredVariant.swift in Sources */,
 				DB126D1A1E5368A200054E95 /* Locking.swift in Sources */,
 				DB126D4C1E5368AE00054E95 /* ResultPromise.swift in Sources */,
 				DB126D511E5368AE00054E95 /* TaskMap.swift in Sources */,
@@ -936,6 +953,7 @@
 				DB126D121E5368A200054E95 /* Deferred.swift in Sources */,
 				DBABD0BD203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D1B1E5368A200054E95 /* Promise.swift in Sources */,
+				DB647575209652DC00F67EA1 /* DeferredQueue.swift in Sources */,
 				DBA01B062071E69100083CD0 /* FutureMap.swift in Sources */,
 				DB126D161E5368A200054E95 /* FutureCollections.swift in Sources */,
 				DB126D171E5368A200054E95 /* FutureComposition.swift in Sources */,
@@ -989,6 +1007,7 @@
 				DB126D201E5368A200054E95 /* Future.swift in Sources */,
 				DB126D5F1E5368AE00054E95 /* TaskWorkItem.swift in Sources */,
 				DB126D241E5368A200054E95 /* FutureIgnore.swift in Sources */,
+				DB3E3C4920964B2A001F648A /* DeferredVariant.swift in Sources */,
 				DB126D251E5368A200054E95 /* Locking.swift in Sources */,
 				DB126D571E5368AE00054E95 /* ResultPromise.swift in Sources */,
 				DB126D5C1E5368AE00054E95 /* TaskMap.swift in Sources */,
@@ -999,6 +1018,7 @@
 				DB126D1D1E5368A200054E95 /* Deferred.swift in Sources */,
 				DBABD0BE203F2E3E00C50896 /* Atomics.swift in Sources */,
 				DB126D261E5368A200054E95 /* Promise.swift in Sources */,
+				DB647576209652DC00F67EA1 /* DeferredQueue.swift in Sources */,
 				DBA01B072071E69100083CD0 /* FutureMap.swift in Sources */,
 				DB126D211E5368A200054E95 /* FutureCollections.swift in Sources */,
 				DB126D221E5368A200054E95 /* FutureComposition.swift in Sources */,

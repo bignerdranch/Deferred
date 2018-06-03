@@ -41,7 +41,7 @@ class ExistentialFutureTests: XCTestCase {
     }
 
     func testPeekWhenUnfilled() {
-        anyFuture = Future<Int>()
+        anyFuture = Future<Int>.never
         let peek = anyFuture.peek()
         XCTAssertNil(peek)
     }
@@ -103,7 +103,7 @@ class ExistentialFutureTests: XCTestCase {
     }
 
     func testDebugDescriptionUnfilled() {
-        let future = Future<Int>()
+        let future = Future<Int>.never
         XCTAssertEqual("\(future)", "Future(not filled)")
     }
 
@@ -118,7 +118,7 @@ class ExistentialFutureTests: XCTestCase {
     }
 
     func testReflectionUnfilled() {
-        let future = Future<Int>()
+        let future = Future<Int>.never
 
         let magicMirror = Mirror(reflecting: future)
         XCTAssertEqual(magicMirror.displayStyle, .optional)

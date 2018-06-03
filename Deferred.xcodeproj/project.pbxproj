@@ -159,6 +159,13 @@
 		DB126D951E5369E200054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB126D961E5369E300054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB126D971E5369E300054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DB166DC320C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
+		DB166DC420C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
+		DB166DC520C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
+		DB166DC620C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
+		DB166DC820C4460B00C25E9B /* FutureAsyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC720C4460B00C25E9B /* FutureAsyncTests.swift */; };
+		DB166DC920C4460B00C25E9B /* FutureAsyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC720C4460B00C25E9B /* FutureAsyncTests.swift */; };
+		DB166DCA20C4460B00C25E9B /* FutureAsyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC720C4460B00C25E9B /* FutureAsyncTests.swift */; };
 		DB34FC902096D335005D5B82 /* ObjectDeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */; };
 		DB34FC912096D335005D5B82 /* ObjectDeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */; };
 		DB34FC922096D335005D5B82 /* ObjectDeferredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */; };
@@ -234,6 +241,8 @@
 		DB126CD81E53686900054E95 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB126CE01E53686900054E95 /* TVDeferredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TVDeferredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB126CF41E53687300054E95 /* Deferred.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Deferred.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB166DC220C445F500C25E9B /* FutureAsync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureAsync.swift; sourceTree = "<group>"; };
+		DB166DC720C4460B00C25E9B /* FutureAsyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureAsyncTests.swift; sourceTree = "<group>"; };
 		DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDeferredTests.swift; sourceTree = "<group>"; };
 		DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilledDeferredTests.swift; sourceTree = "<group>"; };
 		DB39B2D01DDE194C00DDE4C0 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
@@ -384,6 +393,7 @@
 				DB524C951D85200C00DDF16D /* ExistentialFuture.swift */,
 				DB524C9A1D85200C00DDF16D /* Future.swift */,
 				DBA01B032071E68F00083CD0 /* FutureAndThen.swift */,
+				DB166DC220C445F500C25E9B /* FutureAsync.swift */,
 				DB524C961D85200C00DDF16D /* FutureCollections.swift */,
 				DB524C971D85200C00DDF16D /* FutureComposition.swift */,
 				DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */,
@@ -444,6 +454,7 @@
 				DB55F1F01D96968E00FC1439 /* DeferredTests.swift */,
 				DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */,
 				DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */,
+				DB166DC720C4460B00C25E9B /* FutureAsyncTests.swift */,
 				DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */,
 				DB55F1F31D96968E00FC1439 /* FutureIgnoreTests.swift */,
 				DB55F20B1D969A1B00FC1439 /* FutureTests.swift */,
@@ -733,6 +744,7 @@
 				DB126D2A1E5368A700054E95 /* TaskResult.swift in Sources */,
 				DB126D021E5368A100054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B082071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DB166DC320C445F500C25E9B /* FutureAsync.swift in Sources */,
 				DBA01B0D2071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126CFE1E5368A100054E95 /* ExistentialFuture.swift in Sources */,
 				DBABD0BB203F2E3E00C50896 /* Atomics.swift in Sources */,
@@ -773,6 +785,7 @@
 				DB126D651E5368B900054E95 /* LockingTests.swift in Sources */,
 				DB126D691E5368B900054E95 /* TaskResultTests.swift in Sources */,
 				DB126D6A1E5368B900054E95 /* VoidResultTests.swift in Sources */,
+				DB166DC820C4460B00C25E9B /* FutureAsyncTests.swift in Sources */,
 				DB126D631E5368B900054E95 /* FutureIgnoreTests.swift in Sources */,
 				DB126D6F1E5368B900054E95 /* AllTestsCommon.swift in Sources */,
 				DB126D6B1E5368B900054E95 /* TaskComprehensiveTests.swift in Sources */,
@@ -797,6 +810,7 @@
 				DB126D2D1E5368A700054E95 /* TaskResult.swift in Sources */,
 				DB126D0D1E5368A100054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B092071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DB166DC420C445F500C25E9B /* FutureAsync.swift in Sources */,
 				DBA01B0E2071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126D091E5368A100054E95 /* ExistentialFuture.swift in Sources */,
 				DB126D3F1E5368AD00054E95 /* ExistentialTask.swift in Sources */,
@@ -837,6 +851,7 @@
 				DB126D751E5368B900054E95 /* LockingTests.swift in Sources */,
 				DB126D791E5368B900054E95 /* TaskResultTests.swift in Sources */,
 				DB126D7A1E5368B900054E95 /* VoidResultTests.swift in Sources */,
+				DB166DC920C4460B00C25E9B /* FutureAsyncTests.swift in Sources */,
 				DB126D731E5368B900054E95 /* FutureIgnoreTests.swift in Sources */,
 				DB126D7F1E5368B900054E95 /* AllTestsCommon.swift in Sources */,
 				DB126D7B1E5368B900054E95 /* TaskComprehensiveTests.swift in Sources */,
@@ -861,6 +876,7 @@
 				DB126D301E5368A800054E95 /* TaskResult.swift in Sources */,
 				DB126D181E5368A200054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B0A2071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DB166DC520C445F500C25E9B /* FutureAsync.swift in Sources */,
 				DBA01B0F2071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126D141E5368A200054E95 /* ExistentialFuture.swift in Sources */,
 				DB126D4A1E5368AE00054E95 /* ExistentialTask.swift in Sources */,
@@ -901,6 +917,7 @@
 				DB126D851E5368BA00054E95 /* LockingTests.swift in Sources */,
 				DB126D891E5368BA00054E95 /* TaskResultTests.swift in Sources */,
 				DB126D8A1E5368BA00054E95 /* VoidResultTests.swift in Sources */,
+				DB166DCA20C4460B00C25E9B /* FutureAsyncTests.swift in Sources */,
 				DB126D831E5368BA00054E95 /* FutureIgnoreTests.swift in Sources */,
 				DB126D8F1E5368BA00054E95 /* AllTestsCommon.swift in Sources */,
 				DB126D8B1E5368BA00054E95 /* TaskComprehensiveTests.swift in Sources */,
@@ -925,6 +942,7 @@
 				DB126D331E5368A900054E95 /* TaskResult.swift in Sources */,
 				DB126D231E5368A200054E95 /* FutureEveryMap.swift in Sources */,
 				DBA01B0B2071E69100083CD0 /* FutureAndThen.swift in Sources */,
+				DB166DC620C445F500C25E9B /* FutureAsync.swift in Sources */,
 				DBA01B102071E6FF00083CD0 /* FuturePeek.swift in Sources */,
 				DB126D1F1E5368A200054E95 /* ExistentialFuture.swift in Sources */,
 				DB126D551E5368AE00054E95 /* ExistentialTask.swift in Sources */,

@@ -258,25 +258,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		DB126C9C1E53685300054E95 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DB126CA51E53685300054E95 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				DB126CA91E53685300054E95 /* Deferred.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CB81E53685C00054E95 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,25 +274,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB126CD41E53686900054E95 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DB126CDD1E53686900054E95 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				DB126CE11E53686900054E95 /* Deferred.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CF01E53687300054E95 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,10 +468,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CB11E53685300054E95 /* Build configuration list for PBXNativeTarget "Deferred" */;
 			buildPhases = (
-				DB126C9B1E53685300054E95 /* Sources */,
-				DB126C9C1E53685300054E95 /* Frameworks */,
 				DB126C9D1E53685300054E95 /* Headers */,
-				DB126C9E1E53685300054E95 /* Resources */,
+				DB126C9B1E53685300054E95 /* Sources */,
 			);
 			buildRules = (
 			);
@@ -532,10 +502,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CCD1E53685D00054E95 /* Build configuration list for PBXNativeTarget "MobileDeferred" */;
 			buildPhases = (
-				DB126CB71E53685C00054E95 /* Sources */,
-				DB126CB81E53685C00054E95 /* Frameworks */,
 				DB126CB91E53685C00054E95 /* Headers */,
-				DB126CBA1E53685C00054E95 /* Resources */,
+				DB126CB71E53685C00054E95 /* Sources */,
 			);
 			buildRules = (
 			);
@@ -568,10 +536,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CE91E53686900054E95 /* Build configuration list for PBXNativeTarget "TVDeferred" */;
 			buildPhases = (
-				DB126CD31E53686900054E95 /* Sources */,
-				DB126CD41E53686900054E95 /* Frameworks */,
 				DB126CD51E53686900054E95 /* Headers */,
-				DB126CD61E53686900054E95 /* Resources */,
+				DB126CD31E53686900054E95 /* Sources */,
 			);
 			buildRules = (
 			);
@@ -604,10 +570,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CF91E53687300054E95 /* Build configuration list for PBXNativeTarget "NanoDeferred" */;
 			buildPhases = (
-				DB126CEF1E53687300054E95 /* Sources */,
-				DB126CF01E53687300054E95 /* Frameworks */,
 				DB126CF11E53687300054E95 /* Headers */,
-				DB126CF21E53687300054E95 /* Resources */,
+				DB126CEF1E53687300054E95 /* Sources */,
 			);
 			buildRules = (
 			);
@@ -689,21 +653,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		DB126C9E1E53685300054E95 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DB126CA61E53685300054E95 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CBA1E53685C00054E95 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -717,21 +667,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DB126CD61E53686900054E95 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DB126CDE1E53686900054E95 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CF21E53687300054E95 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (

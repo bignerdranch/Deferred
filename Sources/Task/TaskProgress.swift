@@ -141,15 +141,14 @@ private final class ProxyProgress: Progress {
         override func observeValue(forKeyPath keyPath: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
             let state = State(rawValue: bnr_atomic_load(&self.state, .relaxed))
             guard state.contains(.ready), let observer = observer else { return }
-            switch context {
-            case (&Observation.cancelledContext)?:
+            // This would be prettier as a switch.
+            // https://bugs.swift.org/browse/SR-7877
+            if context == &Observation.cancelledContext {
                 observer.inheritCancelled()
-            case (&Observation.pausedContext)?:
+            } else if context == &Observation.pausedContext {
                 observer.inheritPaused()
-            case (&Observation.attributesContext)?:
+            } else if context == &Observation.attributesContext {
                 observer.inheritValue(forKeyPath: keyPath)
-            default:
-                preconditionFailure("Unexpected KVO context for private object")
             }
         }
     }

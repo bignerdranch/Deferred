@@ -21,10 +21,10 @@ module Fastlane
         readme_content = readme_content.gsub(/(```\ngithub \"bignerdranch\/Deferred\" ).*(\n```)/, "\\1#{carthage_replacement}\\2")
 
         cocoapods_replacement = semver.pre ? "~> #{semver.major}.#{semver.minor}-beta" : "~> #{semver.major}.0"
-        readme_content = readme_content.gsub(/(```ruby\npod 'BNRDeferred', ')\S* \S*('\n```)/, "\\1#{cocoapods_replacement}\\2")
+        readme_content = readme_content.gsub(/(```ruby\npod 'BNRDeferred', ).*'(\n```)/, "\\1'#{cocoapods_replacement}'\\2")
 
-        swiftpm_replacement = semver.pre ? "Version(#{semver.major}, #{semver.minor}, #{semver.patch}, prereleaseIdentifiers: #{semver.pre.split(".")})" : "majorVersion: #{semver.major}"
-        readme_content = readme_content.gsub(/(\.Package\(url: \"\S*Deferred\S*\", ).*(\),)/, "\\1#{swiftpm_replacement}\\2")
+        swiftpm_replacement = semver.pre ? "from: \"#{semver}\"" : "from: \"#{semver.major}.#{semver.minor}.0\""
+        readme_content = readme_content.gsub(/(\.package\(url: \"\S*Deferred\S*\", ).*(\),)/, "\\1#{swiftpm_replacement}\\2")
 
         File.write(readme_path, readme_content)
       end

@@ -9,6 +9,7 @@
 extension TaskResult {
     /// Performs a coalescing operation, returning the result of unwrapping the
     /// success value of `result`, or `defaultValue` in case of an error.
+    @_inlineable
     public static func ?? (result: TaskResult<Value>, defaultValue: @autoclosure() throws -> Value) rethrows -> Value {
         switch result {
         case .success(let value):
@@ -20,6 +21,7 @@ extension TaskResult {
 
     /// Performs a coalescing operation, the wrapped success value `result`, or
     /// that of `defaultValue` in case of an error.
+    @_inlineable
     public static func ?? (result: TaskResult<Value>, defaultValue: @autoclosure() throws -> TaskResult<Value>) rethrows -> TaskResult<Value> {
         return try result.withValues(ifLeft: { _ in try defaultValue() }, ifRight: TaskResult.success)
     }

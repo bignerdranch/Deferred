@@ -41,6 +41,7 @@ public protocol Either {
 
 extension Either where Left == Error {
     /// Derive a success value by calling a failable function `body`.
+    @_inlineable
     public init(from body: () throws -> Right) {
         do {
             try self.init(right: body())
@@ -50,6 +51,7 @@ extension Either where Left == Error {
     }
 
     /// Returns the success value or throws the error.
+    @_inlineable
     public func extract() throws -> Right {
         return try withValues(ifLeft: { throw $0 }, ifRight: { $0 })
     }

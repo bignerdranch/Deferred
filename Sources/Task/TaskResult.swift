@@ -19,11 +19,13 @@ public enum TaskResult<Value> {
 
 extension TaskResult {
     /// Creates an instance storing a successful `value`.
+    @_inlineable
     public init(success value: @autoclosure() throws -> Value) {
         self.init(from: value)
     }
 
     /// Creates an instance storing an `error` describing the failure.
+    @_inlineable
     public init(failure error: Error) {
         self = .failure(error)
     }
@@ -50,6 +52,7 @@ private enum TaskResultInitializerError: Error {
 extension TaskResult where Value == Void {
     /// Creates the success value.
     @available(swift 4)
+    @_inlineable
     public init() {
         self = .success(())
     }
@@ -58,14 +61,17 @@ extension TaskResult where Value == Void {
 // MARK: - Compatibility with Protocol Extensions
 
 extension TaskResult: Either {
+    @_inlineable
     public init(left error: Error) {
         self = .failure(error)
     }
 
+    @_inlineable
     public init(right value: Value) {
         self = .success(value)
     }
 
+    @_inlineable
     public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
         switch self {
         case let .success(value):

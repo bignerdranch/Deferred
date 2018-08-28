@@ -15,25 +15,17 @@ public enum TaskResult<Value> {
     case failure(Error)
 }
 
-extension TaskResult: Either {
+// MARK: - Initializers
 
-    public init(from body: () throws -> Value) {
-        do {
-            self = try .success(body())
-        } catch {
-            self = .failure(error)
-        }
+extension TaskResult {
+    /// Creates an instance storing a successful `value`.
+    public init(success value: @autoclosure() throws -> Value) {
+        self.init(from: value)
     }
 
+    /// Creates an instance storing an `error` describing the failure.
     public init(failure error: Error) {
         self = .failure(error)
-    }
-
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
-        switch self {
-        case let .success(value): return try right(value)
-        case let .failure(error): return try left(error)
-        }
     }
 
     /// Create an exclusive success/failure state derived from two optionals,
@@ -56,11 +48,30 @@ private enum TaskResultInitializerError: Error {
 }
 
 extension TaskResult where Value == Void {
-
     /// Creates the success value.
     @available(swift 4)
     public init() {
         self = .success(())
     }
+}
 
+// MARK: - Compatibility with Protocol Extensions
+
+extension TaskResult: Either {
+    public init(left error: Error) {
+        self = .failure(error)
+    }
+
+    public init(right value: Value) {
+        self = .success(value)
+    }
+
+    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
+        switch self {
+        case let .success(value):
+            return try right(value)
+        case let .failure(error):
+            return try left(error)
+        }
+    }
 }

@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/26/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -11,7 +11,7 @@ import Deferred
 #endif
 import Dispatch
 
-private extension FutureProtocol where Value: Either {
+private extension FutureProtocol where Value: Either, Value.Left == Error {
     func commonSuccessBody(_ body: @escaping(Value.Right) -> Void) -> (Value) -> Void {
         return { result in
             result.withValues(ifLeft: { _ in () }, ifRight: body)
@@ -25,7 +25,7 @@ private extension FutureProtocol where Value: Either {
     }
 }
 
-extension FutureProtocol where Value: Either {
+extension FutureProtocol where Value: Either, Value.Left == Error {
     /// Call some `body` closure if the future successfully resolves a value.
     ///
     /// - parameter executor: A context for handling the `body` on fill.
@@ -75,10 +75,7 @@ extension Future where Value: Either, Value.Left == Error {
     }
 
     /// Create a future having the same underlying task as `other`.
-    public init<Other: FutureProtocol>(success other: Other)
-        where Other.Value == Value.Right {
-        self.init(other.every {
-            Value(success: $0)
-        })
+    public init<Other: FutureProtocol>(success other: Other) where Other.Value == Value.Right {
+        self.init(other.every(per: Value.init(right:)))
     }
 }

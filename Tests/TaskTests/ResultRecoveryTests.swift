@@ -17,11 +17,66 @@ import Deferred
 
 class ResultRecoveryTests: XCTestCase {
     static let allTests: [(String, (ResultRecoveryTests) -> () throws -> Void)] = [
+        ("testMap", testMap),
+        ("testFlatMap", testFlatMap),
         ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
         ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures)
     ]
 
     private typealias Result = Task<String>.Result
+
+    private let aSuccessResult = Result(success: "foo")
+    private let aFailureResult = Result(failure: TestError.first)
+
+    func testMap() {
+        let successResult1: Result = aSuccessResult.map { "\($0)\($0)" }
+        XCTAssertEqual(try successResult1.extract(), "foofoo")
+
+        let successResult2: Result = aSuccessResult.map { _ in throw TestError.second }
+        XCTAssertThrowsError(try successResult2.extract()) {
+            XCTAssertEqual($0 as? TestError, .second)
+        }
+
+        let failureResult1: Result = aFailureResult.map { "\($0)\($0)" }
+        XCTAssertThrowsError(try failureResult1.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
+
+        let failureResult2: Result = aFailureResult.map { _ in throw TestError.second }
+        XCTAssertThrowsError(try failureResult2.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
+    }
+
+    func testFlatMap() {
+        let successResult1: Result = aSuccessResult.flatMap { .success("\($0)\($0)") }
+        XCTAssertEqual(try successResult1.extract(), "foofoo")
+
+        let successResult2: Result = aSuccessResult.flatMap { _ in throw TestError.second }
+        XCTAssertThrowsError(try successResult2.extract()) {
+            XCTAssertEqual($0 as? TestError, .second)
+        }
+
+        let successResult3: Result = aSuccessResult.flatMap { _ in .failure(TestError.third) }
+        XCTAssertThrowsError(try successResult3.extract()) {
+            XCTAssertEqual($0 as? TestError, .third)
+        }
+
+        let failureResult1: Result = aFailureResult.flatMap { .success("\($0)\($0)") }
+        XCTAssertThrowsError(try failureResult1.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
+
+        let failureResult2: Result = aFailureResult.flatMap { _ in throw TestError.second }
+        XCTAssertThrowsError(try failureResult2.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
+
+        let failureResult3: Result = aFailureResult.flatMap { _ in .failure(TestError.third) }
+        XCTAssertThrowsError(try failureResult3.extract()) {
+            XCTAssertEqual($0 as? TestError, .first)
+        }
+    }
 
     private func tryIsSuccess(_ text: String?) throws -> String {
         guard let text = text, text == "success" else {

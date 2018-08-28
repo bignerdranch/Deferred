@@ -55,16 +55,16 @@
 		DB126D261E5368A200054E95 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9E1D85200C00DDF16D /* Promise.swift */; };
 		DB126D271E5368A200054E95 /* Protected.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524C9C1D85200C00DDF16D /* Protected.swift */; };
 		DB126D281E5368A700054E95 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* Either.swift */; };
-		DB126D291E5368A700054E95 /* EitherRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* EitherRecovery.swift */; };
+		DB126D291E5368A700054E95 /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
 		DB126D2A1E5368A700054E95 /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
 		DB126D2B1E5368A700054E95 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* Either.swift */; };
-		DB126D2C1E5368A700054E95 /* EitherRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* EitherRecovery.swift */; };
+		DB126D2C1E5368A700054E95 /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
 		DB126D2D1E5368A700054E95 /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
 		DB126D2E1E5368A800054E95 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* Either.swift */; };
-		DB126D2F1E5368A800054E95 /* EitherRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* EitherRecovery.swift */; };
+		DB126D2F1E5368A800054E95 /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
 		DB126D301E5368A800054E95 /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
 		DB126D311E5368A900054E95 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA51D85200C00DDF16D /* Either.swift */; };
-		DB126D321E5368A900054E95 /* EitherRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* EitherRecovery.swift */; };
+		DB126D321E5368A900054E95 /* ResultRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA41D85200C00DDF16D /* ResultRecovery.swift */; };
 		DB126D331E5368A900054E95 /* TaskResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA61D85200C00DDF16D /* TaskResult.swift */; };
 		DB126D341E5368AD00054E95 /* ExistentialTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CA91D85200C00DDF16D /* ExistentialTask.swift */; };
 		DB126D351E5368AD00054E95 /* ResultFuture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB524CAB1D85200C00DDF16D /* ResultFuture.swift */; };
@@ -252,7 +252,7 @@
 		DB524C9F1D85200C00DDF16D /* Locking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locking.swift; sourceTree = "<group>"; };
 		DB524CA11D85200C00DDF16D /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB524CA21D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB524CA41D85200C00DDF16D /* EitherRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherRecovery.swift; sourceTree = "<group>"; };
+		DB524CA41D85200C00DDF16D /* ResultRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRecovery.swift; sourceTree = "<group>"; };
 		DB524CA51D85200C00DDF16D /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		DB524CA61D85200C00DDF16D /* TaskResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskResult.swift; sourceTree = "<group>"; };
 		DB524CA81D85200C00DDF16D /* TaskWorkItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskWorkItem.swift; sourceTree = "<group>"; };
@@ -397,17 +397,17 @@
 			isa = PBXGroup;
 			children = (
 				DB524CA51D85200C00DDF16D /* Either.swift */,
-				DB524CA41D85200C00DDF16D /* EitherRecovery.swift */,
-				DB524CA61D85200C00DDF16D /* TaskResult.swift */,
 				DB524CA91D85200C00DDF16D /* ExistentialTask.swift */,
 				DB524CAB1D85200C00DDF16D /* ResultFuture.swift */,
 				DB524CAC1D85200C00DDF16D /* ResultPromise.swift */,
+				DB524CA41D85200C00DDF16D /* ResultRecovery.swift */,
 				DB524CAF1D85200C00DDF16D /* TaskAndThen.swift */,
 				DB524CAE1D85200C00DDF16D /* TaskCollections.swift */,
 				DB524CAA1D85200C00DDF16D /* TaskIgnore.swift */,
 				DB524CB01D85200C00DDF16D /* TaskMap.swift */,
 				DB524CB11D85200C00DDF16D /* TaskProgress.swift */,
 				DB524CB21D85200C00DDF16D /* TaskRecovery.swift */,
+				DB524CA61D85200C00DDF16D /* TaskResult.swift */,
 				DB524CA81D85200C00DDF16D /* TaskWorkItem.swift */,
 			);
 			path = Task;
@@ -734,7 +734,7 @@
 				DB126D061E5368A100054E95 /* Protected.swift in Sources */,
 				DB126D281E5368A700054E95 /* Either.swift in Sources */,
 				DB126D351E5368AD00054E95 /* ResultFuture.swift in Sources */,
-				DB126D291E5368A700054E95 /* EitherRecovery.swift in Sources */,
+				DB126D291E5368A700054E95 /* ResultRecovery.swift in Sources */,
 				DB126CFF1E5368A100054E95 /* Future.swift in Sources */,
 				DB126D3E1E5368AD00054E95 /* TaskWorkItem.swift in Sources */,
 				DB3E3C4620964B2A001F648A /* DeferredVariant.swift in Sources */,
@@ -796,7 +796,7 @@
 				DB126D111E5368A100054E95 /* Protected.swift in Sources */,
 				DB126D2B1E5368A700054E95 /* Either.swift in Sources */,
 				DB126D401E5368AD00054E95 /* ResultFuture.swift in Sources */,
-				DB126D2C1E5368A700054E95 /* EitherRecovery.swift in Sources */,
+				DB126D2C1E5368A700054E95 /* ResultRecovery.swift in Sources */,
 				DB126D0A1E5368A100054E95 /* Future.swift in Sources */,
 				DB126D491E5368AD00054E95 /* TaskWorkItem.swift in Sources */,
 				DB126D0E1E5368A100054E95 /* FutureIgnore.swift in Sources */,
@@ -859,7 +859,7 @@
 				DB126D1C1E5368A200054E95 /* Protected.swift in Sources */,
 				DB126D2E1E5368A800054E95 /* Either.swift in Sources */,
 				DB126D4B1E5368AE00054E95 /* ResultFuture.swift in Sources */,
-				DB126D2F1E5368A800054E95 /* EitherRecovery.swift in Sources */,
+				DB126D2F1E5368A800054E95 /* ResultRecovery.swift in Sources */,
 				DB126D151E5368A200054E95 /* Future.swift in Sources */,
 				DB126D541E5368AE00054E95 /* TaskWorkItem.swift in Sources */,
 				DB126D191E5368A200054E95 /* FutureIgnore.swift in Sources */,
@@ -922,7 +922,7 @@
 				DB126D271E5368A200054E95 /* Protected.swift in Sources */,
 				DB126D311E5368A900054E95 /* Either.swift in Sources */,
 				DB126D561E5368AE00054E95 /* ResultFuture.swift in Sources */,
-				DB126D321E5368A900054E95 /* EitherRecovery.swift in Sources */,
+				DB126D321E5368A900054E95 /* ResultRecovery.swift in Sources */,
 				DB126D201E5368A200054E95 /* Future.swift in Sources */,
 				DB126D5F1E5368AE00054E95 /* TaskWorkItem.swift in Sources */,
 				DB126D241E5368A200054E95 /* FutureIgnore.swift in Sources */,

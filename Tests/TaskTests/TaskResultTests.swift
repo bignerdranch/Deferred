@@ -34,25 +34,25 @@ class TaskResultTests: XCTestCase {
 
     private typealias Result = Task<Int>.Result
 
-    private let aSuccessResult = Result.success(42)
-    private let aFailureResult = Result.failure(TestError.first)
+    private let aSuccessResult = Result(success: 42)
+    private let aFailureResult = Result(failure: TestError.first)
 
     func testDescriptionSuccess() {
-        XCTAssertEqual(String(describing: aSuccessResult), String(42))
+        XCTAssertEqual(String(describing: aSuccessResult), "success(42)")
     }
 
     func testDescriptionFailure() {
-        XCTAssertEqual(String(describing: aFailureResult), "first")
+        XCTAssertEqual(String(describing: aFailureResult), "failure(TestError.first)")
     }
 
     func testDebugDescriptionSuccess() {
-        XCTAssertEqual(String(reflecting: aSuccessResult), "success(\(String(reflecting: 42)))")
+        let debugDescription = String(reflecting: aSuccessResult)
+        XCTAssert(debugDescription.hasSuffix("TaskResult<Swift.Int>.success(42)"))
     }
 
     func testDebugDescriptionFailure() {
-        let debugDescription1 = String(reflecting: aFailureResult)
-        XCTAssert(debugDescription1.hasPrefix("failure("))
-        XCTAssert(debugDescription1.hasSuffix("Error.first)"))
+        let debugDescription = String(reflecting: aFailureResult)
+        XCTAssert(debugDescription.hasSuffix("TaskResult<Swift.Int>.failure(TestError.first)"))
     }
 
     func testSuccessExtract() {

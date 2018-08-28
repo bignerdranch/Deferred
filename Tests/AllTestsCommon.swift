@@ -16,10 +16,21 @@ import Dispatch
 
 import Deferred
 
-enum TestError: Error {
+enum TestError: Error, CustomDebugStringConvertible {
     case first
     case second
     case third
+
+    var debugDescription: String {
+        switch self {
+        case .first:
+            return "TestError.first"
+        case .second:
+            return "TestError.second"
+        case .third:
+            return "TestError.third"
+        }
+    }
 }
 
 extension XCTestCase {

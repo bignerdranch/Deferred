@@ -3,47 +3,56 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/9/15.
-//  Copyright © 2014-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
 //
 
-/// A type that can exclusively represent either some result value of a
-/// successful computation or a failure with an error.
-public protocol Either: CustomStringConvertible, CustomDebugStringConvertible {
+/// A type that can exclusively represent one of two values.
+///
+/// By design, an either symmetrical and treats its variants the same way.
+/// For representing success and failures, use `TaskResult`.
+///
+/// This protocol describes a minimal interface for representing `TaskResult`
+/// to overcome limitations with Swift protocol extensions. It is expected that
+/// its use will be removed completely at some later point.
+@available(swift, deprecated: 100000)
+public protocol Either {
     /// One of the two possible results.
     ///
     /// By convention, the left side is used to hold an error value.
     associatedtype Left = Error
+
+    /// Creates a left-biased instance.
+    init(left: Left)
 
     /// One of the two possible results.
     ///
     /// By convention, the right side is used to hold a correct value.
     associatedtype Right
 
-    /// Derive a result from a failable function.
-    init(from body: () throws -> Right)
-
-    /// Creates a failed result with `error`.
-    init(failure: Left)
+    /// Creates a right-biased instance.
+    init(right: Right)
 
     /// Case analysis.
     ///
-    /// Returns the value from the `failure` closure if `self` represents a
-    /// failure, or from the `success` closure if `self` represents a success.
+    /// Returns the value from calling `left` if `self` is left-biased, or
+    /// from calling `right` if `self` is right-biased.
     func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return
 }
 
-extension Either {
-    /// A textual representation of this instance.
-    public var description: String {
-        return withValues(ifLeft: { String(describing: $0) }, ifRight: { String(describing: $0) })
+extension Either where Left == Error {
+    /// Derive a success value by calling a failable function `body`.
+    @_inlineable
+    public init(from body: () throws -> Right) {
+        do {
+            try self.init(right: body())
+        } catch {
+            self.init(left: error)
+        }
     }
 
-    /// A textual representation of this instance, suitable for debugging.
-    public var debugDescription: String {
-        return withValues(ifLeft: {
-            "failure(\(String(reflecting: $0)))"
-        }, ifRight: {
-            "success(\(String(reflecting: $0)))"
-        })
+    /// Returns the success value or throws the error.
+    @_inlineable
+    public func extract() throws -> Right {
+        return try withValues(ifLeft: { throw $0 }, ifRight: { $0 })
     }
 }

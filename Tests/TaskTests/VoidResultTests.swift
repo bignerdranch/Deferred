@@ -25,25 +25,25 @@ class VoidResultTests: XCTestCase {
 
     private typealias Result = Task<Void>.Result
 
-    private let aSuccessResult = Result.success(())
-    private let aFailureResult = Result.failure(TestError.first)
+    private let aSuccessResult = Result()
+    private let aFailureResult = Result(failure: TestError.first)
 
     func testDescriptionSuccess() {
-        XCTAssertEqual(String(describing: aSuccessResult), "()")
+        XCTAssertEqual(String(describing: aSuccessResult), "success()")
     }
 
     func testDescriptionFailure() {
-        XCTAssertEqual(String(describing: aFailureResult), "first")
+        XCTAssertEqual(String(describing: aFailureResult), "failure(TestError.first)")
     }
 
     func testDebugDescriptionSuccess() {
-        XCTAssert(String(reflecting: aSuccessResult) == "success(())")
+        let debugDescription = String(reflecting: aSuccessResult)
+        XCTAssert(debugDescription.hasSuffix("TaskResult<()>.success()"))
     }
 
     func testDebugDescriptionFailure() {
         let debugDescription = String(reflecting: aFailureResult)
-        XCTAssert(debugDescription.hasPrefix("failure("))
-        XCTAssert(debugDescription.hasSuffix("Error.first)"))
+        XCTAssert(debugDescription.hasSuffix("TaskResult<()>.failure(TestError.first)"))
     }
 
     func testExtract() {

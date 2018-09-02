@@ -25,7 +25,10 @@ class TaskTests: CustomExecutorTestCase {
         ("testThatRecoverMapsFailures", testThatRecoverMapsFailures),
         ("testThatMapPassesThroughErrors", testThatMapPassesThroughErrors),
         ("testThatRecoverPassesThroughValues", testThatRecoverPassesThroughValues),
-        ("testThatFallbackAlsoProducesANewTask", testThatFallbackAlsoProducesANewTask)
+        ("testThatFallbackProducesANewTask", testThatFallbackProducesANewTask),
+        ("testThatFallbackUsingCustomExecutorProducesANewTask", testThatFallbackUsingCustomExecutorProducesANewTask),
+        ("testThatFallbackReturnsOriginalSuccessValue", testThatFallbackReturnsOriginalSuccessValue),
+        ("testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue", testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue)
     ]
 
     static var allTests: [(String, (TaskTests) -> () throws -> Void)] {
@@ -268,16 +271,56 @@ class TaskTests: CustomExecutorTestCase {
     }
     #endif
 
-    func testThatFallbackAlsoProducesANewTask() {
+    func testThatFallbackProducesANewTask() {
+        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in
+            return self.makeAnyFinishedTask()
+        }
+
+        shortWait(for: [
+            expectation(that: task, succeedsWith: 42),
+            expectQueueToBeEmpty()
+        ])
+    }
+
+    func testThatFallbackUsingCustomExecutorProducesANewTask() {
         let task = makeAnyFailedTask().fallback(upon: executor) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
         shortWait(for: [
-            expectation(that: task, succeedsWith: 42)
+            expectation(that: task, succeedsWith: 42),
+            expectationThatExecutor(isCalledAtLeast: 1)
         ])
+    }
 
-        assertExecutorCalled(atLeast: 2)
+    func testThatFallbackReturnsOriginalSuccessValue() {
+        let (deferred, task1) = makeAnyUnfinishedTask()
+        let task2 = task1.fallback(upon: queue) { _ -> Task<Int> in
+            return self.makeAnyFinishedTask()
+        }
+
+        let expect = expectation(that: task2, succeedsWith: 99)
+        deferred.succeed(with: 99)
+
+        shortWait(for: [
+            expect,
+            expectQueueToBeEmpty()
+        ])
+    }
+
+    func testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue() {
+        let (deferred, task1) = makeAnyUnfinishedTask()
+        let task2 = task1.fallback(upon: executor) { _ -> Task<Int> in
+            return self.makeAnyFinishedTask()
+        }
+
+        let expect = expectation(that: task2, succeedsWith: 99)
+        deferred.succeed(with: 99)
+
+        shortWait(for: [
+            expect,
+            expectationThatExecutor(isCalledAtLeast: 1)
+        ])
     }
 
     func testSimpleFutureCanBeUpgradedToTask() {

@@ -117,7 +117,7 @@ class TaskTests: CustomExecutorTestCase {
     func testThatAndThenForwardsCancellationToSubsequentTask() {
         let expect = expectation(description: "flatMapped task is cancelled")
         let task = makeAnyFinishedTask().andThen(upon: executor) { _ -> Task<String> in
-            Task(future: Future()) { expect.fulfill() }
+            Task(future: .never) { expect.fulfill() }
         }
 
         task.cancel()
@@ -227,7 +227,7 @@ class TaskTests: CustomExecutorTestCase {
     }
 
     func testThatTaskCreatedUnfilledIsIndeterminate() {
-        let task = Task<Int>()
+        let task = Task<Int>.never
 
         XCTAssert(task.progress.isIndeterminate)
     }

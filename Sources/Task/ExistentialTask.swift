@@ -42,9 +42,8 @@ public final class Task<SuccessValue>: NSObject {
         self.progress = .taskRoot(for: progress)
     }
 
-    /// Create a task that will never complete.
-    public override init() {
-        self.future = Future()
+    private init(never: ()) {
+        self.future = .never
         self.progress = .indefinite()
     }
 
@@ -81,12 +80,16 @@ public final class Task<SuccessValue>: NSObject {
         self.cancellation = cancellation ?? {}
     }
 
-    /// Create a task that will never complete.
-    public override init() {
-        self.future = Future()
+    private init(never: ()) {
+        self.future = .never
         self.cancellation = {}
     }
     #endif
+
+    /// Create a task that will never complete.
+    public static var never: Task<SuccessValue> {
+        return Task(never: ())
+    }
 }
 
 extension Task: FutureProtocol {

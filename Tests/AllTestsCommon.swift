@@ -111,6 +111,27 @@ class CustomExecutorTestCase: XCTestCase {
     final func assertExecutorCalled(atLeast times: Int, file: StaticString = #file, line: UInt = #line) {
         XCTAssert(_executor.submitCount.withReadLock({ $0 >= times }), "Executor was not called enough times", file: file, line: line)
     }
+
+    final func expectationThatExecutor(isCalledAtLeast times: Int) -> XCTestExpectation {
+        return expectation(for: NSPredicate(block: { (sself, _) -> Bool in
+            guard let sself = sself as? CustomExecutorTestCase else { return false }
+            return sself._executor.submitCount.withReadLock({ $0 >= times })
+        }), evaluatedWith: self)
+    }
+
+    final let queue = DispatchQueue(label: "com.bignerdranch.DeferredTests")
+
+    final func expectQueueToBeEmpty(description: String? = nil, file: StaticString = #file, line: UInt = #line) -> XCTestExpectation {
+        let expect = expectation(description: description ?? "queue is empty")
+        queue.async(flags: .barrier) {
+#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || !swift(>=4.1)
+            expect.fulfill()
+#else
+            expect.fulfill(file, line: Int(line))
+#endif
+        }
+        return expect
+    }
 }
 
 extension Collection {

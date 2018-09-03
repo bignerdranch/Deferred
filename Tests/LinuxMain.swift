@@ -29,6 +29,6 @@ XCTMain([
     testCase(TaskComprehensiveTests.allTests),
     testCase(TaskResultTests.allTests),
     testCase(TaskTests.allTests),
-    testCase(TaskWorkItemTests.allTests),
+    testCase(TaskAsyncTests.allTests),
     testCase(VoidResultTests.allTests)
 ])

@@ -1,5 +1,5 @@
 //
-//  TaskWorkItemTests.swift
+//  TaskAsyncTests.swift
 //  DeferredTests
 //
 //  Created by John Gallagher on 7/15/15.
@@ -16,8 +16,8 @@ import Task
 import Deferred
 #endif
 
-class TaskWorkItemTests: XCTestCase {
-    static let allTests: [(String, (TaskWorkItemTests) -> () throws -> Void)] = [
+class TaskAsyncTests: XCTestCase {
+    static let allTests: [(String, (TaskAsyncTests) -> () throws -> Void)] = [
         ("testThatCancellingATaskAfterItStartsRunningIsANoop", testThatCancellingATaskAfterItStartsRunningIsANoop),
         ("testThatCancellingBeforeATaskStartsProducesTheCancellationError", testThatCancellingBeforeATaskStartsProducesTheCancellationError)
     ]
@@ -40,7 +40,7 @@ class TaskWorkItemTests: XCTestCase {
         let startSemaphore = DispatchSemaphore(value: 0)
         let finishSemaphore = DispatchSemaphore(value: 0)
 
-        let task = Task<Int>(upon: queue, onCancel: TestError.first) {
+        let task = Task<Int>.async(upon: queue, onCancel: TestError.first) {
             startSemaphore.signal()
             XCTAssertEqual(finishSemaphore.wait(timeout: .distantFuture), .success)
             return 1
@@ -67,7 +67,7 @@ class TaskWorkItemTests: XCTestCase {
             _ = semaphore.wait(timeout: .distantFuture)
         }
 
-        let task = Task<Int>(upon: queue, onCancel: TestError.second) { 1 }
+        let task = Task<Int>.async(upon: queue, onCancel: TestError.second) { 1 }
 
         task.cancel()
 

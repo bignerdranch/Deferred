@@ -43,11 +43,12 @@ Then run `pod install`.
 
 ### Swift Package Manager
 
-We include support for [Swift Package Manager](https://swift.org/package-manager/) on 3.x toolchains.
+We include support for [Swift Package Manager](https://swift.org/package-manager/) on 4.1 or greater toolchains.
 
 Add us to your `Package.swift`:
 
 ```swift
+// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(

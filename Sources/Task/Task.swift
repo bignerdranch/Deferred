@@ -76,3 +76,13 @@ extension TaskProtocol {
 
     public func cancel() {}
 }
+
+// MARK: - Conditional conformances
+
+extension Future: TaskProtocol where Value: Either, Value.Left == Error {
+    public typealias SuccessValue = Value.Right
+}
+
+extension Deferred: TaskProtocol where Value: Either, Value.Left == Error {
+    public typealias SuccessValue = Value.Right
+}

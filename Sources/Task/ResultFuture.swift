@@ -11,56 +11,6 @@ import Deferred
 #endif
 import Dispatch
 
-private extension FutureProtocol where Value: Either, Value.Left == Error {
-    func commonSuccessBody(_ body: @escaping(Value.Right) -> Void) -> (Value) -> Void {
-        return { result in
-            result.withValues(ifLeft: { _ in () }, ifRight: body)
-        }
-    }
-
-    func commonFailureBody(_ body: @escaping(Value.Left) -> Void) -> (Value) -> Void {
-        return { result in
-            result.withValues(ifLeft: body, ifRight: { _ in () })
-        }
-    }
-}
-
-extension FutureProtocol where Value: Either, Value.Left == Error {
-    /// Call some `body` closure if the future successfully resolves a value.
-    ///
-    /// - parameter executor: A context for handling the `body` on fill.
-    /// - parameter body: A closure that uses the determined success value.
-    /// - see: upon(_:execute:)
-    public func uponSuccess(on executor: Executor, execute body: @escaping(Value.Right) -> Void) {
-        upon(executor, execute: commonSuccessBody(body))
-    }
-
-    /// Call some `body` closure if the future produces an error.
-    ///
-    /// - parameter executor: A context for handling the `body` on fill.
-    /// - parameter body: A closure that uses the determined failure value.
-    /// - see: upon(_:execute:)
-    public func uponFailure(on executor: Executor, execute body: @escaping(Value.Left) -> Void) {
-        upon(executor, execute: commonFailureBody(body))
-    }
-
-    /// Call some `body` closure if the future successfully resolves a value.
-    ///
-    /// - see: uponSuccess(on:execute:)
-    /// - see: upon(_:execute:)
-    public func uponSuccess(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(Value.Right) -> Void) {
-        upon(executor, execute: commonSuccessBody(body))
-    }
-
-    /// Call some `body` closure if the future produces an error.
-    ///
-    /// - see: uponFailure(on:execute:)
-    /// - see: upon(_:body:)
-    public func uponFailure(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(Value.Left) -> Void) {
-        upon(executor, execute: commonFailureBody(body))
-    }
-}
-
 extension Future where Value: Either, Value.Left == Error {
     /// Create a future having the same underlying task as `other`.
     public init<Other: FutureProtocol>(task other: Other)

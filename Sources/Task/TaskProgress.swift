@@ -207,7 +207,7 @@ extension Progress {
 
     /// A simple indeterminate progress with a cancellation function.
     static func wrappingCompletion<OtherFuture: FutureProtocol>(of base: OtherFuture, cancellation: (() -> Void)?) -> Progress {
-        let totalUnitCount: Int64 = base.wait(until: .now()) != nil ? 0 : -1
+        let totalUnitCount: Int64 = base.peek() != nil ? 0 : -1
         let progress = Progress(totalUnitCount: totalUnitCount)
 
         if let cancellation = cancellation {

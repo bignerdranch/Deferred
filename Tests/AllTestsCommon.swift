@@ -45,13 +45,8 @@ extension XCTestCase {
         let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? 0.5 : expectations.count > 10 ? 10 : 3
         wait(for: expectations, timeout: timeout)
     }
-#elseif swift(>=4.1)
-    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: Int = #line) {
-        let timeout: TimeInterval = expectations.count > 10 ? 10 : 3
-        waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
-    }
 #else
-    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: UInt = #line) {
+    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: Int = #line) {
         let timeout: TimeInterval = expectations.count > 10 ? 10 : 3
         waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
     }
@@ -124,11 +119,7 @@ class CustomExecutorTestCase: XCTestCase {
     final func expectQueueToBeEmpty(description: String? = nil, file: StaticString = #file, line: UInt = #line) -> XCTestExpectation {
         let expect = expectation(description: description ?? "queue is empty")
         queue.async(flags: .barrier) {
-#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || !swift(>=4.1)
             expect.fulfill()
-#else
-            expect.fulfill(file, line: Int(line))
-#endif
         }
         return expect
     }

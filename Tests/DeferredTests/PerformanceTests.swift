@@ -146,12 +146,7 @@ class PerformanceTests: XCTestCase {
         let group = DispatchGroup()
         var deferreds = [Deferred<Bool>]()
 
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) || swift(>=4.1)
         let metrics = PerformanceTests.defaultPerformanceMetrics
-        #else
-        let metrics = PerformanceTests.defaultPerformanceMetrics()
-        #endif
-
         measureMetrics(metrics, automaticallyStartMeasuring: false) {
             deferreds.removeAll(keepingCapacity: true)
 

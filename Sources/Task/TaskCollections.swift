@@ -30,12 +30,8 @@ private struct AllFilled<SuccessValue>: FutureProtocol {
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         progress.totalUnitCount = numericCast(array.count)
-        #elseif swift(>=4.1)
-        self.cancellations = array.compactMap {
-            ($0 as? Task<SuccessValue>)?.cancel
-        }
         #else
-        self.cancellations = array.flatMap {
+        self.cancellations = array.compactMap {
             ($0 as? Task<SuccessValue>)?.cancel
         }
         #endif
@@ -97,15 +93,9 @@ extension Collection where Element: FutureProtocol, Element.Value: Either, Eleme
         }
 
         let wrapper = AllFilled(self) { (array) -> [Element.Value.Right] in
-            #if swift(>=4.1)
             // Expect each to be filled but not successful right now.
             // swiftlint:disable:next force_unwrapping
             return array.compactMap { try? $0.peek()!.extract() }
-            #else
-            // Expect each to be filled but not successful right now.
-            // swiftlint:disable:next force_unwrapping
-            return array.flatMap { try? $0.peek()!.extract() }
-            #endif
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

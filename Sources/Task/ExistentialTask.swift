@@ -98,9 +98,7 @@ public final class Task<SuccessValue>: NSObject {
     }
 }
 
-extension Task: FutureProtocol {
-    public typealias Value = Result
-
+extension Task: TaskProtocol {
     public func upon(_ executor: Executor, execute body: @escaping(Result) -> Void) {
         future.upon(executor, execute: body)
     }
@@ -112,40 +110,31 @@ extension Task: FutureProtocol {
     public func wait(until timeout: DispatchTime) -> Result? {
         return future.wait(until: timeout)
     }
-}
 
-extension Task {
-    /// Attempt to cancel the underlying operation.
-    ///
-    /// An implementation should be a "best effort". There are several
-    /// situations in which cancellation may not happen:
-    /// * The operation has already completed.
-    /// * The operation has entered an uncancelable state.
-    /// * The underlying task is not cancellable.
-    ///
-    /// - see: isFilled
-    public func cancel() {
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        progress.cancel()
-#else
-        markCancelled()
-        DispatchQueue.any().async(execute: cancellation)
-#endif
-    }
-
-#if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
-    private func markCancelled() {
-        bnr_atomic_store(&rawIsCancelled, true, .relaxed)
-    }
-#endif
-
-    /// Tests whether the given task has been cancelled.
     public var isCancelled: Bool {
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return progress.isCancelled
-#else
+        #else
         return bnr_atomic_load(&rawIsCancelled, .relaxed)
-#endif
+        #endif
+    }
+
+    #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+    private func markCancelled(using cancellation: (() -> Void)? = nil) {
+        bnr_atomic_store(&rawIsCancelled, true, .relaxed)
+
+        if let cancellation = cancellation {
+            DispatchQueue.any().async(execute: cancellation)
+        }
+    }
+    #endif
+
+    public func cancel() {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        progress.cancel()
+        #else
+        markCancelled(using: cancellation)
+        #endif
     }
 }
 
@@ -167,8 +156,8 @@ extension Task {
             cancellation?()
         }
 
-        if asTask?.isCancelled == true {
-            cancel()
+        if base.isCancelled {
+            markCancelled(using: cancellation)
         }
 #endif
     }

@@ -22,9 +22,15 @@ import Deferred.Atomics
 /// Forwards operations to an arbitrary underlying future having the same result
 /// type, optionally combined with some `cancellation`.
 public final class Task<SuccessValue>: NSObject {
-
     /// A type for returning and propagating recoverable errors.
     public typealias Result = TaskResult<SuccessValue>
+
+    /// A type for communicating the result of asynchronous work.
+    ///
+    /// Create an instance of the task's `Promise` to be filled asynchronously.
+    ///
+    /// - seealso: `Task.async(upon:flags:onCancel:execute:)`
+    public typealias Promise = Deferred<Result>
 
     private let future: Future<Result>
 

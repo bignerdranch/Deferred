@@ -122,10 +122,12 @@ func bnr_atomic_load(_ target: bnr_atomic_bitmask_t, _ order: bnr_atomic_memory_
     return result
 }
 
+@discardableResult
 func bnr_atomic_fetch_or(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
     return DarwinAtomics.shared.or8(target, mask, order)
 }
 
+@discardableResult
 func bnr_atomic_fetch_and(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
     return DarwinAtomics.shared.and8(target, mask, order)
 }

@@ -18,10 +18,6 @@ in a playground, the following post, and the Swift standard library:
 
 // Abstract class that fake-conforms to `FutureProtocol` for use by `Future`.
 private class Box<Value> {
-    func upon(_: Future<Value>.PreferredExecutor, execute _: @escaping(Value) -> Void) {
-        fatalError()
-    }
-
     func upon(_: Executor, execute _: @escaping(Value) -> Void) {
         fatalError()
     }
@@ -40,10 +36,6 @@ private final class ForwardedTo<Future: FutureProtocol>: Box<Future.Value> {
     let base: Future
     init(base: Future) {
         self.base = base
-    }
-
-    override func upon(_ executor: Future.PreferredExecutor, execute body: @escaping(Future.Value) -> Void) {
-        return base.upon(executor, execute: body)
     }
 
     override func upon(_ executor: Executor, execute body: @escaping(Future.Value) -> Void) {
@@ -66,12 +58,6 @@ private final class Always<Value>: Box<Value> {
         self.value = value
     }
 
-    override func upon(_ queue: Future<Value>.PreferredExecutor, execute body: @escaping(Value) -> Void) {
-        queue.async { [value] in
-            body(value)
-        }
-    }
-
     override func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {
         executor.submit { [value] in
             body(value)
@@ -90,8 +76,6 @@ private final class Always<Value>: Box<Value> {
 // Concrete future wrapper that will never get filled.
 private final class Never<Value>: Box<Value> {
     override init() {}
-
-    override func upon(_: Future<Value>.PreferredExecutor, execute _: @escaping(Value) -> Void) {}
 
     override func upon(_: Executor, execute _: @escaping(Value) -> Void) {}
 
@@ -146,10 +130,6 @@ public struct Future<Value>: FutureProtocol {
     /// Create a future having the same underlying future as `other`.
     public init(_ other: Future<Value>) {
         self.box = other.box
-    }
-
-    public func upon(_ queue: PreferredExecutor, execute body: @escaping(Value) -> Void) {
-        return box.upon(queue, execute: body)
     }
 
     public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {

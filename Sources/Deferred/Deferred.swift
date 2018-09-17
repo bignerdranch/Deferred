@@ -70,8 +70,8 @@ extension Deferred.Continuation {
     /// A continuation can be submitted to its passed-in executor or executed
     /// in the current context.
     func execute(with value: Value) {
-        target?.submit {
-            self.handler(value)
+        target?.submit { [handler] in
+            handler(value)
         } ?? handler(value)
     }
 }

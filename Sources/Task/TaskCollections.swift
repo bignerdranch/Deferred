@@ -15,7 +15,7 @@ import Dispatch
 import Foundation
 #endif
 
-private struct AllFilled<SuccessValue>: FutureProtocol {
+private struct AllFilled<SuccessValue>: TaskProtocol {
     let group = DispatchGroup()
     let combined = Deferred<Task<SuccessValue>.Result>()
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
@@ -24,21 +24,19 @@ private struct AllFilled<SuccessValue>: FutureProtocol {
     let cancellations: [() -> Void]
     #endif
 
-    init<Base: Collection>(_ base: Base, mappingBy transform: @escaping([Base.Element]) -> SuccessValue) where Base.Element: FutureProtocol, Base.Element.Value: Either, Base.Element.Value.Left == Error {
+    init<Base: Collection>(_ base: Base, mappingBy transform: @escaping([Base.Element]) -> SuccessValue) where Base.Element: TaskProtocol {
         let array = Array(base)
         let queue = DispatchQueue.global(qos: .utility)
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         progress.totalUnitCount = numericCast(array.count)
         #else
-        self.cancellations = array.compactMap {
-            ($0 as? Task<SuccessValue>)?.cancel
-        }
+        self.cancellations = array.map { $0.cancel }
         #endif
 
         for future in array {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            if let task = future as? Task<Base.Element.Value.Right> {
+            if let task = future as? Task<Base.Element.SuccessValue> {
                 progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             } else {
                 progress.adoptChild(.wrappingSuccess(of: future, cancellation: nil), orphaned: true, pendingUnitCount: 1)
@@ -81,18 +79,18 @@ private struct AllFilled<SuccessValue>: FutureProtocol {
     #endif
 }
 
-extension Collection where Element: FutureProtocol, Element.Value: Either, Element.Value.Left == Error {
+extension Collection where Element: TaskProtocol {
     /// Compose a number of tasks into a single array.
     ///
     /// If any of the contained tasks fail, the returned task will be determined
     /// with that failure. Otherwise, once all operations succeed, the returned
     /// task will be fulfilled by combining the values.
-    public func allSucceeded() -> Task<[Element.Value.Right]> {
+    public func allSucceeded() -> Task<[Element.SuccessValue]> {
         guard !isEmpty else {
             return Task(success: [])
         }
 
-        let wrapper = AllFilled(self) { (array) -> [Element.Value.Right] in
+        let wrapper = AllFilled(self) { (array) -> [Element.SuccessValue] in
             // Expect each to be filled but not successful right now.
             // swiftlint:disable:next force_unwrapping
             return array.compactMap { try? $0.peek()!.extract() }
@@ -106,7 +104,7 @@ extension Collection where Element: FutureProtocol, Element.Value: Either, Eleme
     }
 }
 
-extension Collection where Element: FutureProtocol, Element.Value: Either, Element.Value.Left == Error, Element.Value.Right == Void {
+extension Collection where Element: TaskProtocol, Element.SuccessValue == Void {
     /// Compose a number of tasks into a single array.
     ///
     /// If any of the contained tasks fail, the returned task will be determined

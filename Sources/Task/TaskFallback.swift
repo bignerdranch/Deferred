@@ -11,7 +11,7 @@ import Deferred
 #endif
 import Foundation
 
-extension Task {
+extension TaskProtocol {
     /// Begins another task in the case of the failure of `self` by calling
     /// `restartTask` with the error.
     ///
@@ -20,8 +20,7 @@ extension Task {
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
-    public func fallback<NewTask: FutureProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue>
-        where NewTask.Value: Either, NewTask.Value.Left == Error, NewTask.Value.Right == SuccessValue {
+    public func fallback<NewTask: TaskProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
         return fallback(upon: executor as Executor, to: restartTask)
     }
 
@@ -38,13 +37,12 @@ extension Task {
     /// `restartTask` closure. `fallback` submits `restartTask` to `executor`
     /// once the task fails.
     /// - see: FutureProtocol.andThen(upon:start:)
-    public func fallback<NewTask: FutureProtocol>(upon executor: Executor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue>
-        where NewTask.Value: Either, NewTask.Value.Left == Error, NewTask.Value.Right == SuccessValue {
+    public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = extendedProgress(byUnitCount: 1)
+        let progress = preparedProgressForContinuedWork()
         #endif
 
-        let future: Future<Result> = andThen(upon: executor) { (result) -> Task<SuccessValue> in
+        let future: Future = andThen(upon: executor) { (result) -> Task<SuccessValue> in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }

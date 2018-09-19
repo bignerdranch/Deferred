@@ -11,7 +11,7 @@ import Deferred
 #endif
 import Foundation
 
-extension Task {
+extension TaskProtocol {
     /// Returns a `Task` containing the result of mapping `substitution` over
     /// the failed task's error.
     ///
@@ -37,16 +37,16 @@ extension Task {
     /// - see: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = extendedProgress(byUnitCount: 1)
+        let progress = preparedProgressForContinuedWork()
         #endif
 
-        let future: Future<Result> = map(upon: executor) { (result) in
+        let future: Future = map(upon: executor) { (result) -> Task<SuccessValue>.Result in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             progress.becomeCurrent(withPendingUnitCount: 1)
             defer { progress.resignCurrent() }
             #endif
 
-            return Result {
+            return Task<SuccessValue>.Result {
                 try result.withValues(ifLeft: { try substitution($0) }, ifRight: { $0 })
             }
         }

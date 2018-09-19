@@ -20,7 +20,7 @@ extension TaskProtocol {
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
-    public func fallback<NewTask: TaskProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
+    public func fallback<NewTask: TaskProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Error) throws -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
         return fallback(upon: executor as Executor, to: restartTask)
     }
 
@@ -37,9 +37,11 @@ extension TaskProtocol {
     /// `restartTask` closure. `fallback` submits `restartTask` to `executor`
     /// once the task fails.
     /// - see: FutureProtocol.andThen(upon:start:)
-    public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Error) -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
+    public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Error) throws -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = preparedProgressForContinuedWork()
+        #else
+        let cancellationToken = Deferred<Void>()
         #endif
 
         let future: Future = andThen(upon: executor) { (result) -> Task<SuccessValue> in
@@ -52,14 +54,24 @@ extension TaskProtocol {
                 let value = try result.extract()
                 return Task(success: value)
             } catch {
-                return Task(restartTask(error))
+                do {
+                    let newTask = try restartTask(error)
+                    #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+                    cancellationToken.upon(execute: newTask.cancel)
+                    #endif
+                    return Task(newTask)
+                } catch {
+                    return Task(failure: error)
+                }
             }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task<SuccessValue>(future, progress: progress)
         #else
-        return Task<SuccessValue>(future, uponCancel: cancel)
+        return Task<SuccessValue>(future) {
+            cancellationToken.fill(with: ())
+        }
         #endif
     }
 }

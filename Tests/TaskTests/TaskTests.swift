@@ -15,6 +15,8 @@ import Task
 import Deferred
 #endif
 
+// swiftlint:disable type_body_length
+
 class TaskTests: CustomExecutorTestCase {
     static let universalTests: [(String, (TaskTests) -> () throws -> Void)] = [
         ("testUponSuccess", testUponSuccess),
@@ -28,7 +30,10 @@ class TaskTests: CustomExecutorTestCase {
         ("testThatFallbackProducesANewTask", testThatFallbackProducesANewTask),
         ("testThatFallbackUsingCustomExecutorProducesANewTask", testThatFallbackUsingCustomExecutorProducesANewTask),
         ("testThatFallbackReturnsOriginalSuccessValue", testThatFallbackReturnsOriginalSuccessValue),
-        ("testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue", testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue)
+        ("testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue", testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue),
+        ("testThatFallbackForwardsCancellationToSubsequentTask", testThatFallbackForwardsCancellationToSubsequentTask),
+        ("testThatFallbackSubstitutesThrownError", testThatFallbackSubstitutesThrownError),
+        ("testSimpleFutureCanBeUpgradedToTask", testSimpleFutureCanBeUpgradedToTask)
     ]
 
     static var allTests: [(String, (TaskTests) -> () throws -> Void)] {
@@ -320,6 +325,29 @@ class TaskTests: CustomExecutorTestCase {
         shortWait(for: [
             expect,
             expectationThatExecutor(isCalledAtLeast: 1)
+        ])
+    }
+
+    func testThatFallbackForwardsCancellationToSubsequentTask() {
+        let cancelToBeCalled = expectation(description: "flatMapped task is cancelled")
+        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in
+            Task(.never) { cancelToBeCalled.fulfill() }
+        }
+
+        task.cancel()
+
+        shortWait(for: [
+            cancelToBeCalled,
+            expectQueueToBeEmpty()
+        ])
+    }
+
+    func testThatFallbackSubstitutesThrownError() {
+        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in throw TestError.third }
+
+        shortWait(for: [
+            expectation(that: task, failsWith: TestError.third),
+            expectQueueToBeEmpty()
         ])
     }
 

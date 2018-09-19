@@ -39,7 +39,7 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
             if let task = future as? Task<Base.Element.SuccessValue> {
                 progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             } else {
-                progress.adoptChild(.wrappingSuccess(of: future, cancellation: nil), orphaned: true, pendingUnitCount: 1)
+                progress.adoptChild(.wrappingSuccess(of: future), orphaned: true, pendingUnitCount: 1)
             }
             #endif
 
@@ -99,7 +99,7 @@ extension Collection where Element: TaskProtocol {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task(wrapper, progress: wrapper.progress)
         #else
-        return Task(wrapper, cancellation: wrapper.cancel)
+        return Task(wrapper, uponCancel: wrapper.cancel)
         #endif
     }
 }
@@ -120,7 +120,7 @@ extension Collection where Element: TaskProtocol, Element.SuccessValue == Void {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         return Task(wrapper, progress: wrapper.progress)
         #else
-        return Task(wrapper, cancellation: wrapper.cancel)
+        return Task(wrapper, uponCancel: wrapper.cancel)
         #endif
     }
 }

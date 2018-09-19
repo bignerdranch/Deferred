@@ -82,7 +82,7 @@ class TaskTests: CustomExecutorTestCase {
 
     private func makeContrivedNextTask(for result: Int) -> Task<Int> {
         let deferred = Deferred<Task<Int>.Result>()
-        let task = Task(deferred, cancellation: nil)
+        let task = Task(deferred)
         afterShortDelay {
             deferred.succeed(with: result * 2)
         }
@@ -120,7 +120,7 @@ class TaskTests: CustomExecutorTestCase {
     func testThatAndThenForwardsCancellationToSubsequentTask() {
         let expect = expectation(description: "flatMapped task is cancelled")
         let task = makeAnyFinishedTask().andThen(upon: executor) { _ -> Task<String> in
-            Task(future: .never) { expect.fulfill() }
+            Task(.never) { expect.fulfill() }
         }
 
         task.cancel()
@@ -237,7 +237,7 @@ class TaskTests: CustomExecutorTestCase {
 
     func testThatTaskWrappingUnfilledIsIndeterminate() {
         let deferred = Deferred<Task<Int>.Result>()
-        let wrappedTask = Task(deferred, cancellation: {})
+        let wrappedTask = Task(deferred)
 
         XCTAssertFalse(wrappedTask.progress.isIndeterminate)
     }
@@ -326,7 +326,7 @@ class TaskTests: CustomExecutorTestCase {
     func testSimpleFutureCanBeUpgradedToTask() {
         let deferred = Deferred<Int>()
 
-        let task = Task<Int>(success: deferred, cancellation: nil)
+        let task = Task<Int>(succeedsFrom: deferred)
         let expect = expectation(that: task, succeedsWith: 42)
 
         deferred.fill(with: 42)

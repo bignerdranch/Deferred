@@ -29,10 +29,10 @@ extension TaskProtocol {
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         if let progress = (self as? Task<SuccessValue>)?.progress {
-            return Task<Void>(future: future, progress: progress)
+            return Task<Void>(future, progress: progress)
         }
         #endif
 
-        return Task<Void>(future: future, cancellation: cancel)
+        return Task<Void>(future, uponCancel: cancel)
     }
 }

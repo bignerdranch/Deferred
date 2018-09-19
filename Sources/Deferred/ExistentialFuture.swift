@@ -104,12 +104,11 @@ public struct Future<Value>: FutureProtocol {
     private let box: Box<Value>
 
     /// Create a future whose `upon(_:execute:)` methods forward to `base`.
-    public init<OtherFuture: FutureProtocol>(_ base: OtherFuture)
-        where OtherFuture.Value == Value {
-        if let future = base as? Future<Value> {
+    public init<Wrapped: FutureProtocol>(_ wrapped: Wrapped) where Wrapped.Value == Value {
+        if let future = wrapped as? Future<Value> {
             self.box = future.box
         } else {
-            self.box = ForwardedTo(base: base)
+            self.box = ForwardedTo(base: wrapped)
         }
     }
 
@@ -128,8 +127,8 @@ public struct Future<Value>: FutureProtocol {
     }
 
     /// Create a future having the same underlying future as `other`.
-    public init(_ other: Future<Value>) {
-        self.box = other.box
+    public init(_ future: Future<Value>) {
+        self.box = future.box
     }
 
     public func upon(_ executor: Executor, execute body: @escaping(Value) -> Void) {

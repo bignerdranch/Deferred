@@ -50,9 +50,9 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<NewSuccessValue>(future: future, progress: progress)
+        return Task<NewSuccessValue>(future, progress: progress)
         #else
-        return Task<NewSuccessValue>(future: future, cancellation: cancel)
+        return Task<NewSuccessValue>(future, uponCancel: cancel)
         #endif
     }
 }

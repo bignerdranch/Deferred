@@ -51,7 +51,6 @@ private enum TaskResultInitializerError: Error {
 
 extension TaskResult where Value == Void {
     /// Creates the success value.
-    @available(swift 4)
     @_inlineable
     public init() {
         self = .success(())

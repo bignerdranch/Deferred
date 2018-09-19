@@ -40,7 +40,7 @@ extension TaskProtocol where Self: PromiseProtocol, SuccessValue == Void {
     ///
     /// - seealso: `PromiseProtocol.fill(with:)`
     /// - seealso: `TaskProtocol.succeed(with:)`
-    @discardableResult @available(swift 4)
+    @discardableResult
     public func succeed() -> Bool {
         return fill(with: Value(right: ()))
     }

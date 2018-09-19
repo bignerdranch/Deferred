@@ -176,7 +176,7 @@ extension Task {
 
     /// Creates an operation that has already completed with `value`.
     public convenience init(success value: @autoclosure() throws -> SuccessValue) {
-        let future = Future<Result>(value: Result(from: value))
+        let future = Future<Result>(success: value)
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.init(future, progress: .noWork())
 #else
@@ -186,7 +186,7 @@ extension Task {
 
     /// Creates an operation that has already failed with `error`.
     public convenience init(failure error: Error) {
-        let future = Future<Result>(value: Result(failure: error))
+        let future = Future<Result>(failure: error)
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.init(future, progress: .noWork())
 #else

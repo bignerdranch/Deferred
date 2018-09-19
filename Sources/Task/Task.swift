@@ -93,6 +93,16 @@ extension Future: TaskProtocol where Value: Either, Value.Left == Error {
     public init<Wrapped: FutureProtocol>(succeedsFrom wrapped: Wrapped) where Wrapped.Value == SuccessValue {
         self = wrapped.every(per: Value.init(right:))
     }
+
+    /// Creates an future having already filled successfully with `value`.
+    public init(success value: @autoclosure() throws -> SuccessValue) {
+        self.init(value: Value(from: value))
+    }
+
+    /// Creates an future having already failed with `error`.
+    public init(failure error: FailureValue) {
+        self.init(value: Value(left: error))
+    }
 }
 
 extension Deferred: TaskProtocol where Value: Either, Value.Left == Error {

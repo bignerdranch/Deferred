@@ -9,12 +9,15 @@
 import XCTest
 
 #if SWIFT_PACKAGE
+import Atomics
 import Deferred
 import Task
 #else
 import Deferred
+import Deferred.Atomics
 #endif
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 class TaskTests: CustomExecutorTestCase {
@@ -361,4 +364,62 @@ class TaskTests: CustomExecutorTestCase {
         shortWait(for: [ expect ])
     }
 
+    func testRepeatPassesThroughInitialSuccess() {
+        var counter = 0
+        let task = Task<Int>.repeat(upon: queue, count: 3) {
+            bnr_atomic_fetch_add(&counter, 1)
+            return self.makeAnyFinishedTask()
+        }
+
+        shortWait(for: [
+            expectation(that: task, succeedsWith: 42),
+            expectQueueToBeEmpty()
+        ])
+
+        XCTAssertEqual(bnr_atomic_load(&counter), 1)
+    }
+
+    func testRepeatStartsTaskManyTimesForFailure() {
+        var counter = 0
+        let task = Task<Int>.repeat(upon: queue, count: 3) {
+            bnr_atomic_fetch_add(&counter, 1)
+            return self.makeAnyFailedTask()
+        }
+
+        shortWait(for: [
+            expectation(that: task, failsWith: TestError.first),
+            expectQueueToBeEmpty()
+        ])
+
+        XCTAssertEqual(bnr_atomic_load(&counter), 4)
+    }
+
+    func testRepeatPassesThroughSuccessFromRetry() {
+        var counter = 0
+        let task = Task<Int>.repeat(upon: queue, count: 3) {
+            return bnr_atomic_fetch_add(&counter, 1) == 1 ? self.makeAnyFinishedTask() : self.makeAnyFailedTask()
+        }
+
+        shortWait(for: [
+            expectation(that: task, succeedsWith: 42),
+            expectQueueToBeEmpty()
+        ])
+
+        XCTAssertEqual(bnr_atomic_load(&counter), 2)
+    }
+
+    func testRepeatPassesThroughFailureForContinuation() {
+        var counter = 0
+        let task = Task<Int>.repeat(upon: queue, count: 3, continuingIf: { _ in false }, to: {
+            bnr_atomic_fetch_add(&counter, 1)
+            return self.makeAnyFailedTask()
+        })
+
+        shortWait(for: [
+            expectation(that: task, failsWith: TestError.first),
+            expectQueueToBeEmpty()
+        ])
+
+        XCTAssertEqual(bnr_atomic_load(&counter), 1)
+    }
 }

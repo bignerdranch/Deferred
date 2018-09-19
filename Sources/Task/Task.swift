@@ -81,6 +81,18 @@ extension TaskProtocol {
 
 extension Future: TaskProtocol where Value: Either, Value.Left == Error {
     public typealias SuccessValue = Value.Right
+
+    /// Create a future having the same underlying task as `other`.
+    public init<OtherTask: TaskProtocol>(task other: OtherTask) where OtherTask.SuccessValue == SuccessValue, OtherTask.FailureValue == FailureValue {
+        self = other as? Future<Value> ?? other.every {
+            $0.withValues(ifLeft: Value.init(left:), ifRight: Value.init(right:))
+        }
+    }
+
+    /// Create a future having the same underlying task as `other`.
+    public init<OtherFuture: FutureProtocol>(success other: OtherFuture) where OtherFuture.Value == SuccessValue {
+        self = other.every(per: Value.init(right:))
+    }
 }
 
 extension Deferred: TaskProtocol where Value: Either, Value.Left == Error {

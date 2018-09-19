@@ -10,7 +10,7 @@
 import Deferred
 #endif
 
-extension Task {
+extension TaskProtocol {
     /// Returns a task that ignores the successful completion of this task.
     ///
     /// This is semantically identical to the following:
@@ -27,10 +27,12 @@ extension Task {
             result.withValues(ifLeft: Task<Void>.Result.failure, ifRight: { _ in Task<Void>.Result.success(()) })
         }
 
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<Void>(future: future, progress: progress)
-#else
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        if let progress = (self as? Task<SuccessValue>)?.progress {
+            return Task<Void>(future: future, progress: progress)
+        }
+        #endif
+
         return Task<Void>(future: future, cancellation: cancel)
-#endif
     }
 }

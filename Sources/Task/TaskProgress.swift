@@ -225,9 +225,8 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    static func wrappingSuccess<OtherTask: FutureProtocol>(of base: OtherTask, cancellation: (() -> Void)?) -> Progress
-        where OtherTask.Value: Either {
-        switch (base as? Task<OtherTask.Value.Right>, cancellation) {
+    static func wrappingSuccess<OtherTask: TaskProtocol>(of base: OtherTask, cancellation: (() -> Void)? = nil) -> Progress {
+        switch (base as? Task<OtherTask.SuccessValue>, cancellation) {
         case (let task?, nil):
             return task.progress
         case (let task?, let cancellation?):
@@ -255,53 +254,44 @@ private extension ProgressUserInfoKey {
     static let taskRootLock = ProgressUserInfoKey(rawValue: "com_bignerdranch_Deferred_taskRootLock")
 }
 
-private extension Progress {
-    /// `true` if the progress is a wrapper progress created by `Task<Value>`
-    var isTaskRoot: Bool {
-        return userInfo[.taskRootLock] != nil
-    }
-
-    /// Create a progress for the root of an implicit chain of tasks.
-    convenience init(taskRootFor progress: Progress, orphaned: Bool) {
-        self.init(totalUnitCount: 1)
-        setUserInfoObject(NSLock(), forKey: .taskRootLock)
-        adoptChild(progress, orphaned: orphaned, pendingUnitCount: 1)
-    }
-}
-
 extension Progress {
     /// Wrap or re-wrap `progress` if necessary, suitable for becoming the
     /// progress of a Task node.
-    static func taskRoot(for progress: Progress) -> Progress {
-        if progress.isTaskRoot || progress === Progress.current() {
+    static func taskRoot(for inner: Progress) -> Progress {
+        let current = Progress.current()
+        if inner == current || inner.userInfo[.taskRootLock] != nil {
             // Task<Value> has already taken care of this at a deeper level.
-            return progress
-        } else if let root = Progress.current(), root.isTaskRoot {
+            return inner
+        } else if let root = current, root.userInfo[.taskRootLock] != nil {
             return root
         } else {
             // Otherwise, wrap it up as a Task<Value>-marked progress.
-            return Progress(taskRootFor: progress, orphaned: true)
+            let outer = Progress(totalUnitCount: 1)
+            outer.setUserInfoObject(NSLock(), forKey: .taskRootLock)
+            outer.adoptChild(inner, orphaned: true, pendingUnitCount: 1)
+            return outer
         }
     }
 }
 
-extension Task {
+extension TaskProtocol {
     /// Extend the progress of `self` to reflect an added operation of `cost`.
     ///
     /// Incrementing the total unit count is not atomic; we take a lock so as
     /// to not interfere with simultaneous mapping operations.
-    func extendedProgress(byUnitCount cost: Int64) -> Progress {
-        if let lock = progress.userInfo[.taskRootLock] as? NSLock {
+    func preparedProgressForContinuedWork() -> Progress {
+        let inner = Progress.wrappingSuccess(of: self)
+        if let lock = inner.userInfo[.taskRootLock] as? NSLock {
             lock.lock()
             defer { lock.unlock() }
 
-            progress.totalUnitCount += cost
-            return progress
+            inner.totalUnitCount += 1
+            return inner
         } else {
-            let progress = Progress(taskRootFor: self.progress, orphaned: false)
-
-            progress.totalUnitCount += cost
-            return progress
+            let outer = Progress(totalUnitCount: 2)
+            outer.setUserInfoObject(NSLock(), forKey: .taskRootLock)
+            outer.adoptChild(inner, orphaned: false, pendingUnitCount: 1)
+            return outer
         }
     }
 }

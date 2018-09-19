@@ -101,7 +101,7 @@ private final class TaskProducer {
             deferred.fill(with: .success(()))
         }
 
-        return Task(future: Future(deferred), cancellation: {
+        return Task(deferred, uponCancel: {
             deferred.fill(with: .failure(TaskProducerError.userCancelled))
         })
     }
@@ -114,7 +114,7 @@ private final class TaskProducer {
             deferred.fill(with: .success((items)))
         }
 
-        return Task(future: Future(deferred), cancellation: {
+        return Task(deferred, uponCancel: {
             deferred.fill(with: .failure(TaskProducerError.userCancelled))
         })
     }

@@ -69,9 +69,9 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<NewTask.SuccessValue>(future: future, progress: progress)
+        return Task<NewTask.SuccessValue>(future, progress: progress)
         #else
-        return Task<NewTask.SuccessValue>(future: future) {
+        return Task<NewTask.SuccessValue>(future) {
             cancellationToken.fill(with: ())
         }
         #endif

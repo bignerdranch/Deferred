@@ -206,8 +206,8 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    static func wrappingCompletion<OtherFuture: FutureProtocol>(of base: OtherFuture, cancellation: (() -> Void)?) -> Progress {
-        let totalUnitCount: Int64 = base.peek() != nil ? 0 : -1
+    static func wrappingCompletion<Wrapped: FutureProtocol>(of wrapped: Wrapped, uponCancel cancellation: (() -> Void)?) -> Progress {
+        let totalUnitCount: Int64 = wrapped.peek() != nil ? 0 : -1
         let progress = Progress(totalUnitCount: totalUnitCount)
 
         if let cancellation = cancellation {
@@ -216,7 +216,7 @@ extension Progress {
             progress.isCancellable = false
         }
 
-        base.upon(.global(qos: .utility)) { _ in
+        wrapped.upon(.global(qos: .utility)) { _ in
             progress.totalUnitCount = 1
             progress.completedUnitCount = 1
         }
@@ -225,8 +225,8 @@ extension Progress {
     }
 
     /// A simple indeterminate progress with a cancellation function.
-    static func wrappingSuccess<OtherTask: TaskProtocol>(of base: OtherTask, cancellation: (() -> Void)? = nil) -> Progress {
-        switch (base as? Task<OtherTask.SuccessValue>, cancellation) {
+    static func wrappingSuccess<Wrapped: TaskProtocol>(of wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) -> Progress {
+        switch (wrapped as? Task<Wrapped.SuccessValue>, cancellation) {
         case (let task?, nil):
             return task.progress
         case (let task?, let cancellation?):
@@ -235,7 +235,7 @@ extension Progress {
             progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
             return progress
         default:
-            return .wrappingCompletion(of: base, cancellation: cancellation)
+            return .wrappingCompletion(of: wrapped, uponCancel: cancellation)
         }
     }
 }

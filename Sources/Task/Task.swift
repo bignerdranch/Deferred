@@ -83,7 +83,7 @@ extension Future: TaskProtocol where Value: Either, Value.Left == Error {
     public typealias SuccessValue = Value.Right
 
     /// Create a future having the same underlying task as `other`.
-    public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped) where Wrapped.SuccessValue == SuccessValue, Wrapped.FailureValue == FailureValue {
+    public init<Wrapped: TaskProtocol>(resultFrom wrapped: Wrapped) where Wrapped.SuccessValue == SuccessValue {
         self = wrapped as? Future<Value> ?? wrapped.every {
             $0.withValues(ifLeft: Value.init(left:), ifRight: Value.init(right:))
         }

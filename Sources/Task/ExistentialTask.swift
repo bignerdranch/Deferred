@@ -64,7 +64,7 @@ public final class Task<SuccessValue>: NSObject {
 
     /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
     public convenience init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, progress: Progress) where Wrapped.SuccessValue == SuccessValue {
-        let future = Future<Result>(wrapped)
+        let future = Future<Result>(resultFrom: wrapped)
         self.init(future, progress: progress)
     }
 
@@ -144,7 +144,7 @@ extension Task {
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
     public convenience init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.SuccessValue == SuccessValue {
-        let future = Future<Result>(wrapped)
+        let future = Future<Result>(resultFrom: wrapped)
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let progress = Progress.wrappingSuccess(of: wrapped, uponCancel: cancellation)
         self.init(future, progress: progress)

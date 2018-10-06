@@ -17,11 +17,8 @@ import Deferred
 import Deferred.Atomics
 #endif
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
-
 class TaskTests: CustomExecutorTestCase {
-    static let universalTests: [(String, (TaskTests) -> () throws -> Void)] = [
+    static let allTests: [(String, (TaskTests) -> () throws -> Void)] = [
         ("testUponSuccess", testUponSuccess),
         ("testUponFailure", testUponFailure),
         ("testThatThrowingMapSubstitutesWithError", testThatThrowingMapSubstitutesWithError),
@@ -38,24 +35,6 @@ class TaskTests: CustomExecutorTestCase {
         ("testThatFallbackSubstitutesThrownError", testThatFallbackSubstitutesThrownError),
         ("testSimpleFutureCanBeUpgradedToTask", testSimpleFutureCanBeUpgradedToTask)
     ]
-
-    static var allTests: [(String, (TaskTests) -> () throws -> Void)] {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            return universalTests + [
-                ("testThatCancellationIsAppliedImmediatelyWhenMapping", testThatCancellationIsAppliedImmediatelyWhenMapping),
-                ("testThatTaskCreatedWithProgressReflectsThatProgress", testThatTaskCreatedWithProgressReflectsThatProgress),
-                ("testTaskCreatedUnfilledIs100PercentCompleted", testTaskCreatedUnfilledIs100PercentCompleted),
-                ("testTaskCreatedFilledIs100PercentCompleted", testTaskCreatedFilledIs100PercentCompleted),
-                ("testThatTaskCreatedUnfilledIsIndeterminate", testThatTaskCreatedUnfilledIsIndeterminate),
-                ("testThatTaskWrappingUnfilledIsIndeterminate", testThatTaskWrappingUnfilledIsIndeterminate),
-                ("testThatTaskWrappingFilledIsDeterminate", testThatTaskWrappingFilledIsDeterminate),
-                ("testThatMapIncrementsParentProgressFraction", testThatMapIncrementsParentProgressFraction),
-                ("testThatAndThenIncrementsParentProgressFraction", testThatAndThenIncrementsParentProgressFraction)
-            ]
-        #else
-            return universalTests
-        #endif
-    }
 
     private func expectation<T: Equatable>(that task: Task<T>, succeedsWith makeExpected: @autoclosure @escaping() -> T, description: String? = nil) -> XCTestExpectation {
         let expect = expectation(description: description ?? "uponSuccess is called")
@@ -186,98 +165,6 @@ class TaskTests: CustomExecutorTestCase {
 
         assertExecutorCalled(atLeast: 1)
     }
-
-    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-    func testThatCancellationIsAppliedImmediatelyWhenMapping() {
-        let beforeExpect = expectation(description: "original task cancelled")
-        let beforeTask = Task<Int>(Deferred<Task<Int>.Result>()) {
-            beforeExpect.fulfill()
-        }
-
-        beforeTask.cancel()
-        XCTAssert(beforeTask.progress.isCancelled)
-
-        let afterExpect = expectation(description: "filled with same error")
-        afterExpect.isInverted = true
-
-        let afterTask = beforeTask.map(upon: executor) { (value) -> String in
-            afterExpect.fulfill()
-            return String(describing: value)
-        }
-
-        XCTAssert(afterTask.progress.isCancelled)
-
-        shortWait(for: [ beforeExpect, afterExpect ])
-        assertExecutorNeverCalled()
-    }
-
-    func testThatTaskCreatedWithProgressReflectsThatProgress() {
-        let key = ProgressUserInfoKey(rawValue: "Test")
-
-        let progress = Progress(parent: nil, userInfo: nil)
-        progress.totalUnitCount = 10
-        progress.setUserInfoObject(true, forKey: key)
-        progress.isCancellable = false
-
-        let task = Task<Int>(Deferred<Task<Int>.Result>(), progress: progress)
-
-        XCTAssertEqual(task.progress.fractionCompleted, 0, accuracy: 0.001)
-        XCTAssertEqual(progress.userInfo[key] as? Bool, true)
-        XCTAssert(task.progress.isCancellable)
-
-        progress.completedUnitCount = 5
-        XCTAssertEqual(task.progress.fractionCompleted, 0.5, accuracy: 0.001)
-    }
-
-    func testTaskCreatedUnfilledIs100PercentCompleted() {
-        XCTAssertEqual(makeAnyUnfinishedTask().1.progress.fractionCompleted, 0)
-    }
-
-    func testTaskCreatedFilledIs100PercentCompleted() {
-        XCTAssertEqual(makeAnyFinishedTask().progress.fractionCompleted, 1)
-    }
-
-    func testThatTaskCreatedUnfilledIsIndeterminate() {
-        let task = Task<Int>.never
-
-        XCTAssert(task.progress.isIndeterminate)
-    }
-
-    func testThatTaskWrappingUnfilledIsIndeterminate() {
-        let deferred = Deferred<Task<Int>.Result>()
-        let wrappedTask = Task(deferred)
-
-        XCTAssertFalse(wrappedTask.progress.isIndeterminate)
-    }
-
-    func testThatTaskWrappingFilledIsDeterminate() {
-        let deferred = Deferred<Task<Int>.Result>(filledWith: .success(42))
-        let wrappedTask = Task(deferred)
-
-        XCTAssertFalse(wrappedTask.progress.isIndeterminate)
-    }
-
-    func testThatMapIncrementsParentProgressFraction() {
-        let task = makeAnyFinishedTask().map(upon: executor) { $0 * 2 }
-
-        shortWait(for: [
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task.progress)
-        ])
-
-        assertExecutorCalled(atLeast: 1)
-    }
-
-    func testThatAndThenIncrementsParentProgressFraction() {
-        let task = makeAnyFinishedTask().andThen(upon: executor, start: makeContrivedNextTask)
-        XCTAssertNotEqual(task.progress.fractionCompleted, 1)
-
-        shortWait(for: [
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task.progress)
-        ])
-
-        assertExecutorCalled(atLeast: 1)
-    }
-    #endif
 
     func testThatFallbackProducesANewTask() {
         let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in

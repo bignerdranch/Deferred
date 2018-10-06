@@ -21,36 +21,18 @@ import Deferred.Atomics
 /// tree.
 private final class ProxyProgress: Progress {
 
-    @objc dynamic private let observee: Progress
-    private var token: Observation?
+    @objc dynamic let observee: Progress
+    lazy var token = Observation(forUpdating: self)
 
     init(attachingTo observee: Progress) {
         self.observee = observee
-        super.init(parent: .current(), userInfo: nil)
-        token = Observation(observing: observee, observer: self)
+        super.init(parent: .current())
+        totalUnitCount = 100
+        token.activate(observing: observee)
     }
 
     deinit {
-        token?.invalidate(observing: observee)
-    }
-
-    private func inheritCancelled() {
-        if observee.isCancelled {
-            super.cancel()
-        }
-    }
-
-    private func inheritPaused() {
-        if observee.isPaused {
-            super.pause()
-        } else if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
-            super.resume()
-        }
-    }
-
-    private func inheritValue(forKeyPath keyPath: String?) {
-        guard let keyPath = keyPath else { return }
-        setValue(observee.value(forKeyPath: keyPath), forKeyPath: keyPath)
+        token.invalidate(observing: observee)
     }
 
     // MARK: - Derived values
@@ -68,9 +50,9 @@ private final class ProxyProgress: Progress {
         observee.resume()
     }
 
-    @objc static var keyPathsForValuesAffectingUserInfo: Set<String> {
-        return [ #keyPath(observee.userInfo) ]
-    }
+    @objc static let keyPathsForValuesAffectingUserInfo: Set<String> = [
+        #keyPath(observee.userInfo)
+    ]
 
     override var userInfo: [ProgressUserInfoKey: Any] {
         return observee.userInfo
@@ -82,15 +64,42 @@ private final class ProxyProgress: Progress {
 
     // MARK: - KVO babysitting
 
+    func inheritFraction() {
+        completedUnitCount = observee.isIndeterminate ? -1 : Int64(observee.fractionCompleted * Double(totalUnitCount))
+    }
+
+    func inheritAttribute(_ value: Any?, forKeyPath keyPath: String) {
+        setValue(value, forKeyPath: keyPath)
+    }
+
+    func inheritCancelled() {
+        if observee.isCancelled {
+            super.cancel()
+        }
+    }
+
+    func inheritPaused() {
+        if observee.isPaused {
+            super.pause()
+        } else if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
+            super.resume()
+        }
+    }
+
     /// A side-table object to weakify the progress observer and prevent
     /// delivery of notifications after deinit.
-    private final class Observation: NSObject {
-        private static var cancelledContext = false
-        private static var pausedContext = false
-        private static var attributesContext = false
-        private static let attributes = [
-            #keyPath(Progress.completedUnitCount),
-            #keyPath(Progress.totalUnitCount),
+    final class Observation: NSObject {
+        static var fractionContext = false
+        static var attributesContext = false
+        static var cancelledContext = false
+        static var pausedContext = false
+
+        static let fractionKeyPaths = [
+            #keyPath(Progress.fractionCompleted),
+            #keyPath(Progress.isIndeterminate)
+        ]
+
+        static let attributesKeyPaths = [
             #keyPath(Progress.localizedDescription),
             #keyPath(Progress.localizedAdditionalDescription),
             #keyPath(Progress.cancellable),
@@ -98,7 +107,7 @@ private final class ProxyProgress: Progress {
             #keyPath(Progress.kind)
         ]
 
-        private struct State: OptionSet {
+        struct State: OptionSet {
             let rawValue: UInt8
             static let ready = State(rawValue: 1 << 0)
             static let observing = State(rawValue: 1 << 1)
@@ -106,19 +115,22 @@ private final class ProxyProgress: Progress {
             static let cancelled = State(rawValue: 1 << 2)
         }
 
-        private var state = UInt8() // see State
-        private weak var observer: ProxyProgress?
+        var state = UInt8() // see State
+        weak var observer: ProxyProgress?
 
-        init(observing observee: Progress, observer: ProxyProgress) {
+        init(forUpdating observer: ProxyProgress) {
             self.observer = observer
             bnr_atomic_init(&state, State.ready.rawValue)
             super.init()
-            activate(observing: observee)
         }
 
         func activate(observing observee: Progress) {
-            for key in Observation.attributes {
-                observee.addObserver(self, forKeyPath: key, options: .initial, context: &Observation.attributesContext)
+            for key in Observation.fractionKeyPaths {
+                observee.addObserver(self, forKeyPath: key, options: .initial, context: &Observation.fractionContext)
+            }
+
+            for key in Observation.attributesKeyPaths {
+                observee.addObserver(self, forKeyPath: key, options: [ .initial, .new ], context: &Observation.attributesContext)
             }
             observee.addObserver(self, forKeyPath: #keyPath(Progress.cancelled), options: .initial, context: &Observation.cancelledContext)
             observee.addObserver(self, forKeyPath: #keyPath(Progress.paused), options: .initial, context: &Observation.pausedContext)
@@ -131,24 +143,30 @@ private final class ProxyProgress: Progress {
             guard !oldState.isStrictSuperset(of: .cancellable) else { return }
             bnr_atomic_fetch_or(&state, State.cancelled.rawValue, .relaxed)
 
-            for key in Observation.attributes {
+            for key in Observation.fractionKeyPaths {
+                observee.removeObserver(self, forKeyPath: key, context: &Observation.fractionContext)
+            }
+
+            for key in Observation.attributesKeyPaths {
                 observee.removeObserver(self, forKeyPath: key, context: &Observation.attributesContext)
             }
             observee.removeObserver(self, forKeyPath: #keyPath(Progress.cancelled), context: &Observation.cancelledContext)
             observee.removeObserver(self, forKeyPath: #keyPath(Progress.paused), context: &Observation.pausedContext)
         }
 
-        override func observeValue(forKeyPath keyPath: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
             let state = State(rawValue: bnr_atomic_load(&self.state, .relaxed))
             guard state.contains(.ready), let observer = observer else { return }
             // This would be prettier as a switch.
             // https://bugs.swift.org/browse/SR-7877
-            if context == &Observation.cancelledContext {
+            if context == &Observation.fractionContext {
+                observer.inheritFraction()
+            } else if context == &Observation.attributesContext, let keyPath = keyPath {
+                observer.inheritAttribute(change?[.newKey], forKeyPath: keyPath)
+            } else if context == &Observation.cancelledContext {
                 observer.inheritCancelled()
             } else if context == &Observation.pausedContext {
                 observer.inheritPaused()
-            } else if context == &Observation.attributesContext {
-                observer.inheritValue(forKeyPath: keyPath)
             }
         }
     }

@@ -268,25 +268,24 @@ extension Progress {
  creating a root node implicitly used by chaining calls.
  **/
 
-private extension ProgressUserInfoKey {
-    static let taskRootLock = ProgressUserInfoKey(rawValue: "com_bignerdranch_Deferred_taskRootLock")
-}
+private let taskRootLock = ProgressUserInfoKey(rawValue: "_DeferredTaskRootLock")
+private let taskRootUnitCount = Int64(16)
 
 extension Progress {
     /// Wrap or re-wrap `progress` if necessary, suitable for becoming the
     /// progress of a Task node.
     static func taskRoot(for inner: Progress) -> Progress {
         let current = Progress.current()
-        if inner == current || inner.userInfo[.taskRootLock] != nil {
+        if inner == current || inner.userInfo[taskRootLock] != nil {
             // Task<Value> has already taken care of this at a deeper level.
             return inner
-        } else if let root = current, root.userInfo[.taskRootLock] != nil {
+        } else if let root = current, root.userInfo[taskRootLock] != nil {
             return root
         } else {
             // Otherwise, wrap it up as a Task<Value>-marked progress.
-            let outer = Progress(totalUnitCount: 1)
-            outer.setUserInfoObject(NSLock(), forKey: .taskRootLock)
-            outer.adoptChild(inner, orphaned: true, pendingUnitCount: 1)
+            let outer = Progress(totalUnitCount: taskRootUnitCount)
+            outer.setUserInfoObject(NSLock(), forKey: taskRootLock)
+            outer.adoptChild(inner, orphaned: true, pendingUnitCount: taskRootUnitCount)
             return outer
         }
     }
@@ -299,16 +298,17 @@ extension TaskProtocol {
     /// to not interfere with simultaneous mapping operations.
     func preparedProgressForContinuedWork() -> Progress {
         let inner = Progress.wrappingSuccess(of: self)
-        if let lock = inner.userInfo[.taskRootLock] as? NSLock {
+        let continuedWorkUnitCount = Int64(1)
+        if let lock = inner.userInfo[taskRootLock] as? NSLock {
             lock.lock()
             defer { lock.unlock() }
 
-            inner.totalUnitCount += 1
+            inner.totalUnitCount += continuedWorkUnitCount
             return inner
         } else {
-            let outer = Progress(totalUnitCount: 2)
-            outer.setUserInfoObject(NSLock(), forKey: .taskRootLock)
-            outer.adoptChild(inner, orphaned: false, pendingUnitCount: 1)
+            let outer = Progress(totalUnitCount: taskRootUnitCount + continuedWorkUnitCount)
+            outer.setUserInfoObject(NSLock(), forKey: taskRootLock)
+            outer.adoptChild(inner, orphaned: false, pendingUnitCount: taskRootUnitCount)
             return outer
         }
     }

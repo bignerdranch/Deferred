@@ -214,6 +214,9 @@
 		DBABD0BC203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
 		DBABD0BD203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
 		DBABD0BE203F2E3E00C50896 /* Atomics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBABD0BA203F2E3E00C50896 /* Atomics.swift */; };
+		DBEC962B216FF229004CF0FC /* TaskProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */; };
+		DBEC962C216FF229004CF0FC /* TaskProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */; };
+		DBEC962D216FF229004CF0FC /* TaskProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -311,6 +314,7 @@
 		DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FuturePeek.swift; sourceTree = "<group>"; };
 		DBABD0BA203F2E3E00C50896 /* Atomics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomics.swift; sourceTree = "<group>"; };
 		DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureEveryMap.swift; sourceTree = "<group>"; };
+		DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskProgressTests.swift; sourceTree = "<group>"; };
 		EBEB828C1DC4A79A00B7E089 /* TaskComprehensiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskComprehensiveTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -483,6 +487,7 @@
 				DB55F1F71D96968E00FC1439 /* ResultRecoveryTests.swift */,
 				DB55F1FD1D96968E00FC1439 /* TaskAsyncTests.swift */,
 				EBEB828C1DC4A79A00B7E089 /* TaskComprehensiveTests.swift */,
+				DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */,
 				DB78F5EB215C4C5700D07CC6 /* TaskProtocolTests.swift */,
 				DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */,
 				DB55F1FC1D96968E00FC1439 /* TaskTests.swift */,
@@ -804,6 +809,7 @@
 				DB126D641E5368B900054E95 /* FutureTests.swift in Sources */,
 				DB126D661E5368B900054E95 /* ProtectedTests.swift in Sources */,
 				DB126D6E1E5368B900054E95 /* TaskAsyncTests.swift in Sources */,
+				DBEC962B216FF229004CF0FC /* TaskProgressTests.swift in Sources */,
 				DB34FC942096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */,
 				DB126D6D1E5368B900054E95 /* TaskTests.swift in Sources */,
 				DB126D621E5368B900054E95 /* FutureCustomExecutorTests.swift in Sources */,
@@ -872,6 +878,7 @@
 				DB126D741E5368B900054E95 /* FutureTests.swift in Sources */,
 				DB126D761E5368B900054E95 /* ProtectedTests.swift in Sources */,
 				DB126D7E1E5368B900054E95 /* TaskAsyncTests.swift in Sources */,
+				DBEC962C216FF229004CF0FC /* TaskProgressTests.swift in Sources */,
 				DB34FC952096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */,
 				DB126D7D1E5368B900054E95 /* TaskTests.swift in Sources */,
 				DB126D721E5368B900054E95 /* FutureCustomExecutorTests.swift in Sources */,
@@ -940,6 +947,7 @@
 				DB126D841E5368BA00054E95 /* FutureTests.swift in Sources */,
 				DB126D861E5368BA00054E95 /* ProtectedTests.swift in Sources */,
 				DB126D8E1E5368BA00054E95 /* TaskAsyncTests.swift in Sources */,
+				DBEC962D216FF229004CF0FC /* TaskProgressTests.swift in Sources */,
 				DB34FC962096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */,
 				DB126D8D1E5368BA00054E95 /* TaskTests.swift in Sources */,
 				DB126D821E5368BA00054E95 /* FutureCustomExecutorTests.swift in Sources */,

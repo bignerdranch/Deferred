@@ -12,16 +12,19 @@ Pod::Spec.new do |s|
                    DESC
 
   s.homepage     = "https://github.com/bignerdranch/Deferred"
+  s.documentation_url = "https://bignerdranch.github.io/Deferred/"
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.license      = "MIT"
+  s.license = { :type => 'MIT', :file => 'LICENSE' }
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.authors             = {"John Gallagher" => "jgallagher@bignerdranch.com",
-                           "Zachary Waldowski" => "zachary@bignerdranch.com",
-                           "Brian Hardy" => "brian@bignerdranch.com"}
+  s.authors          = {"Zachary Waldowski" => "zachary@bignerdranch.com",
+                        "Big Nerd Ranch" => nil}
+  s.social_media_url = "https://twitter.com/bignerdranch"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  s.swift_version             = "4.1"
+  s.cocoapods_version         = ">=1.1.0"
   s.ios.deployment_target     = "8.0"
   s.osx.deployment_target     = "10.10"
   s.watchos.deployment_target = "2.0"
@@ -34,6 +37,8 @@ Pod::Spec.new do |s|
   s.source_files  = "Sources/**/*.swift"
   s.preserve_path = "Sources/Atomics"
   s.module_name   = "Deferred"
+
+  # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.pod_target_xcconfig = { "SWIFT_INCLUDE_PATHS": "$(PODS_TARGET_SRCROOT)/Sources/Atomics/include" }
 
 end

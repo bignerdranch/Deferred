@@ -7,7 +7,7 @@ matrix:
       script: bundle exec fastlane mac ci
     - language: objective-c
       os: osx
-      osx_image: xcode10.0
+      osx_image: xcode10.1
       install: bundle install --quiet
       script: bundle exec fastlane ios ci
       after_failure:
@@ -26,7 +26,7 @@ matrix:
       os: linux
       dist: trusty
       sudo: required
-      env: SWIFT_VERSION=4.2-DEVELOPMENT-SNAPSHOT-2018-09-14-a
+      env: SWIFT_VERSION=4.2.1
       install: eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
       script:
         - swift --version

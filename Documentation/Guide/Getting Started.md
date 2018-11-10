@@ -1,6 +1,6 @@
 ## Getting Started
 
-Deferred is designed to be used as an embedded framework on Apple platforms, which requires a minimum deployment target of iOS 8, macOS 10.10, watchOS 2.0, or tvOS 9.0.
+Deferred is designed to be used as an embedded framework on Apple platforms, which requires a minimum deployment target of iOS 9, macOS 10.11, watchOS 2.0, or tvOS 9.0.
 
 Linux is also supported.
 

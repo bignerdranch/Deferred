@@ -1,8 +1,8 @@
 // Architectures
 VALID_ARCHS[sdk=macosx*] = i386 x86_64
-VALID_ARCHS[sdk=iphoneos*] = arm64 armv7 armv7s
+VALID_ARCHS[sdk=iphoneos*] = arm64 arm64e armv7 armv7s
 VALID_ARCHS[sdk=iphonesimulator*] = i386 x86_64
-VALID_ARCHS[sdk=watchos*] = armv7k
+VALID_ARCHS[sdk=watchos*] = arm64_32 armv7k
 VALID_ARCHS[sdk=watchsimulator*] = i386
 VALID_ARCHS[sdk=appletvos*] = arm64
 VALID_ARCHS[sdk=appletvsimulator*] = x86_64
@@ -12,8 +12,8 @@ TOOLCHAINS = default
 
 // Deployment
 COPY_PHASE_STRIP = NO
-MACOSX_DEPLOYMENT_TARGET = 10.10
-IPHONEOS_DEPLOYMENT_TARGET = 8.0
+MACOSX_DEPLOYMENT_TARGET = 10.11
+IPHONEOS_DEPLOYMENT_TARGET = 9.0
 WATCHOS_DEPLOYMENT_TARGET = 2.0
 TVOS_DEPLOYMENT_TARGET = 9.0
 
@@ -81,4 +81,4 @@ CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES
 CLANG_ANALYZER_NONNULL = YES
 
 // Swift Compiler - Version
-SWIFT_VERSION = 4.0
+SWIFT_VERSION = 4.1

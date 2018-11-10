@@ -37,9 +37,9 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
         for future in array {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             if let task = future as? Task<Base.Element.SuccessValue> {
-                progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+                progress.adoptChild(task.progress, pendingUnitCount: 1)
             } else {
-                progress.adoptChild(.wrappingSuccess(of: future), orphaned: true, pendingUnitCount: 1)
+                progress.addChild(.wrappingSuccess(of: future), withPendingUnitCount: 1)
             }
             #endif
 

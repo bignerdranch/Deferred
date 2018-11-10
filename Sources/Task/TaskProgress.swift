@@ -26,7 +26,7 @@ private final class ProxyProgress: Progress {
 
     init(attachingTo observee: Progress) {
         self.observee = observee
-        super.init(parent: .current())
+        super.init(parent: nil)
         totalUnitCount = 100
         token.activate(observing: observee)
     }
@@ -81,7 +81,7 @@ private final class ProxyProgress: Progress {
     func inheritPaused() {
         if observee.isPaused {
             super.pause()
-        } else if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
+        } else {
             super.resume()
         }
     }
@@ -173,34 +173,11 @@ private final class ProxyProgress: Progress {
 }
 
 extension Progress {
-    /// Attempt a backwards-compatible implementation of iOS 9's explicit
-    /// progress handling. It's not perfect; this is a best effort of proxying
-    /// an external progress tree.
-    ///
-    /// If `progress` may possibly already have a parent,
-    /// send `orphaned: false`, using similar behavior to the backwards-
-    /// compatible path.
-    @discardableResult
-    func adoptChild(_ progress: Progress, orphaned canAdopt: Bool, pendingUnitCount: Int64) -> Progress {
-        if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *), canAdopt {
-            addChild(progress, withPendingUnitCount: pendingUnitCount)
-            return progress
-        } else {
-            let changedPendingUnitCount = Progress.current() === self
-            if changedPendingUnitCount {
-                resignCurrent()
-            }
-
-            becomeCurrent(withPendingUnitCount: pendingUnitCount)
-
-            let progress = ProxyProgress(attachingTo: progress)
-
-            if !changedPendingUnitCount {
-                resignCurrent()
-            }
-
-            return progress
-        }
+    /// Emulate `addChild(_:withPendingUnitCount:)` if `progress` may possibly
+    /// already have a parent.
+    func adoptChild(_ progress: Progress, pendingUnitCount: Int64) {
+        let child = ProxyProgress(attachingTo: progress)
+        addChild(child, withPendingUnitCount: pendingUnitCount)
     }
 }
 
@@ -250,7 +227,7 @@ extension Progress {
         case (let task?, let cancellation?):
             let progress = Progress(totalUnitCount: 1)
             progress.cancellationHandler = cancellation
-            progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+            progress.adoptChild(task.progress, pendingUnitCount: 1)
             return progress
         default:
             return .wrappingCompletion(of: wrapped, uponCancel: cancellation)
@@ -285,7 +262,7 @@ extension Progress {
             // Otherwise, wrap it up as a Task<Value>-marked progress.
             let outer = Progress(totalUnitCount: taskRootUnitCount)
             outer.setUserInfoObject(NSLock(), forKey: taskRootLock)
-            outer.adoptChild(inner, orphaned: true, pendingUnitCount: taskRootUnitCount)
+            outer.addChild(inner, withPendingUnitCount: taskRootUnitCount)
             return outer
         }
     }
@@ -308,7 +285,7 @@ extension TaskProtocol {
         } else {
             let outer = Progress(totalUnitCount: taskRootUnitCount + continuedWorkUnitCount)
             outer.setUserInfoObject(NSLock(), forKey: taskRootLock)
-            outer.adoptChild(inner, orphaned: false, pendingUnitCount: taskRootUnitCount)
+            outer.adoptChild(inner, pendingUnitCount: taskRootUnitCount)
             return outer
         }
     }

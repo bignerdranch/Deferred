@@ -333,32 +333,19 @@ extension Task {
     /// queue. If you must do work on a specific queue, schedule work on it.
     public convenience init<Wrapped: FutureProtocol>(succeedsFrom wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.Value == SuccessValue {
         let future = Future<Result>(succeedsFrom: wrapped)
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = Progress.wrappingCompletion(of: wrapped, uponCancel: cancellation)
-        self.init(future, progress: progress)
-        #else
         self.init(future, uponCancel: cancellation)
-        #endif
     }
 
     /// Creates an operation that has already completed with `value`.
     public convenience init(success value: @autoclosure() throws -> SuccessValue) {
         let future = Future<Result>(success: value)
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.init(future, progress: .noWork())
-#else
         self.init(future)
-#endif
     }
 
     /// Creates an operation that has already failed with `error`.
     public convenience init(failure error: Error) {
         let future = Future<Result>(failure: error)
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.init(future, progress: .noWork())
-#else
         self.init(future)
-#endif
     }
 
     /// Creates a task having the same underlying operation as the `other` task.

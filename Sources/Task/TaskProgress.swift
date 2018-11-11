@@ -214,15 +214,6 @@ extension Progress {
         return progress
     }
 
-    /// Progress for which no work actually needs to be done.
-    static func noWork() -> Progress {
-        let progress = Progress(totalUnitCount: 0)
-        progress.completedUnitCount = 1
-        progress.isCancellable = false
-        progress.isPausable = false
-        return progress
-    }
-
     /// A simple indeterminate progress with a cancellation function.
     static func wrappingCompletion<Wrapped: FutureProtocol>(of wrapped: Wrapped, uponCancel cancellation: (() -> Void)?) -> Progress {
         let totalUnitCount: Int64 = wrapped.peek() != nil ? 0 : -1

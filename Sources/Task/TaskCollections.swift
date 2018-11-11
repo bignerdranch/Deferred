@@ -9,7 +9,6 @@
 #if SWIFT_PACKAGE
 import Deferred
 #endif
-
 import Dispatch
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import Foundation
@@ -19,7 +18,7 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
     let group = DispatchGroup()
     let combined = Deferred<Task<SuccessValue>.Result>()
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-    let progress = Progress(parent: nil, userInfo: nil)
+    let progress = Progress()
     #else
     let cancellations: [() -> Void]
     #endif
@@ -37,9 +36,9 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
         for future in array {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             if let task = future as? Task<Base.Element.SuccessValue> {
-                progress.adoptChild(task.progress, orphaned: false, pendingUnitCount: 1)
+                progress.monitorChild(task.progress, withPendingUnitCount: 1)
             } else {
-                progress.adoptChild(.wrappingSuccess(of: future), orphaned: true, pendingUnitCount: 1)
+                progress.monitorCompletion(of: future, withPendingUnitCount: 1)
             }
             #endif
 

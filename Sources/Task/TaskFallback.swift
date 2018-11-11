@@ -14,8 +14,10 @@ extension TaskProtocol {
     /// Begins another task in the case of the failure of `self` by calling
     /// `restartTask` with the error.
     ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
+    /// On Apple platforms, retrying a task contributes a unit of progress to
+    /// the root task. A root task is the earliest task in a chain of tasks. If
+    /// `restartTask` runs and returns a task that itself reports progress, that
+    /// progress will also contribute to the chain's overall progress.
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
@@ -26,8 +28,10 @@ extension TaskProtocol {
     /// Begins another task in the case of the failure of `self` by calling
     /// `restartTask` with the error.
     ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
+    /// On Apple platforms, retrying a task contributes a unit of progress to
+    /// the root task. A root task is the earliest task in a chain of tasks. If
+    /// `restartTask` runs and returns a task that itself reports progress, that
+    /// progress will also contribute to the chain's overall progress.
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.

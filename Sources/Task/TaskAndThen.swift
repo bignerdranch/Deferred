@@ -15,8 +15,10 @@ extension TaskProtocol {
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
     ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
+    /// On Apple platforms, chaining a task contributes a unit of progress to
+    /// the root task. A root task is the earliest task in a chain of tasks. If
+    /// `startNextTask` runs and returns a task that itself reports progress,
+    /// that progress will also contribute to the chain's overall progress.
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
@@ -27,8 +29,10 @@ extension TaskProtocol {
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
     ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
+    /// On Apple platforms, chaining a task contributes a unit of progress to
+    /// the root task. A root task is the earliest task in a chain of tasks. If
+    /// `startNextTask` runs and returns a task that itself reports progress,
+    /// that progress will also contribute to the chain's overall progress.
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.

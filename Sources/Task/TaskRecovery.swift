@@ -14,8 +14,10 @@ extension TaskProtocol {
     /// Returns a `Task` containing the result of mapping `substitution` over
     /// the failed task's error.
     ///
-    /// Recovering from a failed task appends a unit of progress to the root
-    /// task. A root task is the earliest, or parent-most, task in a tree.
+    /// On Apple platforms, recovering from a failed task reports its progress
+    /// to the root task. A root task is the earliest task in a chain of tasks.
+    /// During execution of `transform`, an additional progress object created
+    /// using the current parent will also contribute to the chain's progress.
     ///
     /// The resulting task is cancellable in the same way the receiving task is.
     public func recover(upon executor: PreferredExecutor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
@@ -28,8 +30,10 @@ extension TaskProtocol {
     /// `recover` submits the `substitution` to the `executor` once the task
     /// fails.
     ///
-    /// Recovering from a failed task appends a unit of progress to the root
-    /// task. A root task is the earliest, or parent-most, task in a tree.
+    /// On Apple platforms, recovering from a failed task reports its progress
+    /// to the root task. A root task is the earliest task in a chain of tasks.
+    /// During execution of `transform`, an additional progress object created
+    /// using the current parent will also contribute to the chain's progress.
     ///
     /// The resulting task is cancellable in the same way the receiving task is.
     ///

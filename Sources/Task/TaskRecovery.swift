@@ -9,7 +9,6 @@
 #if SWIFT_PACKAGE
 import Deferred
 #endif
-import Foundation
 
 extension TaskProtocol {
     /// Returns a `Task` containing the result of mapping `substitution` over
@@ -37,13 +36,13 @@ extension TaskProtocol {
     /// - see: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = preparedProgressForContinuedWork()
+        let chain = TaskChain(continuingWith: self)
         #endif
 
         let future: Future = map(upon: executor) { (result) -> Task<SuccessValue>.Result in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            progress.becomeCurrent(withPendingUnitCount: 1)
-            defer { progress.resignCurrent() }
+            chain.beginMap()
+            defer { chain.commitMap() }
             #endif
 
             return Task<SuccessValue>.Result {
@@ -52,7 +51,7 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<SuccessValue>(future, progress: progress)
+        return Task<SuccessValue>(future, progress: chain.effectiveProgress)
         #else
         return Task<SuccessValue>(future, uponCancel: cancel)
         #endif

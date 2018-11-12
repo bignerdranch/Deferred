@@ -202,13 +202,13 @@ public final class Task<SuccessValue>: NSObject {
     /// Creates a task given a `future` and its `progress`.
     public init(_ future: Future<Result>, progress: Progress) {
         self.future = future
-        self.progress = .taskRoot(for: progress)
+        self.progress = TaskChain(startingWith: future, using: progress).effectiveProgress
     }
 
     /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
     public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, progress: Progress) where Wrapped.SuccessValue == SuccessValue {
         self.future = Future<Result>(resultFrom: wrapped)
-        self.progress = .taskRoot(for: progress)
+        self.progress = TaskChain(startingWith: wrapped, using: progress).effectiveProgress
     }
     #else
     private let cancellation: () -> Void
@@ -222,7 +222,7 @@ public final class Task<SuccessValue>: NSObject {
     public init(_ future: Future<Result>, uponCancel cancellation: (() -> Void)? = nil) {
         self.future = future
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.progress = .taskRoot(for: .wrappingSuccess(of: future, uponCancel: cancellation))
+        self.progress = TaskChain(startingWith: future, uponCancel: cancellation).effectiveProgress
         #else
         self.cancellation = cancellation ?? {}
         #endif
@@ -235,7 +235,7 @@ public final class Task<SuccessValue>: NSObject {
     public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.SuccessValue == SuccessValue {
         self.future = Future<Result>(resultFrom: wrapped)
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.progress = .taskRoot(for: .wrappingSuccess(of: wrapped, uponCancel: cancellation))
+        self.progress = TaskChain(startingWith: wrapped, uponCancel: cancellation).effectiveProgress
         #else
         self.cancellation = {
             wrapped.cancel()

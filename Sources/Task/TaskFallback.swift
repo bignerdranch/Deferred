@@ -9,7 +9,6 @@
 #if SWIFT_PACKAGE
 import Deferred
 #endif
-import Foundation
 
 extension TaskProtocol {
     /// Begins another task in the case of the failure of `self` by calling
@@ -39,35 +38,42 @@ extension TaskProtocol {
     /// - see: FutureProtocol.andThen(upon:start:)
     public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Error) throws -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = preparedProgressForContinuedWork()
+        let chain = TaskChain(continuingWith: self)
         #else
         let cancellationToken = Deferred<Void>()
         #endif
 
-        let future: Future = andThen(upon: executor) { (result) -> Task<SuccessValue> in
+        let future: Future = andThen(upon: executor) { (result) -> Future<NewTask.Value> in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            progress.becomeCurrent(withPendingUnitCount: 1)
-            defer { progress.resignCurrent() }
+            chain.beginAndThen()
             #endif
 
             do {
                 let value = try result.extract()
-                return Task(success: value)
+                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+                chain.flushAndThen()
+                #endif
+                return Future(success: value)
             } catch {
                 do {
                     let newTask = try restartTask(error)
-                    #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+                    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+                    chain.commitAndThen(with: newTask)
+                    #else
                     cancellationToken.upon(execute: newTask.cancel)
                     #endif
-                    return Task(newTask)
+                    return Future(newTask)
                 } catch {
-                    return Task(failure: error)
+                    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+                    chain.flushAndThen()
+                    #endif
+                    return Future(failure: error)
                 }
             }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<SuccessValue>(future, progress: progress)
+        return Task<SuccessValue>(future, progress: chain.effectiveProgress)
         #else
         return Task<SuccessValue>(future) {
             cancellationToken.fill(with: ())

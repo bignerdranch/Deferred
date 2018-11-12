@@ -35,13 +35,13 @@ extension TaskProtocol {
     /// - see: FutureProtocol.map(upon:transform:)
     public func map<NewSuccessValue>(upon executor: Executor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = preparedProgressForContinuedWork()
+        let chain = TaskChain(continuingWith: self)
         #endif
 
         let future: Future = map(upon: executor) { (result) -> Task<NewSuccessValue>.Result in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            progress.becomeCurrent(withPendingUnitCount: 1)
-            defer { progress.resignCurrent() }
+            chain.beginMap()
+            defer { chain.commitMap() }
             #endif
 
             return Task<NewSuccessValue>.Result {
@@ -50,7 +50,7 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<NewSuccessValue>(future, progress: progress)
+        return Task<NewSuccessValue>(future, progress: chain.effectiveProgress)
         #else
         return Task<NewSuccessValue>(future, uponCancel: cancel)
         #endif

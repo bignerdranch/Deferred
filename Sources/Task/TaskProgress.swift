@@ -207,13 +207,6 @@ extension Progress {
 // MARK: - Convenience initializers
 
 extension Progress {
-    /// Indeterminate progress which will likely not change.
-    static func indefinite() -> Progress {
-        let progress = Progress(totalUnitCount: -1)
-        progress.isCancellable = false
-        return progress
-    }
-
     /// A simple indeterminate progress with a cancellation function.
     static func wrappingCompletion<Wrapped: FutureProtocol>(of wrapped: Wrapped, uponCancel cancellation: (() -> Void)?) -> Progress {
         let totalUnitCount: Int64 = wrapped.peek() != nil ? 0 : -1

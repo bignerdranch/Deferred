@@ -23,9 +23,9 @@ class TaskProgressTests: CustomExecutorTestCase {
         ("testThatTaskCreatedWithProgressReflectsThatProgress", testThatTaskCreatedWithProgressReflectsThatProgress),
         ("testTaskCreatedUnfilledIs0PercentCompleted", testTaskCreatedUnfilledIs0PercentCompleted),
         ("testTaskCreatedFilledIs100PercentCompleted", testTaskCreatedFilledIs100PercentCompleted),
-        ("testThatTaskCreatedUnfilledIsIndeterminate", testThatTaskCreatedUnfilledIsIndeterminate),
-        ("testThatTaskWrappingUnfilledIsIndeterminate", testThatTaskWrappingUnfilledIsIndeterminate),
-        ("testThatTaskCreatedFilledIsDeterminate", testThatTaskCreatedFilledIsDeterminate),
+        ("testThatTaskCreatedUnfilledIsNotFinished", testThatTaskCreatedUnfilledIsNotFinished),
+        ("testThatTaskWrappingUnfilledIsNotFinished", testThatTaskWrappingUnfilledIsNotFinished),
+        ("testThatTaskCreatedFilledIsFinished", testThatTaskCreatedFilledIsFinished),
         ("testThatMapProgressFinishesAlongsideBaseProgress", testThatMapProgressFinishesAlongsideBaseProgress),
         ("testThatAndThenProgressFinishesAlongsideBaseProgress", testThatAndThenProgressFinishesAlongsideBaseProgress),
         ("testThanMappedProgressTakesUpMajorityOfDerivedProgress", testThanMappedProgressTakesUpMajorityOfDerivedProgress)
@@ -82,20 +82,20 @@ class TaskProgressTests: CustomExecutorTestCase {
         XCTAssertEqual(completedTask.progress.fractionCompleted, 1)
     }
 
-    func testThatTaskCreatedUnfilledIsIndeterminate() {
+    func testThatTaskCreatedUnfilledIsNotFinished() {
         let task = Task<Int>.never
-        XCTAssert(task.progress.isIndeterminate)
+        XCTAssertFalse(task.progress.isFinished)
     }
 
-    func testThatTaskWrappingUnfilledIsIndeterminate() {
+    func testThatTaskWrappingUnfilledIsNotFinished() {
         let deferred = Task<Int>.Promise()
         let wrappedTask = Task(deferred)
-        XCTAssertFalse(wrappedTask.progress.isIndeterminate)
+        XCTAssertFalse(wrappedTask.progress.isFinished)
     }
 
-    func testThatTaskCreatedFilledIsDeterminate() {
+    func testThatTaskCreatedFilledIsFinished() {
         let completedTask = Task(success: 42)
-        XCTAssertFalse(completedTask.progress.isIndeterminate)
+        XCTAssert(completedTask.progress.isFinished)
     }
 
     func testThatMapProgressFinishesAlongsideBaseProgress() {

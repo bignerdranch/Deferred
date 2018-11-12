@@ -243,15 +243,6 @@ public final class Task<SuccessValue>: NSObject {
         }
         #endif
     }
-
-    private init(never: ()) {
-        self.future = .never
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        self.progress = .indefinite()
-        #else
-        self.cancellation = {}
-        #endif
-    }
 }
 
 extension Task: TaskProtocol {
@@ -348,6 +339,6 @@ extension Task {
 
     /// Create a task that will never complete.
     public static var never: Task<SuccessValue> {
-        return Task(never: ())
+        return Task(Future<Result>.never)
     }
 }

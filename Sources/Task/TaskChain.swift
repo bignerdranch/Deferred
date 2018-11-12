@@ -19,6 +19,9 @@ struct TaskChain {
     /// The default work unit count for a single call to a `Task` initializer or
     /// chaining method.
     private static let singleUnit = Int64(1)
+    /// The work unit count when a `Task` initializer or chaining method accepts
+    /// an user-provided `Progress` instance.
+    private static let explicitChildUnitCount = Int64(100)
 
     /// Marker class representing the start of a task chain.
     ///
@@ -62,14 +65,15 @@ struct TaskChain {
         } else {
             // Create a "root" progress for the task and its follow-up steps.
             // If the initial operation provides progress, give it a 100x slice.
+            let unitCount = customProgress == nil ? TaskChain.singleUnit : TaskChain.explicitChildUnitCount
             self.root = Root()
-            self.root.totalUnitCount = TaskChain.singleUnit
+            self.root.totalUnitCount = unitCount
             self.effectiveProgress = root
 
             if let customProgress = customProgress, cancellation == nil {
-                root.adoptChild(customProgress, withPendingUnitCount: TaskChain.singleUnit)
+                root.adoptChild(customProgress, withPendingUnitCount: unitCount)
             } else {
-                root.monitorCompletion(of: wrapped, uponCancel: cancellation, withPendingUnitCount: TaskChain.singleUnit)
+                root.monitorCompletion(of: wrapped, uponCancel: cancellation, withPendingUnitCount: unitCount)
             }
         }
     }
@@ -120,7 +124,9 @@ struct TaskChain {
     /// See `beginAndThen`.
     func commitAndThen<Wrapped: TaskProtocol>(with wrapped: Wrapped) {
         if let task = wrapped as? Task<Wrapped.SuccessValue>, !(task.progress is Root) {
-            root.adoptChild(task.progress, withPendingUnitCount: TaskChain.singleUnit)
+            let pendingUnitCount = task.progress.wasGeneratedByTask ? TaskChain.singleUnit : TaskChain.explicitChildUnitCount
+            root.totalUnitCount += pendingUnitCount - TaskChain.singleUnit
+            root.adoptChild(task.progress, withPendingUnitCount: pendingUnitCount)
         } else {
             root.monitorCompletion(of: wrapped, uponCancel: wrapped.cancel, withPendingUnitCount: TaskChain.singleUnit)
         }

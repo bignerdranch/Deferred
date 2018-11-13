@@ -40,14 +40,26 @@ extension XCTestCase {
         }), evaluatedWith: NSNull(), handler: nil)
     }
 
+    var shortTimeoutInverted: TimeInterval {
+        return 0.5
+    }
+
+    var shortTimeout: TimeInterval {
+        return 3
+    }
+
+    var longTimeout: TimeInterval {
+        return 10
+    }
+
 #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
     func shortWait(for expectations: [XCTestExpectation]) {
-        let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? 0.5 : expectations.count > 10 ? 10 : 3
+        let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? shortTimeoutInverted : expectations.count > 10 ? longTimeout : shortTimeout
         wait(for: expectations, timeout: timeout)
     }
 #else
     func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: Int = #line) {
-        let timeout: TimeInterval = expectations.count > 10 ? 10 : 3
+        let timeout: TimeInterval = expectations.count > 10 ? longTimeout : shortTimeout
         waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
     }
 #endif
@@ -97,10 +109,6 @@ class CustomExecutorTestCase: XCTestCase {
 
     final var executor: Executor {
         return _executor
-    }
-
-    final func assertExecutorNeverCalled(file: StaticString = #file, line: UInt = #line) {
-        XCTAssert(_executor.submitCount.withReadLock({ $0 == 0 }), "Executor was called unexpectedly", file: file, line: line)
     }
 
     final func assertExecutorCalled(atLeast times: Int, file: StaticString = #file, line: UInt = #line) {

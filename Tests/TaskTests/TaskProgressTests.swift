@@ -9,11 +9,10 @@
 import XCTest
 
 #if SWIFT_PACKAGE
-import Atomics
+import Deferred
 import Task
 #else
 import Deferred
-import Deferred.Atomics
 #endif
 
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
@@ -23,12 +22,16 @@ class TaskProgressTests: CustomExecutorTestCase {
         ("testThatTaskCreatedWithProgressReflectsThatProgress", testThatTaskCreatedWithProgressReflectsThatProgress),
         ("testTaskCreatedUnfilledIs0PercentCompleted", testTaskCreatedUnfilledIs0PercentCompleted),
         ("testTaskCreatedFilledIs100PercentCompleted", testTaskCreatedFilledIs100PercentCompleted),
-        ("testThatTaskCreatedUnfilledIsIndeterminate", testThatTaskCreatedUnfilledIsIndeterminate),
-        ("testThatTaskWrappingUnfilledIsIndeterminate", testThatTaskWrappingUnfilledIsIndeterminate),
-        ("testThatTaskCreatedFilledIsDeterminate", testThatTaskCreatedFilledIsDeterminate),
-        ("testThatMapProgressFinishesAlongsideBaseProgress", testThatMapProgressFinishesAlongsideBaseProgress),
-        ("testThatAndThenProgressFinishesAlongsideBaseProgress", testThatAndThenProgressFinishesAlongsideBaseProgress),
-        ("testThanMappedProgressTakesUpMajorityOfDerivedProgress", testThanMappedProgressTakesUpMajorityOfDerivedProgress)
+        ("testThatTaskCreatedUnfilledIsNotFinished", testThatTaskCreatedUnfilledIsNotFinished),
+        ("testThatTaskWrappingUnfilledIsNotFinished", testThatTaskWrappingUnfilledIsNotFinished),
+        ("testThatTaskCreatedFilledIsFinished", testThatTaskCreatedFilledIsFinished),
+        ("testThatMapProgressFinishes", testThatMapProgressFinishes),
+        ("testThatAndThenProgressFinishes", testThatAndThenProgressFinishes),
+        ("testThatChainingWithAThrownErrorFinishes", testThatChainingWithAThrownErrorFinishes),
+        ("testThatChainingAFutureIsWeightedEqually", testThatChainingAFutureIsWeightedEqually),
+        ("testThatChainingATaskWithoutCustomProgressIsWeightedEqually", testThatChainingATaskWithoutCustomProgressIsWeightedEqually),
+        ("testThatChainingATaskWithCustomProgressIsWeighted", testThatChainingATaskWithCustomProgressIsWeighted),
+        ("testThatChainingWithCustomProgressIsWeighted", testThatChainingWithCustomProgressIsWeighted)
     ]
 
     func testThatCancellationIsAppliedImmediatelyWhenMapping() {
@@ -50,8 +53,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         XCTAssert(afterTask.progress.isCancelled)
 
-        shortWait(for: [ beforeExpect, afterExpect ])
-        assertExecutorNeverCalled()
+        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeout)
     }
 
     func testThatTaskCreatedWithProgressReflectsThatProgress() {
@@ -64,7 +66,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         let task = Task<Int>(.never, progress: progress)
 
-        XCTAssertEqual(task.progress.fractionCompleted, 0, accuracy: 0.001)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
         XCTAssertEqual(progress.userInfo[key] as? Bool, true)
         XCTAssert(task.progress.isCancellable)
 
@@ -82,83 +84,229 @@ class TaskProgressTests: CustomExecutorTestCase {
         XCTAssertEqual(completedTask.progress.fractionCompleted, 1)
     }
 
-    func testThatTaskCreatedUnfilledIsIndeterminate() {
+    func testThatTaskCreatedUnfilledIsNotFinished() {
         let task = Task<Int>.never
-        XCTAssert(task.progress.isIndeterminate)
+        XCTAssertFalse(task.progress.isFinished)
     }
 
-    func testThatTaskWrappingUnfilledIsIndeterminate() {
+    func testThatTaskWrappingUnfilledIsNotFinished() {
         let deferred = Task<Int>.Promise()
         let wrappedTask = Task(deferred)
-        XCTAssertFalse(wrappedTask.progress.isIndeterminate)
+        XCTAssertFalse(wrappedTask.progress.isFinished)
     }
 
-    func testThatTaskCreatedFilledIsDeterminate() {
+    func testThatTaskCreatedFilledIsFinished() {
         let completedTask = Task(success: 42)
-        XCTAssertFalse(completedTask.progress.isIndeterminate)
+        XCTAssert(completedTask.progress.isFinished)
     }
 
-    func testThatMapProgressFinishesAlongsideBaseProgress() {
-        let deferred = Task<Int>.Promise()
-        let task1 = Task(deferred)
-        let task2 = task1.map(upon: queue) { $0 * 2 }
+    private func expectation(toFinish progress: Progress) -> XCTestExpectation {
+        return XCTKVOExpectation(keyPath: #keyPath(Progress.isFinished), object: progress, expectedValue: true, options: .initial)
+    }
 
-        XCTAssertNotEqual(task1.progress.fractionCompleted, 1)
-        XCTAssertNotEqual(task2.progress.fractionCompleted, 1)
+    func testThatMapProgressFinishes() {
+        let deferred = Task<Int>.Promise()
+        let task = deferred.map(upon: queue) { $0 * 2 }
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 2)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         deferred.succeed(with: 9000)
 
-        shortWait(for: [
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task1.progress),
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task2.progress),
+        wait(for: [
+            expectation(toFinish: task.progress),
             expectQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
     }
 
-    func testThatAndThenProgressFinishesAlongsideBaseProgress() {
-        let deferred = Task<Int>.Promise()
-        let task1 = Task(deferred)
-        let task2 = task1.andThen(upon: executor) { (result) -> Task<Int>.Promise in
-            let deferred2 = Task<Int>.Promise()
-            self.afterShortDelay {
-                deferred2.succeed(with: result * 2)
-            }
-            return deferred2
+    private func delaySuccessAsFuture<Value>(_ value: @autoclosure @escaping() -> Value) -> Future<TaskResult<Value>> {
+        let deferred = Task<Value>.Promise()
+        afterShortDelay {
+            deferred.succeed(with: value())
         }
-
-        XCTAssertNotEqual(task1.progress.fractionCompleted, 1)
-        XCTAssertNotEqual(task2.progress.fractionCompleted, 1)
-
-        deferred.succeed(with: 9000)
-
-        shortWait(for: [
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task1.progress),
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task2.progress)
-        ])
-
-        assertExecutorCalled(atLeast: 1)
+        return Future(deferred)
     }
 
-    func testThanMappedProgressTakesUpMajorityOfDerivedProgress() {
-        let customProgress = Progress(totalUnitCount: 5)
-        let deferred = Task<Int>.Promise()
-        let task = Task(deferred, progress: customProgress)
-            .map(upon: .any(), transform: { $0 * 2 })
-            .map(upon: .any(), transform: { "\($0)" })
+    private func delaySuccessAsTask<Value>(_ value: @autoclosure @escaping() -> Value) -> Task<Value> {
+        let promise = Task<Value>.Promise()
+        afterShortDelay {
+            promise.succeed(with: value())
+        }
+        return Task(promise)
+    }
+
+    func testThatAndThenProgressFinishes() {
+        let promise = Task<Int>.Promise()
+        let task = promise.andThen(upon: executor) { self.delaySuccessAsFuture($0 * 2) }
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 2)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        promise.succeed(with: 9000)
+
+        wait(for: [
+            expectation(toFinish: task.progress),
+            expectationThatExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 2)
+        XCTAssertEqual(task.progress.totalUnitCount, 2)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
+    }
+
+    func testThatChainingWithAThrownErrorFinishes() {
+        let promise = Task<Int>.Promise()
+        let task = promise.andThen(upon: executor) { _ throws -> Task<String> in throw TestError.first }
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 2)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        promise.succeed(with: 9000)
+
+        wait(for: [
+            expectation(toFinish: task.progress),
+            expectationThatExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 2)
+        XCTAssertEqual(task.progress.totalUnitCount, 2)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
+    }
+
+    func testThatChainingAFutureIsWeightedEqually() {
+        let promise = Task<Int>.Promise()
+        let task = promise
+            .andThen(upon: .any(), start: { self.delaySuccessAsFuture($0 * 2) })
+            .andThen(upon: .any(), start: { self.delaySuccessAsTask("\($0)") })
             .map(upon: .any(), transform: { "\($0)\($0)" })
 
-        XCTAssertNotEqual(customProgress.fractionCompleted, 1)
-        XCTAssertNotEqual(task.progress.fractionCompleted, 1)
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 4)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        promise.succeed(with: 9000)
+
+        wait(for: [
+            expectation(toFinish: task.progress)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 4)
+        XCTAssertEqual(task.progress.totalUnitCount, 4)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
+    }
+
+    func testThatChainingATaskWithoutCustomProgressIsWeightedEqually() {
+        let promise = Task<Int>.Promise()
+        let task = Task(promise)
+            .andThen(upon: .any(), start: { self.delaySuccessAsFuture($0 * 2) })
+            .andThen(upon: .any(), start: { self.delaySuccessAsTask("\($0)") })
+            .map(upon: .any(), transform: { "\($0)\($0)" })
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 4)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        promise.succeed(with: 9000)
+
+        wait(for: [
+            expectation(toFinish: task.progress)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 4)
+        XCTAssertEqual(task.progress.totalUnitCount, 4)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
+    }
+
+    func testThatChainingATaskWithCustomProgressIsWeighted() {
+        let promise = Task<Int>.Promise()
+        let customProgress = Progress()
+        customProgress.totalUnitCount = 5
+
+        let task = Task(promise, progress: customProgress)
+            .andThen(upon: .any(), start: { self.delaySuccessAsFuture($0 * 2) })
+            .andThen(upon: .any(), start: { self.delaySuccessAsTask("\($0)") })
+            .map(upon: .any(), transform: { "\($0)\($0)" })
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 103)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         customProgress.completedUnitCount = 5
 
-        XCTAssertGreaterThanOrEqual(task.progress.fractionCompleted, 0.75)
+        XCTAssertEqual(task.progress.completedUnitCount, 100)
+        XCTAssertEqual(task.progress.totalUnitCount, 103)
+        XCTAssertGreaterThanOrEqual(task.progress.fractionCompleted, 0.96)
 
-        deferred.succeed(with: 9000)
+        promise.succeed(with: 9000)
 
-        shortWait(for: [
-            expectation(for: NSPredicate(format: "fractionCompleted == 1"), evaluatedWith: task.progress)
-        ])
+        wait(for: [
+            expectation(toFinish: task.progress)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 103)
+        XCTAssertEqual(task.progress.totalUnitCount, 103)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
+    }
+
+    func testThatChainingWithCustomProgressIsWeighted() {
+        let promise1 = Task<Int>.Promise()
+        let customQueue2 = DispatchQueue(label: "\(type(of: self)).\(#function)")
+        customQueue2.suspend()
+
+        let task = promise1
+            .andThen(upon: .any(), start: { (value) -> Task<Int> in
+                let promise2 = Task<Int>.Promise()
+                let customProgress = Progress()
+                customProgress.totalUnitCount = 87135
+
+                customQueue2.async {
+                    customProgress.completedUnitCount = 10012
+
+                    customQueue2.async {
+                        customProgress.completedUnitCount = 54442
+
+                        customQueue2.async {
+                            customProgress.completedUnitCount = 67412
+
+                            customQueue2.async {
+                                customProgress.completedUnitCount = 87135
+
+                                promise2.succeed(with: value * 2)
+                            }
+                        }
+                    }
+                }
+
+                return Task(promise2, progress: customProgress)
+            })
+            .map(upon: .any(), transform: { "\($0)" })
+            .map(upon: .any(), transform: { "\($0)\($0)" })
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 4)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        promise1.succeed(with: 9000)
+
+        wait(for: [
+            keyValueObservingExpectation(for: task.progress, keyPath: #keyPath(Progress.totalUnitCount), expectedValue: 103)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 1)
+        XCTAssertLessThanOrEqual(task.progress.fractionCompleted, 0.01)
+
+        customQueue2.resume()
+
+        wait(for: [
+            expectation(toFinish: task.progress)
+        ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 103)
+        XCTAssertEqual(task.progress.totalUnitCount, 103)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 }
 #endif

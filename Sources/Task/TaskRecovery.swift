@@ -9,14 +9,15 @@
 #if SWIFT_PACKAGE
 import Deferred
 #endif
-import Foundation
 
 extension TaskProtocol {
     /// Returns a `Task` containing the result of mapping `substitution` over
     /// the failed task's error.
     ///
-    /// Recovering from a failed task appends a unit of progress to the root
-    /// task. A root task is the earliest, or parent-most, task in a tree.
+    /// On Apple platforms, recovering from a failed task reports its progress
+    /// to the root task. A root task is the earliest task in a chain of tasks.
+    /// During execution of `transform`, an additional progress object created
+    /// using the current parent will also contribute to the chain's progress.
     ///
     /// The resulting task is cancellable in the same way the receiving task is.
     public func recover(upon executor: PreferredExecutor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
@@ -29,21 +30,23 @@ extension TaskProtocol {
     /// `recover` submits the `substitution` to the `executor` once the task
     /// fails.
     ///
-    /// Recovering from a failed task appends a unit of progress to the root
-    /// task. A root task is the earliest, or parent-most, task in a tree.
+    /// On Apple platforms, recovering from a failed task reports its progress
+    /// to the root task. A root task is the earliest task in a chain of tasks.
+    /// During execution of `transform`, an additional progress object created
+    /// using the current parent will also contribute to the chain's progress.
     ///
     /// The resulting task is cancellable in the same way the receiving task is.
     ///
     /// - see: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = preparedProgressForContinuedWork()
+        let chain = TaskChain(continuingWith: self)
         #endif
 
         let future: Future = map(upon: executor) { (result) -> Task<SuccessValue>.Result in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            progress.becomeCurrent(withPendingUnitCount: 1)
-            defer { progress.resignCurrent() }
+            chain.beginMap()
+            defer { chain.commitMap() }
             #endif
 
             return Task<SuccessValue>.Result {
@@ -52,7 +55,7 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<SuccessValue>(future, progress: progress)
+        return Task<SuccessValue>(future, progress: chain.effectiveProgress)
         #else
         return Task<SuccessValue>(future, uponCancel: cancel)
         #endif

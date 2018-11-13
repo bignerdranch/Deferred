@@ -9,15 +9,16 @@
 #if SWIFT_PACKAGE
 import Deferred
 #endif
-
 import Dispatch
 
 extension TaskProtocol {
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
     ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
+    /// On Apple platforms, chaining a task contributes a unit of progress to
+    /// the root task. A root task is the earliest task in a chain of tasks. If
+    /// `startNextTask` runs and returns a task that itself reports progress,
+    /// that progress will also contribute to the chain's overall progress.
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
@@ -28,8 +29,10 @@ extension TaskProtocol {
     /// Begins another task by passing the result of the task to `startNextTask`
     /// once it completes successfully.
     ///
-    /// Chaining a task appends a unit of progress to the root task. A root task
-    /// is the earliest, or parent-most, task in a tree of tasks.
+    /// On Apple platforms, chaining a task contributes a unit of progress to
+    /// the root task. A root task is the earliest task in a chain of tasks. If
+    /// `startNextTask` runs and returns a task that itself reports progress,
+    /// that progress will also contribute to the chain's overall progress.
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
@@ -40,36 +43,35 @@ extension TaskProtocol {
     /// - see: FutureProtocol.andThen(upon:start:)
     public func andThen<NewTask: TaskProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.SuccessValue> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let progress = preparedProgressForContinuedWork()
+        let chain = TaskChain(continuingWith: self)
         #else
         let cancellationToken = Deferred<Void>()
         #endif
 
-        let future: Future = andThen(upon: executor) { (result) -> Task<NewTask.SuccessValue> in
+        let future: Future<NewTask.Value> = andThen(upon: executor) { (result) -> Future<NewTask.Value> in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            // We want to become the thread-local progress, but we don't
-            // want to consume units; we may not attach newTask.progress to
-            // the root progress until after the scope ends.
-            progress.becomeCurrent(withPendingUnitCount: 1)
-            defer { progress.resignCurrent() }
+            chain.beginAndThen()
             #endif
 
             do {
                 let value = try result.extract()
-                // Attempt to create and wrap the next task. Task's own progress
-                // wrapper logic takes over at this point.
                 let newTask = try startNextTask(value)
-                #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
+                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+                chain.commitAndThen(with: newTask)
+                #else
                 cancellationToken.upon(DispatchQueue.any(), execute: newTask.cancel)
                 #endif
-                return Task<NewTask.SuccessValue>(newTask)
+                return Future(newTask)
             } catch {
-                return Task<NewTask.SuccessValue>(failure: error)
+                #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+                chain.flushAndThen()
+                #endif
+                return Future(failure: error)
             }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<NewTask.SuccessValue>(future, progress: progress)
+        return Task<NewTask.SuccessValue>(future, progress: chain.effectiveProgress)
         #else
         return Task<NewTask.SuccessValue>(future) {
             cancellationToken.fill(with: ())

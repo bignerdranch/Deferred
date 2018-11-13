@@ -17,10 +17,177 @@ import Atomics
 import Deferred.Atomics
 #endif
 
-/// A wrapper over any task.
+/// A type for managing some work that may either succeed or fail at some point
+/// in the future, including interacting with the end result of the work.
 ///
-/// Forwards operations to an arbitrary underlying future having the same result
-/// type, optionally combined with some `cancellation`.
+/// Tasks work exactly like futures but, because they operate on types that
+/// have one or more exclusive states to describe a success or failure, have
+/// patterns for dealing with just the successful value, the failing error,
+/// chaining dependent operations together, recovering from errors, and so on.
+///
+/// Returning a `Task` from your API encapsulates the entire lifecycle of
+/// asynchronous work, regardless of it being managed by `OperationQueue`,
+/// or `DispatchQueue`, or `URLSession`. Consumers of your `Task` object might
+/// interact with the task by cancelling, pausing, or resuming it.
+///
+/// Creating a Task
+/// ===============
+///
+/// Like `Future`, a task will forward operations involving the result of the
+/// work being performed to some underlying type, hiding the implementation
+/// details of your asynchronous API.
+///
+///     let promise = Task<Int>.Promise()
+///     DispatchQueue.any().asyncAfter(deadline: .now() + 3) {
+///         if Bool.random() {
+///             promise.succeed(with: 4) // chosen by fair dice roll.
+///                                      // guaranteed to be random.
+///         } else {
+///             promise.fail(with: Error.reallyBad)
+///         }
+///     }
+///     return Task(promise)
+///
+/// Tasks Represent Workflows
+/// =========================
+///
+/// You can design an API to use `Task` even the result is known immediately.
+/// This allows you to evolve your code over time without changing callers of
+/// the code.
+///
+///     let alreadySucceeded = Task(success: "13 miles away")
+///     let alreadyFailed = Task(failure: Error.couldNotFetchLocation)
+///
+/// Consider a method that checks the validity of parameters to a web
+/// service before fetching from it:
+///
+///     func fetchFriends(for user: User) throws -> Future<[Friend]?> {
+///         guard !user.id.isEmpty else {
+///             throw Error.invalidParameters
+///         }
+///
+///         ...
+///     }
+///
+/// Consuming this asynchronous value must be done in multiple paths:
+///
+///     do {
+///         let futureFriends = try fetchFriends(for: currentUser)
+///         futureFriends.upon(managedObjectContext) { (friends) in
+///             if let friends = friends {
+///                 do {
+///                      try import(friends)
+///                 catch {
+///                      // handle an error
+///                 }
+///             } else {
+///                 // handle an error
+///             }
+///         }
+///     } catch {
+///         // handle an error
+///     }
+///
+/// Embracing `Task` as the common currency type between layers of code in
+/// your application can consolidate these multiple branches of checking.
+///
+///     func fetchFriends(for user: User) -> Task<[Friend]> {
+///         guard !user.id.isEmpty else {
+///             return Task(failure: Error.invalidParameters)
+///         }
+///
+///         ...
+///     }
+///
+///     fetchFriends(for: currentUser)
+///         .map(upon: managedObjectContext, transform: import)
+///         .uponSuccess(on: .main) { _ in /* handle success */ }
+///         .uponFailure(on: .main) { _ in /* handle failure */ }
+///
+/// Tasks Can Be Cancelled
+/// ======================
+///
+/// When creating a task from a future or promise, an optional `cancellation`
+/// handler can be provided. Inside this method body, you can cancel ongoing
+/// work, such as a network connection or image processing.
+///
+/// When the underlying work can be interrupted, cancelling a `Task` will
+/// typically lead to the operation completing with an error, such as
+/// `CocoaError.userCancelled`.
+///
+///     let promise = Task<UIImage>.Promise()
+///     let operation = makeImageProcessingOperation(for: data)
+///     operation.completionBlock = { [unowned operation] in
+///         promise.fill(with: operation.result!)
+///     }
+///     operationQueue.add(operation)
+///     return Task(promise, uponCancel: operation.cancel)
+///
+/// Cancellation may be invoked in any threading context. If work associated
+/// with cancellation must be done on a specific queue, dispatch to that queue
+/// from within the cancellation handler.
+///
+/// Tasks Can Report Progress
+/// =========================
+///
+/// On macOS, iOS, watchOS, and tvOS, where apps are expected to react to
+/// current conditions, `Task` will automatically maintain instances of the
+/// `Progress` object. These objects can be used to drive UI controls displaying
+/// that progress, as well as interactive controls like buttons to cancel,
+/// pause, or resume the work.
+///
+/// In the simplest cases, using `Task` and methods like `map` and `andThen`
+/// give some insight into the work your application is doing and improve the
+/// user experience. Consider:
+///
+///     let task = downloadImage(for: url)
+///         .map(upon: .any(), transform: decompressImage)
+///         .map(upon: .any(), start: applyFiltersToImage)
+///         .map(upon: .any(), start: writeImageToCache)
+///
+/// `task.progress` will have four work units, each of which will complete after
+/// the work assiociated with the initial task, `map`, `andThen`, and `map`,
+/// yielding progress updates of 25%, 50%, 75%, and 100% respectively.
+///
+/// If you have a better source of data for progress, like those provided on
+/// `URLSessionTask` or `UIDocument`, those can also be incorporated into
+/// `Task` during creation. These `Task`s are weighted more than surrounding
+/// calls to `map` or `andThen`. For instance, you can modify `downloadImage`
+/// above to include another source of progress:
+///
+///     func downloadImage(for url: URL) -> Task<Data> {
+///         let promise = Task<Data>.Promise()
+///         let urlSessionTask = urlSession.dataTask(with: url) {
+///            promise.fill(with: ...)
+///         }
+///         urlSessionTask.resume()
+///         return Task(promise, progress: urlSessionTask.progress)
+///     }
+///
+/// `downloadImage` will account for up to 90% of the returned progress. That
+/// 90% "slice" will fill in as chunks of data get loaded from the network.
+///
+/// You may also create your own `Progress` instances to be given to `Task`.
+/// Progress objects use any context you desire, like byte counts or fractions,
+/// and will also be weighted higher by `Task`. If `applyFiltersToImage` above
+/// applies 5 user-selected filters, you might create a custom progress and
+/// update it when each of the filters is complete:
+///
+///      func applyFiltersToImage(_ image: UIImage) -> UIImage {
+///          var image = image
+///          let progress = Progress(totalUnitCount: filters.count)
+///          for (n, filter) in filters.enumerated() {
+///              image = filter.apply(to: image)
+///              progress.completedUnitCount = n
+///          }
+///          return image
+///      }
+///
+/// `downloadImage` and `applyFiltersToImage` will each take up to 45% of the
+/// returned progress.
+///
+/// - seealso: `TaskProtocol`
+/// - seealso: `Future`
 public final class Task<SuccessValue>: NSObject {
     /// A type for returning and propagating recoverable errors.
     public typealias Result = TaskResult<SuccessValue>

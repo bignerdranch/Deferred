@@ -106,7 +106,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     func testThatMapProgressFinishes() {
         let deferred = Task<Int>.Promise()
-        let task = deferred.map(upon: queue) { $0 * 2 }
+        let task = deferred.map(upon: customQueue) { $0 * 2 }
 
         XCTAssertEqual(task.progress.completedUnitCount, 0)
         XCTAssertEqual(task.progress.totalUnitCount, 2)
@@ -116,7 +116,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         wait(for: [
             expectation(toFinish: task.progress),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ], timeout: shortTimeout)
     }
 

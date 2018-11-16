@@ -116,11 +116,11 @@ class CustomExecutorTestCase: XCTestCase {
         }), evaluatedWith: self)
     }
 
-    final let queue = DispatchQueue(label: "com.bignerdranch.DeferredTests")
+    final let customQueue = DispatchQueue(label: "com.bignerdranch.DeferredTests")
 
-    final func expectQueueToBeEmpty(description: String? = nil, file: StaticString = #file, line: UInt = #line) -> XCTestExpectation {
-        let expect = expectation(description: description ?? "queue is empty")
-        queue.async(flags: .barrier) {
+    final func expectCustomQueueToBeEmpty() -> XCTestExpectation {
+        let expect = expectation(description: "queue is empty")
+        customQueue.async(flags: .barrier) {
             expect.fulfill()
         }
         return expect

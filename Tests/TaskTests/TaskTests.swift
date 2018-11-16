@@ -167,13 +167,13 @@ class TaskTests: CustomExecutorTestCase {
     }
 
     func testThatFallbackProducesANewTask() {
-        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in
+        let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
         shortWait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
     }
 
@@ -190,7 +190,7 @@ class TaskTests: CustomExecutorTestCase {
 
     func testThatFallbackReturnsOriginalSuccessValue() {
         let (deferred, task1) = makeAnyUnfinishedTask()
-        let task2 = task1.fallback(upon: queue) { _ -> Task<Int> in
+        let task2 = task1.fallback(upon: customQueue) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
@@ -199,7 +199,7 @@ class TaskTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
     }
 
@@ -220,7 +220,7 @@ class TaskTests: CustomExecutorTestCase {
 
     func testThatFallbackForwardsCancellationToSubsequentTask() {
         let cancelToBeCalled = expectation(description: "flatMapped task is cancelled")
-        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in
+        let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in
             Task(.never) { cancelToBeCalled.fulfill() }
         }
 
@@ -228,16 +228,16 @@ class TaskTests: CustomExecutorTestCase {
 
         shortWait(for: [
             cancelToBeCalled,
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
     }
 
     func testThatFallbackSubstitutesThrownError() {
-        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in throw TestError.third }
+        let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in throw TestError.third }
 
         shortWait(for: [
             expectation(that: task, failsWith: TestError.third),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
     }
 
@@ -253,14 +253,14 @@ class TaskTests: CustomExecutorTestCase {
 
     func testRepeatPassesThroughInitialSuccess() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3) {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3) {
             bnr_atomic_fetch_add(&counter, 1)
             return self.makeAnyFinishedTask()
         }
 
         shortWait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
 
         XCTAssertEqual(bnr_atomic_load(&counter), 1)
@@ -268,14 +268,14 @@ class TaskTests: CustomExecutorTestCase {
 
     func testRepeatStartsTaskManyTimesForFailure() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3) {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3) {
             bnr_atomic_fetch_add(&counter, 1)
             return self.makeAnyFailedTask()
         }
 
         shortWait(for: [
             expectation(that: task, failsWith: TestError.first),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
 
         XCTAssertEqual(bnr_atomic_load(&counter), 4)
@@ -283,13 +283,13 @@ class TaskTests: CustomExecutorTestCase {
 
     func testRepeatPassesThroughSuccessFromRetry() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3) {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3) {
             return bnr_atomic_fetch_add(&counter, 1) == 1 ? self.makeAnyFinishedTask() : self.makeAnyFailedTask()
         }
 
         shortWait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
 
         XCTAssertEqual(bnr_atomic_load(&counter), 2)
@@ -297,14 +297,14 @@ class TaskTests: CustomExecutorTestCase {
 
     func testRepeatPassesThroughFailureForContinuation() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3, continuingIf: { _ in false }, to: {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3, continuingIf: { _ in false }, to: {
             bnr_atomic_fetch_add(&counter, 1)
             return self.makeAnyFailedTask()
         })
 
         shortWait(for: [
             expectation(that: task, failsWith: TestError.first),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ])
 
         XCTAssertEqual(bnr_atomic_load(&counter), 1)

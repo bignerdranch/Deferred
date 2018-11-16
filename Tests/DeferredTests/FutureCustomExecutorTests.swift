@@ -21,31 +21,35 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         let deferred = Deferred<Void>()
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        deferred.upon(executor) { _ in
+        deferred.upon(customExecutor) { _ in
             expect.fulfill()
         }
 
         deferred.fill(with: ())
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testMap() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let mapped = marker.map(upon: executor) { _ in testValue }
+        let mapped = marker.map(upon: customExecutor) { _ in testValue }
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        mapped.upon(executor) {
+        mapped.upon(customExecutor) {
             XCTAssertEqual($0, testValue)
             expect.fulfill()
         }
 
         marker.fill(with: ())
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 2)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 2)
+        ], timeout: shortTimeout)
     }
 
     // Should this be promoted to an initializer on Future?
@@ -60,17 +64,19 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     func testAndThen() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let flattened = marker.andThen(upon: executor) { _ in self.delay(testValue) }
+        let flattened = marker.andThen(upon: customExecutor) { _ in self.delay(testValue) }
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        flattened.upon(executor) {
+        flattened.upon(customExecutor) {
             XCTAssertEqual($0, testValue)
             expect.fulfill()
         }
 
         marker.fill(with: ())
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 3)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 3)
+        ], timeout: shortTimeout)
     }
 }

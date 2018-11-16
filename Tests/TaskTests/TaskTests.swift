@@ -38,7 +38,7 @@ class TaskTests: CustomExecutorTestCase {
 
     private func expectation<T: Equatable>(that task: Task<T>, succeedsWith makeExpected: @autoclosure @escaping() -> T, description: String? = nil) -> XCTestExpectation {
         let expect = expectation(description: description ?? "uponSuccess is called")
-        task.uponSuccess(on: executor) { (value) in
+        task.uponSuccess(on: customExecutor) { (value) in
             XCTAssertEqual(value, makeExpected())
             expect.fulfill()
         }
@@ -47,7 +47,7 @@ class TaskTests: CustomExecutorTestCase {
 
     private func expectation<T, U: Error & Equatable>(that task: Task<T>, failsWith makeExpected: @autoclosure @escaping() -> U, description: String? = nil) -> XCTestExpectation {
         let expect = expectation(description: description ?? "uponFailure is called")
-        task.uponFailure(on: executor) { (error) in
+        task.uponFailure(on: customExecutor) { (error) in
             XCTAssertEqual(error as? U, makeExpected())
             expect.fulfill()
         }
@@ -82,8 +82,10 @@ class TaskTests: CustomExecutorTestCase {
 
         deferred.succeed(with: 1)
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testUponFailure() {
@@ -92,153 +94,155 @@ class TaskTests: CustomExecutorTestCase {
 
         deferred.fail(with: TestError.first)
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatThrowingMapSubstitutesWithError() {
-        let task: Task<String> = makeAnyFinishedTask().map(upon: executor) { _ in throw TestError.second }
+        let task: Task<String> = makeAnyFinishedTask().map(upon: customExecutor) { _ in throw TestError.second }
         let expect = expectation(that: task, failsWith: TestError.second, description: "mapped filled with error")
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 2)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 2)
+        ], timeout: shortTimeout)
     }
 
     func testThatAndThenForwardsCancellationToSubsequentTask() {
         let expect = expectation(description: "flatMapped task is cancelled")
-        let task = makeAnyFinishedTask().andThen(upon: executor) { _ -> Task<String> in
+        let task = makeAnyFinishedTask().andThen(upon: customExecutor) { _ -> Task<String> in
             Task(.never) { expect.fulfill() }
         }
 
         task.cancel()
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expect,
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatThrowingAndThenSubstitutesWithError() {
-        let task = makeAnyFinishedTask().andThen(upon: executor) { _ -> Task<String> in
+        let task = makeAnyFinishedTask().andThen(upon: customExecutor) { _ -> Task<String> in
             throw TestError.second
         }
 
-        shortWait(for: [
-            expectation(that: task, failsWith: TestError.second, description: "flatMapped task is cancelled")
-        ])
-
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expectation(that: task, failsWith: TestError.second, description: "flatMapped task is cancelled"),
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatRecoverMapsFailures() {
-        let task = makeAnyFailedTask().recover(upon: executor) { _ -> Int in
+        let task = makeAnyFailedTask().recover(upon: customExecutor) { _ -> Int in
             42
         }
 
-        shortWait(for: [
-            expectation(that: task, succeedsWith: 42)
-        ])
-
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expectation(that: task, succeedsWith: 42),
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatMapPassesThroughErrors() {
-        let task = makeAnyFailedTask().map(upon: executor) { (value) -> String in
+        let task = makeAnyFailedTask().map(upon: customExecutor) { (value) -> String in
             XCTFail("Map handler should not be called")
             return String(describing: value)
         }
 
-        shortWait(for: [
-            expectation(that: task, failsWith: TestError.first, description: "original task filled")
-        ])
-
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expectation(that: task, failsWith: TestError.first, description: "original task filled"),
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatRecoverPassesThroughValues() {
-        let task = makeAnyFinishedTask().recover(upon: executor) { _ -> Int in
+        let task = makeAnyFinishedTask().recover(upon: customExecutor) { _ -> Int in
             XCTFail("Recover handler should not be called")
             return -1
         }
 
-        shortWait(for: [
-            expectation(that: task, succeedsWith: 42, description: "filled with same error")
-        ])
-
-        assertExecutorCalled(atLeast: 1)
+        wait(for: [
+            expectation(that: task, succeedsWith: 42, description: "filled with same error"),
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackProducesANewTask() {
-        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in
+        let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackUsingCustomExecutorProducesANewTask() {
-        let task = makeAnyFailedTask().fallback(upon: executor) { _ -> Task<Int> in
+        let task = makeAnyFailedTask().fallback(upon: customExecutor) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectationThatExecutor(isCalledAtLeast: 1)
-        ])
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackReturnsOriginalSuccessValue() {
         let (deferred, task1) = makeAnyUnfinishedTask()
-        let task2 = task1.fallback(upon: queue) { _ -> Task<Int> in
+        let task2 = task1.fallback(upon: customQueue) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
         let expect = expectation(that: task2, succeedsWith: 99)
         deferred.succeed(with: 99)
 
-        shortWait(for: [
+        wait(for: [
             expect,
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue() {
         let (deferred, task1) = makeAnyUnfinishedTask()
-        let task2 = task1.fallback(upon: executor) { _ -> Task<Int> in
+        let task2 = task1.fallback(upon: customExecutor) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
         let expect = expectation(that: task2, succeedsWith: 99)
         deferred.succeed(with: 99)
 
-        shortWait(for: [
+        wait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 1)
-        ])
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackForwardsCancellationToSubsequentTask() {
         let cancelToBeCalled = expectation(description: "flatMapped task is cancelled")
-        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in
+        let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in
             Task(.never) { cancelToBeCalled.fulfill() }
         }
 
         task.cancel()
 
-        shortWait(for: [
+        wait(for: [
             cancelToBeCalled,
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackSubstitutesThrownError() {
-        let task = makeAnyFailedTask().fallback(upon: queue) { _ -> Task<Int> in throw TestError.third }
+        let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in throw TestError.third }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.third),
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
     }
 
     func testSimpleFutureCanBeUpgradedToTask() {
@@ -248,64 +252,64 @@ class TaskTests: CustomExecutorTestCase {
         let expect = expectation(that: task, succeedsWith: 42)
 
         deferred.fill(with: 42)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testRepeatPassesThroughInitialSuccess() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3) {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3) {
             bnr_atomic_fetch_add(&counter, 1)
             return self.makeAnyFinishedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 1)
     }
 
     func testRepeatStartsTaskManyTimesForFailure() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3) {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3) {
             bnr_atomic_fetch_add(&counter, 1)
             return self.makeAnyFailedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.first),
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 4)
     }
 
     func testRepeatPassesThroughSuccessFromRetry() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3) {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3) {
             return bnr_atomic_fetch_add(&counter, 1) == 1 ? self.makeAnyFinishedTask() : self.makeAnyFailedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 2)
     }
 
     func testRepeatPassesThroughFailureForContinuation() {
         var counter = 0
-        let task = Task<Int>.repeat(upon: queue, count: 3, continuingIf: { _ in false }, to: {
+        let task = Task<Int>.repeat(upon: customQueue, count: 3, continuingIf: { _ in false }, to: {
             bnr_atomic_fetch_add(&counter, 1)
             return self.makeAnyFailedTask()
         })
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.first),
-            expectQueueToBeEmpty()
-        ])
+            expectCustomQueueToBeEmpty()
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 1)
     }

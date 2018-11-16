@@ -54,7 +54,7 @@ class LockingTests: XCTestCase {
         var counter = 0
 
         // spin up 5 writers concurrently...
-        let expectations = (0 ..< 5).map { (iteration) -> XCTestExpectation in
+        let allExpectations = (0 ..< 5).map { (iteration) -> XCTestExpectation in
             let expect = expectation(description: "write #\(iteration)")
             queue.async {
                 self.lock.withWriteLock {
@@ -69,7 +69,7 @@ class LockingTests: XCTestCase {
             return expect
         }
 
-        shortWait(for: expectations)
+        wait(for: allExpectations, timeout: shortTimeout)
     }
 
     func testSimultaneousReadersAndWriters() {
@@ -109,7 +109,7 @@ class LockingTests: XCTestCase {
         // and spin up 32 more readers after
         allExpectations += (0 ..< 32).map(startReader)
 
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testSingleThreadPerformanceRead() {
@@ -179,7 +179,7 @@ class POSIXReadWriteLockingTests: LockingTests {
 
         // and make sure all 32 complete in < 3 second. If the readers
         // did not run concurrently, they would take >= 3.2 seconds
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: shortTimeout)
     }
 
 }

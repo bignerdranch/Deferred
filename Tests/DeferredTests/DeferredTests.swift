@@ -42,16 +42,20 @@ class DeferredTests: XCTestCase {
         ("testReflectionFilledWhenValueIsVoid", testReflectionFilledWhenValueIsVoid)
     ]
 
+    #if canImport(Darwin) && !targetEnvironment(simulator)
+    static let darwinDeviceTests: [(String, (DeferredTests) -> () throws -> Void)] = [
+        ("testThatMainThreadPostsUponWithUserInitiatedQoSClass", testThatMainThreadPostsUponWithUserInitiatedQoSClass),
+        ("testThatLowerQoSPostsUponWithSameQoSClass", testThatLowerQoSPostsUponWithSameQoSClass)
+    ]
+
     static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
-        #if os(macOS) || (os(iOS) && !(arch(i386) || arch(x86_64))) || (os(watchOS) && !(arch(i386) || arch(x86_64))) || (os(tvOS) && !arch(x86_64))
-            return universalTests + [
-                ("testThatMainThreadPostsUponWithUserInitiatedQoSClass", testThatMainThreadPostsUponWithUserInitiatedQoSClass),
-                ("testThatLowerQoSPostsUponWithSameQoSClass", testThatLowerQoSPostsUponWithSameQoSClass)
-            ]
-        #else
-            return universalTests
-        #endif
+        return universalTests + darwinDeviceTests
     }
+    #else
+    static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
+        return universalTests
+    }
+    #endif
 
     func testPeekWhenUnfilled() {
         let unfilled = Deferred<Int>()
@@ -75,7 +79,7 @@ class DeferredTests: XCTestCase {
 
         XCTAssertNil(deferred.shortWait())
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testValueOnFilled() {
@@ -96,7 +100,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testValueUnblocksWhenUnfilledIsFilled() {
@@ -112,7 +116,7 @@ class DeferredTests: XCTestCase {
             deferred.fill(with: 3)
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testFill() {
@@ -142,7 +146,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
         toBeFilled.fill(with: 1)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testUponCalledWhenFilled() {
@@ -156,7 +160,7 @@ class DeferredTests: XCTestCase {
             return expect
         }
         toBeFilled.fill(with: 1)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testUponCalledIfAlreadyFilled() {
@@ -172,7 +176,7 @@ class DeferredTests: XCTestCase {
             return expect
         }
 
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testUponNotCalledWhileUnfilled() {
@@ -187,7 +191,7 @@ class DeferredTests: XCTestCase {
             }
             expect = expectation(deallocationOf: object)
         }
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testUponMainQueueCalledWhenFilled() {
@@ -195,17 +199,13 @@ class DeferredTests: XCTestCase {
 
         let expect = expectation(description: "upon block called on main queue")
         deferred.upon(.main) { value in
-            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            XCTAssertTrue(Thread.isMainThread)
-            #else
-            dispatchPrecondition(condition: .onQueue(.main))
-            #endif
+            XCTAssert(Thread.isMainThread)
             XCTAssertEqual(value, 1)
             expect.fulfill()
         }
 
         deferred.fill(with: 1)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testConcurrentUpon() {
@@ -229,7 +229,7 @@ class DeferredTests: XCTestCase {
         }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     /// Deferred values behave as values: All copies reflect the same value.
@@ -250,9 +250,9 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        allDeferreds.random().fill(with: anyValue)
+        allDeferreds.randomElement()?.fill(with: anyValue)
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testDeferredOptionalBehavesCorrectly() {
@@ -273,7 +273,7 @@ class DeferredTests: XCTestCase {
             afterExpect.fulfill()
         }
 
-        shortWait(for: [ beforeExpect, afterExpect ])
+        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeout)
     }
 
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
@@ -294,10 +294,8 @@ class DeferredTests: XCTestCase {
     }
 
     // The QoS APIs do not behave as expected on the iOS Simulator, so we only
-    // run these tests on real devices. This check isn't the most future-proof;
-    // if there's ever another archiecture that runs the simulator, this will
-    // need to be modified.
-    #if os(macOS) || (os(iOS) && !(arch(i386) || arch(x86_64))) || (os(watchOS) && !(arch(i386) || arch(x86_64))) || (os(tvOS) && !arch(x86_64))
+    // run these tests on real devices.
+    #if canImport(Darwin) && !targetEnvironment(simulator)
     func testThatMainThreadPostsUponWithUserInitiatedQoSClass() {
         let deferred = Deferred<Int>()
 
@@ -312,7 +310,7 @@ class DeferredTests: XCTestCase {
 
         deferred.fill(with: 42)
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
         XCTAssertEqual(uponQoS, expectedQoS)
     }
 
@@ -332,10 +330,9 @@ class DeferredTests: XCTestCase {
 
         deferred.fill(with: 42)
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
         XCTAssertEqual(uponQoS, expectedQoS)
     }
-
     #endif // end QoS tests that require a real device
 
     func testSimultaneousFill() {
@@ -349,7 +346,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        for randomValue in 0 ..< (3 ..< 10).random() {
+        for randomValue in 0 ..< 10 {
             DispatchQueue.global().async(group: finishGroup) {
                 XCTAssertEqual(startGroup.wait(timeout: .distantFuture), .success)
                 deferred.fill(with: randomValue)
@@ -358,7 +355,7 @@ class DeferredTests: XCTestCase {
 
         startGroup.leave()
         XCTAssertEqual(finishGroup.wait(timeout: .distantFuture), .success)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testDebugDescriptionUnfilled() {

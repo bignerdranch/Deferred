@@ -7,13 +7,7 @@
 //
 
 import XCTest
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-import Darwin
-#else
-import Glibc
-#endif
 import Dispatch
-
 import Deferred
 
 enum TestError: Error, CustomDebugStringConvertible {
@@ -32,6 +26,8 @@ enum TestError: Error, CustomDebugStringConvertible {
         }
     }
 }
+
+// MARK: -
 
 extension XCTestCase {
     func expectation(deallocationOf object: AnyObject) -> XCTestExpectation {
@@ -52,17 +48,11 @@ extension XCTestCase {
         return 10
     }
 
-#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-    func shortWait(for expectations: [XCTestExpectation]) {
-        let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? shortTimeoutInverted : expectations.count > 10 ? longTimeout : shortTimeout
-        wait(for: expectations, timeout: timeout)
-    }
-#else
-    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: Int = #line) {
-        let timeout: TimeInterval = expectations.count > 10 ? longTimeout : shortTimeout
+    #if !swift(>=5.0) && !canImport(Darwin)
+    func wait(for expectations: [XCTestExpectation], timeout: TimeInterval, enforceOrder: Bool = false, file: StaticString = #file, line: Int = #line) {
         waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
     }
-#endif
+    #endif
 
     func afterShortDelay(upon queue: DispatchQueue = .global(), execute body: @escaping() -> Void) {
         queue.asyncAfter(deadline: .now() + 0.15, execute: body)
@@ -93,57 +83,63 @@ extension FutureProtocol {
     }
 }
 
+// MARK: -
+
+private class CountingExecutor: Executor {
+    let submitCount = Protected(initialValue: 0)
+
+    init() {}
+
+    func submit(_ body: @escaping() -> Void) {
+        submitCount.withWriteLock { $0 += 1 }
+        body()
+    }
+}
+
 class CustomExecutorTestCase: XCTestCase {
-    private class CountingExecutor: Executor {
-        let submitCount = Protected(initialValue: 0)
+    private let _customExecutor = CountingExecutor()
 
-        init() {}
-
-        func submit(_ body: @escaping() -> Void) {
-            submitCount.withWriteLock { $0 += 1 }
-            body()
-        }
+    final var customExecutor: Executor {
+        return _customExecutor
     }
 
-    private let _executor = CountingExecutor()
-
-    final var executor: Executor {
-        return _executor
-    }
-
-    final func assertExecutorCalled(atLeast times: Int, file: StaticString = #file, line: UInt = #line) {
-        XCTAssert(_executor.submitCount.withReadLock({ $0 >= times }), "Executor was not called enough times", file: file, line: line)
-    }
-
-    final func expectationThatExecutor(isCalledAtLeast times: Int) -> XCTestExpectation {
+    final func expectationThatCustomExecutor(isCalledAtLeast times: Int) -> XCTestExpectation {
         return expectation(for: NSPredicate(block: { (sself, _) -> Bool in
             guard let sself = sself as? CustomExecutorTestCase else { return false }
-            return sself._executor.submitCount.withReadLock({ $0 >= times })
+            return sself._customExecutor.submitCount.withReadLock({ $0 >= times })
         }), evaluatedWith: self)
     }
 
-    final let queue = DispatchQueue(label: "com.bignerdranch.DeferredTests")
+    final let customQueue = DispatchQueue(label: "com.bignerdranch.DeferredTests")
 
-    final func expectQueueToBeEmpty(description: String? = nil, file: StaticString = #file, line: UInt = #line) -> XCTestExpectation {
-        let expect = expectation(description: description ?? "queue is empty")
-        queue.async(flags: .barrier) {
+    final func expectCustomQueueToBeEmpty() -> XCTestExpectation {
+        let expect = expectation(description: "queue is empty")
+        customQueue.async(flags: .barrier) {
             expect.fulfill()
         }
         return expect
     }
 }
 
-extension Collection {
+// MARK: -
 
-    func random() -> Iterator.Element {
-        precondition(!isEmpty, "Should not be called on empty collection")
+#if !swift(>=4.2)
+#if canImport(Darwin)
+import Darwin
+#else
+import Glibc
+#endif
+
+extension Collection {
+    func randomElement() -> Iterator.Element? {
+        guard !isEmpty else { return nil }
         #if os(Linux)
-            let offset = Glibc.random() % numericCast(count)
+        let offset = Int(random() % numericCast(count))
         #else // arc4random_uniform is also available on BSD and Bionic
-            let offset = arc4random_uniform(numericCast(count))
+        let offset = Int(arc4random_uniform(numericCast(count)))
         #endif
-        let index = self.index(startIndex, offsetBy: numericCast(offset))
+        let index = self.index(startIndex, offsetBy: offset)
         return self[index]
     }
-
 }
+#endif

@@ -67,7 +67,7 @@ class FilledDeferredTests: XCTestCase {
             return expect
         }
 
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testUponMainQueueCalled() {
@@ -75,16 +75,12 @@ class FilledDeferredTests: XCTestCase {
 
         let expect = expectation(description: "upon block called on main queue")
         filled.upon(.main) { value in
-            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            XCTAssertTrue(Thread.isMainThread)
-            #else
-            dispatchPrecondition(condition: .onQueue(.main))
-            #endif
+            XCTAssert(Thread.isMainThread)
             XCTAssertEqual(value, 1)
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testConcurrentUpon() {
@@ -103,7 +99,7 @@ class FilledDeferredTests: XCTestCase {
         }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     /// Deferred values behave as values: All copies reflect the same value.
@@ -125,7 +121,7 @@ class FilledDeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testDeferredOptionalBehavesCorrectly() {
@@ -145,7 +141,7 @@ class FilledDeferredTests: XCTestCase {
             afterExpect.fulfill()
         }
 
-        shortWait(for: [ beforeExpect, afterExpect ])
+        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeout)
     }
 
     func testIsFilledCanBeCalledMultipleTimesWhenFilled() {

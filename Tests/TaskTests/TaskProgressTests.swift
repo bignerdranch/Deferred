@@ -46,14 +46,14 @@ class TaskProgressTests: CustomExecutorTestCase {
         let afterExpect = expectation(description: "filled with same error")
         afterExpect.isInverted = true
 
-        let afterTask = beforeTask.map(upon: executor) { (value) -> String in
+        let afterTask = beforeTask.map(upon: customExecutor) { (value) -> String in
             afterExpect.fulfill()
             return String(describing: value)
         }
 
         XCTAssert(afterTask.progress.isCancelled)
 
-        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeout)
+        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeoutInverted)
     }
 
     func testThatTaskCreatedWithProgressReflectsThatProgress() {
@@ -106,7 +106,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     func testThatMapProgressFinishes() {
         let deferred = Task<Int>.Promise()
-        let task = deferred.map(upon: queue) { $0 * 2 }
+        let task = deferred.map(upon: customQueue) { $0 * 2 }
 
         XCTAssertEqual(task.progress.completedUnitCount, 0)
         XCTAssertEqual(task.progress.totalUnitCount, 2)
@@ -116,7 +116,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         wait(for: [
             expectation(toFinish: task.progress),
-            expectQueueToBeEmpty()
+            expectCustomQueueToBeEmpty()
         ], timeout: shortTimeout)
     }
 
@@ -138,7 +138,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     func testThatAndThenProgressFinishes() {
         let promise = Task<Int>.Promise()
-        let task = promise.andThen(upon: executor) { self.delaySuccessAsFuture($0 * 2) }
+        let task = promise.andThen(upon: customExecutor) { self.delaySuccessAsFuture($0 * 2) }
 
         XCTAssertEqual(task.progress.completedUnitCount, 0)
         XCTAssertEqual(task.progress.totalUnitCount, 2)
@@ -148,7 +148,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         wait(for: [
             expectation(toFinish: task.progress),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ], timeout: shortTimeout)
 
         XCTAssertEqual(task.progress.completedUnitCount, 2)
@@ -158,7 +158,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     func testThatChainingWithAThrownErrorFinishes() {
         let promise = Task<Int>.Promise()
-        let task = promise.andThen(upon: executor) { _ throws -> Task<String> in throw TestError.first }
+        let task = promise.andThen(upon: customExecutor) { _ throws -> Task<String> in throw TestError.first }
 
         XCTAssertEqual(task.progress.completedUnitCount, 0)
         XCTAssertEqual(task.progress.totalUnitCount, 2)
@@ -168,7 +168,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         wait(for: [
             expectation(toFinish: task.progress),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ], timeout: shortTimeout)
 
         XCTAssertEqual(task.progress.completedUnitCount, 2)
@@ -292,7 +292,7 @@ class TaskProgressTests: CustomExecutorTestCase {
         promise1.succeed(with: 9000)
 
         wait(for: [
-            keyValueObservingExpectation(for: task.progress, keyPath: #keyPath(Progress.totalUnitCount), expectedValue: 103)
+            XCTKVOExpectation(keyPath: #keyPath(Progress.totalUnitCount), object: task.progress, expectedValue: 103, options: .initial)
         ], timeout: shortTimeout)
 
         XCTAssertEqual(task.progress.completedUnitCount, 1)

@@ -42,7 +42,7 @@ class FutureTests: XCTestCase {
         XCTAssertFalse(combined.isFilled)
         toBeCombined2.fill(with: "foo")
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testAllFilled() {
@@ -72,7 +72,7 @@ class FutureTests: XCTestCase {
             outerExpect.fulfill()
         }
 
-        shortWait(for: [ outerExpect, innerExpect ])
+        wait(for: [ outerExpect, innerExpect ], timeout: shortTimeout)
     }
 
     func testAllFilledEmptyCollection() {
@@ -102,7 +102,7 @@ class FutureTests: XCTestCase {
             outerExpect.fulfill()
         }
 
-        shortWait(for: [ outerExpect, innerExpect ])
+        wait(for: [ outerExpect, innerExpect ], timeout: shortTimeout)
     }
 
     func testEveryMapTransformerIsCalledMultipleTimes() {
@@ -119,7 +119,7 @@ class FutureTests: XCTestCase {
             XCTAssertEqual(value, 2)
             expect.fulfill()
         }
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
 
         XCTAssertEqual(mapped.value, 2)
         XCTAssertEqual(bnr_atomic_load(&counter), 2)

@@ -58,7 +58,7 @@ class ExistentialFutureTests: XCTestCase {
 
         XCTAssertNil(anyFuture.shortWait())
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testFilledAnyFutureUpon() {
@@ -71,7 +71,7 @@ class ExistentialFutureTests: XCTestCase {
             }
             return expect
         }
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testUnfilledAnyUponCalledWhenFilled() {
@@ -89,7 +89,7 @@ class ExistentialFutureTests: XCTestCase {
         }
 
         deferred.fill(with: 1)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testFillAndIsFilledPostcondition() {

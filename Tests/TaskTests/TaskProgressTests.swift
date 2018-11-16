@@ -292,7 +292,7 @@ class TaskProgressTests: CustomExecutorTestCase {
         promise1.succeed(with: 9000)
 
         wait(for: [
-            keyValueObservingExpectation(for: task.progress, keyPath: #keyPath(Progress.totalUnitCount), expectedValue: 103)
+            XCTKVOExpectation(keyPath: #keyPath(Progress.totalUnitCount), object: task.progress, expectedValue: 103, options: .initial)
         ], timeout: shortTimeout)
 
         XCTAssertEqual(task.progress.completedUnitCount, 1)

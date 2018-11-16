@@ -21,7 +21,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
         let deferred = Deferred<Void>()
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        deferred.upon(executor) { _ in
+        deferred.upon(customExecutor) { _ in
             expect.fulfill()
         }
 
@@ -29,17 +29,17 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
     func testMap() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let mapped = marker.map(upon: executor) { _ in testValue }
+        let mapped = marker.map(upon: customExecutor) { _ in testValue }
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        mapped.upon(executor) {
+        mapped.upon(customExecutor) {
             XCTAssertEqual($0, testValue)
             expect.fulfill()
         }
@@ -48,7 +48,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 2)
+            expectationThatCustomExecutor(isCalledAtLeast: 2)
         ])
     }
 
@@ -64,10 +64,10 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
     func testAndThen() {
         let marker = Deferred<Void>()
         let testValue = 42
-        let flattened = marker.andThen(upon: executor) { _ in self.delay(testValue) }
+        let flattened = marker.andThen(upon: customExecutor) { _ in self.delay(testValue) }
 
         let expect = expectation(description: "upon block called when deferred is filled")
-        flattened.upon(executor) {
+        flattened.upon(customExecutor) {
             XCTAssertEqual($0, testValue)
             expect.fulfill()
         }
@@ -76,7 +76,7 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 3)
+            expectationThatCustomExecutor(isCalledAtLeast: 3)
         ])
     }
 }

@@ -27,6 +27,8 @@ enum TestError: Error, CustomDebugStringConvertible {
     }
 }
 
+// MARK: -
+
 extension XCTestCase {
     func expectation(deallocationOf object: AnyObject) -> XCTestExpectation {
         return expectation(for: NSPredicate(block: { [weak object] (_, _) -> Bool in
@@ -87,28 +89,30 @@ extension FutureProtocol {
     }
 }
 
+// MARK: -
+
+private class CountingExecutor: Executor {
+    let submitCount = Protected(initialValue: 0)
+
+    init() {}
+
+    func submit(_ body: @escaping() -> Void) {
+        submitCount.withWriteLock { $0 += 1 }
+        body()
+    }
+}
+
 class CustomExecutorTestCase: XCTestCase {
-    private class CountingExecutor: Executor {
-        let submitCount = Protected(initialValue: 0)
+    private let _customExecutor = CountingExecutor()
 
-        init() {}
-
-        func submit(_ body: @escaping() -> Void) {
-            submitCount.withWriteLock { $0 += 1 }
-            body()
-        }
+    final var customExecutor: Executor {
+        return _customExecutor
     }
 
-    private let _executor = CountingExecutor()
-
-    final var executor: Executor {
-        return _executor
-    }
-
-    final func expectationThatExecutor(isCalledAtLeast times: Int) -> XCTestExpectation {
+    final func expectationThatCustomExecutor(isCalledAtLeast times: Int) -> XCTestExpectation {
         return expectation(for: NSPredicate(block: { (sself, _) -> Bool in
             guard let sself = sself as? CustomExecutorTestCase else { return false }
-            return sself._executor.submitCount.withReadLock({ $0 >= times })
+            return sself._customExecutor.submitCount.withReadLock({ $0 >= times })
         }), evaluatedWith: self)
     }
 
@@ -122,6 +126,8 @@ class CustomExecutorTestCase: XCTestCase {
         return expect
     }
 }
+
+// MARK: -
 
 #if !swift(>=4.2)
 #if canImport(Darwin)

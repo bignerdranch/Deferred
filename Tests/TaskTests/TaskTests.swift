@@ -38,7 +38,7 @@ class TaskTests: CustomExecutorTestCase {
 
     private func expectation<T: Equatable>(that task: Task<T>, succeedsWith makeExpected: @autoclosure @escaping() -> T, description: String? = nil) -> XCTestExpectation {
         let expect = expectation(description: description ?? "uponSuccess is called")
-        task.uponSuccess(on: executor) { (value) in
+        task.uponSuccess(on: customExecutor) { (value) in
             XCTAssertEqual(value, makeExpected())
             expect.fulfill()
         }
@@ -47,7 +47,7 @@ class TaskTests: CustomExecutorTestCase {
 
     private func expectation<T, U: Error & Equatable>(that task: Task<T>, failsWith makeExpected: @autoclosure @escaping() -> U, description: String? = nil) -> XCTestExpectation {
         let expect = expectation(description: description ?? "uponFailure is called")
-        task.uponFailure(on: executor) { (error) in
+        task.uponFailure(on: customExecutor) { (error) in
             XCTAssertEqual(error as? U, makeExpected())
             expect.fulfill()
         }
@@ -84,7 +84,7 @@ class TaskTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
@@ -96,23 +96,23 @@ class TaskTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
     func testThatThrowingMapSubstitutesWithError() {
-        let task: Task<String> = makeAnyFinishedTask().map(upon: executor) { _ in throw TestError.second }
+        let task: Task<String> = makeAnyFinishedTask().map(upon: customExecutor) { _ in throw TestError.second }
         let expect = expectation(that: task, failsWith: TestError.second, description: "mapped filled with error")
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 2)
+            expectationThatCustomExecutor(isCalledAtLeast: 2)
         ])
     }
 
     func testThatAndThenForwardsCancellationToSubsequentTask() {
         let expect = expectation(description: "flatMapped task is cancelled")
-        let task = makeAnyFinishedTask().andThen(upon: executor) { _ -> Task<String> in
+        let task = makeAnyFinishedTask().andThen(upon: customExecutor) { _ -> Task<String> in
             Task(.never) { expect.fulfill() }
         }
 
@@ -120,53 +120,53 @@ class TaskTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
     func testThatThrowingAndThenSubstitutesWithError() {
-        let task = makeAnyFinishedTask().andThen(upon: executor) { _ -> Task<String> in
+        let task = makeAnyFinishedTask().andThen(upon: customExecutor) { _ -> Task<String> in
             throw TestError.second
         }
 
         shortWait(for: [
             expectation(that: task, failsWith: TestError.second, description: "flatMapped task is cancelled"),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
     func testThatRecoverMapsFailures() {
-        let task = makeAnyFailedTask().recover(upon: executor) { _ -> Int in
+        let task = makeAnyFailedTask().recover(upon: customExecutor) { _ -> Int in
             42
         }
 
         shortWait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
     func testThatMapPassesThroughErrors() {
-        let task = makeAnyFailedTask().map(upon: executor) { (value) -> String in
+        let task = makeAnyFailedTask().map(upon: customExecutor) { (value) -> String in
             XCTFail("Map handler should not be called")
             return String(describing: value)
         }
 
         shortWait(for: [
             expectation(that: task, failsWith: TestError.first, description: "original task filled"),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
     func testThatRecoverPassesThroughValues() {
-        let task = makeAnyFinishedTask().recover(upon: executor) { _ -> Int in
+        let task = makeAnyFinishedTask().recover(upon: customExecutor) { _ -> Int in
             XCTFail("Recover handler should not be called")
             return -1
         }
 
         shortWait(for: [
             expectation(that: task, succeedsWith: 42, description: "filled with same error"),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
@@ -182,13 +182,13 @@ class TaskTests: CustomExecutorTestCase {
     }
 
     func testThatFallbackUsingCustomExecutorProducesANewTask() {
-        let task = makeAnyFailedTask().fallback(upon: executor) { _ -> Task<Int> in
+        let task = makeAnyFailedTask().fallback(upon: customExecutor) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
         shortWait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 
@@ -209,7 +209,7 @@ class TaskTests: CustomExecutorTestCase {
 
     func testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue() {
         let (deferred, task1) = makeAnyUnfinishedTask()
-        let task2 = task1.fallback(upon: executor) { _ -> Task<Int> in
+        let task2 = task1.fallback(upon: customExecutor) { _ -> Task<Int> in
             return self.makeAnyFinishedTask()
         }
 
@@ -218,7 +218,7 @@ class TaskTests: CustomExecutorTestCase {
 
         shortWait(for: [
             expect,
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ])
     }
 

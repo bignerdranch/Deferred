@@ -46,7 +46,7 @@ class TaskProgressTests: CustomExecutorTestCase {
         let afterExpect = expectation(description: "filled with same error")
         afterExpect.isInverted = true
 
-        let afterTask = beforeTask.map(upon: executor) { (value) -> String in
+        let afterTask = beforeTask.map(upon: customExecutor) { (value) -> String in
             afterExpect.fulfill()
             return String(describing: value)
         }
@@ -138,7 +138,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     func testThatAndThenProgressFinishes() {
         let promise = Task<Int>.Promise()
-        let task = promise.andThen(upon: executor) { self.delaySuccessAsFuture($0 * 2) }
+        let task = promise.andThen(upon: customExecutor) { self.delaySuccessAsFuture($0 * 2) }
 
         XCTAssertEqual(task.progress.completedUnitCount, 0)
         XCTAssertEqual(task.progress.totalUnitCount, 2)
@@ -148,7 +148,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         wait(for: [
             expectation(toFinish: task.progress),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ], timeout: shortTimeout)
 
         XCTAssertEqual(task.progress.completedUnitCount, 2)
@@ -158,7 +158,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     func testThatChainingWithAThrownErrorFinishes() {
         let promise = Task<Int>.Promise()
-        let task = promise.andThen(upon: executor) { _ throws -> Task<String> in throw TestError.first }
+        let task = promise.andThen(upon: customExecutor) { _ throws -> Task<String> in throw TestError.first }
 
         XCTAssertEqual(task.progress.completedUnitCount, 0)
         XCTAssertEqual(task.progress.totalUnitCount, 2)
@@ -168,7 +168,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         wait(for: [
             expectation(toFinish: task.progress),
-            expectationThatExecutor(isCalledAtLeast: 1)
+            expectationThatCustomExecutor(isCalledAtLeast: 1)
         ], timeout: shortTimeout)
 
         XCTAssertEqual(task.progress.completedUnitCount, 2)

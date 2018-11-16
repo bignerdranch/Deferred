@@ -250,7 +250,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        allDeferreds.random().fill(with: anyValue)
+        allDeferreds.randomElement()?.fill(with: anyValue)
 
         shortWait(for: [ expect ])
     }
@@ -349,7 +349,7 @@ class DeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        for randomValue in 0 ..< (3 ..< 10).random() {
+        for randomValue in 0 ..< 10 {
             DispatchQueue.global().async(group: finishGroup) {
                 XCTAssertEqual(startGroup.wait(timeout: .distantFuture), .success)
                 deferred.fill(with: randomValue)

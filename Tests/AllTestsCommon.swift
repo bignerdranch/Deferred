@@ -7,13 +7,7 @@
 //
 
 import XCTest
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-import Darwin
-#else
-import Glibc
-#endif
 import Dispatch
-
 import Deferred
 
 enum TestError: Error, CustomDebugStringConvertible {
@@ -133,17 +127,23 @@ class CustomExecutorTestCase: XCTestCase {
     }
 }
 
-extension Collection {
+#if !swift(>=4.2)
+#if canImport(Darwin)
+import Darwin
+#else
+import Glibc
+#endif
 
-    func random() -> Iterator.Element {
-        precondition(!isEmpty, "Should not be called on empty collection")
+extension Collection {
+    func randomElement() -> Iterator.Element? {
+        guard !isEmpty else { return nil }
         #if os(Linux)
-            let offset = Glibc.random() % numericCast(count)
+        let offset = Int(random() % numericCast(count))
         #else // arc4random_uniform is also available on BSD and Bionic
-            let offset = arc4random_uniform(numericCast(count))
+        let offset = Int(arc4random_uniform(numericCast(count)))
         #endif
-        let index = self.index(startIndex, offsetBy: numericCast(offset))
+        let index = self.index(startIndex, offsetBy: offset)
         return self[index]
     }
-
 }
+#endif

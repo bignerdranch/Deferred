@@ -42,16 +42,20 @@ class DeferredTests: XCTestCase {
         ("testReflectionFilledWhenValueIsVoid", testReflectionFilledWhenValueIsVoid)
     ]
 
+    #if canImport(Darwin) && !targetEnvironment(simulator)
+    static let darwinDeviceTests: [(String, (DeferredTests) -> () throws -> Void)] = [
+        ("testThatMainThreadPostsUponWithUserInitiatedQoSClass", testThatMainThreadPostsUponWithUserInitiatedQoSClass),
+        ("testThatLowerQoSPostsUponWithSameQoSClass", testThatLowerQoSPostsUponWithSameQoSClass)
+    ]
+
     static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
-        #if os(macOS) || (os(iOS) && !(arch(i386) || arch(x86_64))) || (os(watchOS) && !(arch(i386) || arch(x86_64))) || (os(tvOS) && !arch(x86_64))
-            return universalTests + [
-                ("testThatMainThreadPostsUponWithUserInitiatedQoSClass", testThatMainThreadPostsUponWithUserInitiatedQoSClass),
-                ("testThatLowerQoSPostsUponWithSameQoSClass", testThatLowerQoSPostsUponWithSameQoSClass)
-            ]
-        #else
-            return universalTests
-        #endif
+        return universalTests + darwinDeviceTests
     }
+    #else
+    static var allTests: [(String, (DeferredTests) -> () throws -> Void)] {
+        return universalTests
+    }
+    #endif
 
     func testPeekWhenUnfilled() {
         let unfilled = Deferred<Int>()
@@ -294,10 +298,8 @@ class DeferredTests: XCTestCase {
     }
 
     // The QoS APIs do not behave as expected on the iOS Simulator, so we only
-    // run these tests on real devices. This check isn't the most future-proof;
-    // if there's ever another archiecture that runs the simulator, this will
-    // need to be modified.
-    #if os(macOS) || (os(iOS) && !(arch(i386) || arch(x86_64))) || (os(watchOS) && !(arch(i386) || arch(x86_64))) || (os(tvOS) && !arch(x86_64))
+    // run these tests on real devices.
+    #if canImport(Darwin) && !targetEnvironment(simulator)
     func testThatMainThreadPostsUponWithUserInitiatedQoSClass() {
         let deferred = Deferred<Int>()
 
@@ -335,7 +337,6 @@ class DeferredTests: XCTestCase {
         shortWait(for: [ expect ])
         XCTAssertEqual(uponQoS, expectedQoS)
     }
-
     #endif // end QoS tests that require a real device
 
     func testSimultaneousFill() {

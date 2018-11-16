@@ -15,6 +15,8 @@ import Task
 import Deferred
 #endif
 
+// swiftlint:disable type_body_length
+
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 class TaskProgressTests: CustomExecutorTestCase {
     static let allTests: [(String, (TaskProgressTests) -> () throws -> Void)] = [
@@ -307,6 +309,47 @@ class TaskProgressTests: CustomExecutorTestCase {
         XCTAssertEqual(task.progress.completedUnitCount, 103)
         XCTAssertEqual(task.progress.totalUnitCount, 103)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
+    }
+
+    func testThatMappingWithCustomProgressIsWeighted() {
+        let promise1 = Task<Int>.Promise()
+        let expect = expectation(description: "map handler has started executing")
+
+        let task = promise1
+            .map(upon: .any(), transform: { (value) -> Int in
+                XCTAssertNotNil(Progress.current())
+
+                let customProgress = Progress(totalUnitCount: 32)
+                expect.fulfill()
+
+                customProgress.completedUnitCount = 1
+                customProgress.completedUnitCount = 2
+                customProgress.completedUnitCount = 4
+                customProgress.completedUnitCount = 8
+                customProgress.completedUnitCount = 16
+                customProgress.completedUnitCount = 32
+
+                return value * 2
+            })
+            .map(upon: .any(), transform: { "\($0)" })
+            .map(upon: .any(), transform: { "\($0)\($0)" })
+
+        XCTAssertEqual(task.progress.completedUnitCount, 0)
+        XCTAssertEqual(task.progress.totalUnitCount, 4)
+        XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        promise1.succeed(with: 9000)
+
+        wait(for: [ expect ], timeout: shortTimeout)
+
+        XCTAssertEqual(task.progress.totalUnitCount, 103)
+
+        wait(for: [
+            expectation(toFinish: task.progress)
+        ], timeout: longTimeout)
+
+        XCTAssertEqual(task.progress.completedUnitCount, 103)
+        XCTAssertEqual(task.progress.totalUnitCount, 103)
     }
 }
 #endif

@@ -30,14 +30,41 @@ struct TaskChain {
     /// that first task's `Root`.
     @objc(BNRTaskRootProgress)
     private class Root: Progress {
+        /// Key for value of type `Root?` in `Thread.threadDictionary`.
         static let threadKey = "_BNRTaskCurrentRoot"
 
+        /// Propogates the current Task chain for explicit composition during
+        /// `Task.andThen`.
         static var active: Root? {
             get {
                 return Thread.current.threadDictionary[threadKey] as? Root
             }
             set {
                 Thread.current.threadDictionary[threadKey] = newValue
+            }
+        }
+
+        /// Key for value of type `Bool` in `Progress.userInfo`.
+        static let expandsKey = ProgressUserInfoKey(rawValue: "_BNRTaskExpandChildren")
+
+        /// If `true`,  Propogates the current Task chain for explicit composition during
+        /// `Task.andThen`.
+        var expandsAddedChildren: Bool {
+            get {
+                return userInfo[Root.expandsKey] as? Bool == true
+            }
+            set {
+                setUserInfoObject(newValue, forKey: Root.expandsKey)
+            }
+        }
+
+        @available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *)
+        override func addChild(_ child: Progress, withPendingUnitCount unitCount: Int64) {
+            if expandsAddedChildren, !child.wasGeneratedByTask {
+                totalUnitCount += TaskChain.explicitChildUnitCount - unitCount
+                super.addChild(child, withPendingUnitCount: TaskChain.explicitChildUnitCount)
+            } else {
+                super.addChild(child, withPendingUnitCount: unitCount)
             }
         }
     }
@@ -99,16 +126,19 @@ struct TaskChain {
 
     // MARK: -
 
-    /// The handler passed to `map` supports explicit progress reporting.
-    /// Because we must commit to a `pendingUnitCount` in order to
-    /// `becomeCurrent`, for now it only attaches for a single unit.
+    /// The handler passed to `map` can use implicit progress reporting.
+    /// During the handler, the first `Progress` object created using
+    /// `parent: .current()` will be given a 100x slice of the task chain on
+    /// macOS 10.11, iOS 9, and above.
     func beginMap() {
+        root.expandsAddedChildren = true
         root.becomeCurrent(withPendingUnitCount: TaskChain.singleUnit)
     }
 
     /// See `beginMap`.
     func commitMap() {
         root.resignCurrent()
+        root.expandsAddedChildren = false
     }
 
     // MARK: -

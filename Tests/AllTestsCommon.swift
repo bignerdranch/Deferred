@@ -105,10 +105,6 @@ class CustomExecutorTestCase: XCTestCase {
         return _executor
     }
 
-    final func assertExecutorCalled(atLeast times: Int, file: StaticString = #file, line: UInt = #line) {
-        XCTAssert(_executor.submitCount.withReadLock({ $0 >= times }), "Executor was not called enough times", file: file, line: line)
-    }
-
     final func expectationThatExecutor(isCalledAtLeast times: Int) -> XCTestExpectation {
         return expectation(for: NSPredicate(block: { (sself, _) -> Bool in
             guard let sself = sself as? CustomExecutorTestCase else { return false }

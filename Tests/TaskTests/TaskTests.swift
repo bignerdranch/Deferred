@@ -82,8 +82,10 @@ class TaskTests: CustomExecutorTestCase {
 
         deferred.succeed(with: 1)
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        shortWait(for: [
+            expect,
+            expectationThatExecutor(isCalledAtLeast: 1)
+        ])
     }
 
     func testUponFailure() {
@@ -92,16 +94,20 @@ class TaskTests: CustomExecutorTestCase {
 
         deferred.fail(with: TestError.first)
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        shortWait(for: [
+            expect,
+            expectationThatExecutor(isCalledAtLeast: 1)
+        ])
     }
 
     func testThatThrowingMapSubstitutesWithError() {
         let task: Task<String> = makeAnyFinishedTask().map(upon: executor) { _ in throw TestError.second }
         let expect = expectation(that: task, failsWith: TestError.second, description: "mapped filled with error")
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 2)
+        shortWait(for: [
+            expect,
+            expectationThatExecutor(isCalledAtLeast: 2)
+        ])
     }
 
     func testThatAndThenForwardsCancellationToSubsequentTask() {
@@ -112,8 +118,10 @@ class TaskTests: CustomExecutorTestCase {
 
         task.cancel()
 
-        shortWait(for: [ expect ])
-        assertExecutorCalled(atLeast: 1)
+        shortWait(for: [
+            expect,
+            expectationThatExecutor(isCalledAtLeast: 1)
+        ])
     }
 
     func testThatThrowingAndThenSubstitutesWithError() {
@@ -122,10 +130,9 @@ class TaskTests: CustomExecutorTestCase {
         }
 
         shortWait(for: [
-            expectation(that: task, failsWith: TestError.second, description: "flatMapped task is cancelled")
+            expectation(that: task, failsWith: TestError.second, description: "flatMapped task is cancelled"),
+            expectationThatExecutor(isCalledAtLeast: 1)
         ])
-
-        assertExecutorCalled(atLeast: 1)
     }
 
     func testThatRecoverMapsFailures() {
@@ -134,10 +141,9 @@ class TaskTests: CustomExecutorTestCase {
         }
 
         shortWait(for: [
-            expectation(that: task, succeedsWith: 42)
+            expectation(that: task, succeedsWith: 42),
+            expectationThatExecutor(isCalledAtLeast: 1)
         ])
-
-        assertExecutorCalled(atLeast: 1)
     }
 
     func testThatMapPassesThroughErrors() {
@@ -147,10 +153,9 @@ class TaskTests: CustomExecutorTestCase {
         }
 
         shortWait(for: [
-            expectation(that: task, failsWith: TestError.first, description: "original task filled")
+            expectation(that: task, failsWith: TestError.first, description: "original task filled"),
+            expectationThatExecutor(isCalledAtLeast: 1)
         ])
-
-        assertExecutorCalled(atLeast: 1)
     }
 
     func testThatRecoverPassesThroughValues() {
@@ -160,10 +165,9 @@ class TaskTests: CustomExecutorTestCase {
         }
 
         shortWait(for: [
-            expectation(that: task, succeedsWith: 42, description: "filled with same error")
+            expectation(that: task, succeedsWith: 42, description: "filled with same error"),
+            expectationThatExecutor(isCalledAtLeast: 1)
         ])
-
-        assertExecutorCalled(atLeast: 1)
     }
 
     func testThatFallbackProducesANewTask() {

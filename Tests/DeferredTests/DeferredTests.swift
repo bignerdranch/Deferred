@@ -199,11 +199,7 @@ class DeferredTests: XCTestCase {
 
         let expect = expectation(description: "upon block called on main queue")
         deferred.upon(.main) { value in
-            #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            XCTAssertTrue(Thread.isMainThread)
-            #else
-            dispatchPrecondition(condition: .onQueue(.main))
-            #endif
+            XCTAssert(Thread.isMainThread)
             XCTAssertEqual(value, 1)
             expect.fulfill()
         }

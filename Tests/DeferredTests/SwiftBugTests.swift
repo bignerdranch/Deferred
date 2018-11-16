@@ -66,7 +66,7 @@ class SwiftBugTests: XCTestCase {
         }
 
         deferred.fill(with: toBeFilledWith)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     // Variant of #150: In Swift 3.0 ..< 3.0.1, Swift collections have some
@@ -83,6 +83,6 @@ class SwiftBugTests: XCTestCase {
         }
 
         deferred.fill(with: toBeFilledWith)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 }

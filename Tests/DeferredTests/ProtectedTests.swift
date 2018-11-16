@@ -77,7 +77,7 @@ class ProtectedTests: XCTestCase {
 
         allExpectations += (64 ..< 128).map(startReader)
 
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testDebugDescription() {

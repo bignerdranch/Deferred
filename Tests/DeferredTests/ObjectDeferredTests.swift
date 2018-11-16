@@ -67,7 +67,7 @@ class ObjectDeferredTests: XCTestCase {
 
         XCTAssertNil(toBeFilled.shortWait())
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testWaitBlocksWhileUnfilled() {
@@ -82,7 +82,7 @@ class ObjectDeferredTests: XCTestCase {
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testValueUnblocksWhenUnfilledIsFilled() {
@@ -99,7 +99,7 @@ class ObjectDeferredTests: XCTestCase {
             deferred.fill(with: result)
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testFill() {
@@ -133,7 +133,7 @@ class ObjectDeferredTests: XCTestCase {
         }
 
         toBeFilled.fill(with: TestObject())
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testUponCalledWhenFilled() {
@@ -150,7 +150,7 @@ class ObjectDeferredTests: XCTestCase {
         }
 
         deferred.fill(with: result)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testUponCalledIfAlreadyFilled() {
@@ -167,7 +167,7 @@ class ObjectDeferredTests: XCTestCase {
             return expect
         }
 
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     func testUponNotCalledWhileUnfilled() {
@@ -182,7 +182,7 @@ class ObjectDeferredTests: XCTestCase {
             }
             expect = expectation(deallocationOf: object)
         }
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testUponMainQueueCalledWhenFilled() {
@@ -197,7 +197,7 @@ class ObjectDeferredTests: XCTestCase {
         }
 
         deferred.fill(with: result)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testConcurrentUpon() {
@@ -221,7 +221,7 @@ class ObjectDeferredTests: XCTestCase {
         }
 
         // ... and make sure all our upon blocks were called (i.e., the write lock protected access)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 
     /// Deferred values behave as references: All copies reflect the same value.
@@ -244,7 +244,7 @@ class ObjectDeferredTests: XCTestCase {
 
         allDeferreds.randomElement()?.fill(with: anyValue)
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testDeferredOptionalBehavesCorrectly() {
@@ -265,7 +265,7 @@ class ObjectDeferredTests: XCTestCase {
             afterExpect.fulfill()
         }
 
-        shortWait(for: [ beforeExpect, afterExpect ])
+        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeout)
     }
 
     func testIsFilledCanBeCalledMultipleTimesNotFilled() {
@@ -305,7 +305,7 @@ class ObjectDeferredTests: XCTestCase {
 
         startGroup.leave()
         XCTAssertEqual(finishGroup.wait(timeout: .distantFuture), .success)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testDebugDescriptionUnfilled() {

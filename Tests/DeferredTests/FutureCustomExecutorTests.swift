@@ -27,10 +27,10 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         deferred.fill(with: ())
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testMap() {
@@ -46,10 +46,10 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         marker.fill(with: ())
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 2)
-        ])
+        ], timeout: shortTimeout)
     }
 
     // Should this be promoted to an initializer on Future?
@@ -74,9 +74,9 @@ class FutureCustomExecutorTests: CustomExecutorTestCase {
 
         marker.fill(with: ())
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 3)
-        ])
+        ], timeout: shortTimeout)
     }
 }

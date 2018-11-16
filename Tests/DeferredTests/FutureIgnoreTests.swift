@@ -36,7 +36,7 @@ class FutureIgnoreTests: XCTestCase {
 
         XCTAssertNil(future.shortWait())
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testIgnoredUponCalledWhenFilled() {
@@ -53,6 +53,6 @@ class FutureIgnoreTests: XCTestCase {
         }
 
         deferred.fill(with: 1)
-        shortWait(for: allExpectations)
+        wait(for: allExpectations, timeout: longTimeout)
     }
 }

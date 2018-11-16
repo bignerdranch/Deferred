@@ -82,10 +82,10 @@ class TaskTests: CustomExecutorTestCase {
 
         deferred.succeed(with: 1)
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testUponFailure() {
@@ -94,20 +94,20 @@ class TaskTests: CustomExecutorTestCase {
 
         deferred.fail(with: TestError.first)
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatThrowingMapSubstitutesWithError() {
         let task: Task<String> = makeAnyFinishedTask().map(upon: customExecutor) { _ in throw TestError.second }
         let expect = expectation(that: task, failsWith: TestError.second, description: "mapped filled with error")
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 2)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatAndThenForwardsCancellationToSubsequentTask() {
@@ -118,10 +118,10 @@ class TaskTests: CustomExecutorTestCase {
 
         task.cancel()
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatThrowingAndThenSubstitutesWithError() {
@@ -129,10 +129,10 @@ class TaskTests: CustomExecutorTestCase {
             throw TestError.second
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.second, description: "flatMapped task is cancelled"),
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatRecoverMapsFailures() {
@@ -140,10 +140,10 @@ class TaskTests: CustomExecutorTestCase {
             42
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatMapPassesThroughErrors() {
@@ -152,10 +152,10 @@ class TaskTests: CustomExecutorTestCase {
             return String(describing: value)
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.first, description: "original task filled"),
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatRecoverPassesThroughValues() {
@@ -164,10 +164,10 @@ class TaskTests: CustomExecutorTestCase {
             return -1
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42, description: "filled with same error"),
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackProducesANewTask() {
@@ -175,10 +175,10 @@ class TaskTests: CustomExecutorTestCase {
             return self.makeAnyFinishedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackUsingCustomExecutorProducesANewTask() {
@@ -186,10 +186,10 @@ class TaskTests: CustomExecutorTestCase {
             return self.makeAnyFinishedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackReturnsOriginalSuccessValue() {
@@ -201,10 +201,10 @@ class TaskTests: CustomExecutorTestCase {
         let expect = expectation(that: task2, succeedsWith: 99)
         deferred.succeed(with: 99)
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackUsingCustomExecutorReturnsOriginalSuccessValue() {
@@ -216,10 +216,10 @@ class TaskTests: CustomExecutorTestCase {
         let expect = expectation(that: task2, succeedsWith: 99)
         deferred.succeed(with: 99)
 
-        shortWait(for: [
+        wait(for: [
             expect,
             expectationThatCustomExecutor(isCalledAtLeast: 1)
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackForwardsCancellationToSubsequentTask() {
@@ -230,19 +230,19 @@ class TaskTests: CustomExecutorTestCase {
 
         task.cancel()
 
-        shortWait(for: [
+        wait(for: [
             cancelToBeCalled,
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testThatFallbackSubstitutesThrownError() {
         let task = makeAnyFailedTask().fallback(upon: customQueue) { _ -> Task<Int> in throw TestError.third }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.third),
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
     }
 
     func testSimpleFutureCanBeUpgradedToTask() {
@@ -252,7 +252,7 @@ class TaskTests: CustomExecutorTestCase {
         let expect = expectation(that: task, succeedsWith: 42)
 
         deferred.fill(with: 42)
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testRepeatPassesThroughInitialSuccess() {
@@ -262,10 +262,10 @@ class TaskTests: CustomExecutorTestCase {
             return self.makeAnyFinishedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 1)
     }
@@ -277,10 +277,10 @@ class TaskTests: CustomExecutorTestCase {
             return self.makeAnyFailedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.first),
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 4)
     }
@@ -291,10 +291,10 @@ class TaskTests: CustomExecutorTestCase {
             return bnr_atomic_fetch_add(&counter, 1) == 1 ? self.makeAnyFinishedTask() : self.makeAnyFailedTask()
         }
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, succeedsWith: 42),
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 2)
     }
@@ -306,10 +306,10 @@ class TaskTests: CustomExecutorTestCase {
             return self.makeAnyFailedTask()
         })
 
-        shortWait(for: [
+        wait(for: [
             expectation(that: task, failsWith: TestError.first),
             expectCustomQueueToBeEmpty()
-        ])
+        ], timeout: shortTimeout)
 
         XCTAssertEqual(bnr_atomic_load(&counter), 1)
     }

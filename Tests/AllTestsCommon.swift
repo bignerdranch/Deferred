@@ -48,17 +48,11 @@ extension XCTestCase {
         return 10
     }
 
-#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-    func shortWait(for expectations: [XCTestExpectation]) {
-        let timeout: TimeInterval = expectations.contains(where: { $0.isInverted }) ? shortTimeoutInverted : expectations.count > 10 ? longTimeout : shortTimeout
-        wait(for: expectations, timeout: timeout)
-    }
-#else
-    func shortWait(for expectations: [XCTestExpectation], file: StaticString = #file, line: Int = #line) {
-        let timeout: TimeInterval = expectations.count > 10 ? longTimeout : shortTimeout
+    #if !swift(>=5.0) && !canImport(Darwin)
+    func wait(for expectations: [XCTestExpectation], timeout: TimeInterval, enforceOrder: Bool = false, file: StaticString = #file, line: Int = #line) {
         waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
     }
-#endif
+    #endif
 
     func afterShortDelay(upon queue: DispatchQueue = .global(), execute body: @escaping() -> Void) {
         queue.asyncAfter(deadline: .now() + 0.15, execute: body)

@@ -53,7 +53,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
         XCTAssert(afterTask.progress.isCancelled)
 
-        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeout)
+        wait(for: [ beforeExpect, afterExpect ], timeout: shortTimeoutInverted)
     }
 
     func testThatTaskCreatedWithProgressReflectsThatProgress() {

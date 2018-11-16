@@ -43,6 +43,6 @@ class FutureAsyncTests: XCTestCase {
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 }

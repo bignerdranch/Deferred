@@ -56,7 +56,7 @@ class TaskAsyncTests: XCTestCase {
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 
     func testThatCancellingBeforeATaskStartsProducesTheCancellationError() {
@@ -77,6 +77,6 @@ class TaskAsyncTests: XCTestCase {
             expect.fulfill()
         }
 
-        shortWait(for: [ expect ])
+        wait(for: [ expect ], timeout: shortTimeout)
     }
 }

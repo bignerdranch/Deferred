@@ -96,7 +96,7 @@ public final class NativeLock: Locking {
     }
 }
 #else
-public typealias NativeLock = NSLock
+typealias NativeLock = NSLock
 #endif
 
 /// A readers-writer lock provided by the platform implementation of the

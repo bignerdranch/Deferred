@@ -15,7 +15,7 @@ module Fastlane
         end
 
         podspec_content = File.read(podspec_path)
-        podspec_content = podspec_content.gsub(/^([^#]*version\s+=\s+['"])\S*(['"])/i, "\\1#{semver}\\2")
+        podspec_content = podspec_content.gsub(/^([^#]*\.version\s+=\s+['"])\S*(['"])/i, "\\1#{semver}\\2")
 
         File.write(podspec_path, podspec_content)
       end

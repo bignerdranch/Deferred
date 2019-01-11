@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 11/16/16.
-//  Copyright © 2016-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2016-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -20,30 +20,6 @@ class SwiftBugTests: XCTestCase {
         case one
         case two(String)
         case three(Double)
-
-        var hashValue: Int {
-            switch self {
-            case .one:
-                return 1
-            case .two(let str):
-                return str.hashValue
-            case .three(let obj):
-                return obj.hashValue
-            }
-        }
-
-        static func == (lhs: SomeMultipayloadEnum, rhs: SomeMultipayloadEnum) -> Bool {
-            switch (lhs, rhs) {
-            case (.one, .one):
-                return true
-            case let (.two(lhs), .two(rhs)):
-                return lhs == rhs
-            case let (.three(lhs), .three(rhs)):
-                return lhs == rhs
-            default:
-                return false
-            }
-        }
     }
 
     // #150: In Swift 3.0 ..< 3.0.1, Swift collections have some trouble round-

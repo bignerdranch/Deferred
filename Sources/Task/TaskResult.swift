@@ -6,6 +6,20 @@
 //  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
+// MARK: - Unwrapping
+
+extension Task.Result {
+    @_inlineable
+    public func get() throws -> SuccessValue {
+        switch self {
+        case let .success(success):
+            return success
+        case let .failure(failure):
+            throw failure
+        }
+    }
+}
+
 // MARK: - Initializers
 
 extension Task.Result {

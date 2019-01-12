@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 3/27/15.
-//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -19,8 +19,7 @@ class VoidResultTests: XCTestCase {
         ("testDescriptionSuccess", testDescriptionSuccess),
         ("testDescriptionFailure", testDescriptionFailure),
         ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
-        ("testDebugDescriptionFailure", testDebugDescriptionFailure),
-        ("testExtract", testExtract)
+        ("testDebugDescriptionFailure", testDebugDescriptionFailure)
     ]
 
     private typealias Result = Task<Void>.Result
@@ -44,10 +43,5 @@ class VoidResultTests: XCTestCase {
     func testDebugDescriptionFailure() {
         let debugDescription = String(reflecting: aFailureResult)
         XCTAssert(debugDescription.hasSuffix("Task<()>.Result.failure(TestError.first)"))
-    }
-
-    func testExtract() {
-        XCTAssertNoThrow(try aSuccessResult.extract())
-        XCTAssertThrowsError(try aFailureResult.extract())
     }
 }

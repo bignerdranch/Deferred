@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 11/18/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -92,7 +92,7 @@ extension Collection where Element: TaskProtocol {
         let wrapper = AllFilled(self) { (array) -> [Element.SuccessValue] in
             // Expect each to be filled but not successful right now.
             // swiftlint:disable:next force_unwrapping
-            return array.compactMap { try? $0.peek()!.extract() }
+            return array.compactMap { try? $0.peek()!.get() }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

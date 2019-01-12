@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 10/27/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -49,7 +49,7 @@ extension TaskProtocol {
             #endif
 
             return Task<NewSuccessValue>.Result {
-                try transform(result.extract())
+                try transform(result.get())
             }
         }
 

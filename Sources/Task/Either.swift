@@ -43,6 +43,12 @@ public protocol Either {
     /// Returns the value from calling `left` if `self` is left-biased, or
     /// from calling `right` if `self` is right-biased.
     func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return
+    
+    /// Returns the right-biased value as a throwing expression.
+    ///
+    /// Use this method to retrieve the value of this instance if it is
+    /// right-biased or to throw the error if it is left-biased.
+    func get() throws -> Right
 }
 
 extension Either {
@@ -56,9 +62,8 @@ extension Either {
         }
     }
 
-    /// Returns the success value or throws the error.
-    @_inlineable
+    @available(*, unavailable, renamed: "get()", message: "Replace with 'get()' to better align with SE-0235, the Swift 5 Result type.")
     public func extract() throws -> Right {
-        return try withValues(ifLeft: { throw $0 }, ifRight: { $0 })
+        fatalError("unavailable methods cannot be called")
     }
 }

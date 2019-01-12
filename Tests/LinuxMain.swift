@@ -25,10 +25,8 @@ XCTMain([
     testCase(ProtectedTests.allTests),
     testCase(SwiftBugTests.allTests),
 
-    testCase(ResultRecoveryTests.allTests),
     testCase(TaskComprehensiveTests.allTests),
     testCase(TaskResultTests.allTests),
     testCase(TaskTests.allTests),
-    testCase(TaskAsyncTests.allTests),
-    testCase(VoidResultTests.allTests)
+    testCase(TaskAsyncTests.allTests)
 ])

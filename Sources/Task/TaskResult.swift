@@ -20,6 +20,62 @@ extension Task.Result {
     }
 }
 
+// MARK: - Functional Transforms
+
+extension Task.Result {
+    /// Evaluates the `transform` for a success result, passing its unwrapped
+    /// value as the parameter, to derive a new value.
+    ///
+    /// Use the `map` method with a closure that produces a new value.
+    public func map<NewValue>(_ transform: (SuccessValue) -> NewValue) -> Task<NewValue>.Result {
+        switch self {
+        case .success(let value):
+            return .success(transform(value))
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
+    /// Evaluates the `transform` for a failure result, passing the unwrapped
+    /// error as the parameter, to derive a new value.
+    ///
+    /// Use the `mapError` method with a closure that produces a new value.
+    public func mapError(_ transform: (Error) -> Error) -> Task<SuccessValue>.Result {
+        switch self {
+        case .success(let success):
+            return .success(success)
+        case .failure(let failure):
+            return .failure(transform(failure))
+        }
+    }
+
+    /// Evaluates the `transform` for a success result, passing its unwrapped
+    /// value as the parameter, to derive a new result.
+    ///
+    /// Use `flatMap` with a closure that itself returns a result.
+    public func flatMap<NewValue>(_ transform: (SuccessValue) -> Task<NewValue>.Result) -> Task<NewValue>.Result {
+        switch self {
+        case .success(let value):
+            return transform(value)
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
+    /// Evaluates the `transform` for a failure result, passing the unwrapped
+    /// error as the parameter, to derive a new result.
+    ///
+    /// Use the `flatMapError` with a closure that itself returns a result.
+    public func flatMapError(_ transform: (Error) -> Task<SuccessValue>.Result) -> Task<SuccessValue>.Result {
+        switch self {
+        case let .success(success):
+            return .success(success)
+        case let .failure(failure):
+            return transform(failure)
+        }
+    }
+}
+
 // MARK: - Initializers
 
 extension Task.Result {

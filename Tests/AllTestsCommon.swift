@@ -10,10 +10,24 @@ import XCTest
 import Dispatch
 import Deferred
 
-enum TestError: Error, CustomDebugStringConvertible {
+enum TestError: Error, CustomStringConvertible, CustomDebugStringConvertible {
     case first
     case second
     case third
+    case fourth
+
+    var description: String {
+        switch self {
+        case .first:
+            return "first"
+        case .second:
+            return "second"
+        case .third:
+            return "third"
+        case .fourth:
+            return "fourth"
+        }
+    }
 
     var debugDescription: String {
         switch self {
@@ -23,6 +37,8 @@ enum TestError: Error, CustomDebugStringConvertible {
             return "TestError.second"
         case .third:
             return "TestError.third"
+        case .fourth:
+            return "TestError.fourth"
         }
     }
 }

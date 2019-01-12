@@ -43,12 +43,12 @@ class TaskResultTests: XCTestCase {
 
     func testDebugDescriptionSuccess() {
         let debugDescription = String(reflecting: aSuccessResult)
-        XCTAssert(debugDescription.hasSuffix("TaskResult<Swift.Int>.success(42)"))
+        XCTAssert(debugDescription.hasSuffix("Task<Swift.Int>.Result.success(42)"))
     }
 
     func testDebugDescriptionFailure() {
         let debugDescription = String(reflecting: aFailureResult)
-        XCTAssert(debugDescription.hasSuffix("TaskResult<Swift.Int>.failure(TestError.first)"))
+        XCTAssert(debugDescription.hasSuffix("Task<Swift.Int>.Result.failure(TestError.first)"))
     }
 
     func testSuccessExtract() {

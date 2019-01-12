@@ -6,12 +6,12 @@
 //  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
-extension TaskResult {
+extension Task.Result {
     /// Evaluates the `transform` for a success result, passing its unwrapped
     /// value as the parameter, to derive a new value.
     ///
     /// Use the `map` method with a closure that produces a new value.
-    public func map<NewValue>(_ transform: (Value) throws -> NewValue) -> TaskResult<NewValue> {
+    public func map<NewValue>(_ transform: (SuccessValue) throws -> NewValue) -> Task<NewValue>.Result {
         switch self {
         case .success(let value):
             do {
@@ -28,7 +28,7 @@ extension TaskResult {
     /// value as the parameter, to derive a new result.
     ///
     /// Use `flatMap` with a closure that itself returns a result.
-    public func flatMap<NewValue>(_ transform: (Value) throws -> TaskResult<NewValue>) -> TaskResult<NewValue> {
+    public func flatMap<NewValue>(_ transform: (SuccessValue) throws -> Task<NewValue>.Result) -> Task<NewValue>.Result {
         switch self {
         case .success(let value):
             do {

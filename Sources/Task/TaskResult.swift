@@ -3,24 +3,15 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/9/15.
-//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
-
-/// A type that represents either a wrapped value or an error, representing the
-/// possible return values of a throwing function.
-public enum TaskResult<Value> {
-    /// The success value, stored as `Value`.
-    case success(Value)
-    /// The failure value, stored as any error.
-    case failure(Error)
-}
 
 // MARK: - Initializers
 
-extension TaskResult {
+extension Task.Result {
     /// Creates an instance storing a successful `value`.
     @_inlineable
-    public init(success value: @autoclosure() throws -> Value) {
+    public init(success value: @autoclosure() throws -> SuccessValue) {
         self.init(from: value)
     }
 
@@ -32,7 +23,7 @@ extension TaskResult {
 
     /// Create an exclusive success/failure state derived from two optionals,
     /// in the style of Cocoa completion handlers.
-    public init(value: Value?, error: Error?) {
+    public init(value: SuccessValue?, error: Error?) {
         switch (value, error) {
         case (let value?, _):
             // Ignore error if value is non-nil
@@ -49,7 +40,7 @@ private enum TaskResultInitializerError: Error {
     case invalidInput
 }
 
-extension TaskResult where Value == Void {
+extension Task.Result where SuccessValue == Void {
     /// Creates the success value.
     @_inlineable
     public init() {
@@ -59,19 +50,19 @@ extension TaskResult where Value == Void {
 
 // MARK: - Compatibility with Protocol Extensions
 
-extension TaskResult: Either {
+extension Task.Result: Either {
     @_inlineable
     public init(left error: Error) {
         self = .failure(error)
     }
 
     @_inlineable
-    public init(right value: Value) {
+    public init(right value: SuccessValue) {
         self = .success(value)
     }
 
     @_inlineable
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (Value) throws -> Return) rethrows -> Return {
+    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (SuccessValue) throws -> Return) rethrows -> Return {
         switch self {
         case let .success(value):
             return try right(value)

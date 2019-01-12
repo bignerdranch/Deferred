@@ -38,12 +38,12 @@ class VoidResultTests: XCTestCase {
 
     func testDebugDescriptionSuccess() {
         let debugDescription = String(reflecting: aSuccessResult)
-        XCTAssert(debugDescription.hasSuffix("TaskResult<()>.success()"))
+        XCTAssert(debugDescription.hasSuffix("Task<()>.Result.success()"))
     }
 
     func testDebugDescriptionFailure() {
         let debugDescription = String(reflecting: aFailureResult)
-        XCTAssert(debugDescription.hasSuffix("TaskResult<()>.failure(TestError.first)"))
+        XCTAssert(debugDescription.hasSuffix("Task<()>.Result.failure(TestError.first)"))
     }
 
     func testExtract() {

@@ -11,7 +11,6 @@ extension TaskResult {
     /// value as the parameter, to derive a new value.
     ///
     /// Use the `map` method with a closure that produces a new value.
-    @_inlineable
     public func map<NewValue>(_ transform: (Value) throws -> NewValue) -> TaskResult<NewValue> {
         switch self {
         case .success(let value):
@@ -29,7 +28,6 @@ extension TaskResult {
     /// value as the parameter, to derive a new result.
     ///
     /// Use `flatMap` with a closure that itself returns a result.
-    @_inlineable
     public func flatMap<NewValue>(_ transform: (Value) throws -> TaskResult<NewValue>) -> TaskResult<NewValue> {
         switch self {
         case .success(let value):

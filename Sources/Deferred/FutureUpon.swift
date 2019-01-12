@@ -8,11 +8,11 @@
 
 import Dispatch
 
-extension FutureProtocol {
-    /// The natural executor for use with futures; a policy of the framework to
-    /// allow for shorthand syntax with `Future.upon(_:execute:)` and others.
-    public typealias PreferredExecutor = DispatchQueue
+/// The natural executor for use with Futures; a policy of the framework to
+/// allow for shorthand syntax with `Future.upon(_:execute:)` and others.
+public typealias PreferredExecutor = DispatchQueue
 
+extension FutureProtocol {
     /// The executor to use as a default argument to `upon` methods on `Future`.
     ///
     /// Don't provide a default parameter using this declaration unless doing

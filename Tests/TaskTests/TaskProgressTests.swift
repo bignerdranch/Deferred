@@ -3,7 +3,7 @@
 //  DeferredTests
 //
 //  Created by Zachary Waldowski on 10/11/18.
-//  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2018-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 import XCTest
@@ -122,7 +122,7 @@ class TaskProgressTests: CustomExecutorTestCase {
         ], timeout: shortTimeout)
     }
 
-    private func delaySuccessAsFuture<Value>(_ value: @autoclosure @escaping() -> Value) -> Future<TaskResult<Value>> {
+    private func delaySuccessAsFuture<Value>(_ value: @autoclosure @escaping() -> Value) -> Future<Task<Value>.Result> {
         let deferred = Task<Value>.Promise()
         afterShortDelay {
             deferred.succeed(with: value())

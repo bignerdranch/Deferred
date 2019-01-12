@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 3/28/16.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
@@ -189,6 +189,15 @@ import Deferred.Atomics
 /// - seealso: `TaskProtocol`
 /// - seealso: `Future`
 public final class Task<SuccessValue>: NSObject {
+    /// A type that represents either a wrapped value or an error, representing the
+    /// possible return values of a throwing function.
+    public enum Result {
+        /// The success value, stored as `Value`.
+        case success(SuccessValue)
+        /// The failure value, stored as any error.
+        case failure(Error)
+    }
+
     private let future: Future<Result>
 
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
@@ -246,9 +255,6 @@ public final class Task<SuccessValue>: NSObject {
 }
 
 extension Task: TaskProtocol {
-    /// A type for returning and propagating recoverable errors.
-    public typealias Result = TaskResult<SuccessValue>
-
     public func upon(_ executor: Executor, execute body: @escaping(Result) -> Void) {
         future.upon(executor, execute: body)
     }

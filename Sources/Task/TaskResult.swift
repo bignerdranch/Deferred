@@ -74,14 +74,4 @@ extension Task.Result: Either {
     public init(right value: SuccessValue) {
         self = .success(value)
     }
-
-    @_inlineable
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (SuccessValue) throws -> Return) rethrows -> Return {
-        switch self {
-        case let .success(value):
-            return try right(value)
-        case let .failure(error):
-            return try left(error)
-        }
-    }
 }

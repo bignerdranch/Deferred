@@ -84,8 +84,8 @@ extension Future: TaskProtocol where Value: Either {
 
     /// Create a future having the same underlying task as `other`.
     public init<Wrapped: TaskProtocol>(resultFrom wrapped: Wrapped) where Wrapped.SuccessValue == SuccessValue {
-        self = wrapped as? Future<Value> ?? wrapped.every {
-            $0.withValues(ifLeft: Value.init(left:), ifRight: Value.init(right:))
+        self = wrapped as? Future<Value> ?? wrapped.every { (result) -> Value in
+            Value(from: result.get)
         }
     }
 

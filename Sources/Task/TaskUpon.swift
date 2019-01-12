@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/26/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -21,7 +21,9 @@ extension TaskProtocol {
 
     public func uponSuccess(on executor: Executor, execute body: @escaping(_ value: SuccessValue) -> Void) {
         upon(executor) { (result) in
-            result.withValues(ifLeft: { _ in () }, ifRight: body)
+            do {
+                try body(result.get())
+            } catch {}
         }
     }
 
@@ -35,7 +37,11 @@ extension TaskProtocol {
 
     public func uponFailure(on executor: Executor, execute body: @escaping(_ error: FailureValue) -> Void) {
         upon(executor) { result in
-            result.withValues(ifLeft: body, ifRight: { _ in () })
+            do {
+                _ = try result.get()
+            } catch {
+                body(error)
+            }
         }
     }
 }

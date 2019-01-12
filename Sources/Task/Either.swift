@@ -38,12 +38,6 @@ public protocol Either {
     /// Creates a right-biased instance.
     init(right: Right)
 
-    /// Case analysis.
-    ///
-    /// Returns the value from calling `left` if `self` is left-biased, or
-    /// from calling `right` if `self` is right-biased.
-    func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return
-    
     /// Returns the right-biased value as a throwing expression.
     ///
     /// Use this method to retrieve the value of this instance if it is
@@ -64,6 +58,11 @@ extension Either {
 
     @available(*, unavailable, renamed: "get()", message: "Replace with 'get()' to better align with SE-0235, the Swift 5 Result type.")
     public func extract() throws -> Right {
+        fatalError("unavailable methods cannot be called")
+    }
+
+    @available(*, unavailable, message: "Replace with 'get()' inside a 'do' / 'catch' block to better align with SE-0235, the Swift 5 Result type.")
+    public func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return {
         fatalError("unavailable methods cannot be called")
     }
 }

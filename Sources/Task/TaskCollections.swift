@@ -44,9 +44,11 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
 
             group.enter()
             future.upon(queue) { [combined, group] (result) in
-                result.withValues(ifLeft: { (error) in
-                    _ = combined.fail(with: error)
-                }, ifRight: { _ in })
+                do {
+                    _ = try result.get()
+                } catch {
+                    combined.fail(with: error)
+                }
 
                 group.leave()
             }

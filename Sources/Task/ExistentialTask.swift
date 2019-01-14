@@ -188,7 +188,7 @@ import Deferred.Atomics
 ///
 /// - seealso: `TaskProtocol`
 /// - seealso: `Future`
-public final class Task<SuccessValue>: NSObject {
+public final class Task<SuccessValue> {
     /// A type that represents either a wrapped value or an error, representing the
     /// possible return values of a throwing function.
     public enum Result {
@@ -346,5 +346,39 @@ extension Task {
     /// Create a task that will never complete.
     public static var never: Task<SuccessValue> {
         return Task(Future<Result>.never)
+    }
+}
+
+extension Task {
+    @available(*, unavailable, message: "Replace with 'Task.never' for clarity.")
+    public convenience init() {
+        fatalError("unavailable initializer cannot be called")
+    }
+
+    @available(*, unavailable, renamed: "init(_:uponCancel:)")
+    public convenience init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, cancellation: (() -> Void)? = nil) {
+        fatalError("unavailable initializer cannot be called")
+    }
+
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+    @available(*, unavailable, renamed: "init(_:progress:)")
+    public convenience init(future: Future<Result>, progress: Progress) {
+        fatalError("unavailable initializer cannot be called")
+    }
+
+    @available(*, unavailable, renamed: "init(succeedsFrom:progress:)", message: "Replace with 'init(succeedsFrom:progress:)' to disambiguate from a completed Task.")
+    public convenience init<Wrapped: FutureProtocol>(success wrapped: Wrapped, progress: Progress) where Wrapped.Value == SuccessValue {
+        fatalError("unavailable initializer cannot be called")
+    }
+    #endif
+
+    @available(*, unavailable, renamed: "init(_:uponCancel:)")
+    public convenience init(future: Future<Result>, cancellation: (() -> Void)? = nil) {
+        fatalError("unavailable initializer cannot be called")
+    }
+
+    @available(*, unavailable, renamed: "init(succeedsFrom:uponCancel:)", message: "Replace with 'init(succeedsFrom:uponCancel:)' to disambiguate from a completed Task.")
+    public convenience init<Wrapped: FutureProtocol>(success wrapped: Wrapped, cancellation: (() -> Void)? = nil) {
+        fatalError("unavailable initializer cannot be called")
     }
 }

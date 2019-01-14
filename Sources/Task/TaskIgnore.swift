@@ -33,7 +33,7 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        if let progress = (self as? Task<SuccessValue>)?.progress {
+        if let progress = (self as? Task<Success>)?.progress {
             return Task<Void>(future, progress: progress)
         }
         #endif

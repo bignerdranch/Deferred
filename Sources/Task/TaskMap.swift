@@ -20,7 +20,7 @@ extension TaskProtocol {
     /// using the current parent will also contribute to the chain's progress.
     ///
     /// The resulting task is cancellable in the same way the receiving task is.
-    public func map<NewSuccessValue>(upon queue: PreferredExecutor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+    public func map<NewSuccess>(upon queue: PreferredExecutor, transform: @escaping(Success) throws -> NewSuccess) -> Task<NewSuccess> {
         return map(upon: queue as Executor, transform: transform)
     }
 
@@ -37,26 +37,26 @@ extension TaskProtocol {
     /// The resulting task is cancellable in the same way the receiving task is.
     ///
     /// - see: FutureProtocol.map(upon:transform:)
-    public func map<NewSuccessValue>(upon executor: Executor, transform: @escaping(SuccessValue) throws -> NewSuccessValue) -> Task<NewSuccessValue> {
+    public func map<NewSuccess>(upon executor: Executor, transform: @escaping(Success) throws -> NewSuccess) -> Task<NewSuccess> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let chain = TaskChain(continuingWith: self)
         #endif
 
-        let future: Future = map(upon: executor) { (result) -> Task<NewSuccessValue>.Result in
+        let future: Future = map(upon: executor) { (result) -> Task<NewSuccess>.Result in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             chain.beginMap()
             defer { chain.commitMap() }
             #endif
 
-            return Task<NewSuccessValue>.Result {
+            return Task<NewSuccess>.Result {
                 try transform(result.get())
             }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<NewSuccessValue>(future, progress: chain.effectiveProgress)
+        return Task<NewSuccess>(future, progress: chain.effectiveProgress)
         #else
-        return Task<NewSuccessValue>(future, uponCancel: cancel)
+        return Task<NewSuccess>(future, uponCancel: cancel)
         #endif
     }
 }

@@ -14,16 +14,16 @@ import Dispatch
 import Foundation
 #endif
 
-private struct AllFilled<SuccessValue>: TaskProtocol {
+private struct AllFilled<Success>: TaskProtocol {
     let group = DispatchGroup()
-    let combined = Deferred<Task<SuccessValue>.Result>()
+    let combined = Deferred<Task<Success>.Result>()
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     let progress = Progress()
     #else
     let cancellations: [() -> Void]
     #endif
 
-    init<Base: Collection>(_ base: Base, mappingBy transform: @escaping([Base.Element]) -> SuccessValue) where Base.Element: TaskProtocol {
+    init<Base: Collection>(_ base: Base, mappingBy transform: @escaping([Base.Element]) -> Success) where Base.Element: TaskProtocol {
         let array = Array(base)
         let queue = DispatchQueue.global(qos: .utility)
 
@@ -35,7 +35,7 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
 
         for future in array {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            if let task = future as? Task<Base.Element.SuccessValue> {
+            if let task = future as? Task<Base.Element.Success> {
                 progress.monitorChild(task.progress, withPendingUnitCount: 1)
             } else {
                 progress.monitorCompletion(of: future, withPendingUnitCount: 1)
@@ -59,15 +59,15 @@ private struct AllFilled<SuccessValue>: TaskProtocol {
         }
     }
 
-    func upon(_ executor: Executor, execute body: @escaping(Task<SuccessValue>.Result) -> Void) {
+    func upon(_ executor: Executor, execute body: @escaping(Task<Success>.Result) -> Void) {
         combined.upon(executor, execute: body)
     }
 
-    func peek() -> Task<SuccessValue>.Result? {
+    func peek() -> Task<Success>.Result? {
         return combined.peek()
     }
 
-    func wait(until time: DispatchTime) -> Task<SuccessValue>.Result? {
+    func wait(until time: DispatchTime) -> Task<Success>.Result? {
         return combined.wait(until: time)
     }
 
@@ -86,12 +86,12 @@ extension Collection where Element: TaskProtocol {
     /// If any of the contained tasks fail, the returned task will be determined
     /// with that failure. Otherwise, once all operations succeed, the returned
     /// task will be fulfilled by combining the values.
-    public func allSucceeded() -> Task<[Element.SuccessValue]> {
+    public func allSucceeded() -> Task<[Element.Success]> {
         guard !isEmpty else {
             return Task(success: [])
         }
 
-        let wrapper = AllFilled(self) { (array) -> [Element.SuccessValue] in
+        let wrapper = AllFilled(self) { (array) -> [Element.Success] in
             // Expect each to be filled but not successful right now.
             // swiftlint:disable:next force_unwrapping
             return array.compactMap { try? $0.peek()!.get() }
@@ -105,7 +105,7 @@ extension Collection where Element: TaskProtocol {
     }
 }
 
-extension Collection where Element: TaskProtocol, Element.SuccessValue == Void {
+extension Collection where Element: TaskProtocol, Element.Success == Void {
     /// Compose a number of tasks into a single array.
     ///
     /// If any of the contained tasks fail, the returned task will be determined

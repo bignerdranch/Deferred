@@ -20,7 +20,7 @@ extension TaskProtocol where Self: PromiseProtocol {
     ///
     /// - seealso: `PromiseProtocol.fill(with:)`
     @discardableResult
-    public func succeed(with value: @autoclosure() throws -> SuccessValue) -> Bool {
+    public func succeed(with value: @autoclosure() throws -> Success) -> Bool {
         return fill(with: Value(catching: value))
     }
 
@@ -28,12 +28,12 @@ extension TaskProtocol where Self: PromiseProtocol {
     ///
     /// - see: fill(with:)
     @discardableResult
-    public func fail(with error: FailureValue) -> Bool {
+    public func fail(with error: Failure) -> Bool {
         return fill(with: Value(left: error))
     }
 }
 
-extension TaskProtocol where Self: PromiseProtocol, SuccessValue == Void {
+extension TaskProtocol where Self: PromiseProtocol, Success == Void {
     /// Completes the task with a success.
     ///
     /// Fulfilling this deferred value should usually be attempted only once.

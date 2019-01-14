@@ -15,11 +15,11 @@ extension TaskProtocol {
     ///
     /// - seealso: `TaskProtocol.uponSuccess(on:execute:)`
     /// - see: `FutureProtocol.upon(_:execute:)`
-    public func uponSuccess(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ value: SuccessValue) -> Void) {
+    public func uponSuccess(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ value: Success) -> Void) {
         uponSuccess(on: executor as Executor, execute: body)
     }
 
-    public func uponSuccess(on executor: Executor, execute body: @escaping(_ value: SuccessValue) -> Void) {
+    public func uponSuccess(on executor: Executor, execute body: @escaping(_ value: Success) -> Void) {
         upon(executor) { (result) in
             do {
                 try body(result.get())
@@ -31,11 +31,11 @@ extension TaskProtocol {
     ///
     /// - seealso: `TaskProtocol.uponFailure(on:execute:)`
     /// - seealso: `FutureProtocol.upon(_:execute:)`
-    public func uponFailure(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ error: FailureValue) -> Void) {
+    public func uponFailure(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ error: Failure) -> Void) {
         uponFailure(on: executor as Executor, execute: body)
     }
 
-    public func uponFailure(on executor: Executor, execute body: @escaping(_ error: FailureValue) -> Void) {
+    public func uponFailure(on executor: Executor, execute body: @escaping(_ error: Failure) -> Void) {
         upon(executor) { result in
             do {
                 _ = try result.get()

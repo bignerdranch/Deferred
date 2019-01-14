@@ -188,14 +188,19 @@ import Deferred.Atomics
 ///
 /// - seealso: `TaskProtocol`
 /// - seealso: `Future`
-public final class Task<SuccessValue> {
+public final class Task<Success> {
+    @available(*, unavailable, renamed: "Success", message: "Renamed 'Success' to better align with SE-0235, the Swift 5 Result type.")
+    public typealias SuccessValue = Success
+
     /// A type that represents either a wrapped value or an error, representing the
     /// possible return values of a throwing function.
     public enum Result {
+        /// Any error.
+        public typealias Failure = Error
         /// The success value, stored as `Value`.
-        case success(SuccessValue)
+        case success(Success)
         /// The failure value, stored as any error.
-        case failure(Error)
+        case failure(Failure)
     }
 
     private let future: Future<Result>
@@ -215,7 +220,7 @@ public final class Task<SuccessValue> {
     }
 
     /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
-    public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, progress: Progress) where Wrapped.SuccessValue == SuccessValue {
+    public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, progress: Progress) where Wrapped.Success == Success {
         self.future = Future<Result>(resultFrom: wrapped)
         self.progress = TaskChain(startingWith: wrapped, using: progress).effectiveProgress
     }
@@ -241,7 +246,7 @@ public final class Task<SuccessValue> {
     ///
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
-    public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.SuccessValue == SuccessValue {
+    public init<Wrapped: TaskProtocol>(_ wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.Success == Success {
         self.future = Future<Result>(resultFrom: wrapped)
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.progress = TaskChain(startingWith: wrapped, uponCancel: cancellation).effectiveProgress
@@ -304,7 +309,7 @@ extension Task {
 
     #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
     /// Creates a task whose `upon(_:execute:)` methods use those of `base`.
-    public convenience init<Wrapped: FutureProtocol>(succeedsFrom wrapped: Wrapped, progress: Progress) where Wrapped.Value == SuccessValue {
+    public convenience init<Wrapped: FutureProtocol>(succeedsFrom wrapped: Wrapped, progress: Progress) where Wrapped.Value == Success {
         let future = Future<Result>(succeedsFrom: wrapped)
         self.init(future, progress: progress)
     }
@@ -314,25 +319,25 @@ extension Task {
     ///
     /// `cancellation` will be called asynchronously, but not on any specific
     /// queue. If you must do work on a specific queue, schedule work on it.
-    public convenience init<Wrapped: FutureProtocol>(succeedsFrom wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.Value == SuccessValue {
+    public convenience init<Wrapped: FutureProtocol>(succeedsFrom wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) where Wrapped.Value == Success {
         let future = Future<Result>(succeedsFrom: wrapped)
         self.init(future, uponCancel: cancellation)
     }
 
     /// Creates an operation that has already completed with `value`.
-    public convenience init(success value: @autoclosure() throws -> SuccessValue) {
+    public convenience init(success value: @autoclosure() throws -> Success) {
         let future = Future<Result>(success: value)
         self.init(future)
     }
 
     /// Creates an operation that has already failed with `error`.
-    public convenience init(failure error: Error) {
+    public convenience init(failure error: Failure) {
         let future = Future<Result>(failure: error)
         self.init(future)
     }
 
     /// Creates a task having the same underlying operation as the `other` task.
-    public convenience init(_ task: Task<SuccessValue>) {
+    public convenience init(_ task: Task<Success>) {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         self.init(task.future, progress: task.progress)
         #else
@@ -344,7 +349,7 @@ extension Task {
     }
 
     /// Create a task that will never complete.
-    public static var never: Task<SuccessValue> {
+    public static var never: Task<Success> {
         return Task(Future<Result>.never)
     }
 }
@@ -367,7 +372,7 @@ extension Task {
     }
 
     @available(*, unavailable, renamed: "init(succeedsFrom:progress:)", message: "Replace with 'init(succeedsFrom:progress:)' to disambiguate from a completed Task.")
-    public convenience init<Wrapped: FutureProtocol>(success wrapped: Wrapped, progress: Progress) where Wrapped.Value == SuccessValue {
+    public convenience init<Wrapped: FutureProtocol>(success wrapped: Wrapped, progress: Progress) where Wrapped.Value == Success {
         fatalError("unavailable initializer cannot be called")
     }
     #endif

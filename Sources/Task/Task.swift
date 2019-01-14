@@ -85,7 +85,7 @@ extension Future: TaskProtocol where Value: Either {
     /// Create a future having the same underlying task as `other`.
     public init<Wrapped: TaskProtocol>(resultFrom wrapped: Wrapped) where Wrapped.SuccessValue == SuccessValue {
         self = wrapped as? Future<Value> ?? wrapped.every { (result) -> Value in
-            Value(from: result.get)
+            Value(catching: result.get)
         }
     }
 
@@ -96,7 +96,7 @@ extension Future: TaskProtocol where Value: Either {
 
     /// Creates an future having already filled successfully with `value`.
     public init(success value: @autoclosure() throws -> SuccessValue) {
-        self.init(value: Value(from: value))
+        self.init(value: Value(catching: value))
     }
 
     /// Creates an future having already failed with `error`.

@@ -26,7 +26,7 @@ extension Task.Result {
     /// Creates an instance storing a successful `value`.
     @_inlineable
     public init(success value: @autoclosure() throws -> SuccessValue) {
-        self.init(from: value)
+        self.init(catching: value)
     }
 
     /// Creates an instance storing an `error` describing the failure.

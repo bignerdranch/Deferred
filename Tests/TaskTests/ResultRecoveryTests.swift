@@ -18,9 +18,7 @@ import Deferred
 class ResultRecoveryTests: XCTestCase {
     static let allTests: [(String, (ResultRecoveryTests) -> () throws -> Void)] = [
         ("testMap", testMap),
-        ("testFlatMap", testFlatMap),
-        ("testInitWithFunctionProducesSuccesses", testInitWithFunctionProducesSuccesses),
-        ("testInitWithFunctionProducesFailures", testInitWithFunctionProducesFailures)
+        ("testFlatMap", testFlatMap)
     ]
 
     private typealias Result = Task<String>.Result
@@ -74,34 +72,6 @@ class ResultRecoveryTests: XCTestCase {
 
         let failureResult3: Result = aFailureResult.flatMap { _ in .failure(TestError.third) }
         XCTAssertThrowsError(try failureResult3.get()) {
-            XCTAssertEqual($0 as? TestError, .first)
-        }
-    }
-
-    private func tryIsSuccess(_ text: String?) throws -> String {
-        guard let text = text, text == "success" else {
-            throw TestError.first
-        }
-
-        return text
-    }
-
-    private func successFunction() throws -> String {
-        return try tryIsSuccess("success")
-    }
-
-    private func failureFunction() throws -> String {
-        return try tryIsSuccess(nil)
-    }
-
-    func testInitWithFunctionProducesSuccesses() {
-        let result = Result(from: successFunction)
-        XCTAssertEqual(try result.get(), "success")
-    }
-
-    func testInitWithFunctionProducesFailures() {
-        let result = Result(from: failureFunction)
-        XCTAssertThrowsError(try result.get()) {
             XCTAssertEqual($0 as? TestError, .first)
         }
     }

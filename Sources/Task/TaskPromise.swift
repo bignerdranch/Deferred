@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 10/27/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -21,7 +21,7 @@ extension TaskProtocol where Self: PromiseProtocol {
     /// - seealso: `PromiseProtocol.fill(with:)`
     @discardableResult
     public func succeed(with value: @autoclosure() throws -> SuccessValue) -> Bool {
-        return fill(with: Value(from: value))
+        return fill(with: Value(catching: value))
     }
 
     /// Completes the task with a failed `error`.

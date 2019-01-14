@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 7/14/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -32,7 +32,7 @@ extension Task {
             guard case .success = semaphore.wait(timeout: .now()) else { return }
             defer { semaphore.signal() }
 
-            deferred.fill(with: Result(from: work))
+            deferred.fill(with: Result(catching: work))
         }
 
         return Task(deferred) {

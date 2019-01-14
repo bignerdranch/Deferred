@@ -19,6 +19,8 @@ class TaskResultTests: XCTestCase {
     static let allTests: [(String, (TaskResultTests) -> () throws -> Void)] = [
         ("testGetSuccess", testGetSuccess),
         ("testGetFailure", testGetFailure),
+        ("testCatchingInitTurnsReturnedValueIntoSuccess", testCatchingInitTurnsReturnedValueIntoSuccess),
+        ("testCatchingInitTurnsThrownErrorIntoFailure", testCatchingInitTurnsThrownErrorIntoFailure),
         ("testDescriptionSuccess", testDescriptionSuccess),
         ("testDescriptionFailure", testDescriptionFailure),
         ("testDebugDescriptionSuccess", testDebugDescriptionSuccess),
@@ -57,6 +59,34 @@ class TaskResultTests: XCTestCase {
         }
 
         let voidFailure = VoidResult(failure: TestError.third)
+        XCTAssertThrowsError(try voidFailure.get()) { (error) in
+            XCTAssertEqual(error as? TestError, .third)
+        }
+    }
+
+    func testCatchingInitTurnsReturnedValueIntoSuccess() {
+        let intSuccesss = IntResult { return 99 }
+        XCTAssertEqual(try intSuccesss.get(), 99)
+
+        let stringSuccess = StringResult { return "bar" }
+        XCTAssertEqual(try stringSuccess.get(), "bar")
+
+        let voidSuccess = VoidResult {}
+        XCTAssertNoThrow(try voidSuccess.get())
+    }
+
+    func testCatchingInitTurnsThrownErrorIntoFailure() {
+        let intFailure = IntResult { throw TestError.first }
+        XCTAssertThrowsError(try intFailure.get()) { (error) in
+            XCTAssertEqual(error as? TestError, .first)
+        }
+
+        let stringFailure = StringResult { throw TestError.second }
+        XCTAssertThrowsError(try stringFailure.get()) { (error) in
+            XCTAssertEqual(error as? TestError, .second)
+        }
+
+        let voidFailure = VoidResult { throw TestError.third }
         XCTAssertThrowsError(try voidFailure.get()) { (error) in
             XCTAssertEqual(error as? TestError, .third)
         }

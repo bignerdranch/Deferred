@@ -38,6 +38,10 @@ public protocol Either {
     /// Creates a right-biased instance.
     init(right: Right)
 
+    /// Creates an instance by evaluating a throwing `body`, capturing its
+    /// returned value as a right bias, or the thrown error as a left bias.
+    init(catching body: () throws -> Right)
+
     /// Returns the right-biased value as a throwing expression.
     ///
     /// Use this method to retrieve the value of this instance if it is
@@ -46,9 +50,8 @@ public protocol Either {
 }
 
 extension Either {
-    /// Derive a success value by calling a failable function `body`.
     @_inlineable
-    public init(from body: () throws -> Right) {
+    public init(catching body: () throws -> Right) {
         do {
             try self.init(right: body())
         } catch {
@@ -64,5 +67,10 @@ extension Either {
     @available(*, unavailable, message: "Replace with 'get()' inside a 'do' / 'catch' block to better align with SE-0235, the Swift 5 Result type.")
     public func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return {
         fatalError("unavailable methods cannot be called")
+    }
+
+    @available(*, unavailable, renamed: "init(catching:)", message: "Replace with 'init(catching:)' to align with SE-0235, the Swift 5 Result type.") // must be unavailable to prevent ambiguity with trailing closure
+    public init(from body: () throws -> Right) {
+        fatalError("unavailable initializer cannot be called")
     }
 }

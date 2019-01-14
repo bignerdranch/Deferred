@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 9/16/18.
-//  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2018-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -19,9 +19,12 @@ import Deferred
 /// `TaskResult` type, but many types conforming to `TaskProtocol` may exist.
 ///
 /// - seealso: `FutureProtocol`
-public protocol TaskProtocol: FutureProtocol where Value: Either, Value.Left == Error {
+public protocol TaskProtocol: FutureProtocol where Value: Either {
     /// A type that represents the success of some asynchronous work.
     associatedtype SuccessValue where SuccessValue == Value.Right
+
+    /// A type that represents the failure of some asynchronous work.
+    typealias FailureValue = Error
 
     /// Call some `body` closure if the task successfully completes.
     ///
@@ -30,9 +33,6 @@ public protocol TaskProtocol: FutureProtocol where Value: Either, Value.Left == 
     ///  * parameter value: The determined success value.
     /// - seealso: `FutureProtocol.upon(_:execute:)`
     func uponSuccess(on executor: Executor, execute body: @escaping(_ value: SuccessValue) -> Void)
-
-    /// A type that represents the failure of some asynchronous work.
-    typealias FailureValue = Error
 
     /// Call some `body` closure if the task fails.
     ///
@@ -79,7 +79,7 @@ extension TaskProtocol {
 
 // MARK: - Conditional conformances
 
-extension Future: TaskProtocol where Value: Either, Value.Left == Error {
+extension Future: TaskProtocol where Value: Either {
     public typealias SuccessValue = Value.Right
 
     /// Create a future having the same underlying task as `other`.
@@ -105,7 +105,7 @@ extension Future: TaskProtocol where Value: Either, Value.Left == Error {
     }
 }
 
-extension Future where Value: Either, Value.Left == Error {
+extension Future where Value: Either {
     @available(*, unavailable, renamed: "init(resultFrom:)")
     public init<Wrapped: TaskProtocol>(task wrapped: Wrapped) where Wrapped.SuccessValue == SuccessValue {
         fatalError("unavailable initializer cannot be called")
@@ -117,6 +117,6 @@ extension Future where Value: Either, Value.Left == Error {
     }
 }
 
-extension Deferred: TaskProtocol where Value: Either, Value.Left == Error {
+extension Deferred: TaskProtocol where Value: Either {
     public typealias SuccessValue = Value.Right
 }

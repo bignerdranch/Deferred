@@ -3,31 +3,37 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/9/15.
-//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 /// A type that can exclusively represent one of two values.
 ///
-/// By design, an either symmetrical and treats its variants the same way.
-/// For representing success and failures, use `TaskResult`.
+/// By design, an either is symmetrical and treats its variants the same.
+/// For representing the most common case of success and failures, prefer
+/// a result type like `TaskResult`.
 ///
-/// This protocol describes a minimal interface for representing `TaskResult`
-/// to overcome limitations with Swift protocol extensions. It is expected that
-/// its use will be removed completely at some later point.
+/// This protocol describes a minimal interface for representing a result type
+/// to overcome limitations with Swift. It is expected that it will be removed
+/// completely at some later point.
 @available(swift, deprecated: 100000)
 public protocol Either {
     /// One of the two possible results.
     ///
-    /// By convention, the left side is used to hold an error value.
-    associatedtype Left = Error
-
-    /// Creates a left-biased instance.
-    init(left: Left)
+    /// By convention, the left side indicates failure, typically through a
+    /// Swift `Error`.
+    ///
+    /// A `typealias` instead of an `associatedtype` to avoid breaking
+    /// compatibility when what we actually want becomes representable. See also
+    /// <https://github.com/apple/swift/blob/master/docs/LibraryEvolution.rst#protocols>.
+    typealias Left = Error
 
     /// One of the two possible results.
     ///
     /// By convention, the right side is used to hold a correct value.
     associatedtype Right
+
+    /// Creates a left-biased instance.
+    init(left: Left)
 
     /// Creates a right-biased instance.
     init(right: Right)
@@ -39,7 +45,7 @@ public protocol Either {
     func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return
 }
 
-extension Either where Left == Error {
+extension Either {
     /// Derive a success value by calling a failable function `body`.
     @_inlineable
     public init(from body: () throws -> Right) {

@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.name         = "BNRDeferred"
-  s.version      = "4.0.0-beta.3"
+  s.version      = "4.0.0-beta.4"
   s.summary      = "Work with values that haven't been determined yet."
 
   s.description  = <<-DESC

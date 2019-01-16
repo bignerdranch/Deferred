@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/26/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -15,13 +15,15 @@ extension TaskProtocol {
     ///
     /// - seealso: `TaskProtocol.uponSuccess(on:execute:)`
     /// - see: `FutureProtocol.upon(_:execute:)`
-    public func uponSuccess(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ value: SuccessValue) -> Void) {
+    public func uponSuccess(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ value: Success) -> Void) {
         uponSuccess(on: executor as Executor, execute: body)
     }
 
-    public func uponSuccess(on executor: Executor, execute body: @escaping(_ value: SuccessValue) -> Void) {
+    public func uponSuccess(on executor: Executor, execute body: @escaping(_ value: Success) -> Void) {
         upon(executor) { (result) in
-            result.withValues(ifLeft: { _ in () }, ifRight: body)
+            do {
+                try body(result.get())
+            } catch {}
         }
     }
 
@@ -29,13 +31,17 @@ extension TaskProtocol {
     ///
     /// - seealso: `TaskProtocol.uponFailure(on:execute:)`
     /// - seealso: `FutureProtocol.upon(_:execute:)`
-    public func uponFailure(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ error: FailureValue) -> Void) {
+    public func uponFailure(on executor: PreferredExecutor = Self.defaultUponExecutor, execute body: @escaping(_ error: Failure) -> Void) {
         uponFailure(on: executor as Executor, execute: body)
     }
 
-    public func uponFailure(on executor: Executor, execute body: @escaping(_ error: FailureValue) -> Void) {
+    public func uponFailure(on executor: Executor, execute body: @escaping(_ error: Failure) -> Void) {
         upon(executor) { result in
-            result.withValues(ifLeft: body, ifRight: { _ in () })
+            do {
+                _ = try result.get()
+            } catch {
+                body(error)
+            }
         }
     }
 }

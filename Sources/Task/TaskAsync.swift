@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 7/14/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -24,7 +24,7 @@ extension Task {
     ///   preemptively fail the task.
     /// - parameter body: A function body that either calculates and returns the
     ///   success value for the task or throws to indicate failure.
-    public static func async(upon queue: DispatchQueue = .any(), flags: DispatchWorkItemFlags = [], onCancel makeError: @autoclosure @escaping() -> Error, execute work: @escaping() throws -> SuccessValue) -> Task {
+    public static func async(upon queue: DispatchQueue = .any(), flags: DispatchWorkItemFlags = [], onCancel makeError: @autoclosure @escaping() -> Failure, execute work: @escaping() throws -> Success) -> Task {
         let deferred = Deferred<Result>()
         let semaphore = DispatchSemaphore(value: 1)
 
@@ -32,7 +32,7 @@ extension Task {
             guard case .success = semaphore.wait(timeout: .now()) else { return }
             defer { semaphore.signal() }
 
-            deferred.fill(with: Result(from: work))
+            deferred.fill(with: Result(catching: work))
         }
 
         return Task(deferred) {
@@ -44,7 +44,7 @@ extension Task {
     }
 
     @available(*, unavailable, message: "Replace with 'Task.async(upon:flags:onCancel:)' for clarity.")
-    public convenience init(upon queue: DispatchQueue = .any(), flags: DispatchWorkItemFlags = [], onCancel produceError: @autoclosure @escaping() -> Error, execute body: @escaping() throws -> SuccessValue) {
+    public convenience init(upon queue: DispatchQueue = .any(), flags: DispatchWorkItemFlags = [], onCancel produceError: @autoclosure @escaping() -> Error, execute body: @escaping() throws -> Success) {
         fatalError()
     }
 }

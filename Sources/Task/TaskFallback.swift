@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 3/28/17.
-//  Copyright © 2017-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2017-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -21,7 +21,7 @@ extension TaskProtocol {
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
-    public func fallback<NewTask: TaskProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Error) throws -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
+    public func fallback<NewTask: TaskProtocol>(upon executor: PreferredExecutor, to restartTask: @escaping(Failure) throws -> NewTask) -> Task<Success> where NewTask.Success == Success {
         return fallback(upon: executor as Executor, to: restartTask)
     }
 
@@ -40,7 +40,7 @@ extension TaskProtocol {
     /// `restartTask` closure. `fallback` submits `restartTask` to `executor`
     /// once the task fails.
     /// - see: FutureProtocol.andThen(upon:start:)
-    public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Error) throws -> NewTask) -> Task<SuccessValue> where NewTask.SuccessValue == SuccessValue {
+    public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Failure) throws -> NewTask) -> Task<Success> where NewTask.Success == Success {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let chain = TaskChain(continuingWith: self)
         #else
@@ -53,7 +53,7 @@ extension TaskProtocol {
             #endif
 
             do {
-                let value = try result.extract()
+                let value = try result.get()
                 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
                 chain.flushAndThen()
                 #endif
@@ -77,9 +77,9 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<SuccessValue>(future, progress: chain.effectiveProgress)
+        return Task<Success>(future, progress: chain.effectiveProgress)
         #else
-        return Task<SuccessValue>(future) {
+        return Task<Success>(future) {
             cancellationToken.fill(with: ())
         }
         #endif
@@ -90,9 +90,9 @@ extension TaskProtocol {
     public static func `repeat`(
         upon preferredExecutor: PreferredExecutor,
         count numberOfAttempts: Int = 3,
-        continuingIf shouldRetry: @escaping(Error) -> Bool = { _ in return true },
-        to startTask: @escaping() throws -> Task<SuccessValue>
-    ) -> Task<SuccessValue> {
+        continuingIf shouldRetry: @escaping(Failure) -> Bool = { _ in return true },
+        to startTask: @escaping() throws -> Task<Success>
+    ) -> Task<Success> {
         return self.repeat(upon: preferredExecutor as Executor, count: numberOfAttempts, continuingIf: shouldRetry, to: startTask)
     }
 
@@ -112,10 +112,10 @@ extension TaskProtocol {
     public static func `repeat`(
         upon executor: Executor,
         count numberOfAttempts: Int = 3,
-        continuingIf shouldRetry: @escaping(Error) -> Bool = { _ in return true },
-        to startTask: @escaping() throws -> Task<SuccessValue>
-    ) -> Task<SuccessValue> {
-        var lastFailedTask: Task<SuccessValue>
+        continuingIf shouldRetry: @escaping(Failure) -> Bool = { _ in return true },
+        to startTask: @escaping() throws -> Task<Success>
+    ) -> Task<Success> {
+        var lastFailedTask: Task<Success>
         do {
             lastFailedTask = try startTask()
         } catch {
@@ -123,7 +123,7 @@ extension TaskProtocol {
         }
 
         for _ in 0 ..< max(numberOfAttempts, 0) {
-            lastFailedTask = lastFailedTask.fallback(upon: executor) { (error) -> Task<SuccessValue> in
+            lastFailedTask = lastFailedTask.fallback(upon: executor) { (error) -> Task<Success> in
                 guard shouldRetry(error) else {
                     throw error
                 }

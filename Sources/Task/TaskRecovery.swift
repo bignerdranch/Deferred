@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 10/27/15.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -20,7 +20,7 @@ extension TaskProtocol {
     /// using the current parent will also contribute to the chain's progress.
     ///
     /// The resulting task is cancellable in the same way the receiving task is.
-    public func recover(upon executor: PreferredExecutor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
+    public func recover(upon executor: PreferredExecutor, substituting substitution: @escaping(Failure) throws -> Success) -> Task<Success> {
         return recover(upon: executor as Executor, substituting: substitution)
     }
 
@@ -38,26 +38,30 @@ extension TaskProtocol {
     /// The resulting task is cancellable in the same way the receiving task is.
     ///
     /// - see: FutureProtocol.map(upon:transform:)
-    public func recover(upon executor: Executor, substituting substitution: @escaping(Error) throws -> SuccessValue) -> Task<SuccessValue> {
+    public func recover(upon executor: Executor, substituting substitution: @escaping(Failure) throws -> Success) -> Task<Success> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let chain = TaskChain(continuingWith: self)
         #endif
 
-        let future: Future = map(upon: executor) { (result) -> Task<SuccessValue>.Result in
+        let future: Future = map(upon: executor) { (result) -> Task<Success>.Result in
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             chain.beginMap()
             defer { chain.commitMap() }
             #endif
 
-            return Task<SuccessValue>.Result {
-                try result.withValues(ifLeft: { try substitution($0) }, ifRight: { $0 })
+            return Task<Success>.Result {
+                do {
+                    return try result.get()
+                } catch {
+                    return try substitution(error)
+                }
             }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<SuccessValue>(future, progress: chain.effectiveProgress)
+        return Task<Success>(future, progress: chain.effectiveProgress)
         #else
-        return Task<SuccessValue>(future, uponCancel: cancel)
+        return Task<Success>(future, uponCancel: cancel)
         #endif
     }
 }

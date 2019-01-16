@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 4/15/16.
-//  Copyright © 2015-2016 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -24,11 +24,16 @@ extension TaskProtocol {
     /// - see: map(transform:)
     public func ignored() -> Task<Void> {
         let future = every { (result) -> Task<Void>.Result in
-            result.withValues(ifLeft: Task<Void>.Result.failure, ifRight: { _ in Task<Void>.Result.success(()) })
+            do {
+                _ = try result.get()
+                return .success(())
+            } catch {
+                return .failure(error)
+            }
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        if let progress = (self as? Task<SuccessValue>)?.progress {
+        if let progress = (self as? Task<Success>)?.progress {
             return Task<Void>(future, progress: progress)
         }
         #endif

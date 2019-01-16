@@ -108,7 +108,7 @@ struct TaskChain {
     /// Locates or creates the root of a task chain, then increments its
     /// total units in preparation for a follow-up operation to be performed.
     init<Wrapped: TaskProtocol>(continuingWith wrapped: Wrapped) {
-        if let task = wrapped as? Task<Wrapped.SuccessValue>, let root = task.progress as? Root {
+        if let task = wrapped as? Task<Wrapped.Success>, let root = task.progress as? Root {
             // If `wrapped` is a Task created normally, reuse the progress root;
             // this `map` or `andThen` builds on that progress.
             self.root = root
@@ -153,7 +153,7 @@ struct TaskChain {
 
     /// See `beginAndThen`.
     func commitAndThen<Wrapped: TaskProtocol>(with wrapped: Wrapped) {
-        if let task = wrapped as? Task<Wrapped.SuccessValue>, !(task.progress is Root) {
+        if let task = wrapped as? Task<Wrapped.Success>, !(task.progress is Root) {
             let pendingUnitCount = task.progress.wasGeneratedByTask ? TaskChain.singleUnit : TaskChain.explicitChildUnitCount
             root.totalUnitCount += pendingUnitCount - TaskChain.singleUnit
             root.adoptChild(task.progress, withPendingUnitCount: pendingUnitCount)

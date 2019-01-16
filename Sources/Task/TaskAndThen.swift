@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 10/27/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 #if SWIFT_PACKAGE
@@ -22,7 +22,7 @@ extension TaskProtocol {
     ///
     /// Cancelling the resulting task will attempt to cancel both the receiving
     /// task and the created task.
-    public func andThen<NewTask: TaskProtocol>(upon executor: PreferredExecutor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.SuccessValue> {
+    public func andThen<NewTask: TaskProtocol>(upon executor: PreferredExecutor, start startNextTask: @escaping(Success) throws -> NewTask) -> Task<NewTask.Success> {
         return andThen(upon: executor as Executor, start: startNextTask)
     }
 
@@ -41,7 +41,7 @@ extension TaskProtocol {
     /// `startNextTask` closure. `andThen` submits `startNextTask` to `executor`
     /// once the task completes successfully.
     /// - see: FutureProtocol.andThen(upon:start:)
-    public func andThen<NewTask: TaskProtocol>(upon executor: Executor, start startNextTask: @escaping(SuccessValue) throws -> NewTask) -> Task<NewTask.SuccessValue> {
+    public func andThen<NewTask: TaskProtocol>(upon executor: Executor, start startNextTask: @escaping(Success) throws -> NewTask) -> Task<NewTask.Success> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
         let chain = TaskChain(continuingWith: self)
         #else
@@ -54,7 +54,7 @@ extension TaskProtocol {
             #endif
 
             do {
-                let value = try result.extract()
+                let value = try result.get()
                 let newTask = try startNextTask(value)
                 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
                 chain.commitAndThen(with: newTask)
@@ -71,9 +71,9 @@ extension TaskProtocol {
         }
 
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        return Task<NewTask.SuccessValue>(future, progress: chain.effectiveProgress)
+        return Task<NewTask.Success>(future, progress: chain.effectiveProgress)
         #else
-        return Task<NewTask.SuccessValue>(future) {
+        return Task<NewTask.Success>(future) {
             cancellationToken.fill(with: ())
         }
         #endif

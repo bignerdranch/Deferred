@@ -6,24 +6,94 @@
 //  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
+// MARK: - Unwrapping
+
+extension Task.Result {
+    @_inlineable
+    public func get() throws -> Success {
+        switch self {
+        case let .success(success):
+            return success
+        case let .failure(failure):
+            throw failure
+        }
+    }
+}
+
+// MARK: - Functional Transforms
+
+extension Task.Result {
+    /// Evaluates the `transform` for a success result, passing its unwrapped
+    /// value as the parameter, to derive a new value.
+    ///
+    /// Use the `map` method with a closure that produces a new value.
+    public func map<NewSuccess>(_ transform: (Success) -> NewSuccess) -> Task<NewSuccess>.Result {
+        switch self {
+        case .success(let value):
+            return .success(transform(value))
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
+    /// Evaluates the `transform` for a failure result, passing the unwrapped
+    /// error as the parameter, to derive a new value.
+    ///
+    /// Use the `mapError` method with a closure that produces a new value.
+    public func mapError(_ transform: (Failure) -> Error) -> Task<Success>.Result {
+        switch self {
+        case .success(let success):
+            return .success(success)
+        case .failure(let failure):
+            return .failure(transform(failure))
+        }
+    }
+
+    /// Evaluates the `transform` for a success result, passing its unwrapped
+    /// value as the parameter, to derive a new result.
+    ///
+    /// Use `flatMap` with a closure that itself returns a result.
+    public func flatMap<NewSuccess>(_ transform: (Success) -> Task<NewSuccess>.Result) -> Task<NewSuccess>.Result {
+        switch self {
+        case .success(let value):
+            return transform(value)
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
+    /// Evaluates the `transform` for a failure result, passing the unwrapped
+    /// error as the parameter, to derive a new result.
+    ///
+    /// Use the `flatMapError` with a closure that itself returns a result.
+    public func flatMapError(_ transform: (Failure) -> Task<Success>.Result) -> Task<Success>.Result {
+        switch self {
+        case let .success(success):
+            return .success(success)
+        case let .failure(failure):
+            return transform(failure)
+        }
+    }
+}
+
 // MARK: - Initializers
 
 extension Task.Result {
     /// Creates an instance storing a successful `value`.
     @_inlineable
-    public init(success value: @autoclosure() throws -> SuccessValue) {
-        self.init(from: value)
+    public init(success value: @autoclosure() throws -> Success) {
+        self.init(catching: value)
     }
 
     /// Creates an instance storing an `error` describing the failure.
     @_inlineable
-    public init(failure error: Error) {
+    public init(failure error: Failure) {
         self = .failure(error)
     }
 
     /// Create an exclusive success/failure state derived from two optionals,
     /// in the style of Cocoa completion handlers.
-    public init(value: SuccessValue?, error: Error?) {
+    public init(value: Success?, error: Failure?) {
         switch (value, error) {
         case (let value?, _):
             // Ignore error if value is non-nil
@@ -40,7 +110,7 @@ private enum TaskResultInitializerError: Error {
     case invalidInput
 }
 
-extension Task.Result where SuccessValue == Void {
+extension Task.Result where Success == Void {
     /// Creates the success value.
     @_inlineable
     public init() {
@@ -52,22 +122,12 @@ extension Task.Result where SuccessValue == Void {
 
 extension Task.Result: Either {
     @_inlineable
-    public init(left error: Error) {
+    public init(left error: Failure) {
         self = .failure(error)
     }
 
     @_inlineable
-    public init(right value: SuccessValue) {
+    public init(right value: Success) {
         self = .success(value)
-    }
-
-    @_inlineable
-    public func withValues<Return>(ifLeft left: (Error) throws -> Return, ifRight right: (SuccessValue) throws -> Return) rethrows -> Return {
-        switch self {
-        case let .success(value):
-            return try right(value)
-        case let .failure(error):
-            return try left(error)
-        }
     }
 }

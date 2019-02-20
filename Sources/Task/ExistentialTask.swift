@@ -326,7 +326,7 @@ extension Task {
 
     /// Creates an operation that has already completed with `value`.
     public convenience init(success value: @autoclosure() throws -> Success) {
-        let future = Future<Result>(success: value)
+        let future = Future<Result>(success: try value())
         self.init(future)
     }
 

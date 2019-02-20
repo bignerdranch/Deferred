@@ -664,12 +664,12 @@
 				TargetAttributes = {
 					DB126C9F1E53685300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CA71E53685300054E95 = {
 						CreatedOnToolsVersion = 8.2.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					DB126CBB1E53685C00054E95 = {
@@ -705,6 +705,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = DB524C671D851E3800DDF16D;
 			productRefGroup = DB524C721D851E3800DDF16D /* Products */;

@@ -3,7 +3,7 @@
 //  Deferred
 //
 //  Created by John Gallagher on 7/17/14.
-//  Copyright © 2014-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
 import Dispatch
@@ -72,26 +72,34 @@ extension Locking {
 /// - On Linux, BSD, or Android, waiters perform comparably to a kernel lock
 ///   under contention.
 public final class NativeLock: Locking {
-    private var lock = bnr_native_lock()
+    private let lock: UnsafeMutablePointer<bnr_native_lock>
 
     /// Creates a standard platform lock.
     public init() {
-        bnr_native_lock_init(&lock)
+        lock = UnsafeMutablePointer<bnr_native_lock>.allocate(capacity: 1)
+        lock.initialize(to: bnr_native_lock())
+        bnr_native_lock_init(lock)
     }
 
     deinit {
-        bnr_native_lock_deinit(&lock)
+        bnr_native_lock_deinit(lock)
+        lock.deinitialize(count: 1)
+        lock.deallocate()
     }
 
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        bnr_native_lock_lock(&lock)
-        defer { bnr_native_lock_unlock(&lock) }
+        bnr_native_lock_lock(lock)
+        defer {
+            bnr_native_lock_unlock(lock)
+        }
         return try body()
     }
 
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        guard bnr_native_lock_trylock(&lock) else { return nil }
-        defer { bnr_native_lock_unlock(&lock) }
+        guard bnr_native_lock_trylock(lock) else { return nil }
+        defer {
+            bnr_native_lock_unlock(lock)
+        }
         return try body()
     }
 }

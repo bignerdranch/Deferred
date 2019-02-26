@@ -110,39 +110,41 @@ typealias NativeLock = NSLock
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads
 public final class POSIXReadWriteLock: Locking {
-    private var lock = pthread_rwlock_t()
+    private let lock: UnsafeMutablePointer<pthread_rwlock_t>
 
     /// Create the standard platform lock.
     public init() {
-        let status = pthread_rwlock_init(&lock, nil)
-        assert(status == 0)
+        lock = UnsafeMutablePointer<pthread_rwlock_t>.allocate(capacity: 1)
+        lock.initialize(to: pthread_rwlock_t())
+        pthread_rwlock_init(lock, nil)
     }
 
     deinit {
-        let status = pthread_rwlock_destroy(&lock)
-        assert(status == 0)
+        pthread_rwlock_destroy(lock)
+        lock.deinitialize(count: 1)
+        lock.deallocate()
     }
 
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        pthread_rwlock_rdlock(&lock)
+        pthread_rwlock_rdlock(lock)
         defer {
-            pthread_rwlock_unlock(&lock)
+            pthread_rwlock_unlock(lock)
         }
         return try body()
     }
 
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        guard pthread_rwlock_tryrdlock(&lock) == 0 else { return nil }
+        guard pthread_rwlock_tryrdlock(lock) == 0 else { return nil }
         defer {
-            pthread_rwlock_unlock(&lock)
+            pthread_rwlock_unlock(lock)
         }
         return try body()
     }
 
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        pthread_rwlock_wrlock(&lock)
+        pthread_rwlock_wrlock(lock)
         defer {
-            pthread_rwlock_unlock(&lock)
+            pthread_rwlock_unlock(lock)
         }
         return try body()
     }

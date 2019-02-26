@@ -9,14 +9,6 @@
 import Dispatch
 import Foundation
 
-// This #if is over-complex because there is no compilation condition associated
-// with Playgrounds. <rdar://38865726>
-#if SWIFT_PACKAGE || COCOAPODS
-import Atomics
-#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
-import Deferred.Atomics
-#endif
-
 /// A type that mutually excludes execution of code such that only one unit of
 /// code is running at any given time. An implementing type may choose to have
 /// readers-writer semantics, such that many readers can read at once, or lock
@@ -60,9 +52,6 @@ extension Locking {
     }
 }
 
-// This #if is over-complex because there is no compilation condition associated
-// with Playgrounds. <rdar://38865726>
-#if SWIFT_PACKAGE || (XCODE && !FORCE_PLAYGROUND_COMPATIBILITY) || COCOAPODS
 /// A variant lock backed by a platform type that attempts to allow waiters to
 /// block efficiently on contention. This locking type behaves the same for both
 /// read and write locks.
@@ -72,40 +61,81 @@ extension Locking {
 /// - On Linux, BSD, or Android, waiters perform comparably to a kernel lock
 ///   under contention.
 public final class NativeLock: Locking {
-    private let lock: UnsafeMutablePointer<bnr_native_lock>
+    private let lock: UnsafeMutableRawPointer
 
     /// Creates a standard platform lock.
     public init() {
-        lock = UnsafeMutablePointer<bnr_native_lock>.allocate(capacity: 1)
-        lock.initialize(to: bnr_native_lock())
-        bnr_native_lock_init(lock)
+        #if canImport(os)
+        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
+            let lock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
+            lock.initialize(to: os_unfair_lock())
+            self.lock = UnsafeMutableRawPointer(lock)
+            return
+        }
+        #endif
+
+        let lock = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
+        lock.initialize(to: pthread_mutex_t())
+        pthread_mutex_init(lock, nil)
+        self.lock = UnsafeMutableRawPointer(lock)
     }
 
     deinit {
-        bnr_native_lock_deinit(lock)
+        #if canImport(os)
+        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
+            let lock = self.lock.assumingMemoryBound(to: os_unfair_lock.self)
+            lock.deinitialize(count: 1)
+            lock.deallocate()
+            return
+        }
+        #endif
+
+        let lock = self.lock.assumingMemoryBound(to: pthread_mutex_t.self)
+        pthread_mutex_destroy(lock)
         lock.deinitialize(count: 1)
         lock.deallocate()
     }
 
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
-        bnr_native_lock_lock(lock)
+        #if canImport(os)
+        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
+            let lock = self.lock.assumingMemoryBound(to: os_unfair_lock.self)
+            os_unfair_lock_lock(lock)
+            defer {
+                os_unfair_lock_unlock(lock)
+            }
+            return try body()
+        }
+        #endif
+
+        let lock = self.lock.assumingMemoryBound(to: pthread_mutex_t.self)
+        pthread_mutex_lock(lock)
         defer {
-            bnr_native_lock_unlock(lock)
+            pthread_mutex_unlock(lock)
         }
         return try body()
     }
 
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        guard bnr_native_lock_trylock(lock) else { return nil }
+        #if canImport(os)
+        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
+            let lock = self.lock.assumingMemoryBound(to: os_unfair_lock.self)
+            guard os_unfair_lock_trylock(lock) else { return nil }
+            defer {
+                os_unfair_lock_unlock(lock)
+            }
+            return try body()
+        }
+        #endif
+
+        let lock = self.lock.assumingMemoryBound(to: pthread_mutex_t.self)
+        guard pthread_mutex_trylock(lock) == 0 else { return nil }
         defer {
-            bnr_native_lock_unlock(lock)
+            pthread_mutex_unlock(lock)
         }
         return try body()
     }
 }
-#else
-typealias NativeLock = NSLock
-#endif
 
 /// A readers-writer lock provided by the platform implementation of the
 /// POSIX Threads standard. Read more: https://en.wikipedia.org/wiki/POSIX_Threads

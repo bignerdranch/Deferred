@@ -3,12 +3,11 @@
 //  Deferred
 //
 //  Created by Zachary Waldowski on 12/7/15.
-//  Copyright © 2015-2018 Big Nerd Ranch. Licensed under MIT.
+//  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 //  Each of the types defined in this file have specific usage requirements, the
-//  precise semantics of which are defined in the POSIX (for the lock) and C11
-//  (for the atomics) standards. In Swift, they are tricky to use correctly
-//  because of writeback semantics.
+//  precise semantics of which are defined in the C11 standard. In Swift, they
+//  are tricky to use correctly because of writeback semantics.
 //
 //  It is best to use the below methods directly on C pointers
 //  (`UnsafeMutablePointer<UnsafeMutablePointer<T>>`) that are known to
@@ -28,12 +27,8 @@
 #error Required compiler features are not available
 #endif
 
+#include <stdbool.h>
 #include <stdatomic.h>
-#if defined(__APPLE__)
-#include <os/lock.h>
-#endif
-#include <pthread.h>
-#include <dispatch/dispatch.h>
 
 #define BNR_ATOMIC_INLINE static inline __attribute__((always_inline))
 #define BNR_ATOMIC_OVERLOAD __attribute__((overloadable))
@@ -54,71 +49,6 @@ typedef BNR_ATOMIC_ENUM(int, bnr_atomic_memory_order) {
     bnr_atomic_memory_order_acq_rel = memory_order_acq_rel,
     bnr_atomic_memory_order_seq_cst = memory_order_seq_cst
 };
-
-typedef struct bnr_native_lock_s {
-    union {
-        pthread_mutex_t legacy;
-#if defined(__APPLE__)
-        os_unfair_lock modern;
-#endif
-    } impl;
-} bnr_native_lock, *_Nonnull bnr_native_lock_t;
-
-BNR_ATOMIC_INLINE
-void bnr_native_lock_init(bnr_native_lock_t address) {
-#if defined(__APPLE__)
-    if (&os_unfair_lock_trylock != NULL) {
-        address->impl.modern = OS_UNFAIR_LOCK_INIT;
-        return;
-    }
-#endif
-
-    pthread_mutex_init(&address->impl.legacy, NULL);
-}
-
-BNR_ATOMIC_INLINE
-void bnr_native_lock_deinit(bnr_native_lock_t address) {
-#if defined(__APPLE__)
-    if (&os_unfair_lock_trylock != NULL) {
-        return;
-    }
-#endif
-
-    pthread_mutex_destroy(&address->impl.legacy);
-}
-
-BNR_ATOMIC_INLINE
-void bnr_native_lock_lock(bnr_native_lock_t address) {
-#if defined(__APPLE__)
-    if (&os_unfair_lock_lock != NULL) {
-        return os_unfair_lock_lock(&address->impl.modern);
-    }
-#endif
-
-    pthread_mutex_lock(&address->impl.legacy);
-}
-
-BNR_ATOMIC_INLINE
-bool bnr_native_lock_trylock(bnr_native_lock_t address) {
-#if defined(__APPLE__)
-    if (&os_unfair_lock_trylock != NULL) {
-        return os_unfair_lock_trylock(&address->impl.modern);
-    }
-#endif
-
-    return pthread_mutex_trylock(&address->impl.legacy) == 0;
-}
-
-BNR_ATOMIC_INLINE
-void bnr_native_lock_unlock(bnr_native_lock_t address) {
-#if defined(__APPLE__)
-    if (&os_unfair_lock_unlock != NULL) {
-        return os_unfair_lock_unlock(&address->impl.modern);
-    }
-#endif
-
-    pthread_mutex_unlock(&address->impl.legacy);
-}
 
 typedef const void *_Nullable volatile *_Nonnull bnr_atomic_ptr_t;
 

@@ -13,7 +13,7 @@ There are a few different options to install Deferred.
 Add the following to your Cartfile:
 
 ```
-github "bignerdranch/Deferred" "4.0.0-beta.4"
+github "bignerdranch/Deferred" "4.0.0-rc.1"
 ```
 
 Then run `carthage update`.
@@ -54,7 +54,7 @@ import PackageDescription
 let package = Package(
     name: "My Extremely Nerdy App",
     dependencies: [
-        .package(url: "https://github.com/bignerdranch/Deferred.git", from: "4.0.0-beta.4"),
+        .package(url: "https://github.com/bignerdranch/Deferred.git", from: "4.0.0-rc.1"),
     ]
 )
 ```

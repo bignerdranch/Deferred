@@ -50,15 +50,6 @@ public protocol Either {
 }
 
 extension Either {
-    @_inlineable
-    public init(catching body: () throws -> Right) {
-        do {
-            try self.init(right: body())
-        } catch {
-            self.init(left: error)
-        }
-    }
-
     @available(*, unavailable, renamed: "get()", message: "Replace with 'get()' to better align with SE-0235, the Swift 5 Result type.")
     public func extract() throws -> Right {
         fatalError("unavailable methods cannot be called")
@@ -69,8 +60,8 @@ extension Either {
         fatalError("unavailable methods cannot be called")
     }
 
-    @available(*, unavailable, renamed: "init(catching:)", message: "Replace with 'init(catching:)' to align with SE-0235, the Swift 5 Result type.") // must be unavailable to prevent ambiguity with trailing closure
-    public init(from body: () throws -> Right) {
+    @available(*, unavailable, renamed: "init(catching:)", message: "Replace with 'init(catching:)' to align with SE-0235, the Swift 5 Result type.")
+    public init<Body>(from body: Body) {
         fatalError("unavailable initializer cannot be called")
     }
 }

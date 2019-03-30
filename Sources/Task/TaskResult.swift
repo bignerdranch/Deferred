@@ -6,6 +6,29 @@
 //  Copyright © 2014-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
+// MARK: Compatibility with Protocol Extensions
+
+extension Task.Result: Either {
+    @_inlineable
+    public init(left error: Failure) {
+        self = .failure(error)
+    }
+
+    @_inlineable
+    public init(right value: Success) {
+        self = .success(value)
+    }
+
+    @_inlineable
+    public init(catching body: () throws -> Success) {
+        do {
+            self = try .success(body())
+        } catch {
+            self = .failure(error)
+        }
+    }
+}
+
 // MARK: - Unwrapping
 
 extension Task.Result {
@@ -115,19 +138,5 @@ extension Task.Result where Success == Void {
     @_inlineable
     public init() {
         self = .success(())
-    }
-}
-
-// MARK: - Compatibility with Protocol Extensions
-
-extension Task.Result: Either {
-    @_inlineable
-    public init(left error: Failure) {
-        self = .failure(error)
-    }
-
-    @_inlineable
-    public init(right value: Success) {
-        self = .success(value)
     }
 }

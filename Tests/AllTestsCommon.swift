@@ -71,7 +71,7 @@ extension XCTestCase {
     #endif
 
     func afterShortDelay(upon queue: DispatchQueue = .global(), execute body: @escaping() -> Void) {
-        queue.asyncAfter(deadline: .now() + 0.15, execute: body)
+        queue.asyncAfter(deadline: .now() + 0.3, execute: body)
     }
 }
 

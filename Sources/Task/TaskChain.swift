@@ -30,14 +30,14 @@ struct TaskChain {
     /// that first task's `Root`.
     @objc(BNRTaskRootProgress)
     private class Root: Progress {
-        /// Key for value of type `Root?` in `Thread.threadDictionary`.
-        static let threadKey = "_BNRTaskCurrentRoot"
+        /// Key for value of type `[Root]?` in `Thread.threadDictionary`.
+        static let threadKey = "_BNRTaskProgressStack"
 
         /// Propogates the current Task chain for explicit composition during
         /// `Task.andThen`.
-        static var active: Root? {
+        static var activeStack: [Root] {
             get {
-                return Thread.current.threadDictionary[threadKey] as? Root
+                return Thread.current.threadDictionary[threadKey] as? [Root] ?? []
             }
             set {
                 Thread.current.threadDictionary[threadKey] = newValue
@@ -81,7 +81,7 @@ struct TaskChain {
     /// Locates or creates the root of a task chain, then generates any
     /// progress objects needed to represent `wrapped` in that chain.
     init<Wrapped: TaskProtocol>(startingWith wrapped: Wrapped, using customProgress: Progress? = nil, uponCancel cancellation: (() -> Void)? = nil) {
-        if let root = Root.active {
+        if let root = Root.activeStack.last {
             // We're inside `andThen` — `commitAndThen(with:)` will compose instead.
             self.root = root
             self.effectiveProgress = customProgress ?? .basicProgress(parent: nil, for: wrapped, uponCancel: cancellation)
@@ -148,19 +148,19 @@ struct TaskChain {
     /// progress and attach it to the root. If this next step provides custom
     /// progress, give it a 100x slice.
     func beginAndThen() {
-        Root.active = root
+        Root.activeStack.append(root)
     }
 
     /// See `beginAndThen`.
     func commitAndThen<Wrapped: TaskProtocol>(with wrapped: Wrapped) {
-        if let task = wrapped as? Task<Wrapped.Success>, !(task.progress is Root) {
+        if let task = wrapped as? Task<Wrapped.Success> {
             let pendingUnitCount = task.progress.wasGeneratedByTask ? TaskChain.singleUnit : TaskChain.explicitChildUnitCount
             root.totalUnitCount += pendingUnitCount - TaskChain.singleUnit
-            root.adoptChild(task.progress, withPendingUnitCount: pendingUnitCount)
+            root.monitorChild(task.progress, withPendingUnitCount: pendingUnitCount)
         } else {
             root.monitorCompletion(of: wrapped, uponCancel: wrapped.cancel, withPendingUnitCount: TaskChain.singleUnit)
         }
-        Root.active = nil
+        Root.activeStack.removeLast()
     }
 
     /// When the `andThen` handler can't be run at all, mark the enqueued unit
@@ -168,7 +168,7 @@ struct TaskChain {
     func flushAndThen() {
         root.becomeCurrent(withPendingUnitCount: TaskChain.singleUnit)
         root.resignCurrent()
-        Root.active = nil
+        Root.activeStack.removeLast()
     }
 }
 #endif

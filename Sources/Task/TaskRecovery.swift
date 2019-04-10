@@ -40,7 +40,7 @@ extension TaskProtocol {
     /// - see: FutureProtocol.map(upon:transform:)
     public func recover(upon executor: Executor, substituting substitution: @escaping(Failure) throws -> Success) -> Task<Success> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let chain = TaskChain(continuingWith: self)
+        let chain = TaskChain(andThenFrom: self)
         #endif
 
         let future: Future = map(upon: executor) { (result) -> Task<Success>.Result in

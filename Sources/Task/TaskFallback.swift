@@ -42,7 +42,7 @@ extension TaskProtocol {
     /// - see: FutureProtocol.andThen(upon:start:)
     public func fallback<NewTask: TaskProtocol>(upon executor: Executor, to restartTask: @escaping(Failure) throws -> NewTask) -> Task<Success> where NewTask.Success == Success {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let chain = TaskChain(continuingWith: self)
+        let chain = TaskChain(andThenFrom: self)
         #else
         let cancellationToken = Deferred<Void>()
         #endif

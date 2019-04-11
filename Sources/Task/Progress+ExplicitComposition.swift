@@ -16,6 +16,7 @@ import Deferred.Atomics
 
 /// A progress object whose attributes reflect that of an external progress
 /// tree.
+@objc(BNRTaskProxyProgress)
 private final class ProxyProgress: Progress {
 
     @objc dynamic let observee: Progress

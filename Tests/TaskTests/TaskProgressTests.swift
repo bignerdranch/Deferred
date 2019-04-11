@@ -30,8 +30,8 @@ class TaskProgressTests: CustomExecutorTestCase {
         ("testThatMapProgressFinishes", testThatMapProgressFinishes),
         ("testThatAndThenProgressFinishes", testThatAndThenProgressFinishes),
         ("testThatChainingWithAThrownErrorFinishes", testThatChainingWithAThrownErrorFinishes),
-        ("testThatChainingAFutureIsWeightedEqually", testThatChainingAFutureIsWeightedEqually),
-        ("testThatChainingATaskWithoutCustomProgressIsWeightedEqually", testThatChainingATaskWithoutCustomProgressIsWeightedEqually),
+        ("testThatChainingAFutureIsNotWeighted", testThatChainingAFutureIsNotWeighted),
+        ("testThatChainingATaskWithoutCustomProgressIsNotWeighted", testThatChainingATaskWithoutCustomProgressIsNotWeighted),
         ("testThatChainingATaskWithCustomProgressIsWeighted", testThatChainingATaskWithCustomProgressIsWeighted),
         ("testThatChainingWithCustomProgressIsWeighted", testThatChainingWithCustomProgressIsWeighted)
     ]
@@ -110,8 +110,6 @@ class TaskProgressTests: CustomExecutorTestCase {
         let deferred = Task<Int>.Promise()
         let task = deferred.map(upon: customQueue) { $0 * 2 }
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 2)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         deferred.succeed(with: 9000)
@@ -142,8 +140,6 @@ class TaskProgressTests: CustomExecutorTestCase {
         let promise = Task<Int>.Promise()
         let task = promise.andThen(upon: customExecutor) { self.delaySuccessAsFuture($0 * 2) }
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 2)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         promise.succeed(with: 9000)
@@ -153,8 +149,6 @@ class TaskProgressTests: CustomExecutorTestCase {
             expectationThatCustomExecutor(isCalledAtLeast: 1)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 2)
-        XCTAssertEqual(task.progress.totalUnitCount, 2)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 
@@ -162,8 +156,6 @@ class TaskProgressTests: CustomExecutorTestCase {
         let promise = Task<Int>.Promise()
         let task = promise.andThen(upon: customExecutor) { _ throws -> Task<String> in throw TestError.first }
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 2)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         promise.succeed(with: 9000)
@@ -173,52 +165,67 @@ class TaskProgressTests: CustomExecutorTestCase {
             expectationThatCustomExecutor(isCalledAtLeast: 1)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 2)
-        XCTAssertEqual(task.progress.totalUnitCount, 2)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 
-    func testThatChainingAFutureIsWeightedEqually() {
+    private func expect(fractionIn range: ClosedRange<Double>, from progress: Progress) -> XCTestExpectation {
+        let expectation = XCTKVOExpectation(keyPath: #keyPath(Progress.fractionCompleted), object: progress, expectedValue: nil, options: .initial)
+        expectation.handler = { (object, changes) -> Bool in
+            guard let progress = object as? Progress else { return false }
+            return range.contains(progress.fractionCompleted)
+        }
+        return expectation
+    }
+
+    func testThatChainingAFutureIsNotWeighted() {
+        customQueue.suspend()
+
         let promise = Task<Int>.Promise()
         let task = promise
             .andThen(upon: .any(), start: { self.delaySuccessAsFuture($0 * 2) })
-            .andThen(upon: .any(), start: { self.delaySuccessAsTask("\($0)") })
-            .map(upon: .any(), transform: { "\($0)\($0)" })
+            .andThen(upon: customQueue, start: { self.delaySuccessAsTask("\($0)") })
+            .map(upon: customQueue, transform: { "\($0)\($0)" })
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 4)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         promise.succeed(with: 9000)
 
         wait(for: [
+            expect(fractionIn: 0.05 ... 0.25, from: task.progress)
+        ], timeout: shortTimeout)
+
+        customQueue.resume()
+
+        wait(for: [
             expectation(toFinish: task.progress)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 4)
-        XCTAssertEqual(task.progress.totalUnitCount, 4)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 
-    func testThatChainingATaskWithoutCustomProgressIsWeightedEqually() {
+    func testThatChainingATaskWithoutCustomProgressIsNotWeighted() {
+        customQueue.suspend()
+
         let promise = Task<Int>.Promise()
         let task = Task(promise)
             .andThen(upon: .any(), start: { self.delaySuccessAsFuture($0 * 2) })
-            .andThen(upon: .any(), start: { self.delaySuccessAsTask("\($0)") })
-            .map(upon: .any(), transform: { "\($0)\($0)" })
+            .andThen(upon: customQueue, start: { self.delaySuccessAsTask("\($0)") })
+            .map(upon: customQueue, transform: { "\($0)\($0)" })
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 4)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         promise.succeed(with: 9000)
 
         wait(for: [
+            expect(fractionIn: 0.05 ... 0.25, from: task.progress)
+        ], timeout: shortTimeout)
+
+        customQueue.resume()
+
+        wait(for: [
             expectation(toFinish: task.progress)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 4)
-        XCTAssertEqual(task.progress.totalUnitCount, 4)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 
@@ -232,15 +239,11 @@ class TaskProgressTests: CustomExecutorTestCase {
             .andThen(upon: .any(), start: { self.delaySuccessAsTask("\($0)") })
             .map(upon: .any(), transform: { "\($0)\($0)" })
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 103)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         customProgress.completedUnitCount = 5
 
-        XCTAssertEqual(task.progress.completedUnitCount, 100)
-        XCTAssertEqual(task.progress.totalUnitCount, 103)
-        XCTAssertGreaterThanOrEqual(task.progress.fractionCompleted, 0.96)
+        XCTAssertGreaterThanOrEqual(task.progress.fractionCompleted, 0.5)
 
         promise.succeed(with: 9000)
 
@@ -248,32 +251,29 @@ class TaskProgressTests: CustomExecutorTestCase {
             expectation(toFinish: task.progress)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 103)
-        XCTAssertEqual(task.progress.totalUnitCount, 103)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 
     func testThatChainingWithCustomProgressIsWeighted() {
-        let promise1 = Task<Int>.Promise()
-        let customQueue2 = DispatchQueue(label: "\(type(of: self)).\(#function)")
-        customQueue2.suspend()
+        customQueue.suspend()
 
+        let promise1 = Task<Int>.Promise()
         let task = promise1
-            .andThen(upon: .any(), start: { (value) -> Task<Int> in
+            .andThen(upon: .any(), start: { [customQueue] (value) -> Task<Int> in
                 let promise2 = Task<Int>.Promise()
                 let customProgress = Progress()
                 customProgress.totalUnitCount = 87135
 
-                customQueue2.async {
+                customQueue.async {
                     customProgress.completedUnitCount = 10012
 
-                    customQueue2.async {
+                    customQueue.async {
                         customProgress.completedUnitCount = 54442
 
-                        customQueue2.async {
+                        customQueue.async {
                             customProgress.completedUnitCount = 67412
 
-                            customQueue2.async {
+                            customQueue.async {
                                 customProgress.completedUnitCount = 87135
 
                                 promise2.succeed(with: value * 2)
@@ -287,41 +287,31 @@ class TaskProgressTests: CustomExecutorTestCase {
             .map(upon: .any(), transform: { "\($0)" })
             .map(upon: .any(), transform: { "\($0)\($0)" })
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 4)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
 
         promise1.succeed(with: 9000)
 
         wait(for: [
-            XCTKVOExpectation(keyPath: #keyPath(Progress.totalUnitCount), object: task.progress, expectedValue: 103, options: .initial)
+            expect(fractionIn: 0.001 ... 0.05, from: task.progress)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 1)
-        XCTAssertLessThanOrEqual(task.progress.fractionCompleted, 0.01)
-
-        customQueue2.resume()
+        customQueue.resume()
 
         wait(for: [
             expectation(toFinish: task.progress)
         ], timeout: shortTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 103)
-        XCTAssertEqual(task.progress.totalUnitCount, 103)
         XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 
     func testThatMappingWithCustomProgressIsWeighted() {
         let promise1 = Task<Int>.Promise()
-        let expect = expectation(description: "map handler has started executing")
 
         let task = promise1
             .map(upon: .any(), transform: { (value) -> Int in
                 XCTAssertNotNil(Progress.current())
 
                 let customProgress = Progress(totalUnitCount: 32)
-                expect.fulfill()
-
                 customProgress.completedUnitCount = 1
                 customProgress.completedUnitCount = 2
                 customProgress.completedUnitCount = 4
@@ -334,22 +324,19 @@ class TaskProgressTests: CustomExecutorTestCase {
             .map(upon: .any(), transform: { "\($0)" })
             .map(upon: .any(), transform: { "\($0)\($0)" })
 
-        XCTAssertEqual(task.progress.completedUnitCount, 0)
-        XCTAssertEqual(task.progress.totalUnitCount, 4)
         XCTAssertEqual(task.progress.fractionCompleted, 0)
+
+        let expectFractionCompletedToChange = XCTKVOExpectation(keyPath: #keyPath(Progress.fractionCompleted), object: task.progress)
+        expectFractionCompletedToChange.expectedFulfillmentCount = 9
 
         promise1.succeed(with: 9000)
 
-        wait(for: [ expect ], timeout: shortTimeout)
-
-        XCTAssertEqual(task.progress.totalUnitCount, 103)
-
         wait(for: [
+            expectFractionCompletedToChange,
             expectation(toFinish: task.progress)
         ], timeout: longTimeout)
 
-        XCTAssertEqual(task.progress.completedUnitCount, 103)
-        XCTAssertEqual(task.progress.totalUnitCount, 103)
+        XCTAssertEqual(task.progress.fractionCompleted, 1)
     }
 }
 #endif

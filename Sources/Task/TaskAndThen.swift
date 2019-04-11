@@ -43,7 +43,7 @@ extension TaskProtocol {
     /// - see: FutureProtocol.andThen(upon:start:)
     public func andThen<NewTask: TaskProtocol>(upon executor: Executor, start startNextTask: @escaping(Success) throws -> NewTask) -> Task<NewTask.Success> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let chain = TaskChain(continuingWith: self)
+        let chain = TaskChain(andThenFrom: self)
         #else
         let cancellationToken = Deferred<Void>()
         #endif

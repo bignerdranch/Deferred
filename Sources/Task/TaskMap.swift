@@ -39,7 +39,7 @@ extension TaskProtocol {
     /// - see: FutureProtocol.map(upon:transform:)
     public func map<NewSuccess>(upon executor: Executor, transform: @escaping(Success) throws -> NewSuccess) -> Task<NewSuccess> {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let chain = TaskChain(continuingWith: self)
+        let chain = TaskChain(mapFrom: self)
         #endif
 
         let future: Future = map(upon: executor) { (result) -> Task<NewSuccess>.Result in

@@ -1,5 +1,6 @@
 disabled_rules:
   - block_based_kvo
+  - deployment_target
   - nesting
   - todo
 opt_in_rules:

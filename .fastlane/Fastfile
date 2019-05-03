@@ -56,7 +56,7 @@ end
 platform :ios do
   desc "Test using Xcode for iOS"
   lane :test do
-    scan(scheme: "MobileDeferred", device: "iPhone 6s (10.0)")
+    scan(scheme: "MobileDeferred", device: "iPhone 8 (11.4)")
   end
 
   desc "Build using Xcode for tvOS and watchOS"

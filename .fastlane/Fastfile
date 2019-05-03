@@ -16,6 +16,7 @@ end
 
 desc "Build and publish documentation from docs/ into gh-pages"
 lane :publish_docs do
+  build_docs
   publish_gh_pages(path: "docs", author_name: "Big Nerd", author_email: "cocoa-engineering@bignerdranch.com")
 end
 
@@ -33,18 +34,10 @@ platform :mac do
     sh "swift test --parallel"
   end
 
-  desc "Validate we can build with Playgrounds compatibility code"
-  private_lane :build_for_playgrounds do
-    xcodebuild(scheme: "Deferred", build_settings: {
-      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "XCODE FORCE_PLAYGROUND_COMPATIBILITY"
-    })
-  end
-
   desc "Perform linting and publish documentation"
   lane :ci do
-    audit
     test
-    build_for_playgrounds
+    audit
 
     # Note: Coupling to Travis here is not great!
     if is_ci && ENV['TRAVIS_PULL_REQUEST'] == "false" && git_branch == "master"
@@ -59,15 +52,16 @@ platform :ios do
     scan(scheme: "MobileDeferred", device: "iPhone 8 (11.4)")
   end
 
-  desc "Build using Xcode for tvOS and watchOS"
-  private_lane :build_for_other_platforms do
-    xcodebuild(scheme: "TVDeferred", destination: "platform=tvOS Simulator,name=Apple TV")
-    xcodebuild(scheme: "NanoDeferred", destination: "platform=watchOS Simulator,name=Apple Watch - 42mm")
+  desc "Validate we can build with Playgrounds compatibility code"
+  private_lane :build_for_playgrounds do
+    xcodebuild(scheme: "MobileDeferred", build_settings: {
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "XCODE FORCE_PLAYGROUND_COMPATIBILITY"
+    })
   end
 
   desc "Execute tests and ensure that auxiliary platforms build"
   lane :ci do
     test
-    build_for_other_platforms
+    build_for_playgrounds
   end
 end

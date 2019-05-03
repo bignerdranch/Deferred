@@ -1,5 +1,6 @@
 opt_out_usage
 default_platform :mac
+setup_circle_ci
 
 desc "Increment (with 'bump' option) or set (with 'pre' option) the framework version"
 lane :bump_version do |options|

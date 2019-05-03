@@ -16,23 +16,31 @@ module Fastlane
 
         sh "#{git} add -A"
 
-        commit_message = "Publish from #{Actions.last_git_commit_dict[:abbreviated_commit_hash]} of #{Actions.git_branch}"
+        commit_message = "[ci skip] Publish from #{Actions.last_git_commit_dict[:abbreviated_commit_hash]} of #{Actions.git_branch}"
         sh "#{git} commit -m #{commit_message.shellescape} || true"
 
-        remote = URI(sh('git remote get-url origin').strip)
+        remote_uri = sh('git remote get-url origin').strip
+        command = "#{git} push --force"
+
         if params[:github_token]
+          remote = URI(remote_uri)
           remote.userinfo = params[:github_token]
+          command << " #{remote.to_s.shellescape}"
+        else
+          command << " #{remote_uri.shellescape}"
         end
+
+        command << " master:gh-pages"
 
         UI.command("#{git} push [[REDACTED]]")
 
-        Actions.sh_control_output("#{git} push --force #{remote.to_s.shellescape} master:gh-pages",
+        Actions.sh_control_output(command,
           print_command: false, print_command_output: false,
           error_callback: proc do |error|
             if params[:github_token]
-              UI.error(error.gsub(params[:github_token], '[[GITHUB_TOKEN]]'))
+              UI.shell_error!(error.gsub(params[:github_token], '[[GITHUB_TOKEN]]'))
             else
-              UI.error(message)
+              UI.shell_error!(error)
             end
         end)
       end

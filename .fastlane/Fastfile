@@ -39,11 +39,6 @@ platform :mac do
   lane :ci do
     test
     audit
-
-    # Note: Coupling to Travis here is not great!
-    if is_ci && ENV['TRAVIS_PULL_REQUEST'] == "false" && git_branch == "master"
-      publish_docs
-    end
   end
 end
 

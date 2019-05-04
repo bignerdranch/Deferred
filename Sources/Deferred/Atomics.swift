@@ -30,7 +30,7 @@ extension bnr_atomic_memory_order_t {
 
 private extension Optional where Wrapped == UnsafeMutableRawPointer {
     func symbol<T>(named name: String, of _: T.Type = T.self, file: StaticString = #file, line: UInt = #line) -> T {
-        assert("\(T.self)".contains("@convention(c)"), "Type must be a C symbol", file: file, line: line)
+        assert("\(T.self)".hasPrefix("@convention(c)"), "Type must be a C symbol", file: file, line: line)
         guard let symbol = dlsym(self, name) else { preconditionFailure(String(cString: dlerror()), file: file, line: line) }
         return unsafeBitCast(symbol, to: T.self)
     }

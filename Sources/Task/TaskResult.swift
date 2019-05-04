@@ -9,17 +9,17 @@
 // MARK: Compatibility with Protocol Extensions
 
 extension Task.Result: Either {
-    @_inlineable
+    @inlinable
     public init(left error: Failure) {
         self = .failure(error)
     }
 
-    @_inlineable
+    @inlinable
     public init(right value: Success) {
         self = .success(value)
     }
 
-    @_inlineable
+    @inlinable
     public init(catching body: () throws -> Success) {
         do {
             self = try .success(body())
@@ -32,7 +32,7 @@ extension Task.Result: Either {
 // MARK: - Unwrapping
 
 extension Task.Result {
-    @_inlineable
+    @inlinable
     public func get() throws -> Success {
         switch self {
         case let .success(success):
@@ -103,13 +103,13 @@ extension Task.Result {
 
 extension Task.Result {
     /// Creates an instance storing a successful `value`.
-    @_inlineable
+    @inlinable
     public init(success value: @autoclosure() throws -> Success) {
         self.init(catching: value)
     }
 
     /// Creates an instance storing an `error` describing the failure.
-    @_inlineable
+    @inlinable
     public init(failure error: Failure) {
         self = .failure(error)
     }
@@ -135,7 +135,7 @@ private enum TaskResultInitializerError: Error {
 
 extension Task.Result where Success == Void {
     /// Creates the success value.
-    @_inlineable
+    @inlinable
     public init() {
         self = .success(())
     }

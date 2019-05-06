@@ -30,6 +30,11 @@ Output documentation using Jazzy into docs/
 fastlane publish_docs
 ```
 Build and publish documentation from docs/ into gh-pages
+### pod_lint
+```
+fastlane pod_lint
+```
+Use CocoaPods to bootstrap the library for all supported platforms
 
 ----
 
@@ -43,7 +48,7 @@ Test using Swift Package Manager for macOS and Linux
 ```
 fastlane mac ci
 ```
-Perform linting and publish documentation
+Execute tests and check code quality
 
 ----
 

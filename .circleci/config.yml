@@ -41,6 +41,11 @@ jobs:
           command: bundle exec fastlane mac ci
           environment:
             FL_OUTPUT_DIR: output
+      - run:
+          name: CocoaPods lint
+          command: bundle exec fastlane pod_lint
+          environment:
+            FL_OUTPUT_DIR: output
       - store_test_results:
           path: output
 

@@ -48,7 +48,7 @@ end
 platform :ios do
   desc "Test using Xcode for iOS"
   lane :test do
-    scan(scheme: "MobileDeferred", device: "iPhone 8 (11.4)")
+    scan(scheme: "MobileDeferred", device: "iPhone 8 (10.3.1)")
   end
 
   desc "Validate we can build with Playgrounds compatibility code"

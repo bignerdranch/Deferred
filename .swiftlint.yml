@@ -1,8 +1,11 @@
 disabled_rules:
   - block_based_kvo
+  - deployment_target
   - nesting
   - todo
 opt_in_rules:
   - empty_count
   - vertical_whitespace
 line_length: 220
+excluded:
+  - vendor/bundle

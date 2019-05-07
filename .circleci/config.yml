@@ -1,0 +1,136 @@
+# Use latest version of CircleCI
+version: 2.1
+
+# Orbs encapsulate configuration to be executed within a job.
+orbs:
+  ruby-bundle:
+    commands:
+      # Use `ruby-bundle/install` as a command to install gems.
+      install:
+        description: "Install per-job Ruby dependencies using cache"
+        steps:
+          # Cache is includes OS and CPU due to compiled extensions.
+          - restore_cache:
+              key: &cache_key 6-gems-{{ checksum "Gemfile.lock" }}-{{ arch }}
+          - run:
+              name: Install Ruby dependencies
+              command: bundle install --deployment
+          - save_cache:
+              key: *cache_key
+              paths:
+                - vendor/bundle
+                - .bundle/config
+
+# Jobs are a series of steps in a CI run.
+jobs:
+  # Swift 5.0, macOS
+  test_with_xcode_10-2:
+    macos:
+      xcode: 10.2.0
+    steps:
+      - checkout
+      - run:
+          name: Install Homebrew dependencies
+          command: brew install swiftlint
+          environment:
+            # Seems like it's not always happy with updating in CI.
+            HOMEBREW_NO_AUTO_UPDATE: 1
+      - ruby-bundle/install
+      - run:
+          name: Build and test using Fastlane
+          command: bundle exec fastlane mac ci
+          environment:
+            FL_OUTPUT_DIR: output
+      - run:
+          name: CocoaPods lint
+          command: bundle exec fastlane pod_lint
+          environment:
+            FL_OUTPUT_DIR: output
+      - store_test_results:
+          path: output
+
+  # Swift 4.1.2, iOS
+  test_with_xcode_9-4:
+    macos:
+      xcode: 9.4.1
+    # Interactive shell needed for using `chruby` below.
+    shell: /bin/bash --login -eo pipefail
+    steps:
+      - checkout
+      - run:
+          name: Set Ruby Version
+          command: echo "2.5.1" > .ruby-version
+      - ruby-bundle/install
+      - run:
+          name: Build and test using Fastlane
+          command: bundle exec fastlane ios ci
+          environment:
+            FL_OUTPUT_DIR: output
+            FASTLANE_EXPLICIT_OPEN_SIMULATOR: 2
+      - store_test_results:
+          path: output
+
+  # Swift 5.0, Linux
+  test_with_swift_5-0:
+    docker:
+      - image: swift:5.0.1
+    steps:
+      - checkout
+      - run:
+          name: Build and test using Swift Package Manager
+          # Parallelism overridden due to <https://bugs.swift.org/browse/SR-10611>.
+          command: swift test --parallel --num-workers 2 -Xswiftc -j2
+
+  # Swift 4.2.4, Linux
+  test_with_swift_4-2:
+    docker:
+      - image: swift:4.2.4
+    steps:
+      - checkout
+      - run:
+          name: Build and test using Swift Package Manager
+          # Parallelism overridden due to <https://bugs.swift.org/browse/SR-10611>.
+          command: swift test -Xswiftc -j2
+
+  # Swift 4.1.3, Linux
+  test_with_swift_4-1:
+    docker:
+      - image: swift:4.1.3
+    steps:
+      - checkout
+      - run:
+          name: Build and test using Swift Package Manager
+          # Parallelism overridden due to <https://bugs.swift.org/browse/SR-10611>.
+          command: swift test -Xswiftc -j2
+
+  # Publish documentation at <https://bignerdranch.github.io/Deferred/>.
+  deploy:
+    macos:
+      xcode: 10.2.0
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "91:d2:89:5d:19:cb:52:50:8b:5c:f7:d1:b1:bf:62:4d"
+      - ruby-bundle/install
+      - run: bundle exec fastlane publish_docs
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test_with_xcode_10-2
+      - test_with_xcode_9-4
+      - test_with_swift_5-0
+      - test_with_swift_4-2
+      - test_with_swift_4-1
+      - deploy:
+          requires:
+            - test_with_xcode_10-2
+            - test_with_xcode_9-4
+            - test_with_swift_5-0
+            - test_with_swift_4-2
+            - test_with_swift_4-1
+          filters:
+            branches:
+              only: master

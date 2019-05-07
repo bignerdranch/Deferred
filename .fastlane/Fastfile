@@ -1,5 +1,6 @@
 opt_out_usage
 default_platform :mac
+setup_circle_ci
 
 desc "Increment (with 'bump' option) or set (with 'pre' option) the framework version"
 lane :bump_version do |options|
@@ -16,14 +17,18 @@ end
 
 desc "Build and publish documentation from docs/ into gh-pages"
 lane :publish_docs do
+  build_docs
   publish_gh_pages(path: "docs", author_name: "Big Nerd", author_email: "cocoa-engineering@bignerdranch.com")
+end
+
+desc "Use CocoaPods to bootstrap the library for all supported platforms"
+lane :pod_lint do
+  pod_lib_lint(fail_fast: true, use_libraries: true)
 end
 
 desc "Common actions for quality assurance"
 private_lane :audit do
   swiftlint(strict: true)
-  pod_lib_lint(fail_fast: true, use_libraries: true)
-  pod_lib_lint(fail_fast: true, use_libraries: false)
   build_docs
 end
 
@@ -33,41 +38,29 @@ platform :mac do
     sh "swift test --parallel"
   end
 
-  desc "Validate we can build with Playgrounds compatibility code"
-  private_lane :build_for_playgrounds do
-    xcodebuild(scheme: "Deferred", build_settings: {
-      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "XCODE FORCE_PLAYGROUND_COMPATIBILITY"
-    })
-  end
-
-  desc "Perform linting and publish documentation"
+  desc "Execute tests and check code quality"
   lane :ci do
-    audit
     test
-    build_for_playgrounds
-
-    # Note: Coupling to Travis here is not great!
-    if is_ci && ENV['TRAVIS_PULL_REQUEST'] == "false" && git_branch == "master"
-      publish_docs
-    end
+    audit
   end
 end
 
 platform :ios do
   desc "Test using Xcode for iOS"
   lane :test do
-    scan(scheme: "MobileDeferred", device: "iPhone 6s (10.0)")
+    scan(scheme: "MobileDeferred", device: "iPhone 8 (11.4)")
   end
 
-  desc "Build using Xcode for tvOS and watchOS"
-  private_lane :build_for_other_platforms do
-    xcodebuild(scheme: "TVDeferred", destination: "platform=tvOS Simulator,name=Apple TV")
-    xcodebuild(scheme: "NanoDeferred", destination: "platform=watchOS Simulator,name=Apple Watch - 42mm")
+  desc "Validate we can build with Playgrounds compatibility code"
+  private_lane :build_for_playgrounds do
+    xcodebuild(scheme: "MobileDeferred", build_settings: {
+      "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "XCODE FORCE_PLAYGROUND_COMPATIBILITY"
+    })
   end
 
   desc "Execute tests and ensure that auxiliary platforms build"
   lane :ci do
     test
-    build_for_other_platforms
+    build_for_playgrounds
   end
 end

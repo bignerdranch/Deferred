@@ -9,13 +9,13 @@ Deferred is a "futures library", probably like ones you've already heard about. 
 |[![Requires Swift 4.1 or greater](https://img.shields.io/badge/swift-4.1%2B-EF5138.svg)][Swift]         |
 |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]                          |
 |![Multiplatform](https://img.shields.io/badge/platforms-macOS,_iOS,_watchOS,_tvOS,_Linux-lightgrey.svg) |
-|[![Travis CI](https://img.shields.io/travis/bignerdranch/Deferred.svg)][CI]                             |
+|[![Circle CI](https://img.shields.io/circleci/build/gh/bignerdranch/Deferred.svg)][CI]                  |
 |[![CocoaPods](https://img.shields.io/cocoapods/v/BNRDeferred.svg)][CocoaPods]                           |
 |[![Swift Package Manager](https://img.shields.io/badge/swiftpm-supported-orange.svg)][SwiftPM]          |
 
 [Swift]: https://swift.org
 [MIT]: https://github.com/bignerdranch/Deferred/blob/master/LICENSE
-[CI]: http://travis-ci.org/bignerdranch/Deferred
+[CI]: https://circleci.com/gh/bignerdranch/Deferred
 [CocoaPods]: https://cocoapods.org/pods/BNRDeferred
 [SwiftPM]: https://github.com/apple/swift-package-manager
 

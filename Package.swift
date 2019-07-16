@@ -13,7 +13,7 @@ import PackageDescription
 let package = Package(
     name: "Deferred",
     products: [
-        .library(name: "Deferred", type: .dynamic, targets: [ "Deferred", "Task" ])
+        .library(name: "Deferred", targets: [ "Deferred", "Task" ])
     ],
     targets: [
         .target(name: "Atomics"),

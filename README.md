@@ -6,7 +6,7 @@ Deferred is a "futures library", probably like ones you've already heard about. 
 
 | **Vital Statistics**                                                                                   |
 |:-------------------------------------------------------------------------------------------------------|
-|[![Requires Swift 4.1 or greater](https://img.shields.io/badge/swift-4.1%2B-EF5138.svg)][Swift]         |
+|[![Requires Swift 4.2 or greater](https://img.shields.io/badge/swift-4.2%2B-EF5138.svg)][Swift]         |
 |[![Under MIT License](https://img.shields.io/badge/license-MIT-blue.svg)][MIT]                          |
 |![Multiplatform](https://img.shields.io/badge/platforms-macOS,_iOS,_watchOS,_tvOS,_Linux-lightgrey.svg) |
 |[![Circle CI](https://img.shields.io/circleci/build/gh/bignerdranch/Deferred.svg)][CI]                  |

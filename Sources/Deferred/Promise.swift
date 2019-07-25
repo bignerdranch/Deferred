@@ -50,11 +50,9 @@ extension PromiseProtocol {
     /// * In unchecked builds, filling a deferred value that is already filled
     ///   is a serious programming error. The optimizer may assume that it is
     ///   not possible.
-    @_transparent
+    @inlinable
     public func mustFill(with value: Value, file: StaticString = #file, line: UInt = #line) {
-        if !fill(with: value) {
-            preconditionFailure("Cannot fill an already-filled \(type(of: self))", file: file, line: line)
-        }
+        precondition(fill(with: value), "Cannot fill an already-filled \(type(of: self)) using \(#function)", file: file, line: line)
     }
 }
 

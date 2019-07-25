@@ -1,4 +1,4 @@
-// swift-tools-version:4.1
+// swift-tools-version:4.2
 
 //
 //  Package.swift
@@ -31,4 +31,5 @@ let package = Package(
             name: "TaskTests",
             dependencies: [ "Deferred", "Task" ],
             exclude: [ "Tests/AllTestsCommon.swift" ])
-    ])
+    ],
+    swiftLanguageVersions: [.v4_2, .version("5")])

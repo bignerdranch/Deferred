@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   s.social_media_url = "https://twitter.com/bignerdranch"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.swift_version             = "4.1"
+  s.swift_version             = "4.2"
   s.cocoapods_version         = ">=1.1.0"
   s.ios.deployment_target     = "8.0"
   s.osx.deployment_target     = "10.10"

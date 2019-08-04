@@ -24,17 +24,14 @@ orbs:
 # Jobs are a series of steps in a CI run.
 jobs:
   # Swift 5.0.1, macOS
-  test_with_xcode_10-2:
+  test_with_xcode_10-3:
     macos:
-      xcode: 10.2.1
+      xcode: 10.3.0
     steps:
       - checkout
       - run:
           name: Install Homebrew dependencies
           command: brew install swiftlint
-          environment:
-            # Seems like it's not always happy with updating in CI.
-            HOMEBREW_NO_AUTO_UPDATE: 1
       - ruby-bundle/install
       - run:
           name: Build and test using Fastlane
@@ -95,7 +92,7 @@ jobs:
   # Publish documentation at <https://bignerdranch.github.io/Deferred/>.
   deploy:
     macos:
-      xcode: 10.2.0
+      xcode: 10.3.0
     steps:
       - checkout
       - add_ssh_keys:
@@ -108,13 +105,13 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - test_with_xcode_10-2
+      - test_with_xcode_10-3
       - test_with_xcode_10-1
       - test_with_swift_5-0
       - test_with_swift_4-2
       - deploy:
           requires:
-            - test_with_xcode_10-2
+            - test_with_xcode_10-3
             - test_with_xcode_10-1
             - test_with_swift_5-0
             - test_with_swift_4-2

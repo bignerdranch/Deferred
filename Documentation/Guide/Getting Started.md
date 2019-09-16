@@ -54,7 +54,7 @@ import PackageDescription
 let package = Package(
     name: "My Extremely Nerdy App",
     dependencies: [
-        .package(url: "https://github.com/bignerdranch/Deferred.git", from: "4.0.0"),
+        .package(url: "https://github.com/bignerdranch/Deferred.git", from: "4.1.0"),
     ]
 )
 ```

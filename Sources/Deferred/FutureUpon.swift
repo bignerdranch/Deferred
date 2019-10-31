@@ -17,7 +17,7 @@ extension FutureProtocol {
     ///
     /// Don't provide a default parameter using this declaration unless doing
     /// so is unambiguous. For instance, `map` and `andThen` once had a default
-    /// executor, but users found it unclear wherethe  handlers executed.
+    /// executor, but users found it unclear where the handlers executed.
     public static var defaultUponExecutor: PreferredExecutor {
         return DispatchQueue.any()
     }

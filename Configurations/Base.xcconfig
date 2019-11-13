@@ -80,5 +80,8 @@ CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES
 // Static Analyzer - Generic Issues
 CLANG_ANALYZER_NONNULL = YES
 
+// Static Analyzer - Issues - Apple API
+CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES
+
 // Swift Compiler - Version
 SWIFT_VERSION = 4.2

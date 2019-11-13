@@ -21,12 +21,17 @@ extension Sequence where Iterator.Element: FutureProtocol {
     }
 }
 
-private struct AllFilledFuture<Value>: FutureProtocol {
-    let group = DispatchGroup()
-    let combined = Deferred<[Value]>()
+private struct AllFilledFuture<Element>: FutureProtocol {
+    let combined = Deferred<[Element]>()
 
-    fileprivate init<Base: Collection>(base: Base) where Base.Iterator.Element: FutureProtocol, Base.Iterator.Element.Value == Value {
+    init<Base: Collection>(base: Base) where Base.Iterator.Element: FutureProtocol, Base.Iterator.Element.Value == Element {
         let array = Array(base)
+        guard !array.isEmpty else {
+            combined.fill(with: [])
+            return
+        }
+
+        let group = DispatchGroup()
         let queue = DispatchQueue.global(qos: .utility)
 
         for future in array {
@@ -43,11 +48,11 @@ private struct AllFilledFuture<Value>: FutureProtocol {
         }
     }
 
-    func upon(_ executor: Executor, execute body: @escaping([Value]) -> Void) {
+    func upon(_ executor: Executor, execute body: @escaping([Element]) -> Void) {
         combined.upon(executor, execute: body)
     }
 
-    func wait(until time: DispatchTime) -> [Value]? {
+    func wait(until time: DispatchTime) -> [Element]? {
         return combined.wait(until: time)
     }
 }
@@ -55,10 +60,6 @@ private struct AllFilledFuture<Value>: FutureProtocol {
 extension Collection where Iterator.Element: FutureProtocol {
     /// Composes a number of futures into a single deferred array.
     public func allFilled() -> Future<[Iterator.Element.Value]> {
-        guard !isEmpty else {
-            return Future(value: [])
-        }
-
         return Future(AllFilledFuture(base: self))
     }
 }

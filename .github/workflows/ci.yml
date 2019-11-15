@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+    branches-ignore:
+    - gh-pages
+jobs:
+  test_iOS:
+    name: Test iOS
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run xcodebuild
+      env:
+        SCHEME: MobileDeferred
+        DESTINATION: platform=iOS Simulator,name=iPhone 11,OS=13.1
+      run: |
+        xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet build
+        xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" test
+  test_macOS:
+    name: Test macOS
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run swift test
+      run: swift test --parallel
+    - name: Check build for playgrounds
+      env:
+        SCHEME: MobileDeferred
+        DESTINATION: 'generic/platform=iOS'
+      run: xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet SWIFT_ACTIVE_COMPILATION_CONDITIONS="XCODE FORCE_PLAYGROUND_COMPATIBILITY" build
+    - name: Run pod lib lint
+      run: pod lib lint --use-libraries --skip-tests --platforms=macos
+  test_Linux:
+    name: Test Linux
+    runs-on: ubuntu-latest
+    container: swift:5.1.2
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run swift test
+      run: swift test --parallel --sanitize=thread
+    - name: Run swiftlint
+      uses: norio-nomura/action-swiftlint@3.0.1

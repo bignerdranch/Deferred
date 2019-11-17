@@ -1,0 +1,51 @@
+name: Documentation
+on:
+  push:
+    branches-ignore:
+    - gh-pages
+jobs:
+  build:
+    name: Generate docs
+    runs-on: macOS-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Gem cache
+      uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: gems-${{ runner.OS }}-
+    - name: Run jazzy
+      run: |
+        bundle init
+        bundle add jazzy --skip-install
+        bundle install --path vendor/bundle --clean
+        bundle exec jazzy --config .jazzy.yml
+        chmod -R 0700 docs
+    - name: Upload generated docs
+      uses: actions/upload-artifact@v1
+      with:
+        name: Documentation
+        path: docs
+  deploy:
+    name: Upload to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - name: Download generated docs
+      uses: actions/download-artifact@v1
+      with:
+        name: Documentation
+        path: docs
+    - uses: zwaldowski/git-commit-action@v1
+      with:
+        working_directory: docs
+        commit_message: 'Publish from ${{ github.event_name }} to ${{ github.sha }}'
+    - name: git push
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        directory: docs
+        branch: gh-pages
+        force: true

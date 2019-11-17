@@ -8,21 +8,3 @@ lane :bump_version do |options|
   podspec_set_version(path: "BNRDeferred.podspec", version: version)
   puts version
 end
-
-desc "Output documentation using Jazzy into docs/"
-lane :build_docs do
-  jazzy(config: ".jazzy.yml")
-end
-
-desc "Build and publish documentation from docs/ into gh-pages"
-lane :publish_docs do
-  build_docs
-  publish_gh_pages(path: "docs", author_name: "Big Nerd", author_email: "cocoa-engineering@bignerdranch.com")
-end
-
-platform :mac do
-  desc "Execute tests and check code quality"
-  lane :ci do
-    build_docs
-  end
-end

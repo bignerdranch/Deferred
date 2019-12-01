@@ -1,0 +1,43 @@
+name: Release management
+on:
+  pull_request:
+    branches:
+    - master
+    types:
+    - closed
+jobs:
+  create_release:
+    name: Create release
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - id: bump
+      name: Determine version increment
+      uses: zwaldowski/match-label-action@v1
+      with:
+        allowed: major,minor,patch
+    - id: next_version
+      name: Determine incremented version
+      uses: zwaldowski/semver-release-action@v1
+      with:
+        dry_run: true
+        bump: ${{ steps.bump.outputs.match }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: ./.github/actions/set-versions
+      with:
+        version: ${{ steps.next_version.outputs.version }}
+        version_optimistic: ${{ steps.next_version.outputs.version_optimistic }}
+    - id: git_commit
+      uses: zwaldowski/git-commit-action@v1
+      with:
+        commit_message: 'Bump version to ${{ steps.next_version.outputs.version }}'
+    - uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: zwaldowski/semver-release-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        sha: ${{ steps.git_commit.outputs.sha }}
+    - run: pod trunk push
+      env: 
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}

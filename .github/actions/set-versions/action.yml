@@ -1,0 +1,11 @@
+name: Set versions
+inputs:
+  version:
+    description: 'Full semantic version.'
+    required: true
+  version_optimistic:
+    description: 'Major and minor digits (x.y.0) of semantic version.'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'

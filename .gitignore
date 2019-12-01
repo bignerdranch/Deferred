@@ -24,7 +24,3 @@ Packages/
 
 # Jazzy
 docs/
-
-# Fastlane
-test_output/
-.fastlane/report.xml

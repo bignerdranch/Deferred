@@ -1086,7 +1086,6 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = appletvos;
-				TARGETED_DEVICE_FAMILY = 3;
 			};
 			name = Debug;
 		};
@@ -1095,7 +1094,6 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = appletvos;
-				TARGETED_DEVICE_FAMILY = 3;
 			};
 			name = Release;
 		};
@@ -1120,7 +1118,6 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = watchos;
-				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Debug;
 		};
@@ -1129,7 +1126,6 @@
 			baseConfigurationReference = DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */;
 			buildSettings = {
 				SDKROOT = watchos;
-				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Release;
 		};

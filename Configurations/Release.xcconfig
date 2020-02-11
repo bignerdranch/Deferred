@@ -1,19 +1,11 @@
 #include "Base.xcconfig"
 
-// Architectures
-ONLY_ACTIVE_ARCH = NO
-
 // Build Options
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
-ENABLE_TESTABILITY = NO
 VALIDATE_PRODUCT = YES
-
-// C Compiler - Code Generation
-GCC_OPTIMIZATION_LEVEL = s
 
 // C Compiler - Preprocessing
 ENABLE_NS_ASSERTIONS = NO
-GCC_PREPROCESSOR_DEFINITIONS = $(inherited)
 
 // Swift Compiler - Code Generation
 SWIFT_OPTIMIZATION_LEVEL = -O

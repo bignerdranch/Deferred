@@ -48,20 +48,3 @@ public protocol Either {
     /// right-biased or to throw the error if it is left-biased.
     func get() throws -> Right
 }
-
-extension Either {
-    @available(*, unavailable, renamed: "get()", message: "Replace with 'get()' to better align with SE-0235, the Swift 5 Result type.")
-    public func extract() throws -> Right {
-        fatalError("unavailable methods cannot be called")
-    }
-
-    @available(*, unavailable, message: "Replace with 'get()' inside a 'do' / 'catch' block to better align with SE-0235, the Swift 5 Result type.")
-    public func withValues<Return>(ifLeft left: (Left) throws -> Return, ifRight right: (Right) throws -> Return) rethrows -> Return {
-        fatalError("unavailable methods cannot be called")
-    }
-
-    @available(*, unavailable, renamed: "init(catching:)", message: "Replace with 'init(catching:)' to align with SE-0235, the Swift 5 Result type.")
-    public init<Body>(from body: Body) {
-        fatalError("unavailable initializer cannot be called")
-    }
-}

@@ -105,18 +105,6 @@ extension Future: TaskProtocol where Value: Either {
     }
 }
 
-extension Future where Value: Either {
-    @available(*, unavailable, renamed: "init(resultFrom:)")
-    public init<Wrapped: TaskProtocol>(task wrapped: Wrapped) where Wrapped.Success == Success {
-        fatalError("unavailable initializer cannot be called")
-    }
-
-    @available(*, unavailable, renamed: "init(succeedsFrom:)")
-    public init<Wrapped: FutureProtocol>(success wrapped: Wrapped) where Wrapped.Value == Success {
-        fatalError("unavailable initializer cannot be called")
-    }
-}
-
 extension Deferred: TaskProtocol where Value: Either {
     public typealias Success = Value.Right
 }

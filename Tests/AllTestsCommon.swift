@@ -83,11 +83,6 @@ extension FutureProtocol {
         return wait(until: .distantFuture).unsafelyUnwrapped
     }
 
-    /// Check whether or not the receiver is filled.
-    var isFilled: Bool {
-        return peek() != nil
-    }
-
     func shortWait() -> Value? {
         return wait(until: .now() + 0.05)
     }

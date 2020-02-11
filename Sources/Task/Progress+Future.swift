@@ -32,7 +32,7 @@ extension Progress {
             Progress.didTaskGenerateKey: true
         ])
 
-        if wrapped.peek() != nil {
+        if wrapped.isFilled {
             // No work to be done; already finished.
             child.completedUnitCount = 1
         } else {

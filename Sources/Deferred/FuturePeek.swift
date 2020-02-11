@@ -11,10 +11,8 @@ extension FutureProtocol {
     public func peek() -> Value? {
         return wait(until: .now())
     }
-}
 
-extension PromiseProtocol where Self: FutureProtocol {
-    /// By default, checks for a fulfilled future value.
+    /// Checks for a fulfilled future value.
     public var isFilled: Bool {
         return peek() != nil
     }

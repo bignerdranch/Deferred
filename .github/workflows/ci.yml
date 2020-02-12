@@ -12,7 +12,7 @@ jobs:
     - name: Run xcodebuild
       env:
         SCHEME: MobileDeferred
-        DESTINATION: platform=iOS Simulator,name=iPhone 11,OS=13.1
+        DESTINATION: platform=iOS Simulator,name=iPhone 11,OS=latest
       run: |
         xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet build
         xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" test

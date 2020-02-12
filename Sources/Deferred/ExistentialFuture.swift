@@ -143,10 +143,3 @@ public struct Future<Value>: FutureProtocol {
         return box.wait(until: time)
     }
 }
-
-extension Future {
-    @available(*, unavailable, message: "Replace with 'Future.never' for clarity.")
-    public init() {
-        fatalError("unavailable initializer cannot be called")
-    }
-}

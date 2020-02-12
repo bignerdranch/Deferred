@@ -42,9 +42,4 @@ extension Task {
             deferred.fail(with: makeError())
         }
     }
-
-    @available(*, unavailable, message: "Replace with 'Task.async(upon:flags:onCancel:)' for clarity.")
-    public convenience init(upon queue: DispatchQueue = .any(), flags: DispatchWorkItemFlags = [], onCancel produceError: @autoclosure @escaping() -> Error, execute body: @escaping() throws -> Success) {
-        fatalError()
-    }
 }

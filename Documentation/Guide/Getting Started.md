@@ -58,3 +58,21 @@ let package = Package(
     ]
 )
 ```
+
+#### Troubleshooting Swift Package Manager + Xcode
+
+If you incorporate Deferred into your project using Xcode's integrated Swift Package Manager feature, you may find that your project's unit and/or UI testing targets fail to build with the following error:
+
+```swift
+import Deferred // ERROR: missing required module 'Atomics'
+```
+
+This can happen either in Xcode builds or command line builds. This is a known Xcode bug that has received [repeated attention from Apple](https://github.com/apple/swift-nio/issues/1128), but is still [reproducible](https://github.com/apple/swift-nio/issues/1128#issuecomment-588483372), at least as of Xcode 11.3.1.
+
+If this happens to you, here are workarounds we have found that may help:
+
+1. In your unit or UI test target, add the Deferred library to the linked libraries build phase, even if that test target doesn't use it directly.
+
+2. *Sometimes Required in Addition to Remedy 1:* If you are also using an Xcode scheme that is pointed at a unit or UI test target, you must also make sure that the "Build" section of the scheme editor includes your application target in that list. By default, if you add a new Xcode scheme for, e.g., a UI test target, the application won't be included in that list. 
+
+Both of these workarounds somehow manage to coax Xcode into including the necessary `-fmodule-map-file` compiler flag for application source files that contain `import Deferred` statements.

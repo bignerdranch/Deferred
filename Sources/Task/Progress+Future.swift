@@ -27,8 +27,8 @@ extension Progress {
 
     /// Returns a progress that is indeterminate until `wrapped` is fulfilled,
     /// then finishes at 100%.
-    static func basicProgress<Wrapped: FutureProtocol>(parent: Progress?, for wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil) -> Progress {
-        let child = Progress(parent: parent, userInfo: [
+    static func basicProgress<Wrapped: FutureProtocol>(for wrapped: Wrapped, uponCancel cancellation: (() -> Void)?) -> Progress {
+        let child = Progress(parent: nil, userInfo: [
             Progress.didTaskGenerateKey: true
         ])
 
@@ -50,7 +50,7 @@ extension Progress {
         return child
     }
 
-    /// `true` for wrappers created by `Progress.basicProgress(parent:for:uponCancel:)`.
+    /// `true` for wrappers created by `Progress.basicProgress(for:uponCancel:)`.
     var wasGeneratedByTask: Bool {
         return userInfo[Progress.didTaskGenerateKey] as? Bool == true
     }
@@ -60,14 +60,8 @@ extension Progress {
     /// `pendingUnitCount` of `self` is assigned upon fulfillment. Otherwise,
     /// the `pendingUnitCount` becomes complete immediately.
     func monitorCompletion<Wrapped: FutureProtocol>(of wrapped: Wrapped, uponCancel cancellation: (() -> Void)? = nil, withPendingUnitCount pendingUnitCount: Int64) {
-        if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
-            let child = Progress.basicProgress(parent: nil, for: wrapped, uponCancel: cancellation)
-            addChild(child, withPendingUnitCount: pendingUnitCount)
-        } else {
-            becomeCurrent(withPendingUnitCount: pendingUnitCount)
-            _ = Progress.basicProgress(parent: self, for: wrapped, uponCancel: cancellation)
-            resignCurrent()
-        }
+        let child = Progress.basicProgress(for: wrapped, uponCancel: cancellation)
+        addChild(child, withPendingUnitCount: pendingUnitCount)
     }
 }
 #endif

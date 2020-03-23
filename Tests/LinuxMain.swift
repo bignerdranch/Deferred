@@ -12,17 +12,16 @@ import XCTest
 
 XCTMain([
     testCase(DeferredTests.allTests),
-    testCase(DispatchSemaphoreLockingTests.allTests),
     testCase(ExistentialFutureTests.allTests),
     testCase(FilledDeferredTests.allTests),
     testCase(FutureCustomExecutorTests.allTests),
     testCase(FutureIgnoreTests.allTests),
     testCase(FutureTests.allTests),
-    testCase(LockingTests.allTests),
-    testCase(NSLockingTests.allTests),
     testCase(ObjectDeferredTests.allTests),
-    testCase(POSIXReadWriteLockingTests.allTests),
     testCase(ProtectedTests.allTests),
+    testCase(ProtectedTestsUsingDispatchSemaphore.allTests),
+    testCase(ProtectedTestsUsingPOSIXReadWriteLock.allTests),
+    testCase(ProtectedTestsUsingNSLock.allTests),
     testCase(SwiftBugTests.allTests),
 
     testCase(TaskComprehensiveTests.allTests),

@@ -8,7 +8,6 @@
 
 import XCTest
 import Dispatch
-
 import Deferred
 
 class ProtectedTests: XCTestCase {
@@ -17,22 +16,30 @@ class ProtectedTests: XCTestCase {
         ("testDebugDescription", testDebugDescription),
         ("testDebugDescriptionWhenLocked", testDebugDescriptionWhenLocked),
         ("testReflection", testReflection),
-        ("testReflectionWhenLocked", testReflectionWhenLocked)
+        ("testReflectionWhenLocked", testReflectionWhenLocked),
+        ("testPerformanceSingleThreadRead", testPerformanceSingleThreadRead),
+        ("testPerformanceSingleThreadWrite", testPerformanceSingleThreadWrite),
+        ("testPerformance90PercentReads4ThreadsLock", testPerformance90PercentReads4ThreadsLock)
     ]
 
+    func makeLock() -> Locking {
+        return NativeLock()
+    }
+
+    var lock: Locking!
     var protected: Protected<(Date?, [Int])>!
-    var queue: DispatchQueue!
+    let queue = DispatchQueue(label: "ProtectedTests", attributes: .concurrent)
 
     override func setUp() {
         super.setUp()
 
-        protected = Protected(initialValue: (nil, []))
-        queue = DispatchQueue(label: "ProtectedTests", attributes: .concurrent)
+        lock = makeLock()
+        protected = Protected(initialValue: (nil, []), lock: lock)
     }
 
     override func tearDown() {
-        queue = nil
         protected = nil
+        lock = nil
 
         super.tearDown()
     }
@@ -81,22 +88,20 @@ class ProtectedTests: XCTestCase {
     }
 
     func testDebugDescription() {
-        let protected = Protected<Int>(initialValue: 42)
+        let protected = Protected<Int>(initialValue: 42, lock: lock)
         XCTAssertEqual("\(protected)", "Protected(42)")
     }
 
     func testDebugDescriptionWhenLocked() {
-        let customLock = NSLock()
-        let protected = Protected<Int>(initialValue: 42, lock: customLock)
+        let protected = Protected<Int>(initialValue: 42, lock: lock)
 
-        customLock.lock()
-        defer { customLock.unlock() }
-
-        XCTAssertEqual("\(protected)", "Protected(locked)")
+        lock.withWriteLock {
+            XCTAssertEqual("\(protected)", "Protected(locked)")
+        }
     }
 
     func testReflection() {
-        let protected = Protected<Int>(initialValue: 42)
+        let protected = Protected<Int>(initialValue: 42, lock: lock)
 
         let magicMirror = Mirror(reflecting: protected)
         XCTAssertEqual(magicMirror.displayStyle, .optional)
@@ -105,16 +110,76 @@ class ProtectedTests: XCTestCase {
     }
 
     func testReflectionWhenLocked() {
-        let customLock = NSLock()
-        let protected = Protected<Int>(initialValue: 42, lock: customLock)
+        let protected = Protected<Int>(initialValue: 42, lock: lock)
 
-        customLock.lock()
-        defer { customLock.unlock() }
-
-        let magicMirror = Mirror(reflecting: protected)
-        XCTAssertEqual(magicMirror.displayStyle, .optional)
-        XCTAssertNil(magicMirror.superclassMirror)
-        XCTAssertEqual(magicMirror.descendant("isLocked") as? Bool, true)
+        lock.withWriteLock {
+            let magicMirror = Mirror(reflecting: protected)
+            XCTAssertEqual(magicMirror.displayStyle, .optional)
+            XCTAssertNil(magicMirror.superclassMirror)
+            XCTAssertEqual(magicMirror.descendant("isLocked") as? Bool, true)
+        }
     }
 
+    func testPerformanceSingleThreadRead() {
+        let iterations = 250_000
+        func doNothing() {}
+
+        measure {
+            for _ in 0 ..< iterations {
+                lock.withReadLock(doNothing)
+            }
+        }
+    }
+
+    func testPerformanceSingleThreadWrite() {
+        let iterations = 250_000
+        func doNothing() {}
+
+        measure {
+            for _ in 0 ..< iterations {
+                lock.withWriteLock(doNothing)
+            }
+        }
+    }
+
+    func testPerformance90PercentReads4ThreadsLock() {
+        let iterations = 5000
+        let numberOfThreads = max(ProcessInfo.processInfo.processorCount, 2)
+        let group = DispatchGroup()
+        func doNothing() {}
+
+        measure {
+            for _ in 0 ..< numberOfThreads {
+                queue.async(group: group) {
+                    for iteration in 0 ..< iterations {
+                        if (iteration % 10) == 0 {
+                            self.lock.withWriteLock(doNothing)
+                        } else {
+                            self.lock.withReadLock(doNothing)
+                        }
+                    }
+                }
+            }
+
+            group.wait()
+        }
+    }
+}
+
+class ProtectedTestsUsingDispatchSemaphore: ProtectedTests {
+    override func makeLock() -> Locking {
+        return DispatchSemaphore(value: 1)
+    }
+}
+
+class ProtectedTestsUsingPOSIXReadWriteLock: ProtectedTests {
+    override func makeLock() -> Locking {
+        return POSIXReadWriteLock()
+    }
+}
+
+class ProtectedTestsUsingNSLock: ProtectedTests {
+    override func makeLock() -> Locking {
+        return NSLock()
+    }
 }

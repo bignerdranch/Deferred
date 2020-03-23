@@ -8,13 +8,7 @@
 
 import XCTest
 import Dispatch
-
 import Deferred
-#if SWIFT_PACKAGE
-import Atomics
-#else
-import Deferred.Atomics
-#endif
 
 class FutureTests: XCTestCase {
     static let allTests: [(String, (FutureTests) -> () throws -> Void)] = [
@@ -107,21 +101,25 @@ class FutureTests: XCTestCase {
 
     func testEveryMapTransformerIsCalledMultipleTimes() {
         let deferred = Deferred(filledWith: 1)
-        var counter = 0
 
-        let mapped = deferred.every { (value) -> (Int) in
-            bnr_atomic_fetch_add(&counter, 1)
+        let everyExpectation = XCTestExpectation(description: "every is called each time the result is needed")
+        everyExpectation.expectedFulfillmentCount = 4
+
+        let doubled = deferred.every { (value) -> Int in
+            everyExpectation.fulfill()
             return value * 2
         }
 
-        let expect = expectation(description: "upon is called when filled")
-        mapped.upon { (value) in
-            XCTAssertEqual(value, 2)
-            expect.fulfill()
-        }
-        wait(for: [ expect ], timeout: shortTimeout)
+        let uponExpection = XCTestExpectation(description: "upon is called when filled")
+        uponExpection.expectedFulfillmentCount = 4
 
-        XCTAssertEqual(mapped.value, 2)
-        XCTAssertEqual(bnr_atomic_load(&counter), 2)
+        for _ in 0 ..< 4 {
+            doubled.upon { (value) in
+                XCTAssertEqual(value, 2)
+                uponExpection.fulfill()
+            }
+        }
+
+        wait(for: [ everyExpectation, uponExpection ], timeout: shortTimeout)
     }
 }

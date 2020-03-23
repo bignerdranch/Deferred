@@ -23,21 +23,6 @@ extension TaskProtocol {
     ///
     /// - see: map(transform:)
     public func ignored() -> Task<Void> {
-        let future = every { (result) -> Task<Void>.Result in
-            do {
-                _ = try result.get()
-                return .success(())
-            } catch {
-                return .failure(error)
-            }
-        }
-
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        if let progress = (self as? Task<Success>)?.progress {
-            return Task<Void>(future, progress: progress)
-        }
-        #endif
-
-        return Task<Void>(future, uponCancel: cancel)
+        return everySuccess { _ in }
     }
 }

@@ -10,7 +10,7 @@
 ///
 /// By design, an either is symmetrical and treats its variants the same.
 /// For representing the most common case of success and failures, prefer
-/// a result type like `TaskResult`.
+/// a result type like `Result`.
 ///
 /// This protocol describes a minimal interface for representing a result type
 /// to overcome limitations with Swift. It is expected that it will be removed

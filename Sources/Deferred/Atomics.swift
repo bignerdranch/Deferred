@@ -43,8 +43,6 @@ private struct DarwinAtomics {
     let store: @convention(c) (Int, UnsafeMutableRawPointer, UnsafeMutableRawPointer, bnr_atomic_memory_order_t) -> Void
     let exchange: @convention(c) (Int, UnsafeMutableRawPointer, UnsafeMutableRawPointer, UnsafeMutableRawPointer, bnr_atomic_memory_order_t) -> Void
     let compareExchange: @convention(c) (Int, UnsafeMutableRawPointer, UnsafeMutableRawPointer, UnsafeMutableRawPointer, bnr_atomic_memory_order_t, bnr_atomic_memory_order_t) -> Bool
-    let or8: @convention(c) (UnsafeMutablePointer<UInt8>, UInt8, bnr_atomic_memory_order_t) -> UInt8
-    let and8: @convention(c) (UnsafeMutablePointer<UInt8>, UInt8, bnr_atomic_memory_order_t) -> UInt8
 
     static let shared: DarwinAtomics = {
         let library = UnsafeMutableRawPointer(bitPattern: -2) // RTLD_DEFAULT
@@ -52,9 +50,7 @@ private struct DarwinAtomics {
             load: library.symbol(named: "__atomic_load"),
             store: library.symbol(named: "__atomic_store"),
             exchange: library.symbol(named: "__atomic_exchange"),
-            compareExchange: library.symbol(named: "__atomic_compare_exchange"),
-            or8: library.symbol(named: "__atomic_fetch_or_1"),
-            and8: library.symbol(named: "__atomic_fetch_and_1"))
+            compareExchange: library.symbol(named: "__atomic_compare_exchange"))
     }()
 }
 
@@ -108,28 +104,6 @@ func bnr_atomic_load(_ target: bnr_atomic_flag_t, _ order: bnr_atomic_memory_ord
 func bnr_atomic_store(_ target: bnr_atomic_flag_t, _ desired: Bool, _ order: bnr_atomic_memory_order_t) {
     var desired = desired
     DarwinAtomics.shared.store(MemoryLayout<Bool>.size, target, &desired, order)
-}
-
-func bnr_atomic_init(_ target: bnr_atomic_bitmask_t, _ mask: UInt8) {
-    target.pointee = mask
-}
-
-typealias bnr_atomic_bitmask_t = UnsafeMutablePointer<UInt8>
-
-func bnr_atomic_load(_ target: bnr_atomic_bitmask_t, _ order: bnr_atomic_memory_order_t) -> UInt8 {
-    var result: UInt8 = 0
-    DarwinAtomics.shared.load(MemoryLayout<UInt8>.size, target, &result, order)
-    return result
-}
-
-@discardableResult
-func bnr_atomic_fetch_or(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
-    return DarwinAtomics.shared.or8(target, mask, order)
-}
-
-@discardableResult
-func bnr_atomic_fetch_and(_ target: bnr_atomic_bitmask_t, _ mask: UInt8, _ order: bnr_atomic_memory_order_t) -> UInt8 {
-    return DarwinAtomics.shared.and8(target, mask, order)
 }
 #endif
 

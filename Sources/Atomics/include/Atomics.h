@@ -105,28 +105,6 @@ void bnr_atomic_store(bnr_atomic_flag_t target, bool desired, bnr_atomic_memory_
     atomic_store_explicit((atomic_bool *)target, desired, order);
 }
 
-typedef volatile uint8_t *_Nonnull bnr_atomic_bitmask_t;
-
-BNR_ATOMIC_INLINE BNR_ATOMIC_OVERLOAD
-void bnr_atomic_init(bnr_atomic_bitmask_t target, uint8_t mask) {
-    atomic_init((uint8_t _Atomic *)target, mask);
-}
-
-BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT BNR_ATOMIC_OVERLOAD
-uint8_t bnr_atomic_load(bnr_atomic_bitmask_t target, bnr_atomic_memory_order_t order) {
-    return atomic_load_explicit((uint8_t _Atomic *)target, order);
-}
-
-BNR_ATOMIC_INLINE BNR_ATOMIC_OVERLOAD
-uint8_t bnr_atomic_fetch_or(bnr_atomic_bitmask_t target, uint8_t mask, bnr_atomic_memory_order_t order) {
-    return atomic_fetch_or_explicit((uint8_t _Atomic *)target, mask, order);
-}
-
-BNR_ATOMIC_INLINE BNR_ATOMIC_OVERLOAD
-uint8_t bnr_atomic_fetch_and(bnr_atomic_bitmask_t target, uint8_t mask, bnr_atomic_memory_order_t order) {
-    return atomic_fetch_and_explicit((uint8_t _Atomic *)target, mask, order);
-}
-
 #undef SWIFT_ENUM
 
 #endif // __BNR_DEFERRED_ATOMIC_SHIMS__

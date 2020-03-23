@@ -7,14 +7,9 @@
 //
 
 import XCTest
-
+import Deferred
 #if SWIFT_PACKAGE
-import Atomics
-import Deferred
 import Task
-#else
-import Deferred
-import Deferred.Atomics
 #endif
 
 class TaskTests: CustomExecutorTestCase {
@@ -256,61 +251,72 @@ class TaskTests: CustomExecutorTestCase {
     }
 
     func testRepeatPassesThroughInitialSuccess() {
-        var counter = 0
+        let repeatCalledExpectation = XCTestExpectation(description: "repeat closure was called")
+
         let task = Task<Int>.repeat(upon: customQueue, count: 3) {
-            bnr_atomic_fetch_add(&counter, 1)
+            repeatCalledExpectation.fulfill()
             return self.makeAnyFinishedTask()
         }
 
         wait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectCustomQueueToBeEmpty()
+            expectCustomQueueToBeEmpty(),
+            repeatCalledExpectation
         ], timeout: shortTimeout)
-
-        XCTAssertEqual(bnr_atomic_load(&counter), 1)
     }
 
     func testRepeatStartsTaskManyTimesForFailure() {
-        var counter = 0
+        let repeatCalledExpectation = XCTestExpectation(description: "repeat closure was called")
+        repeatCalledExpectation.expectedFulfillmentCount = 4
+
         let task = Task<Int>.repeat(upon: customQueue, count: 3) {
-            bnr_atomic_fetch_add(&counter, 1)
+            repeatCalledExpectation.fulfill()
             return self.makeAnyFailedTask()
         }
 
         wait(for: [
             expectation(that: task, failsWith: TestError.first),
-            expectCustomQueueToBeEmpty()
+            expectCustomQueueToBeEmpty(),
+            repeatCalledExpectation
         ], timeout: shortTimeout)
-
-        XCTAssertEqual(bnr_atomic_load(&counter), 4)
     }
 
     func testRepeatPassesThroughSuccessFromRetry() {
-        var counter = 0
+        let repeatCalledExpectation = XCTestExpectation(description: "repeat closure was called")
+        repeatCalledExpectation.expectedFulfillmentCount = 2
+
+        let shouldSucceedSemaphore = DispatchSemaphore(value: 0)
+
         let task = Task<Int>.repeat(upon: customQueue, count: 3) {
-            return bnr_atomic_fetch_add(&counter, 1) == 1 ? self.makeAnyFinishedTask() : self.makeAnyFailedTask()
+            repeatCalledExpectation.fulfill()
+
+            if shouldSucceedSemaphore.wait(timeout: .now()) == .timedOut {
+                shouldSucceedSemaphore.signal()
+                return self.makeAnyFailedTask()
+            } else {
+                return self.makeAnyFinishedTask()
+            }
         }
 
         wait(for: [
             expectation(that: task, succeedsWith: 42),
-            expectCustomQueueToBeEmpty()
+            expectCustomQueueToBeEmpty(),
+            repeatCalledExpectation
         ], timeout: shortTimeout)
-
-        XCTAssertEqual(bnr_atomic_load(&counter), 2)
     }
 
     func testRepeatPassesThroughFailureForContinuation() {
-        var counter = 0
+        let repeatCalledExpectation = XCTestExpectation(description: "repeat closure was called")
+
         let task = Task<Int>.repeat(upon: customQueue, count: 3, continuingIf: { _ in false }, to: {
-            bnr_atomic_fetch_add(&counter, 1)
+            repeatCalledExpectation.fulfill()
             return self.makeAnyFailedTask()
         })
 
         wait(for: [
             expectation(that: task, failsWith: TestError.first),
-            expectCustomQueueToBeEmpty()
+            expectCustomQueueToBeEmpty(),
+            repeatCalledExpectation
         ], timeout: shortTimeout)
-
-        XCTAssertEqual(bnr_atomic_load(&counter), 1)
     }
 }

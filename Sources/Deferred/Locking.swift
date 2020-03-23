@@ -46,10 +46,6 @@ extension Locking {
     public func withWriteLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         return try withReadLock(body)
     }
-
-    public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
-        return try withReadLock(body)
-    }
 }
 
 /// A variant lock backed by a platform type that attempts to allow waiters to

@@ -99,7 +99,6 @@
 		DB126D621E5368B900054E95 /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */; };
 		DB126D631E5368B900054E95 /* FutureIgnoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F31D96968E00FC1439 /* FutureIgnoreTests.swift */; };
 		DB126D641E5368B900054E95 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F20B1D969A1B00FC1439 /* FutureTests.swift */; };
-		DB126D651E5368B900054E95 /* LockingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F41D96968E00FC1439 /* LockingTests.swift */; };
 		DB126D661E5368B900054E95 /* ProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */; };
 		DB126D671E5368B900054E95 /* SwiftBugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4002691DDC21B300382BAE /* SwiftBugTests.swift */; };
 		DB126D691E5368B900054E95 /* TaskResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */; };
@@ -112,7 +111,6 @@
 		DB126D721E5368B900054E95 /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */; };
 		DB126D731E5368B900054E95 /* FutureIgnoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F31D96968E00FC1439 /* FutureIgnoreTests.swift */; };
 		DB126D741E5368B900054E95 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F20B1D969A1B00FC1439 /* FutureTests.swift */; };
-		DB126D751E5368B900054E95 /* LockingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F41D96968E00FC1439 /* LockingTests.swift */; };
 		DB126D761E5368B900054E95 /* ProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */; };
 		DB126D771E5368B900054E95 /* SwiftBugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4002691DDC21B300382BAE /* SwiftBugTests.swift */; };
 		DB126D791E5368B900054E95 /* TaskResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */; };
@@ -125,7 +123,6 @@
 		DB126D821E5368BA00054E95 /* FutureCustomExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */; };
 		DB126D831E5368BA00054E95 /* FutureIgnoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F31D96968E00FC1439 /* FutureIgnoreTests.swift */; };
 		DB126D841E5368BA00054E95 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F20B1D969A1B00FC1439 /* FutureTests.swift */; };
-		DB126D851E5368BA00054E95 /* LockingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F41D96968E00FC1439 /* LockingTests.swift */; };
 		DB126D861E5368BA00054E95 /* ProtectedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */; };
 		DB126D871E5368BA00054E95 /* SwiftBugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4002691DDC21B300382BAE /* SwiftBugTests.swift */; };
 		DB126D891E5368BA00054E95 /* TaskResultTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */; };
@@ -291,7 +288,6 @@
 		DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
 		DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureCustomExecutorTests.swift; sourceTree = "<group>"; };
 		DB55F1F31D96968E00FC1439 /* FutureIgnoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureIgnoreTests.swift; sourceTree = "<group>"; };
-		DB55F1F41D96968E00FC1439 /* LockingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockingTests.swift; sourceTree = "<group>"; };
 		DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProtectedTests.swift; sourceTree = "<group>"; };
 		DB55F1F81D96968E00FC1439 /* TaskResultTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskResultTests.swift; sourceTree = "<group>"; };
 		DB55F1FC1D96968E00FC1439 /* TaskTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
@@ -310,6 +306,7 @@
 		DBA01B032071E68F00083CD0 /* FutureAndThen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureAndThen.swift; sourceTree = "<group>"; };
 		DBA01B0C2071E6FF00083CD0 /* FuturePeek.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FuturePeek.swift; sourceTree = "<group>"; };
 		DBABD0BA203F2E3E00C50896 /* Atomics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomics.swift; sourceTree = "<group>"; };
+		DBB2209C2428796600288A76 /* LinuxMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinuxMain.swift; sourceTree = "<group>"; };
 		DBC742631DC2F6D4002FB30D /* FutureEveryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureEveryMap.swift; sourceTree = "<group>"; };
 		DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskProgressTests.swift; sourceTree = "<group>"; };
 		EBEB828C1DC4A79A00B7E089 /* TaskComprehensiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskComprehensiveTests.swift; sourceTree = "<group>"; };
@@ -447,6 +444,7 @@
 				DB55F1EF1D96968E00FC1439 /* DeferredTests */,
 				DB55F1FA1D96968E00FC1439 /* TaskTests */,
 				DB55F1EE1D96968E00FC1439 /* AllTestsCommon.swift */,
+				DBB2209C2428796600288A76 /* LinuxMain.swift */,
 				DB524CBA1D85200C00DDF16D /* Info.plist */,
 			);
 			path = Tests;
@@ -470,7 +468,6 @@
 				DB55F1F21D96968E00FC1439 /* FutureCustomExecutorTests.swift */,
 				DB55F1F31D96968E00FC1439 /* FutureIgnoreTests.swift */,
 				DB55F20B1D969A1B00FC1439 /* FutureTests.swift */,
-				DB55F1F41D96968E00FC1439 /* LockingTests.swift */,
 				DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */,
 				DB8A071B2060D38C00639AB3 /* PerformanceTests.swift */,
 				DB55F1F51D96968E00FC1439 /* ProtectedTests.swift */,
@@ -797,7 +794,6 @@
 				DB126D671E5368B900054E95 /* SwiftBugTests.swift in Sources */,
 				DB126D601E5368B900054E95 /* DeferredTests.swift in Sources */,
 				DB8A071C2060D38C00639AB3 /* PerformanceTests.swift in Sources */,
-				DB126D651E5368B900054E95 /* LockingTests.swift in Sources */,
 				DB126D691E5368B900054E95 /* TaskResultTests.swift in Sources */,
 				DB166DC820C4460B00C25E9B /* FutureAsyncTests.swift in Sources */,
 				DB126D631E5368B900054E95 /* FutureIgnoreTests.swift in Sources */,
@@ -865,7 +861,6 @@
 				DB126D771E5368B900054E95 /* SwiftBugTests.swift in Sources */,
 				DB126D701E5368B900054E95 /* DeferredTests.swift in Sources */,
 				DB8A071D2060D38C00639AB3 /* PerformanceTests.swift in Sources */,
-				DB126D751E5368B900054E95 /* LockingTests.swift in Sources */,
 				DB126D791E5368B900054E95 /* TaskResultTests.swift in Sources */,
 				DB166DC920C4460B00C25E9B /* FutureAsyncTests.swift in Sources */,
 				DB126D731E5368B900054E95 /* FutureIgnoreTests.swift in Sources */,
@@ -933,7 +928,6 @@
 				DB126D871E5368BA00054E95 /* SwiftBugTests.swift in Sources */,
 				DB126D801E5368BA00054E95 /* DeferredTests.swift in Sources */,
 				DB8A071E2060D38C00639AB3 /* PerformanceTests.swift in Sources */,
-				DB126D851E5368BA00054E95 /* LockingTests.swift in Sources */,
 				DB126D891E5368BA00054E95 /* TaskResultTests.swift in Sources */,
 				DB166DCA20C4460B00C25E9B /* FutureAsyncTests.swift in Sources */,
 				DB126D831E5368BA00054E95 /* FutureIgnoreTests.swift in Sources */,

@@ -9,14 +9,10 @@
 // swiftlint:disable type_name
 // swiftlint:disable identifier_name
 
-// This #if is over-complex because there is no compilation condition associated
-// with Playgrounds. <rdar://38865726>
-#if SWIFT_PACKAGE || COCOAPODS
-import Atomics
-#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
-import Deferred.Atomics
-#else
-import Darwin.C.stdatomic
+#if canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY
+@_implementationOnly import CAtomics
+#elseif canImport(Darwin)
+import Darwin
 
 typealias bnr_atomic_memory_order_t = memory_order
 

@@ -6,15 +6,12 @@
 //  Copyright © 2015-2019 Big Nerd Ranch. Licensed under MIT.
 //
 
-import Dispatch
 import Foundation
 #if SWIFT_PACKAGE
-import Atomics
 import Deferred
-#elseif COCOAPODS
-import Atomics
-#elseif XCODE && !FORCE_PLAYGROUND_COMPATIBILITY
-import Deferred.Atomics
+#endif
+#if canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY
+@_implementationOnly import CAtomics
 #endif
 
 /// A type for managing some work that may either succeed or fail at some point

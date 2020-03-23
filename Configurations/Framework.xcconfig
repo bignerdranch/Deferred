@@ -16,15 +16,12 @@ LD_RUNPATH_SEARCH_PATHS = '@executable_path/Frameworks' '@loader_path/Frameworks
 LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = '@executable_path/../Frameworks' '@loader_path/Frameworks'
 
 // Packaging
-DEFINES_MODULE = YES
-FRAMEWORK_VERSION[sdk=macosx*] = A
 INFOPLIST_FILE = Sources/Info.plist
-MODULEMAP_FILE = $(PROJECT_DIR)/Sources/module.modulemap
 PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.$(TARGET_NAME)
 PRODUCT_NAME = Deferred
 
-// Swift Compiler - Custom Flags
-SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) XCODE
-
 // Swift Compiler - General
 SWIFT_INSTALL_OBJC_HEADER = NO
+
+// Swift Compiler - Search Paths
+SWIFT_INCLUDE_PATHS = Sources/CAtomics/include

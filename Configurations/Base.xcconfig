@@ -27,9 +27,6 @@ GCC_NO_COMMON_BLOCKS = YES
 // C Compiler - Language
 GCC_C_LANGUAGE_STANDARD = gnu11
 
-// C Compiler - Language - Modules
-CLANG_ENABLE_MODULES = YES
-
 // C Compiler - Language - Objective-C
 CLANG_ENABLE_OBJC_ARC = YES
 CLANG_ENABLE_OBJC_WEAK = YES

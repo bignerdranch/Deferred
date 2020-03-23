@@ -19,19 +19,19 @@ let package = Package(
         .library(name: "Deferred", targets: [ "Deferred", "Task" ])
     ],
     targets: [
-        .target(name: "Atomics"),
         .target(
             name: "Deferred",
-            dependencies: [ "Atomics" ]),
+            dependencies: [ "CAtomics" ]),
         .testTarget(
             name: "DeferredTests",
             dependencies: [ "Deferred" ],
             exclude: [ "Tests/AllTestsCommon.swift" ]),
         .target(
             name: "Task",
-            dependencies: [ "Deferred" ]),
+            dependencies: [ "Deferred", "CAtomics" ]),
         .testTarget(
             name: "TaskTests",
             dependencies: [ "Deferred", "Task" ],
-            exclude: [ "Tests/AllTestsCommon.swift" ])
+            exclude: [ "Tests/AllTestsCommon.swift" ]),
+        .target(name: "CAtomics")
     ])

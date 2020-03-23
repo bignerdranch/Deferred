@@ -35,10 +35,10 @@ Pod::Spec.new do |s|
 
   # ――― Source Settings ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source_files  = "Sources/**/*.swift"
-  s.preserve_path = "Sources/Atomics"
+  s.preserve_path = "Sources/CAtomics"
   s.module_name   = "Deferred"
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  s.pod_target_xcconfig = { "SWIFT_INCLUDE_PATHS": "$(PODS_TARGET_SRCROOT)/Sources/Atomics/include" }
+  s.pod_target_xcconfig = { "SWIFT_INCLUDE_PATHS": "$(PODS_TARGET_SRCROOT)/Sources/CAtomics/include" }
 
 end

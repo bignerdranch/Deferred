@@ -1,7 +1,0 @@
-framework module Deferred {
-  umbrella header "Deferred.h"
-
-  explicit module Atomics {
-    header "Atomics.h"
-  }
-}

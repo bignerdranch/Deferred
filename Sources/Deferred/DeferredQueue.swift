@@ -6,10 +6,6 @@
 //  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
 //
 
-#if SWIFT_PACKAGE || COCOAPODS
-import Atomics
-#endif
-
 extension Deferred {
     /// Heap storage acting as a linked list node of continuations.
     ///

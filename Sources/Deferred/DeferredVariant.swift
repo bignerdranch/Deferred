@@ -6,8 +6,8 @@
 //  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
 //
 
-#if SWIFT_PACKAGE || COCOAPODS
-import Atomics
+#if canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY
+@_implementationOnly import CAtomics
 #endif
 
 extension Deferred {

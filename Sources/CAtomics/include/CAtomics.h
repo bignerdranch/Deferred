@@ -33,7 +33,6 @@
 #define BNR_ATOMIC_INLINE static inline __attribute__((always_inline))
 #define BNR_ATOMIC_OVERLOAD __attribute__((overloadable))
 #define BNR_ATOMIC_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
-#define BNR_ATOMIC_LIKELY(expression) __builtin_expect(!!(expression), 1)
 
 #if !defined(SWIFT_ENUM)
 #define SWIFT_ENUM(_type, _name) enum _name _name##_t; enum _name
@@ -65,22 +64,6 @@ const void *_Nullable bnr_atomic_exchange(bnr_atomic_ptr_t target, const void *_
 BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT
 bool bnr_atomic_compare_and_swap(bnr_atomic_ptr_t target, const void *_Nullable expected, const void *_Nullable desired, bnr_atomic_memory_order_t order, bnr_atomic_memory_order_t failureOrder) {
     return atomic_compare_exchange_strong_explicit((const void *_Atomic *)target, &expected, desired, order, failureOrder);
-}
-
-BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT
-const void *_Nonnull bnr_atomic_load_and_wait(bnr_atomic_ptr_t target) {
-    const void *result = NULL;
-    for (;;) {
-        if (BNR_ATOMIC_LIKELY(result = bnr_atomic_load(target, bnr_atomic_memory_order_acquire))) break;
-#if defined(__x86_64__) || defined(__i386__)
-        __asm__("pause");
-#elif defined(__arm__) || defined(__arm64__)
-        __asm__("yield");
-#else
-        __asm__("");
-#endif
-    }
-    return result;
 }
 
 typedef volatile bool *_Nonnull bnr_atomic_flag_t;

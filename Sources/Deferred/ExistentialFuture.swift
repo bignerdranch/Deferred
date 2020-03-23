@@ -142,3 +142,13 @@ public struct Future<Value>: FutureProtocol {
         return box.wait(until: time)
     }
 }
+
+public extension FutureProtocol {
+    /// Wraps this future with a type eraser.
+    ///
+    /// Use `eraseToFuture()` to expose an instance of `Future` across an API boundary, rather than this future's actual type.
+    @inlinable
+    func eraseToFuture() -> Future<Value> {
+        return Future(self)
+    }
+}

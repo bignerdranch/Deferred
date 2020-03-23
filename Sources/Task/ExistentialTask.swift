@@ -346,3 +346,23 @@ extension Task {
         return Task(Future<Result>.never)
     }
 }
+
+public extension TaskProtocol {
+    /// Wraps this task with a type eraser.
+    ///
+    /// Use `eraseToTask(uponCancel:)` to expose an instance of `Task` across an API boundary, rather than this task's actual type.
+    @inlinable
+    func eraseToTask(uponCancel cancellation: (() -> Void)? = nil) -> Task<Success> {
+        return Task(self, uponCancel: cancellation)
+    }
+
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+    /// Wraps this task with a type eraser.
+    ///
+    /// Use `eraseToTask(uponCancel:)` to expose an instance of `Task` across an API boundary, rather than this task's actual type.
+    @inlinable
+    func eraseToTask(progress: Progress) -> Task<Success> {
+        return Task(self, progress: progress)
+    }
+    #endif
+}

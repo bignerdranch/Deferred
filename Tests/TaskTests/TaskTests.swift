@@ -12,6 +12,8 @@ import Deferred
 import Task
 #endif
 
+// swiftlint:disable type_body_length
+
 class TaskTests: CustomExecutorTestCase {
     static let allTests: [(String, (TaskTests) -> () throws -> Void)] = [
         ("testUponSuccess", testUponSuccess),
@@ -51,7 +53,7 @@ class TaskTests: CustomExecutorTestCase {
 
     private func makeAnyUnfinishedTask() -> (deferred: Deferred<Task<Int>.Result>, wrappingTask: Task<Int>) {
         let deferred = Deferred<Task<Int>.Result>()
-        return (deferred, Task(deferred))
+        return (deferred, deferred.eraseToTask())
     }
 
     private  func makeAnyFinishedTask() -> Task<Int> {
@@ -64,11 +66,10 @@ class TaskTests: CustomExecutorTestCase {
 
     private func makeContrivedNextTask(for result: Int) -> Task<Int> {
         let deferred = Deferred<Task<Int>.Result>()
-        let task = Task(deferred)
         afterShortDelay {
             deferred.succeed(with: result * 2)
         }
-        return task
+        return deferred.eraseToTask()
     }
 
     func testUponSuccess() {

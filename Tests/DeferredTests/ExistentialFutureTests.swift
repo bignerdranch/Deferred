@@ -48,7 +48,7 @@ class ExistentialFutureTests: XCTestCase {
 
     func testAnyWaitWithTimeout() {
         let deferred = Deferred<Int>()
-        anyFuture = Future(deferred)
+        anyFuture = deferred.eraseToFuture()
 
         let expect = expectation(description: "value blocks while unfilled")
         afterShortDelay {
@@ -76,7 +76,7 @@ class ExistentialFutureTests: XCTestCase {
 
     func testUnfilledAnyUponCalledWhenFilled() {
         let deferred = Deferred<Int>()
-        anyFuture = Future(deferred)
+        anyFuture = deferred.eraseToFuture()
 
         let allExpectations = (0 ..< 10).map { (iteration) -> XCTestExpectation in
             let expect = expectation(description: "upon block #\(iteration) not called while deferred is unfilled")
@@ -94,7 +94,7 @@ class ExistentialFutureTests: XCTestCase {
 
     func testFillAndIsFilledPostcondition() {
         let deferred = Deferred<Int>()
-        anyFuture = Future(deferred)
+        anyFuture = deferred.eraseToFuture()
         XCTAssertNil(anyFuture.peek())
         XCTAssertFalse(anyFuture.isFilled)
         deferred.fill(with: 42)

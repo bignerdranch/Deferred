@@ -130,14 +130,6 @@
 		DB126D8D1E5368BA00054E95 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FC1D96968E00FC1439 /* TaskTests.swift */; };
 		DB126D8E1E5368BA00054E95 /* TaskAsyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1FD1D96968E00FC1439 /* TaskAsyncTests.swift */; };
 		DB126D8F1E5368BA00054E95 /* AllTestsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB55F1EE1D96968E00FC1439 /* AllTestsCommon.swift */; };
-		DB126D901E53698A00054E95 /* Atomics.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CFD1D85489500DDF16D /* Atomics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D911E53698A00054E95 /* Atomics.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CFD1D85489500DDF16D /* Atomics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D921E53698B00054E95 /* Atomics.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CFD1D85489500DDF16D /* Atomics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D931E53698B00054E95 /* Atomics.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CFD1D85489500DDF16D /* Atomics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D941E5369E100054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D951E5369E200054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D961E5369E300054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB126D971E5369E300054E95 /* Deferred.h in Headers */ = {isa = PBXBuildFile; fileRef = DB524CA11D85200C00DDF16D /* Deferred.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB166DC320C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
 		DB166DC420C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
 		DB166DC520C445F500C25E9B /* FutureAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB166DC220C445F500C25E9B /* FutureAsync.swift */; };
@@ -250,7 +242,6 @@
 		DB166DC720C4460B00C25E9B /* FutureAsyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureAsyncTests.swift; sourceTree = "<group>"; };
 		DB34FC8F2096D335005D5B82 /* ObjectDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDeferredTests.swift; sourceTree = "<group>"; };
 		DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilledDeferredTests.swift; sourceTree = "<group>"; };
-		DB39B2D01DDE194C00DDE4C0 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		DB3E3C4520964B2A001F648A /* DeferredVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredVariant.swift; sourceTree = "<group>"; };
 		DB4002691DDC21B300382BAE /* SwiftBugTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftBugTests.swift; sourceTree = "<group>"; };
 		DB4FFD3C213C6912007ED461 /* TaskFallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskFallback.swift; sourceTree = "<group>"; };
@@ -269,7 +260,6 @@
 		DB524C9C1D85200C00DDF16D /* Protected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protected.swift; sourceTree = "<group>"; };
 		DB524C9E1D85200C00DDF16D /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
 		DB524C9F1D85200C00DDF16D /* Locking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locking.swift; sourceTree = "<group>"; };
-		DB524CA11D85200C00DDF16D /* Deferred.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Deferred.h; sourceTree = "<group>"; };
 		DB524CA21D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DB524CA51D85200C00DDF16D /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		DB524CA61D85200C00DDF16D /* TaskResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskResult.swift; sourceTree = "<group>"; };
@@ -282,7 +272,7 @@
 		DB524CB11D85200C00DDF16D /* TaskChain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskChain.swift; sourceTree = "<group>"; };
 		DB524CB21D85200C00DDF16D /* TaskRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRecovery.swift; sourceTree = "<group>"; };
 		DB524CBA1D85200C00DDF16D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB524CFD1D85489500DDF16D /* Atomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Atomics.h; path = include/Atomics.h; sourceTree = "<group>"; };
+		DB524CFD1D85489500DDF16D /* CAtomics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CAtomics.h; path = include/CAtomics.h; sourceTree = "<group>"; };
 		DB55F1EE1D96968E00FC1439 /* AllTestsCommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AllTestsCommon.swift; path = Tests/AllTestsCommon.swift; sourceTree = SOURCE_ROOT; };
 		DB55F1F01D96968E00FC1439 /* DeferredTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeferredTests.swift; sourceTree = "<group>"; };
 		DB55F1F11D96968E00FC1439 /* ExistentialFutureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExistentialFutureTests.swift; sourceTree = "<group>"; };
@@ -379,11 +369,9 @@
 		DB524C911D85200C00DDF16D /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				DB524CFA1D85489500DDF16D /* Atomics */,
+				DB524CFA1D85489500DDF16D /* CAtomics */,
 				DB524C921D85200C00DDF16D /* Deferred */,
-				DB524CA11D85200C00DDF16D /* Deferred.h */,
 				DB524CA21D85200C00DDF16D /* Info.plist */,
-				DB39B2D01DDE194C00DDE4C0 /* module.modulemap */,
 				DB524CA71D85200C00DDF16D /* Task */,
 			);
 			path = Sources;
@@ -450,12 +438,12 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		DB524CFA1D85489500DDF16D /* Atomics */ = {
+		DB524CFA1D85489500DDF16D /* CAtomics */ = {
 			isa = PBXGroup;
 			children = (
-				DB524CFD1D85489500DDF16D /* Atomics.h */,
+				DB524CFD1D85489500DDF16D /* CAtomics.h */,
 			);
-			path = Atomics;
+			path = CAtomics;
 			sourceTree = "<group>";
 		};
 		DB55F1EF1D96968E00FC1439 /* DeferredTests */ = {
@@ -491,51 +479,11 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		DB126C9D1E53685300054E95 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DB126D901E53698A00054E95 /* Atomics.h in Headers */,
-				DB126D941E5369E100054E95 /* Deferred.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CB91E53685C00054E95 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DB126D911E53698A00054E95 /* Atomics.h in Headers */,
-				DB126D951E5369E200054E95 /* Deferred.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CD51E53686900054E95 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DB126D921E53698B00054E95 /* Atomics.h in Headers */,
-				DB126D961E5369E300054E95 /* Deferred.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DB126CF11E53687300054E95 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DB126D931E53698B00054E95 /* Atomics.h in Headers */,
-				DB126D971E5369E300054E95 /* Deferred.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		DB126C9F1E53685300054E95 /* Deferred */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CB11E53685300054E95 /* Build configuration list for PBXNativeTarget "Deferred" */;
 			buildPhases = (
-				DB126C9D1E53685300054E95 /* Headers */,
 				DB126C9B1E53685300054E95 /* Sources */,
 			);
 			buildRules = (
@@ -569,7 +517,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CCD1E53685D00054E95 /* Build configuration list for PBXNativeTarget "MobileDeferred" */;
 			buildPhases = (
-				DB126CB91E53685C00054E95 /* Headers */,
 				DB126CB71E53685C00054E95 /* Sources */,
 			);
 			buildRules = (
@@ -603,7 +550,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CE91E53686900054E95 /* Build configuration list for PBXNativeTarget "TVDeferred" */;
 			buildPhases = (
-				DB126CD51E53686900054E95 /* Headers */,
 				DB126CD31E53686900054E95 /* Sources */,
 			);
 			buildRules = (
@@ -637,7 +583,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB126CF91E53687300054E95 /* Build configuration list for PBXNativeTarget "NanoDeferred" */;
 			buildPhases = (
-				DB126CF11E53687300054E95 /* Headers */,
 				DB126CEF1E53687300054E95 /* Sources */,
 			);
 			buildRules = (

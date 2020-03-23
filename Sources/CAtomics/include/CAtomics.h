@@ -23,8 +23,8 @@
 #ifndef __BNR_DEFERRED_ATOMIC_SHIMS__
 #define __BNR_DEFERRED_ATOMIC_SHIMS__
 
-#if !__has_include(<stdatomic.h>) || !__has_extension(c_atomic)
-#error Required compiler features are not available
+#if !__has_include(<stdatomic.h>)
+#error An implementation of threading primitives is not available on this platform. Please open an issue with the Deferred project.
 #endif
 
 #include <stdbool.h>

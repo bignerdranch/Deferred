@@ -101,6 +101,8 @@ func bnr_atomic_store(_ target: bnr_atomic_flag_t, _ desired: Bool, _ order: bnr
     var desired = desired
     DarwinAtomics.shared.store(MemoryLayout<Bool>.size, target, &desired, order)
 }
+#else
+#error("An implementation of threading primitives is not available on this platform. Please open an issue with the Deferred project.")
 #endif
 
 func bnr_atomic_init<T: AnyObject>(_ target: UnsafeMutablePointer<T?>) {

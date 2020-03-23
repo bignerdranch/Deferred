@@ -65,10 +65,10 @@ func bnr_atomic_exchange(_ target: bnr_atomic_ptr_t, _ desired: UnsafeRawPointer
     return old
 }
 
-func bnr_atomic_compare_and_swap(_ target: bnr_atomic_ptr_t, _ expected: UnsafeRawPointer?, _ desired: UnsafeRawPointer?, _ order: bnr_atomic_memory_order_t) -> Bool {
+func bnr_atomic_compare_and_swap(_ target: bnr_atomic_ptr_t, _ expected: UnsafeRawPointer?, _ desired: UnsafeRawPointer?, _ order: bnr_atomic_memory_order_t, _ failureOrder: bnr_atomic_memory_order_t) -> Bool {
     var expected = expected
     var desired = desired
-    return DarwinAtomics.shared.compareExchange(MemoryLayout<UnsafeRawPointer?>.size, target, &expected, &desired, order, .relaxed)
+    return DarwinAtomics.shared.compareExchange(MemoryLayout<UnsafeRawPointer?>.size, target, &expected, &desired, order, failureOrder)
 }
 
 func bnr_atomic_load_and_wait(_ target: bnr_atomic_ptr_t) -> UnsafeRawPointer {
@@ -119,7 +119,7 @@ func bnr_atomic_store<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, _ desire
 func bnr_atomic_initialize_once<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, _ desired: T) -> Bool {
     let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
     let retainedDesired = Unmanaged.passRetained(desired)
-    let wonRace = bnr_atomic_compare_and_swap(rawTarget, nil, retainedDesired.toOpaque(), .acq_rel)
+    let wonRace = bnr_atomic_compare_and_swap(rawTarget, nil, retainedDesired.toOpaque(), .acq_rel, .acquire)
     if !wonRace {
         retainedDesired.release()
     }

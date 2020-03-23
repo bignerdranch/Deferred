@@ -63,8 +63,8 @@ const void *_Nullable bnr_atomic_exchange(bnr_atomic_ptr_t target, const void *_
 }
 
 BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT
-bool bnr_atomic_compare_and_swap(bnr_atomic_ptr_t target, const void *_Nullable expected, const void *_Nullable desired, bnr_atomic_memory_order_t order) {
-    return atomic_compare_exchange_strong_explicit((const void *_Atomic *)target, &expected, desired, order, memory_order_relaxed);
+bool bnr_atomic_compare_and_swap(bnr_atomic_ptr_t target, const void *_Nullable expected, const void *_Nullable desired, bnr_atomic_memory_order_t order, bnr_atomic_memory_order_t failureOrder) {
+    return atomic_compare_exchange_strong_explicit((const void *_Atomic *)target, &expected, desired, order, failureOrder);
 }
 
 BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT

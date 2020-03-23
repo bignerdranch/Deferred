@@ -25,10 +25,10 @@ Pod::Spec.new do |s|
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.swift_version             = "5.1"
   s.cocoapods_version         = ">=1.1.0"
-  s.ios.deployment_target     = "8.0"
-  s.osx.deployment_target     = "10.10"
-  s.watchos.deployment_target = "2.0"
-  s.tvos.deployment_target    = "9.0"
+  s.ios.deployment_target     = "10.0"
+  s.osx.deployment_target     = "10.12"
+  s.watchos.deployment_target = "3.0"
+  s.tvos.deployment_target    = "10.0"
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.source       = { :git => "https://github.com/bignerdranch/Deferred.git", :tag => "#{s.version}" }

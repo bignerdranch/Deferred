@@ -36,7 +36,7 @@ extension Deferred {
             let storage = super.create(minimumCapacity: 1, makingHeaderWith: { _ in Queue() })
 
             storage.withUnsafeMutablePointers { (_, pointerToValue) in
-                bnr_atomic_init(pointerToValue)
+                pointerToValue.initialize(to: nil)
             }
 
             return unsafeDowncast(storage, to: ObjectVariant.self)

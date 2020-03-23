@@ -52,11 +52,6 @@ typedef BNR_ATOMIC_ENUM(int, bnr_atomic_memory_order) {
 
 typedef const void *_Nullable volatile *_Nonnull bnr_atomic_ptr_t;
 
-BNR_ATOMIC_INLINE BNR_ATOMIC_OVERLOAD
-void bnr_atomic_init(bnr_atomic_ptr_t target, const void *_Nullable initial) {
-    atomic_init((const void *_Atomic *)target, initial);
-}
-
 BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT BNR_ATOMIC_OVERLOAD
 const void *_Nullable bnr_atomic_load(bnr_atomic_ptr_t target, bnr_atomic_memory_order_t order) {
     return atomic_load_explicit((const void *_Atomic *)target, order);
@@ -89,11 +84,6 @@ const void *_Nonnull bnr_atomic_load_and_wait(bnr_atomic_ptr_t target) {
 }
 
 typedef volatile bool *_Nonnull bnr_atomic_flag_t;
-
-BNR_ATOMIC_INLINE BNR_ATOMIC_OVERLOAD
-void bnr_atomic_init(bnr_atomic_flag_t target, bool initial) {
-    atomic_init((atomic_bool *)target, initial);
-}
 
 BNR_ATOMIC_INLINE BNR_ATOMIC_WARN_UNUSED_RESULT BNR_ATOMIC_OVERLOAD
 bool bnr_atomic_load(bnr_atomic_flag_t target, bnr_atomic_memory_order_t order) {

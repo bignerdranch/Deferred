@@ -52,10 +52,6 @@ private struct DarwinAtomics {
 
 typealias bnr_atomic_ptr_t = UnsafeMutablePointer<UnsafeRawPointer?>
 
-func bnr_atomic_init(_ target: bnr_atomic_ptr_t, _ initial: UnsafeRawPointer?) {
-    target.pointee = initial
-}
-
 func bnr_atomic_load(_ target: bnr_atomic_ptr_t, _ order: bnr_atomic_memory_order_t) -> UnsafeRawPointer? {
     var result: UnsafeRawPointer?
     DarwinAtomics.shared.load(MemoryLayout<UnsafeRawPointer?>.size, target, &result, order)
@@ -87,10 +83,6 @@ func bnr_atomic_load_and_wait(_ target: bnr_atomic_ptr_t) -> UnsafeRawPointer {
 
 typealias bnr_atomic_flag_t = UnsafeMutablePointer<Bool>
 
-func bnr_atomic_init(_ target: bnr_atomic_flag_t, _ initial: Bool) {
-    target.pointee = initial
-}
-
 func bnr_atomic_load(_ target: bnr_atomic_flag_t, _ order: bnr_atomic_memory_order_t) -> Bool {
     var result: Bool = false
     DarwinAtomics.shared.load(MemoryLayout<Bool>.size, target, &result, order)
@@ -104,11 +96,6 @@ func bnr_atomic_store(_ target: bnr_atomic_flag_t, _ desired: Bool, _ order: bnr
 #else
 #error("An implementation of threading primitives is not available on this platform. Please open an issue with the Deferred project.")
 #endif
-
-func bnr_atomic_init<T: AnyObject>(_ target: UnsafeMutablePointer<T?>) {
-    let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)
-    bnr_atomic_init(rawTarget, nil)
-}
 
 func bnr_atomic_load<T: AnyObject>(_ target: UnsafeMutablePointer<T?>, _ order: bnr_atomic_memory_order_t) -> T? {
     let rawTarget = UnsafeMutableRawPointer(target).assumingMemoryBound(to: UnsafeRawPointer?.self)

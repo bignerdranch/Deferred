@@ -36,7 +36,7 @@ private struct AllFilled<Success>: TaskProtocol {
         for future in array {
             #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
             if let task = future as? Task<Base.Element.Success> {
-                progress.monitorChild(task.progress, withPendingUnitCount: 1)
+                progress.addProxiedChild(task.progress, withPendingUnitCount: 1)
             } else {
                 progress.monitorCompletion(of: future, withPendingUnitCount: 1)
             }

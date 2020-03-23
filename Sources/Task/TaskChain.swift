@@ -61,7 +61,6 @@ struct TaskChain {
             }
         }
 
-        @available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *)
         override func addChild(_ child: Progress, withPendingUnitCount unitCount: Int64) {
             if expandsAddedChildren, !child.wasGeneratedByTask {
                 totalUnitCount += TaskChain.explicitChildUnitCount - unitCount
@@ -87,7 +86,7 @@ struct TaskChain {
         if let root = Root.activeStack.last {
             // We're inside `andThen` — `commitAndThen(with:)` will compose instead.
             self.root = root
-            self.effectiveProgress = customProgress ?? .basicProgress(parent: nil, for: wrapped, uponCancel: cancellation)
+            self.effectiveProgress = customProgress ?? .basicProgress(for: wrapped, uponCancel: cancellation)
         } else if let root = customProgress as? Root {
             // Being passed the `progress` of another `Task`. Just pass it through.
             self.root = root
@@ -101,7 +100,7 @@ struct TaskChain {
             self.effectiveProgress = root
 
             if let customProgress = customProgress, cancellation == nil {
-                root.adoptChild(customProgress, withPendingUnitCount: unitCount)
+                root.addChild(customProgress, withPendingUnitCount: unitCount)
             } else {
                 root.monitorCompletion(of: wrapped, uponCancel: cancellation, withPendingUnitCount: unitCount)
             }
@@ -137,8 +136,7 @@ struct TaskChain {
 
     /// The handler passed to `map` can use implicit progress reporting.
     /// During the handler, the first `Progress` object created using
-    /// `parent: .current()` will be given a larger slice of the task chain on
-    /// macOS 10.11, iOS 9, and above.
+    /// `parent: .current()` will be given a larger slice of the task chain.
     func beginMap() {
         root.expandsAddedChildren = true
         root.becomeCurrent(withPendingUnitCount: TaskChain.singleUnit)
@@ -172,7 +170,7 @@ struct TaskChain {
         let pendingUnitCount = wrappedProgress?.wasGeneratedByTask == false ? TaskChain.explicitChildUnitCount : TaskChain.singleUnit
         root.totalUnitCount += pendingUnitCount - TaskChain.undeterminedUnit
         if let wrappedProgress = wrappedProgress {
-            root.monitorChild(wrappedProgress, withPendingUnitCount: pendingUnitCount)
+            root.addProxiedChild(wrappedProgress, withPendingUnitCount: pendingUnitCount)
         } else {
             root.monitorCompletion(of: wrapped, uponCancel: wrapped.cancel, withPendingUnitCount: pendingUnitCount)
         }

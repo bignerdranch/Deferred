@@ -123,10 +123,6 @@ extension CFRunLoop: Executor {
 /// of the run loop.
 extension RunLoop: Executor {
     public func submit(_ body: @escaping() -> Void) {
-        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
-            perform(body)
-        } else {
-            getCFRunLoop().submit(body)
-        }
+        perform(body)
     }
 }

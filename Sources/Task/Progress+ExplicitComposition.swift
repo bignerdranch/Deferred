@@ -44,7 +44,6 @@ private final class ProxyProgress: Progress {
         observee.pause()
     }
 
-    @available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *)
     override func resume() {
         observee.resume()
     }
@@ -81,7 +80,7 @@ private final class ProxyProgress: Progress {
     func inheritPaused() {
         if observee.isPaused {
             super.pause()
-        } else if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
+        } else {
             super.resume()
         }
     }
@@ -136,19 +135,6 @@ private final class ProxyProgress: Progress {
 }
 
 extension Progress {
-    /// Add a progress object as a child of a progress tree. The
-    /// `pendingUnitCount` indicates the expected work for the progress unit.
-    ///
-    /// This method is a shim for `Progress.addChild(_:withPendingUnitCount:)`,
-    /// using an approximation of the behavior on iOS 8 and macOS 10.10.
-    func adoptChild(_ child: Progress, withPendingUnitCount pendingUnitCount: Int64) {
-        if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
-            addChild(child, withPendingUnitCount: pendingUnitCount)
-        } else {
-            monitorChild(child, withPendingUnitCount: pendingUnitCount)
-        }
-    }
-
     /// Adds an external progress tree as a child of this progress tree.
     ///
     /// This method has a similar effect to
@@ -157,15 +143,9 @@ extension Progress {
     ///
     /// This method may be useful if `child` cannot be known to already have no
     /// parent.
-    func monitorChild(_ child: Progress, withPendingUnitCount pendingUnitCount: Int64) {
-        if #available(macOS 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *) {
-            let child = ProxyProgress(parent: nil, referencing: child)
-            addChild(child, withPendingUnitCount: pendingUnitCount)
-        } else {
-            becomeCurrent(withPendingUnitCount: pendingUnitCount)
-            _ = ProxyProgress(parent: self, referencing: child)
-            resignCurrent()
-        }
+    func addProxiedChild(_ child: Progress, withPendingUnitCount pendingUnitCount: Int64) {
+        let child = ProxyProgress(parent: nil, referencing: child)
+        addChild(child, withPendingUnitCount: pendingUnitCount)
     }
 }
 #endif

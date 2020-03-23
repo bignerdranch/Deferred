@@ -64,12 +64,6 @@ extension XCTestCase {
         return 10
     }
 
-    #if !swift(>=5.0) && !canImport(Darwin)
-    func wait(for expectations: [XCTestExpectation], timeout: TimeInterval, enforceOrder: Bool = false, file: StaticString = #file, line: Int = #line) {
-        waitForExpectations(timeout: timeout, file: file, line: line, handler: nil)
-    }
-    #endif
-
     func afterShortDelay(upon queue: DispatchQueue = .global(), execute body: @escaping() -> Void) {
         queue.asyncAfter(deadline: .now() + 0.3, execute: body)
     }
@@ -136,26 +130,3 @@ class CustomExecutorTestCase: XCTestCase {
         return expect
     }
 }
-
-// MARK: -
-
-#if !swift(>=4.2)
-#if canImport(Darwin)
-import Darwin
-#else
-import Glibc
-#endif
-
-extension Collection {
-    func randomElement() -> Iterator.Element? {
-        guard !isEmpty else { return nil }
-        #if os(Linux)
-        let offset = Int(random() % numericCast(count))
-        #else // arc4random_uniform is also available on BSD and Bionic
-        let offset = Int(arc4random_uniform(numericCast(count)))
-        #endif
-        let index = self.index(startIndex, offsetBy: offset)
-        return self[index]
-    }
-}
-#endif

@@ -52,83 +52,60 @@ extension Locking {
 /// block efficiently on contention. This locking type behaves the same for both
 /// read and write locks.
 ///
-/// - On recent versions of Darwin (iOS 10.0, macOS 12.0, tvOS 1.0, watchOS 3.0,
-///   or better), this efficiency is a guarantee.
+/// - On Apple platforms (iOS, macOS, tvOS, watchOS, or better), this efficiency is a guarantee.
 /// - On Linux, BSD, or Android, waiters perform comparably to a kernel lock
 ///   under contention.
 public final class NativeLock: Locking {
-    private let lock: UnsafeMutableRawPointer
+    #if canImport(os)
+    private let lock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
+    #else
+    private let lock = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
+    #endif
 
     /// Creates a standard platform lock.
     public init() {
         #if canImport(os)
-        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
-            let lock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
-            lock.initialize(to: os_unfair_lock())
-            self.lock = UnsafeMutableRawPointer(lock)
-            return
-        }
-        #endif
-
-        let lock = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
+        lock.initialize(to: os_unfair_lock())
+        #else
         lock.initialize(to: pthread_mutex_t())
         pthread_mutex_init(lock, nil)
-        self.lock = UnsafeMutableRawPointer(lock)
+        #endif
     }
 
     deinit {
-        #if canImport(os)
-        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
-            let lock = self.lock.assumingMemoryBound(to: os_unfair_lock.self)
-            lock.deinitialize(count: 1)
-            lock.deallocate()
-            return
-        }
+        #if !canImport(os)
         #endif
-
-        let lock = self.lock.assumingMemoryBound(to: pthread_mutex_t.self)
-        pthread_mutex_destroy(lock)
         lock.deinitialize(count: 1)
         lock.deallocate()
     }
 
     public func withReadLock<Return>(_ body: () throws -> Return) rethrows -> Return {
         #if canImport(os)
-        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
-            let lock = self.lock.assumingMemoryBound(to: os_unfair_lock.self)
-            os_unfair_lock_lock(lock)
-            defer {
-                os_unfair_lock_unlock(lock)
-            }
-            return try body()
+        os_unfair_lock_lock(lock)
+        defer {
+            os_unfair_lock_unlock(lock)
         }
-        #endif
-
-        let lock = self.lock.assumingMemoryBound(to: pthread_mutex_t.self)
+        #else
         pthread_mutex_lock(lock)
         defer {
             pthread_mutex_unlock(lock)
         }
+        #endif
         return try body()
     }
 
     public func withAttemptedReadLock<Return>(_ body: () throws -> Return) rethrows -> Return? {
         #if canImport(os)
-        if #available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *) {
-            let lock = self.lock.assumingMemoryBound(to: os_unfair_lock.self)
-            guard os_unfair_lock_trylock(lock) else { return nil }
-            defer {
-                os_unfair_lock_unlock(lock)
-            }
-            return try body()
+        guard os_unfair_lock_trylock(lock) else { return nil }
+        defer {
+            os_unfair_lock_unlock(lock)
         }
-        #endif
-
-        let lock = self.lock.assumingMemoryBound(to: pthread_mutex_t.self)
+        #else
         guard pthread_mutex_trylock(lock) == 0 else { return nil }
         defer {
             pthread_mutex_unlock(lock)
         }
+        #endif
         return try body()
     }
 }

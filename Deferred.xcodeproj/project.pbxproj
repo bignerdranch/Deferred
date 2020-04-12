@@ -147,6 +147,9 @@
 		DB3E3C4720964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
 		DB3E3C4820964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
 		DB3E3C4920964B2A001F648A /* DeferredVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3E3C4520964B2A001F648A /* DeferredVariant.swift */; };
+		DB48DFB32443B95800CA2D17 /* TaskCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB48DFB22443B95800CA2D17 /* TaskCompositionTests.swift */; };
+		DB48DFB42443B95800CA2D17 /* TaskCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB48DFB22443B95800CA2D17 /* TaskCompositionTests.swift */; };
+		DB48DFB52443B95800CA2D17 /* TaskCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB48DFB22443B95800CA2D17 /* TaskCompositionTests.swift */; };
 		DB4FFD3D213C6912007ED461 /* TaskFallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FFD3C213C6912007ED461 /* TaskFallback.swift */; };
 		DB4FFD3E213C6912007ED461 /* TaskFallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FFD3C213C6912007ED461 /* TaskFallback.swift */; };
 		DB4FFD3F213C6912007ED461 /* TaskFallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FFD3C213C6912007ED461 /* TaskFallback.swift */; };
@@ -252,6 +255,7 @@
 		DB34FC932096DCE1005D5B82 /* FilledDeferredTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilledDeferredTests.swift; sourceTree = "<group>"; };
 		DB3E3C4520964B2A001F648A /* DeferredVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredVariant.swift; sourceTree = "<group>"; };
 		DB4002691DDC21B300382BAE /* SwiftBugTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftBugTests.swift; sourceTree = "<group>"; };
+		DB48DFB22443B95800CA2D17 /* TaskCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCompositionTests.swift; sourceTree = "<group>"; };
 		DB4FFD3C213C6912007ED461 /* TaskFallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskFallback.swift; sourceTree = "<group>"; };
 		DB524C8C1D851E5B00DDF16D /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		DB524C8D1D851E5B00DDF16D /* Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Framework.xcconfig; sourceTree = "<group>"; };
@@ -480,6 +484,7 @@
 			isa = PBXGroup;
 			children = (
 				DB55F1FD1D96968E00FC1439 /* TaskAsyncTests.swift */,
+				DB48DFB22443B95800CA2D17 /* TaskCompositionTests.swift */,
 				EBEB828C1DC4A79A00B7E089 /* TaskComprehensiveTests.swift */,
 				DBEC962A216FF229004CF0FC /* TaskProgressTests.swift */,
 				DB78F5EB215C4C5700D07CC6 /* TaskProtocolTests.swift */,
@@ -765,6 +770,7 @@
 				DB34FC942096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */,
 				DB126D6D1E5368B900054E95 /* TaskTests.swift in Sources */,
 				DB126D621E5368B900054E95 /* FutureCustomExecutorTests.swift in Sources */,
+				DB48DFB32443B95800CA2D17 /* TaskCompositionTests.swift in Sources */,
 				DB126D611E5368B900054E95 /* ExistentialFutureTests.swift in Sources */,
 				DB78F5EC215C4C5700D07CC6 /* TaskProtocolTests.swift in Sources */,
 				DB34FC902096D335005D5B82 /* ObjectDeferredTests.swift in Sources */,
@@ -834,6 +840,7 @@
 				DB34FC952096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */,
 				DB126D7D1E5368B900054E95 /* TaskTests.swift in Sources */,
 				DB126D721E5368B900054E95 /* FutureCustomExecutorTests.swift in Sources */,
+				DB48DFB42443B95800CA2D17 /* TaskCompositionTests.swift in Sources */,
 				DB126D711E5368B900054E95 /* ExistentialFutureTests.swift in Sources */,
 				DB78F5ED215C4C5700D07CC6 /* TaskProtocolTests.swift in Sources */,
 				DB34FC912096D335005D5B82 /* ObjectDeferredTests.swift in Sources */,
@@ -903,6 +910,7 @@
 				DB34FC962096DCE1005D5B82 /* FilledDeferredTests.swift in Sources */,
 				DB126D8D1E5368BA00054E95 /* TaskTests.swift in Sources */,
 				DB126D821E5368BA00054E95 /* FutureCustomExecutorTests.swift in Sources */,
+				DB48DFB52443B95800CA2D17 /* TaskCompositionTests.swift in Sources */,
 				DB126D811E5368BA00054E95 /* ExistentialFutureTests.swift in Sources */,
 				DB78F5EE215C4C5700D07CC6 /* TaskProtocolTests.swift in Sources */,
 				DB34FC922096D335005D5B82 /* ObjectDeferredTests.swift in Sources */,

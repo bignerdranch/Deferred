@@ -12,8 +12,8 @@ extension Deferred {
     /// The use of `ManagedBuffer` ensures aligned and heap-allocated addresses
     /// for the storage. The storage is tail-allocated with a reference to the
     /// next node.
-    final class Node: ManagedBuffer<AnyObject?, Continuation> {
-        fileprivate static func create(with continuation: Continuation) -> Node {
+    final class Node: ManagedBuffer<Node?, Continuation> {
+        static func create(with continuation: Continuation) -> Node {
             let storage = super.create(minimumCapacity: 1, makingHeaderWith: { _ in nil })
 
             storage.withUnsafeMutablePointers { (_, pointerToContinuation) in
@@ -48,7 +48,7 @@ private extension Deferred.Node {
     var next: Deferred.Node {
         get {
             return withUnsafeMutablePointers { (target, _) in
-                unsafeDowncast(bnr_atomic_load_and_wait(target), to: Deferred.Node.self)
+                bnr_atomic_load_and_wait(target)
             }
         }
         set {

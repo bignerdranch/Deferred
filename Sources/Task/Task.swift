@@ -42,15 +42,6 @@ public protocol TaskProtocol: FutureProtocol where Value: Either {
     /// - seealso: `FutureProtocol.upon(_:execute:)`
     func uponFailure(on executor: Executor, execute body: @escaping(_ error: Failure) -> Void)
 
-    /// Tests whether the underlying work has been cancelled.
-    ///
-    /// An implementation should be a "best effort". By default, no cancellation
-    /// is supported, and thus cannot become cancelled.
-    ///
-    /// Should an implementation choose to be cancellable, it should fully
-    /// implement cancellability with `cancel`.
-    var isCancelled: Bool { get }
-
     /// Attempt to cancel the underlying work.
     ///
     /// An implementation should be a "best effort". By default, no cancellation
@@ -61,20 +52,13 @@ public protocol TaskProtocol: FutureProtocol where Value: Either {
     /// * The work has already completed.
     /// * The work has entered an uncancelable state.
     /// * An underlying task is not cancellable.
-    ///
-    /// Should an implementation choose to be cancellable, it should fully
-    /// implement cancellability with `isCancelled`.
     func cancel()
 }
 
 // MARK: - Default implementation
 
-extension TaskProtocol {
-    public var isCancelled: Bool {
-        return false
-    }
-
-    public func cancel() {}
+public extension TaskProtocol {
+    func cancel() {}
 }
 
 // MARK: - Conditional conformances

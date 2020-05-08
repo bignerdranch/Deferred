@@ -71,13 +71,15 @@ private struct AllFilled<Success>: TaskProtocol {
         return combined.wait(until: time)
     }
 
-    #if !os(macOS) && !os(iOS) && !os(tvOS) && !os(watchOS)
     func cancel() {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        progress.cancel()
+        #else
         for cancellation in cancellations {
             cancellation()
         }
+        #endif
     }
-    #endif
 }
 
 extension Collection where Element: TaskProtocol {

@@ -10,7 +10,7 @@
 import Deferred
 #endif
 
-extension TaskProtocol where Self: PromiseProtocol {
+extension Deferred: TaskProtocol where Value: Either {
     /// Completes the task with a successful `value`, or a thrown error.
     ///
     /// If `value` represents an expression that may fail by throwing, the
@@ -18,7 +18,7 @@ extension TaskProtocol where Self: PromiseProtocol {
     ///
     /// Fulfilling this deferred value should usually be attempted only once.
     ///
-    /// - seealso: `PromiseProtocol.fill(with:)`
+    /// - seealso: `Deferred.fill(with:)`
     @discardableResult
     public func succeed(with value: Success) -> Bool {
         return fill(with: Value(right: value))
@@ -33,13 +33,12 @@ extension TaskProtocol where Self: PromiseProtocol {
     }
 }
 
-extension TaskProtocol where Self: PromiseProtocol, Success == Void {
+extension Deferred where Value: Either, Value.Right == Void {
     /// Completes the task with a success.
     ///
     /// Fulfilling this deferred value should usually be attempted only once.
     ///
-    /// - seealso: `PromiseProtocol.fill(with:)`
-    /// - seealso: `TaskProtocol.succeed(with:)`
+    /// - seealso: `Deferred.succeed(with:)`
     @discardableResult
     public func succeed() -> Bool {
         return fill(with: Value(right: ()))

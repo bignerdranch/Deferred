@@ -110,5 +110,3 @@ extension Future: TaskProtocol where Value: Either {
         self.init(value: Value(left: error))
     }
 }
-
-extension Deferred: TaskProtocol where Value: Either {}

@@ -98,8 +98,7 @@ private final class Never<Value>: Box<Value> {
 /// - Prevent clients from coupling to the specific kind of `FutureProtocol` your
 ///   implementation is currently using.
 /// - Publicly expose only the `FutureProtocol` aspect of a deferred value,
-///   ensuring that only your implementation can fill the deferred value
-///   using the `PromiseProtocol` aspect.
+///   ensuring that only your implementation can fill the deferred value.
 public struct Future<Value>: FutureProtocol {
     private let box: Box<Value>
 

@@ -76,7 +76,12 @@ extension Deferred.Continuation {
     }
 }
 
-extension Deferred: PromiseProtocol {
+extension Deferred {
+    /// Determines the promise with `value`.
+    ///
+    /// Filling a deferred value should usually be attempted only once.
+    ///
+    /// - returns: Whether the promise was fulfilled with `value`.
     @discardableResult
     public func fill(with value: Value) -> Bool {
         return variant.store(value)

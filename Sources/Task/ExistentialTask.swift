@@ -188,14 +188,7 @@ import Deferred
 public final class Task<Success> {
     /// A type that represents either a wrapped value or an error, representing the
     /// possible return values of a throwing function.
-    public enum Result {
-        /// Any error.
-        public typealias Failure = Error
-        /// The success value, stored as `Value`.
-        case success(Success)
-        /// The failure value, stored as any error.
-        case failure(Failure)
-    }
+    public typealias Result = Swift.Result<Success, Error>
 
     private let future: Future<Result>
 
@@ -318,9 +311,15 @@ extension Task {
         self.init(future, uponCancel: cancellation)
     }
 
+    /// Creates an operation that is immediately completed immediately with the result of calling `body` in the current context.
+    public convenience init(catching body: () throws -> Success) {
+        let future = Future<Result>(catching: body)
+        self.init(future)
+    }
+
     /// Creates an operation that has already completed with `value`.
-    public convenience init(success value: @autoclosure() throws -> Success) {
-        let future = Future<Result>(success: try value())
+    public convenience init(success value: Success) {
+        let future = Future<Result>(success: value)
         self.init(future)
     }
 

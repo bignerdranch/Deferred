@@ -21,7 +21,7 @@ import Deferred
 /// - seealso: `FutureProtocol`
 public protocol TaskProtocol: FutureProtocol where Value: Either {
     /// A type that represents the success of some asynchronous work.
-    associatedtype Success where Success == Value.Right
+    typealias Success = Value.Right
 
     /// A type that represents the failure of some asynchronous work.
     typealias Failure = Error
@@ -80,8 +80,6 @@ extension TaskProtocol {
 // MARK: - Conditional conformances
 
 extension Future: TaskProtocol where Value: Either {
-    public typealias Success = Value.Right
-
     /// Create a future having the same underlying task as `other`.
     public init<Wrapped: TaskProtocol>(resultFrom wrapped: Wrapped) where Wrapped.Success == Success {
         self = wrapped as? Future<Value> ?? wrapped.every { (result) -> Value in
@@ -94,17 +92,23 @@ extension Future: TaskProtocol where Value: Either {
         self = wrapped.every(per: Value.init(right:))
     }
 
+    /// Creates a future that is immediately filled with the result of calling `body` in the current context.
+    @inlinable
+    public init(catching body: () throws -> Success) {
+        self.init(value: Value(catching: body))
+    }
+
     /// Creates an future having already filled successfully with `value`.
-    public init(success value: @autoclosure() throws -> Success) {
-        self.init(value: Value(catching: value))
+    @inlinable
+    public init(success value: Success) {
+        self.init(value: Value(right: value))
     }
 
     /// Creates an future having already failed with `error`.
+    @inlinable
     public init(failure error: Failure) {
         self.init(value: Value(left: error))
     }
 }
 
-extension Deferred: TaskProtocol where Value: Either {
-    public typealias Success = Value.Right
-}
+extension Deferred: TaskProtocol where Value: Either {}

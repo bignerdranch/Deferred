@@ -20,8 +20,8 @@ extension TaskProtocol where Self: PromiseProtocol {
     ///
     /// - seealso: `PromiseProtocol.fill(with:)`
     @discardableResult
-    public func succeed(with value: @autoclosure() throws -> Success) -> Bool {
-        return fill(with: Value(catching: value))
+    public func succeed(with value: Success) -> Bool {
+        return fill(with: Value(right: value))
     }
 
     /// Completes the task with a failed `error`.

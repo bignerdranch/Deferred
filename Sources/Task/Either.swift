@@ -19,8 +19,7 @@
 public protocol Either {
     /// One of the two possible results.
     ///
-    /// By convention, the left side indicates failure, typically through a
-    /// Swift `Error`.
+    /// By convention, one side indicates a failure through Swift `Error`.
     ///
     /// A `typealias` instead of an `associatedtype` to avoid breaking
     /// compatibility when what we actually want becomes representable. See also
@@ -29,14 +28,8 @@ public protocol Either {
 
     /// One of the two possible results.
     ///
-    /// By convention, the right side is used to hold a correct value.
+    /// By convention, one side indicates the output of some operation.
     associatedtype Right
-
-    /// Creates a left-biased instance.
-    init(left: Left)
-
-    /// Creates a right-biased instance.
-    init(right: Right)
 
     /// Creates an instance by evaluating a throwing `body`, capturing its
     /// returned value as a right bias, or the thrown error as a left bias.
@@ -47,4 +40,21 @@ public protocol Either {
     /// Use this method to retrieve the value of this instance if it is
     /// right-biased or to throw the error if it is left-biased.
     func get() throws -> Right
+}
+
+extension Either {
+    @inlinable
+    init(left: Left) {
+        self.init { throw left }
+    }
+
+    @inlinable
+    init(right: Right) {
+        self.init { right }
+    }
+
+    @inlinable
+    init<Other>(from other: Other) where Other: Either, Other.Right == Right {
+        self.init(catching: other.get)
+    }
 }

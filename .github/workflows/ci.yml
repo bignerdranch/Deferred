@@ -6,19 +6,17 @@ on:
 jobs:
   test_iOS:
     name: Test iOS
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
     - name: Run xcodebuild
       env:
         SCHEME: MobileDeferred
         DESTINATION: platform=iOS Simulator,name=iPhone 11,OS=latest
-      run: |
-        xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet build
-        xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" test
+      run: xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet test
   test_macOS:
     name: Test macOS
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
     - name: Run swift test
@@ -27,16 +25,16 @@ jobs:
       env:
         SCHEME: MobileDeferred
         DESTINATION: 'generic/platform=iOS'
-      run: xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet SWIFT_ACTIVE_COMPILATION_CONDITIONS="XCODE FORCE_PLAYGROUND_COMPATIBILITY" build
+      run: xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" SWIFT_ACTIVE_COMPILATION_CONDITIONS="XCODE FORCE_PLAYGROUND_COMPATIBILITY" -quiet build
     - name: Run pod lib lint
       run: pod lib lint --use-libraries --skip-tests --platforms=macos
   test_Linux:
     name: Test Linux
     runs-on: ubuntu-latest
-    container: swift:5.1.2
+    container: swift:5.2
     steps:
     - uses: actions/checkout@v1
     - name: Run swift test
       run: swift test --parallel --sanitize=thread
     - name: Run swiftlint
-      uses: norio-nomura/action-swiftlint@3.0.1
+      uses: norio-nomura/action-swiftlint@3.1.0

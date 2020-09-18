@@ -618,7 +618,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0820;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Big Nerd Ranch";
 				TargetAttributes = {
 					DB126C9F1E53685300054E95 = {

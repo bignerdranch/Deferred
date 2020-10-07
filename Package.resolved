@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "swift-atomics",
+        "repositoryURL": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "branch": null,
+          "revision": "b97750eb1815973a377cb85ea2f6c62374a9995d",
+          "version": "0.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

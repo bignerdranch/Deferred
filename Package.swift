@@ -18,20 +18,28 @@ let package = Package(
     products: [
         .library(name: "Deferred", targets: [ "Deferred", "Task" ])
     ],
+    dependencies: [
+       .package(
+         url: "https://github.com/apple/swift-atomics.git",
+         from: "0.0.1"
+       )
+     ],
     targets: [
         .target(
             name: "Deferred",
-            dependencies: [ "CAtomics" ]),
+            dependencies: [
+            .product(name: "Atomics", package: "swift-atomics")
+             ]),
         .testTarget(
             name: "DeferredTests",
             dependencies: [ "Deferred" ],
             exclude: [ "Tests/AllTestsCommon.swift" ]),
         .target(
             name: "Task",
-            dependencies: [ "Deferred", "CAtomics" ]),
+            dependencies: [ "Deferred", .product(name: "Atomics", package: "swift-atomics") ]),
         .testTarget(
             name: "TaskTests",
             dependencies: [ "Deferred", "Task" ],
             exclude: [ "Tests/AllTestsCommon.swift" ]),
-        .target(name: "CAtomics")
+//        .target(name: "Atomics")
     ])

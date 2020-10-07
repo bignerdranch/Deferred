@@ -29,17 +29,16 @@ let package = Package(
             name: "Deferred",
             dependencies: [
             .product(name: "Atomics", package: "swift-atomics")
-             ]),
+            ]),
         .testTarget(
             name: "DeferredTests",
             dependencies: [ "Deferred" ],
             exclude: [ "Tests/AllTestsCommon.swift" ]),
         .target(
             name: "Task",
-            dependencies: [ "Deferred", .product(name: "Atomics", package: "swift-atomics") ]),
+            dependencies: ["Deferred",.product(name: "Atomics", package: "swift-atomics")]),
         .testTarget(
             name: "TaskTests",
             dependencies: [ "Deferred", "Task" ],
-            exclude: [ "Tests/AllTestsCommon.swift" ]),
-//        .target(name: "Atomics")
+            exclude: [ "Tests/AllTestsCommon.swift" ])
     ])

@@ -15,9 +15,11 @@ import Darwin
 import Glibc
 #endif
 
-#if canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY
+#if SWIFT_PACKAGE || (canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY)
 @_implementationOnly import CAtomics
 #elseif canImport(Darwin)
+#warning("Using fallback implementation for Swift Playgrounds. This is unsafe for use in production. Check your build setup.")
+
 typealias bnr_atomic_memory_order_t = memory_order
 
 extension bnr_atomic_memory_order_t {

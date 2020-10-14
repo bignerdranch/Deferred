@@ -6,7 +6,7 @@
 //  Copyright © 2018 Big Nerd Ranch. Licensed under MIT.
 //
 
-#if canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY
+#if SWIFT_PACKAGE || (canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY)
 @_implementationOnly import CAtomics
 #endif
 

@@ -10,7 +10,7 @@ import Foundation
 #if SWIFT_PACKAGE
 import Deferred
 #endif
-#if canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY
+#if SWIFT_PACKAGE || (canImport(CAtomics) && !FORCE_PLAYGROUND_COMPATIBILITY)
 @_implementationOnly import CAtomics
 #endif
 

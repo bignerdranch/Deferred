@@ -1,5 +1,8 @@
 #include "Base.xcconfig"
 
+// Architectures
+SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator appletvos appletvsimulator
+
 // Build Options
 ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 

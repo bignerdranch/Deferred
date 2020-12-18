@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DB126C9F1E53685300054E95"
+               BlueprintIdentifier = "DB126CBB1E53685C00054E95"
                BuildableName = "Deferred.framework"
                BlueprintName = "Deferred"
                ReferencedContainer = "container:Deferred.xcodeproj">
@@ -31,7 +31,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DB126C9F1E53685300054E95"
+            BlueprintIdentifier = "DB126CBB1E53685C00054E95"
             BuildableName = "Deferred.framework"
             BlueprintName = "Deferred"
             ReferencedContainer = "container:Deferred.xcodeproj">
@@ -42,7 +42,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DB126CA71E53685300054E95"
+               BlueprintIdentifier = "DB126CC31E53685D00054E95"
                BuildableName = "DeferredTests.xctest"
                BlueprintName = "DeferredTests"
                ReferencedContainer = "container:Deferred.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DB126C9F1E53685300054E95"
+            BlueprintIdentifier = "DB126CBB1E53685C00054E95"
             BuildableName = "Deferred.framework"
             BlueprintName = "Deferred"
             ReferencedContainer = "container:Deferred.xcodeproj">
@@ -75,12 +75,11 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      debugDocumentVersioning = "YES"
-      enableTestabilityWhenProfilingTests = "No">
+      debugDocumentVersioning = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DB126C9F1E53685300054E95"
+            BlueprintIdentifier = "DB126CBB1E53685C00054E95"
             BuildableName = "Deferred.framework"
             BlueprintName = "Deferred"
             ReferencedContainer = "container:Deferred.xcodeproj">

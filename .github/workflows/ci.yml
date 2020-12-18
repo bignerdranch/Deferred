@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Run xcodebuild
       env:
-        SCHEME: MobileDeferred
+        SCHEME: Deferred
         DESTINATION: platform=iOS Simulator,name=iPhone 11,OS=latest
       run: xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" -quiet test
   test_macOS:
@@ -23,7 +23,7 @@ jobs:
       run: swift test --parallel
     - name: Check build for playgrounds
       env:
-        SCHEME: MobileDeferred
+        SCHEME: Deferred
         DESTINATION: 'generic/platform=iOS'
       run: xcodebuild -scheme "$SCHEME" -destination "$DESTINATION" SWIFT_ACTIVE_COMPILATION_CONDITIONS="XCODE FORCE_PLAYGROUND_COMPATIBILITY" -quiet build
     - name: Run pod lib lint

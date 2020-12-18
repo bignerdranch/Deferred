@@ -1,8 +1,13 @@
 // Build Options
 TOOLCHAINS = default
 
+// Architectures
+SDKROOT = iphoneos
+SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator
+
 // Deployment
 COPY_PHASE_STRIP = NO
+TARGETED_DEVICE_FAMILY = 1,2,3,4,6
 MACOSX_DEPLOYMENT_TARGET = 10.12
 IPHONEOS_DEPLOYMENT_TARGET = 10.0
 WATCHOS_DEPLOYMENT_TARGET = 3.0
@@ -77,4 +82,4 @@ CLANG_ANALYZER_NONNULL = YES
 CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE
 
 // Swift Compiler - Version
-SWIFT_VERSION = 5.1
+SWIFT_VERSION = 5.0

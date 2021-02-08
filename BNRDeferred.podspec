@@ -20,7 +20,6 @@ Pod::Spec.new do |s|
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.authors          = {"Zachary Waldowski" => "zachary@bignerdranch.com",
                         "Big Nerd Ranch" => nil}
-  s.social_media_url = "https://twitter.com/bignerdranch"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   s.swift_version             = "5.1"

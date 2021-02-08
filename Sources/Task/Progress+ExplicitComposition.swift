@@ -93,11 +93,11 @@ private final class ProxyProgress: Progress {
             #keyPath(Progress.isIndeterminate),
             #keyPath(Progress.localizedDescription),
             #keyPath(Progress.localizedAdditionalDescription),
-            #keyPath(Progress.cancellable),
-            #keyPath(Progress.pausable),
+            #keyPath(Progress.isCancellable),
+            #keyPath(Progress.isPausable),
             #keyPath(Progress.kind),
-            #keyPath(Progress.cancelled),
-            #keyPath(Progress.paused)
+            #keyPath(Progress.isCancelled),
+            #keyPath(Progress.isPaused)
         ]
 
         weak var observer: ProxyProgress?

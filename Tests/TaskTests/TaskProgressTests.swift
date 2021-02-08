@@ -170,7 +170,7 @@ class TaskProgressTests: CustomExecutorTestCase {
 
     private func expect(fractionIn range: ClosedRange<Double>, from progress: Progress) -> XCTestExpectation {
         let expectation = XCTKVOExpectation(keyPath: #keyPath(Progress.fractionCompleted), object: progress, expectedValue: nil, options: .initial)
-        expectation.handler = { (object, changes) -> Bool in
+        expectation.handler = { object, _ in
             guard let progress = object as? Progress else { return false }
             return range.contains(progress.fractionCompleted)
         }

@@ -43,7 +43,7 @@ import Foundation
 ///         Person(json: json, inContext: context)
 ///     }
 ///
-public protocol Executor: class {
+public protocol Executor: AnyObject {
     /// Execute the `body` closure.
     func submit(_ body: @escaping() -> Void)
 

@@ -1,6 +1,10 @@
 # Deferred
 
-Deferred lets you work with values that haven't been determined yet, like an array that's coming later (one day!) from a web service call. It was originally inspired by [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) library.
+> **Warning**
+>
+> Deferred is deprecated in favor of Swift Concurrency. For migration hints, see [Migrating to Swift Concurrency](https://github.com/bignerdranch/Deferred/tree/develop/Documentation/Guide/Migrating%20to%20Swift%20Concurrency.md).
+
+Deferred let you work with values that haven't been determined yet, like an array that's coming later (one day!) from a web service call. It was originally inspired by [OCaml's Deferred](https://ocaml.janestreet.com/ocaml-core/111.25.00/doc/async_kernel/#Deferred) library.
 
 Deferred is a "futures library", probably like ones you've already heard about. Where Deferred aims to be different is by providing a small, efficient API that's easily adopted in our many [consulting projects](https://www.bignerdranch.com/work).
 
@@ -19,11 +23,12 @@ Deferred is a "futures library", probably like ones you've already heard about. 
 [CocoaPods]: https://cocoapods.org/pods/BNRDeferred
 [SwiftPM]: https://github.com/apple/swift-package-manager
 
-## Don't Panic!
+## Don't Panic
 
 See Deferred's comprehensive programming guide and documentation at the [Deferred Reference](https://bignerdranch.github.io/Deferred/).
 
 If you have a question not answered by the guide or the module comments, please open an issue!
+
 
 ## Need Some Help?
 

@@ -1,14 +1,15 @@
 # jazzy --config .jazzy.yml
 author: "Big Nerd Ranch"
 author_url: "https://bignerdranch.github.io"
-copyright: "© 2014-2018 [Big Nerd Ranch](//www.bignerdranch.com) under [MIT license](//github.com/bignerdranch/Deferred/blob/master/LICENSE)."
+copyright: "© 2014-2020 [Big Nerd Ranch](//www.bignerdranch.com) under [MIT license](//github.com/bignerdranch/Deferred/blob/master/LICENSE)."
 custom_categories:
-  - name: Intuition
+  - name: Articles
     children:
     - Why Deferred?
+    - Getting Started
     - Basic Tasks
     - Mastering The Future Type
-    - Getting Started
+    - Migrating to Swift Concurrency
   - name: Futures and Promises
     children:
     - Deferred
